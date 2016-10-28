@@ -682,7 +682,7 @@ public void onWriteMessageResponse(WriteMessageResponseEvent  event) {
 ```
 Itt fontos hogy a @Subscribe annotáció használva legyen, ez mondja meg hogy ez egy elkapó metódus, valamint a thread mode main legyen, mert így az események a főszálon kerülnek továbbításra. Fontos hogy az elküldött objektumokat az osztály típusa szerint tudja a rendszer a megfelelő elkapó metódusnak elküldeni. Egyébként 1 eseményhez több elkapó metódus is lehet egyszerre beregisztrálva.
 
-Ezután regisztráljuk be az elkapó metódusokat, pontosabban azt az osztályt amely ezeket tartalmazza (jelen esetben ez a MinActivity aktuális példánya (this)).
+Ezután regisztráljuk be az elkapó metódusokat, pontosabban azt az osztályt amely ezeket tartalmazza (jelen esetben ez a MainActivity aktuális példánya (this)).
 
 Azt szeretnénk hogy akkor legyenek ezek az esemény elkapó metódusok aktívak, amikor az activity előtérben van, így az onResume-ban iratkorunk fel, és az onPause-ban le.
 
@@ -737,6 +737,9 @@ Próbáljuk ki az alkalmazást. Láthatjuk, hogy mostmár a hálózati hívások
 Végül próbáljuk ki az alkalmazást működés közben: 
 
 <img src="./images/game.png" width="400" align="middle">
+
+
+<img src="./images/ui_fin.png" width="250" align="middle">
 
 ## Bonus feladat - Válaszidő kijelzése
 
