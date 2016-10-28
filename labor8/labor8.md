@@ -676,7 +676,7 @@ public void onMoveUserResponse(MoveUserResponseEvent event) {
 }
 
 @Subscribe(threadMode = ThreadMode.MAIN)
-public void onWriteMessageResponse(MoveUserResponseEvent event) {
+public void onWriteMessageResponse(WriteMessageResponseEvent  event) {
     responseTV.setText("Write Message Response:" + event.getResponse());
 }
 ```
