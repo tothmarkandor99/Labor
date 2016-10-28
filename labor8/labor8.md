@@ -34,7 +34,7 @@ Első lépésként készítsük el az alkalmazás felhasználói felületét XML
 
 Az ehhez megfelelő XML állomány a következő: 
 
-```  
+```xml  
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/bgLayout"
@@ -139,7 +139,7 @@ Az ehhez megfelelő XML állomány a következő:
 A felület tartalmaz több szöveges konstanst is, ezért töltsük fel a _res/values_ könyvtárban lévő _strings.xml_ állományunkat a következő értékekkel: 
 
 
-```
+```xml
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Labirintus</string>
@@ -157,7 +157,7 @@ A felület tartalmaz több szöveges konstanst is, ezért töltsük fel a _res/v
 
 A felület tartalmaz stílusokat is, ezért töltsük fel a _res/values_ könyvtárban lévő _styles.xml_ állományunkat a következő értékekkel: 
 
-```
+```xml
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
@@ -177,7 +177,7 @@ A felület tartalmaz stílusokat is, ezért töltsük fel a _res/values_ könyvt
 
 Szabjuk testre az alkalmazás színeit _res/values_ könyvtárban lévő _color.xml_ állományban.
 
-```
+```xml
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <color name="primary">#009688</color>
@@ -195,7 +195,7 @@ Szabjuk testre az alkalmazás színeit _res/values_ könyvtárban lévő _color.
 
 Szabjuk testre a _dimens.xml_ file tartalmát.
 
-```
+```xml
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="activity_horizontal_margin">16dp</dimen>
@@ -213,7 +213,7 @@ Illetve a _MainActivity_-ben a menü felfújás kódrészt is töröljük! Vég�
 
 Mivel az alkalmazásunk interneten keresztül fog kommunikálni, vegyül fel a manifestbe az ehhez kapcsolódó permissiont.
 
-```
+```xml
  <uses-permission android:name="android.permission.INTERNET"/>
 ```
 
@@ -223,7 +223,7 @@ Az előző laborok során többször is használtuk a **findViewByID** hívást 
 
 Ehhez a module build.gradle ben kell a dependencies részbe felvenni a könyvátrat. Egyszer fel kell venni mint compile függőség, hogy az osztályait elérjük. Másrészt fel kell venni mint annotationProcessor-t, hogy az annotáció feldolgozás lefuthasson. (Régebben erre az apt gradle plugin kellet, de Az Android Gradle Plugin 2.2 óta beépítve elérhető).
 
-```
+```java
 compile 'com.jakewharton:butterknife:8.4.0'
 annotationProcessor 'com.jakewharton:butterknife-compiler:8.4.0'
 ```
@@ -231,7 +231,7 @@ annotationProcessor 'com.jakewharton:butterknife-compiler:8.4.0'
 A könyvtár fordítás időben generálja le a findViewByID hívásokat, és el is fedi előlünk, az összerendelést annotációkkal tudjuk megadni.
 
 
-```
+```java
 public class MainActivity extends AppCompatActivity
 {
 	@BindView(R.id.usernameET) EditText usernameET;
@@ -253,7 +253,7 @@ Ha plugin már telepítve van, akkor  a setContentView(**R.layout.activity_main*
 
 Jelen esetben csak az EditText és TextView mezőket fogjuk használni ilyen formában. A 4 gomb kezelésére használjuk a ButterKnife beépített `@OnClick(R.id.button)` annotációt.
 
-```
+```java
 @OnClick(R.id.downBTN)
 public void onDownButtonClick() {
 	//...
@@ -261,7 +261,7 @@ public void onDownButtonClick() {
 ```
 Az összekötést (a tényleges findViewByID és setOnClickListener hívásokat) a ButterKnife.bind(this) hívás csinálja meg, azutána hívás után használhatóak a nézeteink és a listenerek.
 
-```
+```java
 public class MainActivity extends AppCompatActivity {
 
     @BindView(R.id.usernameET)
@@ -383,7 +383,7 @@ Következő feladatunk a szerver oldali kommunikációt biztosító osztály meg
 
 A **network** csomagban hozzunk létre a **LabyrinthAPI** osztályt.
 
-```
+```java
 public class LabyrinthAPI {
 
     private static final String BASE_URL = "http://babcomaut.aut.bme.hu/labyrinthwar/";
@@ -410,13 +410,13 @@ Az Android platform több megoldást is ad beépítve HTTP hívásokra. Egyrész
 
 Ennek használatához fel kell vennük a következő sort az alklamzás build.gradle dependencies részéhez.
 
-```
+```java
 compile 'com.squareup.okhttp3:okhttp:3.4.1'
 ```
 
 Ezután a könyvtár nagyon egyszerűen használható. Készítsünk is egy általános HTTP GET hívást lebonyolító függvényt a LabyrinthAPI osztályba.
 
-```
+```java
 private static String httpGet(String URL) throws IOException {
     OkHttpClient client = new OkHttpClient();
     Request request = new Request.Builder()
@@ -431,7 +431,7 @@ private static String httpGet(String URL) throws IOException {
 
 Ezt fogjuk használni az összes HTTP GET híváshoz. Használjuk is az újonnal elkészített függvényünket, és implementáljuk a moveUser és writeMessage hívásokat.
 
-```
+```java
 private static final String ENDPOINT_MOVE_USER = "moveuser.php";
 private static final String PARAM_USERNAME = "username";
 private static final String SEPARATOR_QUESTION = "?";
@@ -493,7 +493,7 @@ public static final int MOVE_DOWN = 4;
 Majd private field ként adjunk hozzá az előbb létrehozott LabyrithAPI osztályt, és használjuk a megfelelő események bekövetkeztekor.
 
 
-```
+```java
 public class MainActivity extends AppCompatActivity {
 
     @BindView(R.id.usernameET) EditText usernameET;
@@ -564,7 +564,7 @@ Azt tapasztaljuk, hogy minden kérésre ERROR-t kapunk, és ha megnézzük a Log
 ### Szálkezelés elkészítése
 A szálkezeléshez használjuk az egyszerű, és könnyen testre szabható JavaThread-eket. Készítsünk el a MainActivityben 1-1 segéd függvényt a moveUser és writeMessage híváshoz. Elsőnek egy új szálat készítünk,melyben elindítjuk az API hívást, és amint az válaszolt, visszaadjuk a választ a fő szálra (runOnUIThread) ahol pedíg már a főszálon megjelenítjük a választ.
 
-```
+```java
 private void asyncMoveUser(final String username, final int direction) {
     new Thread(new Runnable() {
         @Override
@@ -601,7 +601,7 @@ private void asyncWriteMessage(final String username, final String message) {
 ```
 Hívjuk meg ezeket az onClick metódusokból, a direkt hívások helyett, és nézzük meg mit tapasztalunk.
 
-```
+```java
 @OnClick(R.id.downBTN)
 public void onDownButtonClick() {
   asyncMoveUser(usernameET.getText().toString(),MOVE_DOWN);
@@ -638,7 +638,7 @@ Számos 3rd party eseménybusz megoldás van, mi az Greenrobot EventBus megoldá
 
 Majd definiáljunk esemény osztályokat. Hozzunk létre 1-1 esemény osztályt, a **MoveUser** és a **WriteMessage** eseményeknek, az **events** csomagban, **MoveUserResponseEvent** és **WriteUserResponseEvent** néven. Mivel az eseménybuszok az osztály alapján dolgoznak ezért az egyes eseményekhez külön osztályok szükségesek. Mindenkét osztály standard Java osztály, mely 1-1 String-ben tárolja a választ.
 
-```
+```java
 public class MoveUserResponseEvent {
     private String response;
 
@@ -669,7 +669,7 @@ public class WriteMessageResponseEvent {
 
 A MainActivityben definiáljuk az eseménybusz elkapó esemnyeit.
 
-```
+```java
 @Subscribe(threadMode = ThreadMode.MAIN)
 public void onMoveUserResponse(MoveUserResponseEvent event) {
     responseTV.setText("Move User Response:" + event.getResponse());
@@ -686,7 +686,7 @@ Ezután regisztráljuk be az elkapó metódusokat, pontosabban azt az osztályt 
 
 Azt szeretnénk hogy akkor legyenek ezek az esemény elkapó metódusok aktívak, amikor az activity előtérben van, így az onResume-ban iratkorunk fel, és az onPause-ban le.
 
-```
+```java
 @Override
 protected void onResume() {
     super.onResume();
@@ -702,7 +702,7 @@ protected void onPause() {
 
 Mostmár elkapjuk az eseményeket, nincs más hátra mint kiváltani őket. A különszálakban az `EventBus.getDefault().post(...)` segítségével küldjük ki az eseményeket.
 
-```
+```java
 private void asyncMoveUser(final String username, final int direction) {
     new Thread(new Runnable() {
         @Override
@@ -749,7 +749,7 @@ Tipp: Az aktuális időt legegyszerűbben a következő hívással érhetjük el
 
 Egészítsük ki az alkalmazást úgy, hogy a _WiFi_ állapotát és a hálózat nevét megjelenítsük a felhasználói felületen.  Segítség: 
 
-``` 
+``` java
 WifiManager wifiManager = (WifiManager) getSystemService(WIFI_SERVICE);
 WifiInfo wifiInfo = wifiManager.getConnectionInfo();
 Log.d("wifiInfo", wifiInfo.toString());
