@@ -1,4 +1,4 @@
-# Labor 8 - Hálózat kezelés
+# Labor 8 - Hálózatkezelés
 
 ## Bevezetés
 
