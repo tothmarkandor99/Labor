@@ -2,7 +2,7 @@
 
 ## Bevezetés
 
-A labor célja a hálózati kommunikáció, a platformon leginkább használt, HTTP kommunikáció alapjainak bemutatása, valamint az ehhez kapcsolódó aszinkron hívások ismertetése. A labor során egy multiplayer labirintus játékhoz fogunk mobil klienst fejleszteni. A kliens segítségével irányíthatjuk a labirintusban egy bábut, továbbá lehetőség lesz üzenetek küldésére is. A labor az alábbi témákat érinti:
+A labor célja a hálózati kommunikáció, a platformon leginkább használt, HTTP kommunikáció alapjainak bemutatása, valamint az ehhez kapcsolódó aszinkron hívások ismertetése. A labor során egy multiplayer labirintus játékhoz fogunk mobil klienst fejleszteni. A kliens segítségével irányíthatjuk a labirintusban egy bábut, továbbá lehetőség lesz üzenetek küldésére is. A labor az alábbi témákat érinti:
 
 *   Felületek használata ButterKnife segítségével
 *   HTTP hálózati hívások
@@ -204,12 +204,7 @@ Szabjuk testre a _dimens.xml_ file tartalmát.
 </resources>
 ```
 
-A tabletekre optimalizált dimens file-t törölhetjük is (figyeljük oda, hogy ne mindakettőt töröljük, mert az ajánlaná fel a Studió).
-
-Töröljük a _res/menu_ könyvtárat és tartalmát, mivel az alkalmazásban nem fogunk menüt használni. Töröljük az **androidTest** és **test** könyvtárakat is, nem lesz most rá szükségünk. 
-
-
-Illetve a _MainActivity_-ben a menü felfújás kódrészt is töröljük! Végül a _MainActivity_-ben kérjük el a referenciát a vezérlőkre, mivel ezekre a későbbiekben szükség lesz. 
+A tabletekre optimalizált dimens file-t törölhetjük is (figyeljük oda, hogy ne mind a kettőt töröljük, mert azt ajánlaná fel a Studió).Töröljük az **androidTest** és **test** könyvtárakat is, nem lesz most rá szükségünk. 
 
 Mivel az alkalmazásunk interneten keresztül fog kommunikálni, vegyül fel a manifestbe az ehhez kapcsolódó permissiont.
 
@@ -221,7 +216,7 @@ Mivel az alkalmazásunk interneten keresztül fog kommunikálni, vegyül fel a m
 ## A felületi elemek egyszerű feloldása
 Az előző laborok során többször is használtuk a **findViewByID** hívást a nézetek feloldására. Ez a felületi elemekkel arányos mennyiségű kódolást kiván, mely egyébként nagyon repetativ. Azért hogy ezt ne _kézzel_ kelljen megcsinálnunk újra használjuk a [Butterknife](http://jakewharton.github.io/butterknife/) könyvtárat.
 
-Ehhez a module build.gradle ben kell a dependencies részbe felvenni a könyvátrat. Egyszer fel kell venni mint compile függőség, hogy az osztályait elérjük. Másrészt fel kell venni mint annotationProcessor-t, hogy az annotáció feldolgozás lefuthasson. (Régebben erre az apt gradle plugin kellet, de Az Android Gradle Plugin 2.2 óta beépítve elérhető).
+Ehhez a module build.gradle ben kell a dependencies részbe felvenni a könyvátrat. Egyszer fel kell venni mint compile függőség, hogy az osztályait elérjük. Másrészt fel kell venni mint annotationProcessor-t, hogy az annotáció feldolgozás lefuthasson. (Régebben erre az **android-apt** gradle plugin kellett, de az Android Gradle Plugin 2.2 óta beépítve elérhető, ha mégsem a legújabb gradle plugint használtnánk, azt a projekt _build.gradle_ -ben tudjuk frissíteni.).
 
 ```java
 compile 'com.jakewharton:butterknife:8.4.0'
@@ -418,7 +413,11 @@ Ezután a könyvtár nagyon egyszerűen használható. Készítsünk is egy ált
 
 ```java
 private static String httpGet(String URL) throws IOException {
-    OkHttpClient client = new OkHttpClient();
+     OkHttpClient client = new OkHttpClient.Builder()
+            .connectTimeout(10, TimeUnit.SECONDS)
+            .readTimeout(10, TimeUnit.SECONDS)
+            .build();
+            
     Request request = new Request.Builder()
             .url(URL)
             .build();
@@ -429,9 +428,11 @@ private static String httpGet(String URL) throws IOException {
 }
 ```
 
-Ezt fogjuk használni az összes HTTP GET híváshoz. Használjuk is az újonnal elkészített függvényünket, és implementáljuk a moveUser és writeMessage hívásokat.
+Ezt fogjuk használni az összes HTTP GET híváshoz. Használjuk is az újonnal elkészített függvényünket, és implementáljuk a moveUser és writeMessage hívásokat. 
+> Megjegyzés: Jelen esetben a stringeket nyugodtan összefűzhetjük a + operátorral, a háttérben ezt a fordító kioptimalizálja, összetettebb összefüzésekre (pl. file sorainak összefűzése), használjuk a [StringBuilder](https://developer.android.com/reference/java/lang/StringBuilder.html) -t.
 
 ```java
+private static final String TAG = "Network";
 private static final String ENDPOINT_MOVE_USER = "moveuser.php";
 private static final String PARAM_USERNAME = "username";
 private static final String SEPARATOR_QUESTION = "?";
@@ -449,7 +450,7 @@ public String moveUser(String userName, int direction) {
 
         String moveUserUrl = ENDPOINT_MOVE_USER + SEPARATOR_QUESTION + PARAM_USERNAME + SEPARATOR_EQUALS + usernameURLEncoded + SEPARATOR_AMPERSAND + PARAM_STEP + SEPARATOR_EQUALS + direction;
 
-        Log.d("Network","Call to:"+moveUserUrl);
+        Log.d(TAG,"Call to:"+moveUserUrl);
         String response = httpGet(BASE_URL + moveUserUrl);
         return response;
 
@@ -466,7 +467,7 @@ public String writeMessage(String userName, String message) {
 
         String writeMessageUrl = ENDPOINT_WRITE_MESSAGE + SEPARATOR_QUESTION + PARAM_USERNAME + SEPARATOR_EQUALS + usernameURLEncoded + SEPARATOR_AMPERSAND + PARAM_MESSAGE + SEPARATOR_EQUALS + messageURLEncoded;
 
-        Log.d("Network","Call to:"+writeMessageUrl);
+        Log.d(TAG,"Call to:"+writeMessageUrl);
         String response = httpGet(BASE_URL + writeMessageUrl);
         return response;
 
@@ -741,14 +742,26 @@ Végül próbáljuk ki az alkalmazást működés közben:
 
 <img src="./images/ui_fin.png" width="250" align="middle">
 
-## Bonus feladat - Válaszidő kijelzése
+## Bonus feladat 1 - Válaszidő kijelzése
 
 Egészítsük ki az alkalmazást úgy, hogy a felhasználói felületen megjelenítsük a szerverrel való kommunikáció során tapasztalt átlagos válaszidőt (üzenet küldése és válasz megérkezése közti idő).
 
 Tipp: Az aktuális időt legegyszerűbben a következő hívással érhetjük el:
 `long currentTime=System.currentTimeMillis();` 
 
-## Bonus feladat - WiFi állapot kijelzése
+## Bonus feladat 2 - Hálozat elérhető-e
+
+Egészítsük ki az alkalmazást úgy, hogy a hálózati hívások előtt ellenőrizzük, hogy elérhető-e a hálózat, ha nem, jelenítsünk meg hibaüzenetet pl. Toast-ban. Segítség: 
+
+``` java
+ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+boolean networkAvailable = activeNetworkInfo != null && activeNetworkInfo.isConnected();
+``` 
+
+A szükséges manifest engedély: `<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>`
+
+## Bonus feladat 3 - WiFi állapot kijelzése
 
 Egészítsük ki az alkalmazást úgy, hogy a _WiFi_ állapotát és a hálózat nevét megjelenítsük a felhasználói felületen.  Segítség: 
 
