@@ -56,7 +56,7 @@ Próbálják ki ezeket a funkciókat!
 
 Most, hogy néhány hasznos dolgot megismertünk, ideje letöltenük a prototípust:
 
-[PlacesToVisit.zip](https://github.com/VIAUAV21/Labor/blob/master/labor10/PlacesToVisit.zip)
+[PlacesToVisit.zip](./PlacesToVisit.zip)
 
 Tömörítsük ki a mappát, indítsuk el az Android Studio-t, majd az Open segítségével nyissuk meg az alkalmazást.
 
@@ -132,7 +132,7 @@ Az activity_places_list.xmlben az include után:
 
 A Floating Action Button ikonja fontos szerepet játszik. A felhasználónak  első ránézére tudnia kell belőle, hogy mire szolgál a gomb. Így tehát olyan ikont kell választanunk, amiből rögtön látszik, hogy a gomb elem hozzáadására szolgál. Töltsük le az alábbi zipet:
 
-[Drawable.zip](https://github.com/VIAUAV21/Labor/blob/master/labor10/Drawable.zip)
+[Drawable.zip](./Drawable.zip)
 
 Tömörítsük ki és tegyük a projektünkbe, majd állítsuk be a FAB ikonját az activity_places_list.xml-ben:
 
