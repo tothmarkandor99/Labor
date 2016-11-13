@@ -132,7 +132,7 @@ Az activity_places_list.xmlben az include után:
 
 A Floating Action Button ikonja fontos szerepet játszik. A felhasználónak  első ránézére tudnia kell belőle, hogy mire szolgál a gomb. Így tehát olyan ikont kell választanunk, amiből rögtön látszik, hogy a gomb elem hozzáadására szolgál. Töltsük le az alábbi zipet:
 
-[Drawable.zip](./Drawable.zip)
+[Drawable.zip](./drawable.zip)
 
 Tömörítsük ki és tegyük a projektünkbe, majd állítsuk be a FAB ikonját az activity_places_list.xml-ben:
 
