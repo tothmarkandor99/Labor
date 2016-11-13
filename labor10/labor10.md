@@ -7,6 +7,7 @@ Ma már igen sok alkalmazás található a Play áruházban, köszönhető ez t�
 
 Tartsuk szem előtt, hogy ez csak néhány egyszerű ötlet, és ahogy a lollipopos megjelenésű elemektől még nem lesz material egy alkalmazás megjelenése, úgy mi sem leszünk mindenható dizájnerek a labor után. Ez a témakör koránt sem olyan egyértelmű, mint a mérnöki tanulmányok jó része, az itt alkalmazott lépések nem feltétlenül univerzálisak.
 
+
 ##Material és UX alapok
 
 Először is, akinek szándékában áll végigolvasni a teljes útmutatót később, az itt megteheti:
@@ -38,6 +39,7 @@ Néhány arány magasságvonala az útmutatóból.
 
 * Ne használjuk a kártyanézeteket (tipikusan Google asszisztens) olyan elemekre, amik megjelenése azonos! Ezesetben egy listáról beszélünk, aminek használatát megnehezíti, hogy a kártyák közt van kihagyott terület és árnyékot is vetnek.
 
+
 ## Hasznos fejlesztői eszközök
 
 Amikor a felhasználói felületet igazítjuk, nem mindig egyértelmű, hogy miért azt látjuk renderelve, amit. A Beállítások/Fejlesztői eszközök menüpontban találjuk az alábbiakat:
@@ -49,3 +51,353 @@ Amikor a felhasználói felületet igazítjuk, nem mindig egyértelmű, hogy mi�
 
 Próbálják ki ezeket a funkciókat!
 
+
+## Javítandó alkalmazás
+
+Most, hogy néhány hasznos dolgot megismertünk, ideje letöltenük a prototípust:
+
+[PlacesToVisit.zip](https://github.com/VIAUAV21/Labor/blob/master/labor10/PlacesToVisit.zip)
+
+Tömörítsük ki a mappát, indítsuk el az Android Studio-t, majd az Open segítségével nyissuk meg az alkalmazást.
+
+<img src="./images/screen1.jpg" width="350" align="middle">
+
+A kezdőalkalmazás.
+
+Ennek az alkalmazásnak az a feladata, hogy meglátogatandó helyeket gyűjtsünk benne. A prototípus arra koncentrál, hogy minimális funkcionalitást valósítson meg gyorsan. Az adatok perzisztens tárolásához a Sugar ORM ([http://satyan.github.io/sugar/](http://satyan.github.io/sugar/)) könyvtárat használja . Laborvezetővel tekintsék át a kódot és a működést! Főbb elemei:
+
+* A Sugar ORM számára a Manifest-ben elhelyezett meta-data tag-ek segítségével adhatjuk meg az adatbázist tartalmazó fájl nevét és verzióját, hogy logolja-e a query-ket, illetve hogy milyen domain-t használunk.
+
+
+```xml 
+    <meta-data android:name="DATABASE" android:value="sugar_places.db" />
+    <meta-data android:name="VERSION" android:value="2" />
+    <meta-data android:name="QUERY_LOG" android:value="true" />
+    <meta-data android:name="DOMAIN_PACKAGE_NAME" android:value="hu.bme.aut.amorg.examples.placestovisit.data" />
+```
+
+* Az applicationnek a SugarApp-ból kell származnia, ezzel biztosítjuk a Sugar ORM megfelelő inicializálását, illetve lezárását. Esetünkben nincs szükség külön application objektumra, használhatjuk a SugarAppot.
+
+```xml
+<application 
+    android:name="com.orm.SugarApp" 
+    android:allowBackup="true" 
+    android:icon="@mipmap/ic_launcher"
+    android:label="@string/app_name" 
+    android:supportsRtl="true" 
+    android:theme="@style/AppTheme">
+```
+
+* A modell osztálynál (Place) ősosztályként a SugarRecordot használtuk, ez biztosítja, hogy az osztály példányait adatbázisba lehessen menteni. Ehhez implementáljuk a Serializable interfészt is.
+
+
+```java
+public class Place extends SugarRecord implements Serializable {...}
+```
+
+
+### Menü
+
+Új elemet az options menü megnyomásával lehet létrehozni, amely menüben más elem nincs is. Ez a menü tipikusan nem ilyen feladatokra szolgál. Az ilyen feladatokat Floating Action Buttonnel szokás megoldani. Ezért először is töröljük a menüt a nyitóképernyőről, majd helyezzünk fel egy Floating Action Buttont. Ehhez töröljük az Activity OnCreateOptionsMenu és OnOptionsItemSelected metódusait, illetve a res/menu mappát, majd hozzunk létre egy Floating Action Buttont!
+
+A PlacesListActivitybe az OnCreatebe:
+
+```java
+        FloatingActionButton fab =
+                (FloatingActionButton) findViewById(R.id.addButton);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showNewPlaceDialog();
+            }
+        });
+```
+
+
+Az activity_places_list.xmlben az include után:
+
+```xml
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/addButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/fab_margin"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"/>
+```
+
+
+### FAB ikon
+
+A Floating Action Button ikonja fontos szerepet játszik. A felhasználónak  első ránézére tudnia kell belőle, hogy mire szolgál a gomb. Így tehát olyan ikont kell választanunk, amiből rögtön látszik, hogy a gomb elem hozzáadására szolgál. Töltsük le az alábbi zipet:
+
+[Drawable.zip](https://github.com/VIAUAV21/Labor/blob/master/labor10/Drawable.zip)
+
+Tömörítsük ki és tegyük a projektünkbe, majd állítsuk be a FAB ikonját az activity_places_list.xml-ben:
+
+```xml
+app:srcCompat="@drawable/ic_add_white_24dp"
+```
+
+
+### A lista fejléce
+
+Jelenleg a Toolbaron megjelenik a az Activity neve, ami "PlacesToVisit", alatta egy TextView-ban pedig a szöveg, hogy "Places to visit". Ezek közül az egyik felesleges, és szebb ha a normál helyesírás szerinti, "Places to visit"-et hagyjuk meg. Azonban egy üres Toolbarnak nincs sok értelme, úgyhogy inkább rakjuk fel oda ezt a szöveget.
+
+Ehhez előzör is az activity_places_list.xml-ben a Toolbar tagen belül vegyük fel az app:title attribútumot, és vegyük fel a string erőforrást.
+
+```xml
+app:title="@string/places_to_visit"
+```
+
+```xml
+<string name="places_to_visit">Places to visit</string>
+```
+
+Majd töröljük a content_places_list.xmlből a TextViewt, a RecyclerView-t pedig igazítsuk a szülője tetejéhez.
+
+```xml
+android:layout_alignParentTop="true"
+```
+
+Ahhoz, hogy a Toolbar vetett árnyéka érvényesüljön, és úgy tűnjön, hogy a lista görgetésnél tényleg alá csúszik be, töröljük ki a RelativeLayout felső paddingjét.
+
+Próbáljuk ki az alkalmazást!
+
+<img src="./images/screen2.jpg" width="350" align="middle">
+
+
+### Üres lista
+
+Kevesen készülnek arra a lehetőségre, hogy mi fogadja a felhasználót akkor, ha üres a listanézet. Célszerű ilyenkor az üres lita helyett valamilyen szöveget megjeleníteni. Írjuk tehát át a content_places_list.xmlt.
+
+```xml
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/content_places_list"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context=".PlacesListActivity"
+    tools:showIn="@layout/activity_places_list">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/placesListRV"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true" />
+
+        <TextView
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/emptyTV"
+            style="@style/TextViewTitleStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/add_places_to_visit" />
+
+    </FrameLayout>
+
+</RelativeLayout>
+```
+
+Figyeljük meg a FrameLayoutot! Egyszerre csak egyik gyermeke látható. Most már csak meg kell mondjuk az Activity-nek, hogy üres lista esetén el kell rejtenie a listát és meg kell jelenítenie a szöveget:
+
+Először is hozzunk létre egy privát TextView-t, majd szerezzünk rá referenciát az onCreate-ben.
+
+```java
+    private TextView emptyTV;
+```
+
+```java
+emptyTV = (TextView) findViewById(R.id.emptyTV);
+```
+
+Ahhoz, hogy az adapter értesíteni tudja az Activity-nket a lista kiürüléséről, listenert fogunk használni.
+Készítsünk egy új interface-t DataSetChangedListener néven.
+
+```java
+public interface DataSetChangedListener {
+    public void onDataSetChanged();
+}
+```
+
+A PlacesToVisitActivitynek ezt kell **implementálnia**. Az onDataSetChanged függvény felüldefiniálásakor állítsuk be a megfelelő view-k láthatóságát.
+
+```java
+    @Override
+    public void onDataSetChanged() {
+        if (adapter.getItemCount()==0) {
+            emptyTV.setVisibility(View.VISIBLE);
+            recyclerView.setVisibility(View.GONE);
+        } else {
+            emptyTV.setVisibility(View.GONE);
+            recyclerView.setVisibility(View.VISIBLE);
+        }
+    }
+```
+
+Ezt a függvényt meg is hívhatjuk az OnCreate végén, hogy induláskor jól jelenjenek meg a nézetek.
+Következő lépésként vegyünk föl egy listenert privát tagváltozóként a PlacesToVisitAdapterbe (majd egy setter metódust is rá (Alt+Enter >> Create setter...)). Ezen keresztül fogunk tudni visszaszólni az Activitynek, hogy valami változás történt.
+
+```java
+    private DataSetChangedListener dataSetChangedListener;
+```
+
+Írjunk egy függvényt, ami ezen a listener objektumon keresztül viszaszól a változásról, majd **hívjuk is meg** az addPlace, az updatePlace és a removePlace függvényben.
+
+```java
+    private void dataSetChanged() {
+        if (dataSetChangedListener instanceof DataSetChangedListener) {
+            dataSetChangedListener.onDataSetChanged();
+        }
+    }
+```
+
+Ezzel készen is vagyunk, már csak az Activityt kell beregisztrálni. Ezt az OnCreate-ben az adapter példányosítása után meg is tehetjük.
+
+```java
+adapter.setDataSetChangedListener(this);
+```
+
+Próbáljuk ki az alkalmazást! Láthatjuk, hogy üres lista helyett valóban az "Add places to visit" felirat jelenik meg. 
+Segíthetünk a felhasználónak még annyiban, hogy megengedjük, hogy erre a feliratra rákattintva is vehessen föl új helyet. Ehhez írjuk meg az OnClickListenert:
+
+```java
+        emptyTV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showNewPlaceDialog();
+            }
+        });
+
+```
+
+<img src="./images/screen3.jpg" width="350" align="middle">
+
+### Dialógus és animációja
+
+Az Android Lollipop verziójától lehetőségünk van képernyőátmenetek során elemeket megosztva animálni. Ebben az esetben azt fogjuk elérni, hogy amikor a felhasználó megérinti a FAB-ot, akkor az új helyszínt létrehozó képernyő abból animálódjon ki. A visszafelé portolás ebben az esetben nem tökéletes, 21-es API szint alatt ezt nem fogjuk látni. A megosztott animációhoz át kell írjuk a stílusainkat, azonban az új xml elemek csak API 21-től működnek.
+
+Hozzunk létre egy új erőforrás mappát! A neve legyen **values-v21**! Ebbe másoljuk bele a meglevő styles.xml állományt a minősítetlen mappából. A v21-es styles-xml-ben az alaptémát módosítsuk az alábbiaknak megfelelően:
+
+```xml
+<!-- Base application theme. -->
+<style name="AppTheme"
+    parent="Theme.AppCompat.Light.DarkActionBar">
+
+    <item name="colorPrimary">@color/colorPrimary</item>
+    <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+    <item name="colorAccent">@color/colorAccent</item>
+        
+    <!-- Customize your theme here. -->
+    <item name="android:buttonStyle">@style/ButtonStyleRounded</item>
+
+    <!-- enable window content transitions -->
+    <item name="android:windowContentTransitions">true</item>
+
+    <!-- enable overlapping of exiting and entering activities-->
+    <item name="android:windowAllowEnterTransitionOverlap">true</item>
+    <item name="android:windowAllowReturnTransitionOverlap">true</item>
+
+</style>
+
+```
+
+Most meg kell adjuk az xml erőforrásokban, hogy miből-mit kell animálni. Ehhez úgy párosítjuk össze őket, hogy új attribútumot veszünk fel mind a Floating Action Button-hez, mind az activity_create_place_to_visit.xml gyökér eleméhez (Ez ugye a LinearLayout).
+
+```xml
+android:transitionName="create"
+```
+
+Ezután a PlaceListActivity showNewPlaceDialog metódusát egészítsük ki az alábbiak szerint (a Floating Action Buttont ki kell szervezni) :
+
+```java
+private void showNewPlaceDialog() {
+    ActivityOptionsCompat options = 
+		ActivityOptionsCompat.makeSceneTransitionAnimation(
+            PlacesListActivity.this,
+            fab,
+            "create");
+    Intent i = new Intent();
+    i.setClass(this, CreatePlaceToVisitActivity.class);
+    startActivityForResult(i, REQUEST_NEW_PLACE_CODE, options.toBundle());
+}
+```
+
+A 4. sorban megadjuk, hogy melyik View-ból indul az animáció, és az 5-ben is, hogy milyen transitionName-mel kell dolgoznia a rendszernek. A 8. sorban egy Bundle-be pakolva átadjuk az animációról szóló információt.
+
+Próbáljuk ki az alkalmazást!
+
+### Új hely felvétele
+
+Nem a legjobb, hiszen az alkalmazás második képernyője eredetileg dialógus stílusú. Hát töröljük a Manifest 39.sorából és a stílusfájlokból a kapcsolódó stílusbejegyzést!
+
+Az Activity azonban még így sem tökéletes, hiszen ha nagyon hosszú leírást adunk neki, akkor a Save gomb kicsúszik a képernyőről és használhatatlan lesz. Rögzítsük tehát a gombot a képernyő aljára, a fölötte lévő tartalmat pedig tegyük görgethetővé!
+
+Az activity_create_place_to_visit.xml gyökérelemét változtassuk RelativeLayout-ra, a benne lévő gombot pedig kössük az aljához.
+
+```xml
+android:layout_alignParentBottom="true"
+```
+
+A többi elemet pedig ágyazzuk be egy vertikális LinearLayoutba, majd egy ScrollView-ba, amit kössünk fölülre, és helyezzünk a gomb fölé:
+
+```xml
+<ScrollView
+        android:layout_width="match_parent"
+        android:layout_alignParentTop="true"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/btnSave">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+```
+
+### Snackbar
+
+A Toast üzeneteknél már van egy sokkal szebb megoldás ami a Material Design-t követi, a SnackBar. Cseréljük le a Toast figyelmeztetést SnackBar-ra!
+
+Ehhez írjunk egy külön showText() függvényt, ami a paraméterül kapott szöveget jeleníti meg, majd használjuk ezt: 
+
+```java
+private void showText(String text) {
+    Snackbar.make(coordinatorLayout,text,Snackbar.LENGTH_LONG).show();
+}
+```
+
+Hívás:
+```java
+showText(getResources().getString(R.string.cancelled));
+```
+
+A Snackbar.make(...) függvény első paramétere egy View. Adjuk meg ide az Activitynk CoordinatorLayout-ját. Ehhez az activity_places_list.xml-ben id-t kell neki adni, a PlacesListActivityben felvenni változóként, majd az onCreate-ben referenciát szerezni rá.
+
+Próbáljuk ki a Snakcbart!
+
+<img src="./images/screen4.jpg" width="350" align="middle">
+
+
+## Önálló feladat
+
+A fenti alapok segítségével alakítsa tovább az alkalmazást!
+
+* Csökkentse a listában megjelenített információkat
+* Készítsen új képernyőt, ahol részletesen jeleníti meg az adott helyet
+* Készítse fel a felületet arra, hogy később a felhasználónak lehetősége lesz képet rögzíteni a helyről
+
+### Feladatok haladóknak:
+
+Valósítsa meg a swipe gesztussal való törlést (és esetleg módosítást). Használhatja például a következő osztálykönyvtárat: [https://github.com/wdullaer/SwipeActionAdapter](https://github.com/wdullaer/SwipeActionAdapter)
