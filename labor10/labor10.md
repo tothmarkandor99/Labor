@@ -3,9 +3,9 @@
 
 ## Bevezetés
 
-Ma már igen sok alkalmazás található a Play áruházban, köszönhető ez többek között a terjesztés egyszerűségének és az alacsony belépési korlátnak. Azonban ezeknek az alkalmazásoknak igen magas hányada végzi alacsony értékeléssel és magas elégedetlenséggel. A legtöbb projekt fejlesztője késznek érzi az alkalmazást, azonban csak magára gondol és nem a felhasználóra. Ezen a laboron bemutatunk néhány egyszerű fogalmat és technikát, ami segít abban, hogy minőségibb alkalmazások szülessenek. Ehhez egy alapvetően prototípus kaliberű alkalmazást fogunk material szemlélettel javítani.
+Ma már igen sok alkalmazás található a Play áruházban, köszönhető ez többek között a terjesztés egyszerűségének és az alacsony belépési korlátnak. Azonban ezeknek az alkalmazásoknak igen magas hányada végzi alacsony értékeléssel és magas elégedetlenséggel. A legtöbb projekt fejlesztője késznek érzi az alkalmazást, azonban csak magára gondol és nem a felhasználóra. Ezen a laboron bemutatunk néhány egyszerű fogalmat és technikát, ami segít abban, hogy minőségibb alkalmazások szülessenek. Ehhez egy alapvetően prototípus kaliberű alkalmazást fogunk *material* szemlélettel javítani.
 
-Tartsuk szem előtt, hogy ez csak néhány egyszerű ötlet, és ahogy a lollipopos megjelenésű elemektől még nem lesz material egy alkalmazás megjelenése, úgy mi sem leszünk mindenható dizájnerek a labor után. Ez a témakör koránt sem olyan egyértelmű, mint a mérnöki tanulmányok jó része, az itt alkalmazott lépések nem feltétlenül univerzálisak.
+Tartsuk szem előtt, hogy ez csak néhány egyszerű ötlet, és ahogy a *lollipopos* megjelenésű elemektől még nem lesz *material* egy alkalmazás megjelenése, úgy mi sem leszünk mindenható dizájnerek a labor után. Ez a témakör koránt sem olyan egyértelmű, mint a mérnöki tanulmányok jó része, az itt alkalmazott lépések nem feltétlenül univerzálisak.
 
 
 ##Material és UX alapok
@@ -16,11 +16,11 @@ Először is, akinek szándékában áll végigolvasni a teljes útmutatót kés
 
 * A material dizájnban lényeges minden elem megjelenése. Például a Floating Action Button vetett árnyéka nem véletlen. Funkciója kiemelkedik, ezért megjelenítéskor is azt próbáljuk hangsúlyozni, hogy feljebb van. Az elemeknek van Z tengely szerinti **magasságuk**, a rendszer ebből számolja az általuk vetett árnyékot.
 * Az animációknak jelentésük kell legyen. Csak úgy nem animálunk dolgokat, mert az jól néz ki. Ha egy listaelemre vagy kártyára tapint a felhasználó, akkor azt az elemet átanimálhatjuk az új képernyővé, úgy, hogy a kártya (vagy listaelem) olyan elemei, amik a következő képernyőn is szerepelnek elfoglalják új helyüket a második képernyőn. Az Android platformon már régóta elérhetőek egyszerű áttűnések, lapozások a képernyőátmenetek közt. Erre azért van szükség, mert a felhasználót (meg)zavarja a hirtelen váltás. A való életben sem villanással kerül az égre a madár, hanem lezajlik egy átmenet (a felszállás), ami átvezet a két állapot között. Emlékezzünk vissza: találkoztunk már olyan alkalmazással, ahol a képernyőváltás során oldalirányban úsztak ki-be a képernyők? Előre és visszafelé navigálásnál melyik irányba haladtak a képernyők?
-* Bár laboron a beépített komponensek során nem futunk ebbe a problémába, de jegyezzük meg: minden felhasználói interakcióra legyen visszajelzés! Gondoljunk bele mit teszünk, ha egy gombot megnyomva nem történik semmi (fel se villan a gomb nyomott állapota), mit feltételezünk? Jusson eszünkbe egyéni nézetek használatakor! A material szemlélet ezt bővíti azzal, hogy a kiváltott változás egy egyre nagyobb sugarú kör íve mentén történik, aminek középpontja az a hely, ahol a felhasználó kiváltotta a változást:
+* Bár laboron a beépített komponensek során nem futunk ebbe a problémába, de jegyezzük meg: minden felhasználói interakcióra legyen visszajelzés! Gondoljunk bele mit teszünk, ha egy gombot megnyomva nem történik semmi (fel se villan a gomb nyomott állapota), mit feltételezünk? Jusson eszünkbe egyéni nézetek használatakor! A *material* szemlélet ezt bővíti azzal, hogy a kiváltott változás egy egyre nagyobb sugarú kör íve mentén történik, aminek középpontja az a hely, ahol a felhasználó kiváltotta a változást:
 [material animáció](http://material-design.storage.googleapis.com/publish/material_v_3/material_ext_publish/0B3T7oTWa3HiFdWhpd296VUhLTFk/animation_responsiveinteraction_radialreaction.webm?_=1)
 
 * Minimális gépelés. Nehéz nagyobb fájdalmat okozni a felhsználónak annál, hogy mobilon kelljen gépelnie, nem véletlenül létezik annyi különböző gesztúra. Ha egyszerű bevitelről van szó (számok, intervallumok, dátumok) egyszerűsítsük csúszkával, vizuális naptári választóval.
-* A materialos színekhez jó segítség az alábbi oldal: [http://www.materialpalette.com/](http://www.materialpalette.com/). Innen le is tudjuk tölteni xml formában a kapott színeket. Annyit érdemes tudni, hogy az “accent” színt csak a leghangsúlyosabb elemek kaphatják meg. Tipikusan ilyen a Floating Action Button, ami a képernyő legfontosabb funkcióját kell jelentse, ha van ilyen. Ugyanúgy másodlagos színt kapnak a Switch és a Slider nézetek is.
+* A *materialos* színekhez jó segítség az alábbi oldal: [http://www.materialpalette.com/](http://www.materialpalette.com/). Innen le is tudjuk tölteni xml formában a kapott színeket. Annyit érdemes tudni, hogy az “*accent*” színt csak a leghangsúlyosabb elemek kaphatják meg. Tipikusan ilyen a Floating Action Button, ami a képernyő legfontosabb funkcióját kell jelentse, ha van ilyen. Ugyanúgy másodlagos színt kapnak a Switch és a Slider nézetek is.
 * Ikonokat tervezni külön szakma, de mivel a legtöbb fejlesztő nem foglalkozik ilyesmivel másodállásban, ezért a Google nem csak néhány ikont készített el előre, hanem rengeteget. Innen letölthetők: [http://www.google.com/design/spec/resources/sticker-sheets-icons.html#sticker-sheets-icons-system-icons](http://www.google.com/design/spec/resources/sticker-sheets-icons.html#sticker-sheets-icons-system-icons). Valószínűleg megtaláljuk a nekünk kellőt. Alapszabály, hogy ne használjunk olyan ikont (bármennyire is jó lenne), ami már másik ismert funkciót jelöl. Hasonlóan kinéző komponenstől a felhasználó azt várja, hogy hasonlóan fog működni. A Floating Action Button funkciójának alapvetően egy pozitív cselekedetnek kell lennie (jó példa az új elem létrehozása, rossz példa a szín módosítása vagy a kuka törlése), így válasszunk ennek megfelelő ikont. A fentebb linkelt zipben rengeteg fájl van (több, mint 72.000). A laborhoz mellékeljük a szükséges ikonokat, de az otthoni használathoz a javasolt mód az alábbi:
  * Nyissuk meg a kitömörített mappa gyökerében az index.html-t
  * Válasszunk egy ikont (például az add ikon)
@@ -28,13 +28,10 @@ Először is, akinek szándékában áll végigolvasni a teljes útmutatót kés
  * Válasszuk ki a nekünk kellő variánst. Szerepel fehérben, feketében, szürkében és mindhárom színhez 4 féle méretben (nekünk az “*ic_add_white_24dp.png*” kell)
  * Menjünk egy könyvtárral feljebb és Total Commanderrel másoljuk az összes minősített mappát a célhelyre, de úgy, hogy megadjuk milyen illeszkedő fájlokat másoljon csak. Oda írjuk be a kiválasztott formátum fájlnevét.
 
-* Tartsunk megfelelő távolságokat az elemek között, különösen ügyelve az interaktív elemekre. Lesz olyan, akinek nálunk nagyobb az ujjbegye, gondoljunk rá is! A tartalom ne kezdődjön a képernyő 0. pixelénél! Az ajánlásokban elég részletesen taglalják a számokat: az új guideline szerint minden elem egy 8dp-s rácsban helyezkedik el. Ez alól kivételek a szövegek (amiknek alapvonala igazodik 4dp-hez) és a toolbar ikonjai (szintén 4 dp). Tehát alapvetően mindennek a mérete vagy a távolsága n x 8dp. A kijelző szélétől tartandó margó például 16dp, az érinthető területek minimum mérete 48 x 48dp, a köztük tartandó távolság pedig minimum 8dp, de inkább több.
-* A képi elemek legyen inkább személyesek. Ne használjunk pár élettelen mosolyú modell arcát mutató sotck fotókat, a képnek egyen köze a tartalomhoz. A személyes (felhasználó készítette) képek még jobbak. A képek töltsék ki a teret, amennyire csak lehet! Ez azt jelenti, hogy szélességben a teljes kijelzőt fedje, magasságban pedig lehetőleg valamilyen jellegzetes arány vonalát kövesse. Van néhány ajánlás, ezekre az arányokra – mármint arra hogy bizonyos képarányú elemek magassága hol helyezkedik el.
+* Tartsunk megfelelő távolságokat az elemek között, különösen ügyelve az interaktív elemekre. Lesz olyan, akinek nálunk nagyobb az ujjbegye, gondoljunk rá is! A tartalom ne kezdődjön a képernyő 0. pixelénél! Az ajánlásokban elég részletesen taglalják a számokat: az új *guideline* szerint minden elem egy 8dp-s rácsban helyezkedik el. Ez alól kivételek a szövegek (amiknek alapvonala igazodik 4dp-hez) és a *toolbar* ikonjai (szintén 4 dp). Tehát alapvetően mindennek a mérete vagy a távolsága n x 8dp. A kijelző szélétől tartandó margó például 16dp, az érinthető területek minimum mérete 48 x 48dp, a köztük tartandó távolság pedig minimum 8dp, de inkább több.
+* A képi elemek legyen inkább személyesek. Ne használjunk pár élettelen mosolyú modell arcát mutató sotck fotókat, a képnek legyen köze a tartalomhoz. A személyes (felhasználó készítette) képek még jobbak. A képek töltsék ki a teret, amennyire csak lehet! Ez azt jelenti, hogy szélességben a teljes kijelzőt fedje, magasságban pedig lehetőleg valamilyen jellegzetes arány vonalát kövesse. Van néhány ajánlás, ezekre az arányokra – mármint arra hogy bizonyos képarányú elemek magassága hol helyezkedik el.
 
 <img src="./images/keylines.png" width="300" " align="middle">
-
-
-
 
 * Ne használjuk a kártyanézeteket (tipikusan Google asszisztens) olyan elemekre, amik megjelenése azonos! Ezesetben egy listáról beszélünk, aminek használatát megnehezíti, hogy a kártyák közt van kihagyott terület és árnyékot is vetnek.
 
@@ -53,17 +50,17 @@ Próbálják ki ezeket a funkciókat!
 
 ## Javítandó alkalmazás
 
-Most, hogy néhány hasznos dolgot megismertünk, ideje letöltenük a prototípust:
+Most, hogy néhány hasznos dolgot megismertünk, ideje letöltenünk a prototípust:
 
 [PlacesToVisit.zip](./assets/PlacesToVisit.zip)
 
 Tömörítsük ki a mappát, indítsuk el az Android Studio-t, majd az Open segítségével nyissuk meg az alkalmazást.
 
-<img src="./images/screen1.jpg" width="200" align="middle">
+<img src="./images/screen1_framed.png" width="200" align="middle">
 
 A kezdőalkalmazás.
 
-Ennek az alkalmazásnak az a feladata, hogy meglátogatandó helyeket gyűjtsünk benne. A prototípus arra koncentrál, hogy minimális funkcionalitást valósítson meg gyorsan. Az adatok perzisztens tárolásához a Sugar ORM ([http://satyan.github.io/sugar/](http://satyan.github.io/sugar/)) könyvtárat használja . Laborvezetővel tekintsék át a kódot és a működést! Főbb elemei:
+Ennek az alkalmazásnak az a feladata, hogy meglátogatandó helyeket gyűjtsünk benne. A prototípus arra koncentrál, hogy minimális funkcionalitást valósítson meg gyorsan. Az adatok perzisztens tárolásához a *Sugar ORM* ([http://satyan.github.io/sugar/](http://satyan.github.io/sugar/)) könyvtárat használja . Laborvezetővel tekintsék át a kódot és a működést! Főbb elemei:
 
 * A Sugar ORM számára a Manifest-ben elhelyezett meta-data tag-ek segítségével adhatjuk meg az adatbázist tartalmazó fájl nevét és verzióját, hogy logolja-e a query-ket, illetve hogy milyen domain-t használunk.
 
@@ -99,37 +96,37 @@ public class Place extends SugarRecord implements Serializable {...}
 
 Új elemet az options menü megnyomásával lehet létrehozni, amely menüben más elem nincs is. Ez a menü tipikusan nem ilyen feladatokra szolgál. Az ilyen feladatokat Floating Action Buttonnel szokás megoldani. Ezért először is töröljük a menüt a nyitóképernyőről, majd helyezzünk fel egy Floating Action Buttont. Ehhez töröljük az Activity OnCreateOptionsMenu és OnOptionsItemSelected metódusait, illetve a res/menu mappát, majd hozzunk létre egy Floating Action Buttont!
 
-A PlacesListActivitybe az OnCreatebe:
+A PlacesListActivityben az OnCreatebe:
 
 ```java
-        FloatingActionButton fab =
-                (FloatingActionButton) findViewById(R.id.addButton);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showNewPlaceDialog();
-            }
-        });
+FloatingActionButton fab =
+        (FloatingActionButton) findViewById(R.id.addButton);
+    fab.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            showNewPlaceDialog();
+        }
+});
 ```
 
 
 Az activity_places_list.xmlben az include után:
 
 ```xml
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/addButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/fab_margin"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"/>
+<android.support.design.widget.FloatingActionButton
+    android:id="@+id/addButton"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="bottom|end"
+    android:layout_margin="@dimen/fab_margin"
+    android:layout_alignParentBottom="true"
+    android:layout_alignParentRight="true"/>
 ```
 
 
 ### FAB ikon
 
-A Floating Action Button ikonja fontos szerepet játszik. A felhasználónak  első ránézére tudnia kell belőle, hogy mire szolgál a gomb. Így tehát olyan ikont kell választanunk, amiből rögtön látszik, hogy a gomb elem hozzáadására szolgál. Töltsük le az alábbi zipet:
+A Floating Action Button ikonja fontos szerepet játszik. A felhasználónak  első ránézésre tudnia kell belőle, hogy mire szolgál a gomb. Így tehát olyan ikont kell választanunk, amiből rögtön látszik, hogy a gomb elem hozzáadására szolgál. Töltsük le az alábbi *zip*et:
 
 [Drawable.zip](./assets/drawable.zip)
 
@@ -142,9 +139,9 @@ app:srcCompat="@drawable/ic_add_white_24dp"
 
 ### A lista fejléce
 
-Jelenleg a Toolbaron megjelenik a az Activity neve, ami "PlacesToVisit", alatta egy TextView-ban pedig a szöveg, hogy "Places to visit". Ezek közül az egyik felesleges, és szebb ha a normál helyesírás szerinti, "Places to visit"-et hagyjuk meg. Azonban egy üres Toolbarnak nincs sok értelme, úgyhogy inkább rakjuk fel oda ezt a szöveget.
+Jelenleg a Toolbaron megjelenik az Activity neve, ami "PlacesToVisit", alatta egy TextView-ban pedig a szöveg, hogy "Places to visit". Ezek közül az egyik felesleges, és szebb, ha a normál helyesírás szerinti "Places to visit"-et hagyjuk meg. Azonban egy üres Toolbarnak nincs sok értelme, úgyhogy inkább rakjuk fel ezt a szöveget oda.
 
-Ehhez előzör is az activity_places_list.xml-ben a Toolbar tagen belül vegyük fel az app:title attribútumot, és vegyük fel a string erőforrást.
+Ehhez először is az activity_places_list.xml-ben a Toolbar tagen belül vegyük fel az app:title attribútumot, és vegyük fel a string erőforrást.
 
 ```xml
 app:title="@string/places_to_visit"
@@ -164,12 +161,12 @@ Ahhoz, hogy a Toolbar vetett árnyéka érvényesüljön, és úgy tűnjön, hog
 
 Próbáljuk ki az alkalmazást!
 
-<img src="./images/screen2.jpg" width="200" align="middle">
+<img src="./images/screen2_framed.png" width="200" align="middle">
 
 
 ### Üres lista
 
-Kevesen készülnek arra a lehetőségre, hogy mi fogadja a felhasználót akkor, ha üres a listanézet. Célszerű ilyenkor az üres lita helyett valamilyen szöveget megjeleníteni. Írjuk tehát át a content_places_list.xmlt.
+Kevesen készülnek arra a lehetőségre, hogy mi fogadja a felhasználót akkor, ha üres a listanézet. Célszerű ilyenkor az üres lista helyett valamilyen szöveget megjeleníteni. Írjuk tehát át a content_places_list.xmlt.
 
 ```xml
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -235,16 +232,16 @@ public interface DataSetChangedListener {
 A PlacesToVisitActivitynek ezt kell **implementálnia**. Az onDataSetChanged függvény felüldefiniálásakor állítsuk be a megfelelő view-k láthatóságát.
 
 ```java
-    @Override
-    public void onDataSetChanged() {
-        if (adapter.getItemCount()==0) {
-            emptyTV.setVisibility(View.VISIBLE);
-            recyclerView.setVisibility(View.GONE);
-        } else {
-            emptyTV.setVisibility(View.GONE);
-            recyclerView.setVisibility(View.VISIBLE);
-        }
+@Override
+public void onDataSetChanged() {
+    if (adapter.getItemCount()==0) {
+        emptyTV.setVisibility(View.VISIBLE);
+        recyclerView.setVisibility(View.GONE);
+    } else {
+        emptyTV.setVisibility(View.GONE);
+        recyclerView.setVisibility(View.VISIBLE);
     }
+}
 ```
 
 Ezt a függvényt meg is hívhatjuk az OnCreate végén, hogy induláskor jól jelenjenek meg a nézetek.
@@ -254,7 +251,7 @@ Következő lépésként vegyünk föl egy listenert privát tagváltozóként a
     private DataSetChangedListener dataSetChangedListener;
 ```
 
-Írjunk egy függvényt, ami ezen a listener objektumon keresztül viszaszól a változásról, majd **hívjuk is meg** az addPlace, az updatePlace és a removePlace függvényben.
+Írjunk egy függvényt, ami ezen a listener objektumon keresztül visszaszól a változásról, majd **hívjuk is meg** az addPlace, az updatePlace és a removePlace függvényben.
 
 ```java
 private void dataSetChanged() {
@@ -270,7 +267,10 @@ Ezzel készen is vagyunk, már csak az Activityt kell beregisztrálni. Ezt az On
 adapter.setDataSetChangedListener(this);
 ```
 
-Próbáljuk ki az alkalmazást! Láthatjuk, hogy üres lista helyett valóban az "Add places to visit" felirat jelenik meg. 
+Próbáljuk ki az alkalmazást! Láthatjuk, hogy üres lista helyett valóban az "Add places to visit" felirat jelenik meg.
+
+<img src="./images/screen3_framed.png" width="200" align="middle">
+ 
 Segíthetünk a felhasználónak még annyiban, hogy megengedjük, hogy erre a feliratra rákattintva is vehessen föl új helyet. Ehhez írjuk meg az OnClickListenert:
 
 ```java
@@ -283,7 +283,6 @@ Segíthetünk a felhasználónak még annyiban, hogy megengedjük, hogy erre a f
 
 ```
 
-<img src="./images/screen3.jpg" width="200" align="middle">
 
 ### Dialógus és animációja
 
@@ -339,6 +338,9 @@ A 4. sorban megadjuk, hogy melyik View-ból indul az animáció, és az 5-ben is
 
 Próbáljuk ki az alkalmazást!
 
+<img src="./images/screen4_framed.png" width="200" align="middle">
+
+
 ### Új hely felvétele
 
 Nem a legjobb, hiszen az alkalmazás második képernyője eredetileg dialógus stílusú. Hát töröljük a Manifest 39.sorából és a stílusfájlokból a kapcsolódó stílusbejegyzést!
@@ -351,7 +353,7 @@ Az activity_create_place_to_visit.xml gyökérelemét változtassuk RelativeLayo
 android:layout_alignParentBottom="true"
 ```
 
-A többi elemet pedig ágyazzuk be egy vertikális LinearLayoutba, majd egy ScrollView-ba, amit kössünk fölülre, és helyezzünk a gomb fölé:
+A többi elemet pedig ágyazzuk be egy vertikális LinearLayoutba, majd egy ScrollView-ba, amit kössünk felülre, és helyezzünk a gomb fölé:
 
 ```xml
 <ScrollView
@@ -367,7 +369,7 @@ A többi elemet pedig ágyazzuk be egy vertikális LinearLayoutba, majd egy Scro
 
 ### Snackbar
 
-A Toast üzeneteknél már van egy sokkal szebb megoldás ami a Material Design-t követi, a SnackBar. Cseréljük le a Toast figyelmeztetést SnackBar-ra!
+A Toast üzeneteknél már van egy sokkal szebb megoldás, ami a Material Design-t követi, a SnackBar. Cseréljük le a Toast figyelmeztetést SnackBar-ra!
 
 Ehhez írjunk egy külön showText() függvényt, ami a paraméterül kapott szöveget jeleníti meg, majd használjuk ezt: 
 
@@ -387,7 +389,7 @@ A Snackbar.make(...) függvény első paramétere egy View. Adjuk meg ide az Act
 
 Próbáljuk ki a Snakcbart!
 
-<img src="./images/screen4.jpg" width="200" align="middle">
+<img src="./images/screen5_framed.png" width="200" align="middle">
 
 
 ## Önálló feladat
