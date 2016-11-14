@@ -3,9 +3,9 @@
 
 ## Bevezetés
 
-Ma már igen sok alkalmazás található a Play áruházban, köszönhető ez többek között a terjesztés egyszerűségének és az alacsony belépési korlátnak. Azonban ezeknek az alkalmazásoknak igen magas hányada végzi alacsony értékeléssel és magas elégedetlenséggel. A legtöbb projekt fejlesztője késznek érzi az alkalmazást, azonban csak magára gondol és nem a felhasználóra. Ezen a laboron bemutatunk néhány egyszerű fogalmat és technikát, ami segít abban, hogy minőségibb alkalmazások szülessenek. Ehhez egy alapvetően prototípus kaliberű alkalmazást fogunk *material* szemlélettel javítani.
+Ma már igen sok alkalmazás található a Play áruházban, köszönhető ez többek között a terjesztés egyszerűségének és az alacsony belépési korlátnak. Azonban ezeknek az alkalmazásoknak igen magas hányada végzi alacsony értékeléssel és magas elégedetlenséggel. A legtöbb projekt fejlesztője késznek érzi az alkalmazást, azonban csak magára gondol és nem a felhasználóra. Ezen a laboron bemutatunk néhány egyszerű fogalmat és technikát, ami segít abban, hogy minőségibb alkalmazások szülessenek. Ehhez egy alapvetően prototípus kaliberű alkalmazást fogunk material szemlélettel javítani.
 
-Tartsuk szem előtt, hogy ez csak néhány egyszerű ötlet, és ahogy a *lollipopos* megjelenésű elemektől még nem lesz *material* egy alkalmazás megjelenése, úgy mi sem leszünk mindenható dizájnerek a labor után. Ez a témakör koránt sem olyan egyértelmű, mint a mérnöki tanulmányok jó része, az itt alkalmazott lépések nem feltétlenül univerzálisak.
+Tartsuk szem előtt, hogy ez csak néhány egyszerű ötlet, és ahogy a lollipopos megjelenésű elemektől még nem lesz material egy alkalmazás megjelenése, úgy mi sem leszünk mindenható dizájnerek a labor után. Ez a témakör koránt sem olyan egyértelmű, mint a mérnöki tanulmányok jó része, az itt alkalmazott lépések nem feltétlenül univerzálisak.
 
 
 ##Material és UX alapok
@@ -18,12 +18,12 @@ Először is, akinek szándékában áll végigolvasni a teljes útmutatót kés
 
 * Az **animációknak jelentésük** kell legyen. Csak úgy nem animálunk dolgokat, mert az jól néz ki. Ha egy listaelemre vagy kártyára tapint a felhasználó, akkor azt az elemet átanimálhatjuk az új képernyővé, úgy, hogy a kártya (vagy listaelem) olyan elemei, amik a következő képernyőn is szerepelnek elfoglalják új helyüket a második képernyőn. Az Android platformon már régóta elérhetőek egyszerű áttűnések, lapozások a képernyőátmenetek közt. Erre azért van szükség, mert a felhasználót (meg)zavarja a hirtelen váltás. A való életben sem villanással kerül az égre a madár, hanem lezajlik egy átmenet (a felszállás), ami átvezet a két állapot között. Emlékezzünk vissza: találkoztunk már olyan alkalmazással, ahol a képernyőváltás során oldalirányban úsztak ki-be a képernyők? Előre és visszafelé navigálásnál melyik irányba haladtak a képernyők?
 
-* Bár laboron a beépített komponensek során nem futunk ebbe a problémába, de jegyezzük meg: **minden felhasználói interakcióra legyen visszajelzés!** Gondoljunk bele mit teszünk, ha egy gombot megnyomva nem történik semmi (fel se villan a gomb nyomott állapota), mit feltételezünk? Jusson eszünkbe egyéni nézetek használatakor! A *material* szemlélet ezt bővíti azzal, hogy a kiváltott változás egy egyre nagyobb sugarú kör íve mentén történik, aminek középpontja az a hely, ahol a felhasználó kiváltotta a változást:
+* Bár laboron a beépített komponensek során nem futunk ebbe a problémába, de jegyezzük meg: **minden felhasználói interakcióra legyen visszajelzés!** Gondoljunk bele mit teszünk, ha egy gombot megnyomva nem történik semmi (fel se villan a gomb nyomott állapota), mit feltételezünk? Jusson eszünkbe egyéni nézetek használatakor! A material szemlélet ezt bővíti azzal, hogy a kiváltott változás egy egyre nagyobb sugarú kör íve mentén történik, aminek középpontja az a hely, ahol a felhasználó kiváltotta a változást:
 [material animáció](http://material-design.storage.googleapis.com/publish/material_v_3/material_ext_publish/0B3T7oTWa3HiFdWhpd296VUhLTFk/animation_responsiveinteraction_radialreaction.webm?_=1)
 
 * **Minimális gépelés**. Nehéz nagyobb fájdalmat okozni a felhsználónak annál, hogy mobilon kelljen gépelnie, nem véletlenül létezik annyi különböző gesztúra. Ha egyszerű bevitelről van szó (számok, intervallumok, dátumok) egyszerűsítsük csúszkával, vizuális naptári választóval.
 
-* A *materialos* színekhez jó segítség az alábbi oldal: [http://www.materialpalette.com/](http://www.materialpalette.com/). Innen le is tudjuk tölteni xml formában a kapott színeket. Annyit érdemes tudni, hogy az “*accent*” színt csak a leghangsúlyosabb elemek kaphatják meg. Tipikusan ilyen a Floating Action Button, ami a képernyő legfontosabb funkcióját kell jelentse, ha van ilyen. Ugyanúgy másodlagos színt kapnak a Switch és a Slider nézetek is.
+* A materialos színekhez jó segítség az alábbi oldal: [http://www.materialpalette.com/](http://www.materialpalette.com/). Innen le is tudjuk tölteni xml formában a kapott színeket. Annyit érdemes tudni, hogy az “accent” színt csak a leghangsúlyosabb elemek kaphatják meg. Tipikusan ilyen a Floating Action Button, ami a képernyő legfontosabb funkcióját kell jelentse, ha van ilyen. Ugyanúgy másodlagos színt kapnak a Switch és a Slider nézetek is.
 
 * Ikonokat tervezni külön szakma, de mivel a legtöbb fejlesztő nem foglalkozik ilyesmivel másodállásban, ezért a Google nem csak néhány ikont készített el előre, hanem rengeteget. Innen letölthetőka hivatalos ikonok: [http://www.google.com/design/spec/resources/sticker-sheets-icons.html#sticker-sheets-icons-system-icons](http://www.google.com/design/spec/resources/sticker-sheets-icons.html#sticker-sheets-icons-system-icons). 
 
@@ -33,7 +33,7 @@ Először is, akinek szándékában áll végigolvasni a teljes útmutatót kés
  * Válasszuk ki a nekünk kellő variánst. Szerepel fehérben, feketében, szürkében és mindhárom színhez 4 féle méretben (nekünk az `ic_add_white_24dp.png` kell)
  * Menjünk egy könyvtárral feljebb másoljuk az összes minősített mappát a célhelyre.
 
-* Tartsunk megfelelő távolságokat az elemek között, különösen ügyelve az interaktív elemekre. Lesz olyan, akinek nálunk nagyobb az ujjbegye, gondoljunk rá is! A tartalom ne kezdődjön a képernyő 0. pixelénél! Az ajánlásokban elég részletesen taglalják a számokat: az új *guideline* szerint minden elem egy 8dp-s rácsban helyezkedik el. Ez alól kivételek a szövegek (amiknek alapvonala igazodik 4dp-hez) és a *toolbar* ikonjai (szintén 4 dp). Tehát alapvetően mindennek a mérete vagy a távolsága n x 8dp. A kijelző szélétől tartandó margó például 16dp, az érinthető területek minimum mérete 48 x 48dp, a köztük tartandó távolság pedig minimum 8dp, de inkább több.
+* Tartsunk megfelelő távolságokat az elemek között, különösen ügyelve az interaktív elemekre. Lesz olyan, akinek nálunk nagyobb az ujjbegye, gondoljunk rá is! A tartalom ne kezdődjön a képernyő 0. pixelénél! Az ajánlásokban elég részletesen taglalják a számokat: az új guideline szerint minden elem egy 8dp-s rácsban helyezkedik el. Ez alól kivételek a szövegek (amiknek alapvonala igazodik 4dp-hez) és a toolbar ikonjai (szintén 4 dp). Tehát alapvetően mindennek a mérete vagy a távolsága n x 8dp. A kijelző szélétől tartandó margó például 16dp, az érinthető területek minimum mérete 48 x 48dp, a köztük tartandó távolság pedig minimum 8dp, de inkább több.
 * A képi elemek legyen inkább személyesek. Ne használjunk pár élettelen mosolyú modell arcát mutató sotck fotókat, a képnek legyen köze a tartalomhoz. A személyes (felhasználó készítette) képek még jobbak. A képek töltsék ki a teret, amennyire csak lehet! Ez azt jelenti, hogy szélességben a teljes kijelzőt fedje, magasságban pedig lehetőleg valamilyen jellegzetes arány vonalát kövesse. Van néhány ajánlás, ezekre az arányokra – mármint arra hogy bizonyos képarányú elemek magassága hol helyezkedik el.
 
 <img src="./images/keylines.png" width="300" " align="middle">
@@ -150,10 +150,6 @@ Ehhez először is az `activity_places_list.xml`-ben a Toolbar tagen belül vegy
 app:title="@string/places_to_visit"
 ```
 
-```xml
-<string name="places_to_visit">Places to visit</string>
-```
-
 Majd töröljük a `content_places_list.xml`-ből a TextViewt, a RecyclerView-t pedig igazítsuk a szülője tetejéhez.
 
 ```xml
@@ -211,78 +207,146 @@ Kevesen készülnek arra a lehetőségre, hogy mi fogadja a felhasználót akkor
 </RelativeLayout>
 ```
 
-Figyeljük meg a FrameLayoutot! Egyszerre csak egyik gyermeke látható. Most már csak meg kell mondjuk az Activity-nek, hogy üres lista esetén el kell rejtenie a listát és meg kell jelenítenie a szöveget:
-
-Először is hozzunk létre egy privát TextView-t, majd szerezzünk rá referenciát az onCreate-ben.
-
-```java
-private TextView emptyTV;
+```xml
+<string name="add_places_to_visit">Add_places to visit</string>
 ```
 
+Figyeljük meg a FrameLayoutot! Egyszerre csak egyik gyermeke látható. Most már csak meg kell oldanunk, hogy üres RecyclerView esetén csak a TextView jelenjen meg:
+
+Először is hozzunk létre egy új View-t, ami képes ezt kezelni. Legyen a neve EmptyRecyclerView, és származzon a RecyclerView-ból. Implementáljuk a három kötelező konstruktorát is:
+
 ```java
-emptyTV = (TextView) findViewById(R.id.emptyTV);
+public class EmptyRecyclerView extends RecyclerView {
+
+    public EmptyRecyclerView(Context context) {
+        super(context);
+    }
+
+    public EmptyRecyclerView(Context context, @Nullable AttributeSet attrs) {
+        super(context, attrs);
+    }
+
+    public EmptyRecyclerView(Context context, @Nullable AttributeSet attrs, int defStyle) {
+        super(context, attrs, defStyle);
+    }
+
+}
+```
+Vegyünk fel bele egy emptyView-t, amiben azt a View-t fogjuk tárolni, amit üres lista esetén meg szeretnénk jeleníteni:
+
+```java
+private View emptyView;
 ```
 
-Ahhoz, hogy az adapter értesíteni tudja az Activity-nket a lista kiürüléséről, listenert fogunk használni.
-Készítsünk egy új interface-t DataSetChangedListener néven.
+Ezek után vegyünk fel egy observert, aminek a feladata, hogy a listában történt változásokat lekezelje. 
 
 ```java
-public interface DataSetChangedListener {
-    public void onDataSetChanged();
+final private AdapterDataObserver observer = new AdapterDataObserver() {
+    @Override
+    public void onChanged() {
+        checkIfEmpty();
+    }
+
+    @Override
+    public void onItemRangeInserted(int positionStart, int itemCount) {
+        checkIfEmpty();
+    }
+
+    @Override
+    public void onItemRangeRemoved(int positionStart, int itemCount) {
+        checkIfEmpty();
+    }
+};
+```
+
+Bármilyen változás történik az adathalmazban, le kell ellenőriznünk, hogy a melyik felületet kell megjelenítenünk vagyis, hogy üres-e a lista. Erre szolgál a checkIfEmpty() függvény. Implementáljuk ezt is:
+
+```java
+void checkIfEmpty() {
+        if (emptyView != null && getAdapter() != null) {
+            final boolean emptyViewVisible = 
+                                    getAdapter().getItemCount() == 0;
+            emptyView.setVisibility(emptyViewVisible ? VISIBLE : GONE);
+            setVisibility(emptyViewVisible ? GONE : VISIBLE);
+        }
+    }
+```
+
+Látható, hogy a checkIfEmpty függvény az adapterben található elemek számának függvényében állítja az EmptyRecyclerView, és az EmptyView láthatóságát.
+
+Hozzunk létre egy setter fügvényt az emptyView-hoz, amivel kívülről megadhatjuk majd a megfelelő View-t. Hívjunk ebben is egy checkIfEmpty-t:
+
+```java
+public void setEmptyView(View emptyView) {
+    this.emptyView = emptyView;
+    checkIfEmpty();
 }
 ```
 
-A PlacesToVisitActivitynek ezt kell **implementálnia**. Az onDataSetChanged függvény felüldefiniálásakor állítsuk be a megfelelő view-k láthatóságát.
+Az EmptyRecyclerView-nk megfelelő működéséhez felül kell még írnunk a setAdapter függvényt. Ebben tudjuk beregisztrálni az imént létrehozott observerünket, ami kezeli az adathalmazban történt változásokat:
 
 ```java
 @Override
-public void onDataSetChanged() {
-    if (adapter.getItemCount()==0) {
-        emptyTV.setVisibility(View.VISIBLE);
-        recyclerView.setVisibility(View.GONE);
-    } else {
-        emptyTV.setVisibility(View.GONE);
-        recyclerView.setVisibility(View.VISIBLE);
+public void setAdapter(Adapter adapter) {
+    final Adapter oldAdapter = getAdapter();
+    if (oldAdapter != null) {
+        oldAdapter.unregisterAdapterDataObserver(observer);
     }
+    super.setAdapter(adapter);
+    if (adapter != null) {
+        adapter.registerAdapterDataObserver(observer);
+    }
+
+    checkIfEmpty();
 }
 ```
 
-Ezt a függvényt meg is hívhatjuk az OnCreate végén, hogy induláskor jól jelenjenek meg a nézetek.
-Következő lépésként vegyünk föl egy listenert privát tagváltozóként a PlacesToVisitAdapterbe (majd egy setter metódust is rá (Alt+Enter >> Create setter...)). Ezen keresztül fogunk tudni visszaszólni az Activitynek, hogy valami változás történt.
+Ezzel el is készült az EmptyRecyclerView-nk. Most cseréljük le az eddig használt RecyclerView-t:
+
+`content_places_list.xml`:
 
 ```java
-    private DataSetChangedListener dataSetChangedListener;
+<hu.bme.aut.amorg.examples.placestovisit.view.EmptyRecyclerView
+            android:id="@+id/placesListERV"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true" />
 ```
 
-Írjunk egy függvényt, ami ezen a listener objektumon keresztül visszaszól a változásról, majd **hívjuk is meg** az addPlace, az updatePlace és a removePlace függvényben.
+PlacesListActivity.java:
 
 ```java
-private void dataSetChanged() {
-    if (dataSetChangedListener instanceof DataSetChangedListener) {
-        dataSetChangedListener.onDataSetChanged();
-    }
-}
+private EmptyRecyclerView emptyRecyclerView;
 ```
 
-Ezzel készen is vagyunk, már csak az Activityt kell beregisztrálni. Ezt az OnCreate-ben az adapter példányosítása után meg is tehetjük.
+```java
+emptyRecyclerView = (EmptyRecyclerView) findViewById(R.id.placesListERV);
+emptyRecyclerView.setLayoutManager(new LinearLayoutManager((this)));
+adapter = new PlacesToVisitAdapter(this, placesToVisit);
+emptyRecyclerView.setAdapter(adapter);
+registerForContextMenu(emptyRecyclerView);
+```
+
+Végül szerezzünk referenciát a `content_places_list.xml`-ben létrehozott TextView-ra, és állítsuk be az EmptyRecyclerView emptyView-jának:
 
 ```java
-adapter.setDataSetChangedListener(this);
+View emptyView = findViewById(R.id.emptyTV);
+emptyRecyclerView.setEmptyView(emptyView);
 ```
 
 Próbáljuk ki az alkalmazást! Láthatjuk, hogy üres lista helyett valóban az "Add places to visit" felirat jelenik meg.
 
 <img src="./images/screen3_framed.png" width="200" align="middle">
  
-Segíthetünk a felhasználónak még annyiban, hogy megengedjük, hogy erre a feliratra rákattintva is vehessen föl új helyet. Ehhez írjuk meg az OnClickListenert:
+Segíthetünk a felhasználónak még annyiban, hogy megengedjük, hogy erre a feliratra rákattintva is vehessen fel új helyet. Ehhez írjuk meg az OnClickListenert:
 
 ```java
-        emptyTV.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showNewPlaceDialog();
-            }
-        });
+emptyTV.setOnClickListener(new View.OnClickListener() {
+    @Override
+    public void onClick(View v) {
+        showNewPlaceDialog();
+    }
+});
 
 ```
 
@@ -291,7 +355,7 @@ Segíthetünk a felhasználónak még annyiban, hogy megengedjük, hogy erre a f
 
 Az Android Lollipop verziójától lehetőségünk van képernyőátmenetek során elemeket megosztva animálni. Ebben az esetben azt fogjuk elérni, hogy amikor a felhasználó megérinti a FAB-ot, akkor az új helyszínt létrehozó képernyő abból animálódjon ki. A visszafelé portolás ebben az esetben nem tökéletes, 21-es API szint alatt ezt nem fogjuk látni. A megosztott animációhoz át kell írjuk a stílusainkat, azonban az új xml elemek csak API 21-től működnek.
 
-Hozzunk létre egy új erőforrás mappát! A neve legyen **values-v21**! Ebbe másoljuk bele a meglevő styles.xml állományt a minősítetlen mappából. A v21-es styles-xml-ben az alaptémát módosítsuk az alábbiaknak megfelelően:
+Hozzunk létre egy új erőforrás mappát! A neve legyen **values-v21**! Ebbe másoljuk bele a meglevő `styles.xml` állományt a minősítetlen mappából. A v21-es styles-xml-ben az alaptémát módosítsuk az alábbiaknak megfelelően:
 
 ```xml
 <!-- Base application theme. -->
@@ -337,7 +401,7 @@ private void showNewPlaceDialog() {
 }
 ```
 
-A 4. sorban megadjuk, hogy melyik View-ból indul az animáció, és az 5-ben is, hogy milyen transitionName-mel kell dolgoznia a rendszernek. A 8. sorban egy Bundle-be pakolva átadjuk az animációról szóló információt.
+Itt megdjuk, hogy melyik View-ból indul az animáció (fab), és azt is, hogy milyen transitionName-mel kell dolgoznia a rendszernek ("create"). Az animációról szóló információt egy Bundle-be pakolva adjuk át.
 
 Próbáljuk ki az alkalmazást!
 
@@ -346,7 +410,7 @@ Próbáljuk ki az alkalmazást!
 
 ### Új hely felvétele
 
-Nem a legjobb, hiszen az alkalmazás második képernyője eredetileg dialógus stílusú. Hát töröljük a Manifest 39.sorából és a stílusfájlokból a kapcsolódó stílusbejegyzést!
+Nem a legjobb, hiszen az alkalmazás második képernyője eredetileg dialógus stílusú. Hát töröljük a Manifestből és a stílusfájlokból a kapcsolódó stílusbejegyzést!
 
 Az Activity azonban még így sem tökéletes, hiszen ha nagyon hosszú leírást adunk neki, akkor a Save gomb kicsúszik a képernyőről és használhatatlan lesz. Rögzítsük tehát a gombot a képernyő aljára, a fölötte lévő tartalmat pedig tegyük görgethetővé!
 
@@ -382,13 +446,23 @@ private void showText(String text) {
 }
 ```
 
-Hívás:s
+Hívás:
 
 ```java
 showText(getResources().getString(R.string.cancelled));
 ```
 
-A Snackbar.make(...) függvény első paramétere egy View. Adjuk meg ide az Activitynk CoordinatorLayout-ját. Ehhez az `activity_places_list.xml`-ben id-t kell neki adni, a PlacesListActivityben felvenni változóként, majd az onCreate-ben referenciát szerezni rá.
+A Snackbar.make(...) függvény első paramétere egy View. Adjuk meg ide az Activitynk CoordinatorLayout-ját. Ehhez a PlacesListActivityben fel kell venni változóként, majd az onCreate-ben referenciát szerezni rá.
+
+
+```java
+private CoordinatorLayout coordinatorLayout;
+```
+
+```java
+coordinatorLayout = (CoordinatorLayout) 
+        findViewById(R.id.main_coordinator_layout);
+```
 
 Próbáljuk ki a Snakcbart!
 
