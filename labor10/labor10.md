@@ -11,22 +11,27 @@ Tartsuk szem előtt, hogy ez csak néhány egyszerű ötlet, és ahogy a *lollip
 ##Material és UX alapok
 
 Először is, akinek szándékában áll végigolvasni a teljes útmutatót később, az itt megteheti:
-[http://www.google.com/design/spec/material-design/introduction.html](http://www.google.com/design/spec/material-design/introduction.html)
+[https://material.google.com/#](https://material.google.com/#)
 
 
 * A material dizájnban lényeges minden elem megjelenése. Például a Floating Action Button vetett árnyéka nem véletlen. Funkciója kiemelkedik, ezért megjelenítéskor is azt próbáljuk hangsúlyozni, hogy feljebb van. Az elemeknek van Z tengely szerinti **magasságuk**, a rendszer ebből számolja az általuk vetett árnyékot.
-* Az animációknak jelentésük kell legyen. Csak úgy nem animálunk dolgokat, mert az jól néz ki. Ha egy listaelemre vagy kártyára tapint a felhasználó, akkor azt az elemet átanimálhatjuk az új képernyővé, úgy, hogy a kártya (vagy listaelem) olyan elemei, amik a következő képernyőn is szerepelnek elfoglalják új helyüket a második képernyőn. Az Android platformon már régóta elérhetőek egyszerű áttűnések, lapozások a képernyőátmenetek közt. Erre azért van szükség, mert a felhasználót (meg)zavarja a hirtelen váltás. A való életben sem villanással kerül az égre a madár, hanem lezajlik egy átmenet (a felszállás), ami átvezet a két állapot között. Emlékezzünk vissza: találkoztunk már olyan alkalmazással, ahol a képernyőváltás során oldalirányban úsztak ki-be a képernyők? Előre és visszafelé navigálásnál melyik irányba haladtak a képernyők?
-* Bár laboron a beépített komponensek során nem futunk ebbe a problémába, de jegyezzük meg: minden felhasználói interakcióra legyen visszajelzés! Gondoljunk bele mit teszünk, ha egy gombot megnyomva nem történik semmi (fel se villan a gomb nyomott állapota), mit feltételezünk? Jusson eszünkbe egyéni nézetek használatakor! A *material* szemlélet ezt bővíti azzal, hogy a kiváltott változás egy egyre nagyobb sugarú kör íve mentén történik, aminek középpontja az a hely, ahol a felhasználó kiváltotta a változást:
+
+* Az **animációknak jelentésük** kell legyen. Csak úgy nem animálunk dolgokat, mert az jól néz ki. Ha egy listaelemre vagy kártyára tapint a felhasználó, akkor azt az elemet átanimálhatjuk az új képernyővé, úgy, hogy a kártya (vagy listaelem) olyan elemei, amik a következő képernyőn is szerepelnek elfoglalják új helyüket a második képernyőn. Az Android platformon már régóta elérhetőek egyszerű áttűnések, lapozások a képernyőátmenetek közt. Erre azért van szükség, mert a felhasználót (meg)zavarja a hirtelen váltás. A való életben sem villanással kerül az égre a madár, hanem lezajlik egy átmenet (a felszállás), ami átvezet a két állapot között. Emlékezzünk vissza: találkoztunk már olyan alkalmazással, ahol a képernyőváltás során oldalirányban úsztak ki-be a képernyők? Előre és visszafelé navigálásnál melyik irányba haladtak a képernyők?
+
+* Bár laboron a beépített komponensek során nem futunk ebbe a problémába, de jegyezzük meg: **minden felhasználói interakcióra legyen visszajelzés!** Gondoljunk bele mit teszünk, ha egy gombot megnyomva nem történik semmi (fel se villan a gomb nyomott állapota), mit feltételezünk? Jusson eszünkbe egyéni nézetek használatakor! A *material* szemlélet ezt bővíti azzal, hogy a kiváltott változás egy egyre nagyobb sugarú kör íve mentén történik, aminek középpontja az a hely, ahol a felhasználó kiváltotta a változást:
 [material animáció](http://material-design.storage.googleapis.com/publish/material_v_3/material_ext_publish/0B3T7oTWa3HiFdWhpd296VUhLTFk/animation_responsiveinteraction_radialreaction.webm?_=1)
 
-* Minimális gépelés. Nehéz nagyobb fájdalmat okozni a felhsználónak annál, hogy mobilon kelljen gépelnie, nem véletlenül létezik annyi különböző gesztúra. Ha egyszerű bevitelről van szó (számok, intervallumok, dátumok) egyszerűsítsük csúszkával, vizuális naptári választóval.
+* **Minimális gépelés**. Nehéz nagyobb fájdalmat okozni a felhsználónak annál, hogy mobilon kelljen gépelnie, nem véletlenül létezik annyi különböző gesztúra. Ha egyszerű bevitelről van szó (számok, intervallumok, dátumok) egyszerűsítsük csúszkával, vizuális naptári választóval.
+
 * A *materialos* színekhez jó segítség az alábbi oldal: [http://www.materialpalette.com/](http://www.materialpalette.com/). Innen le is tudjuk tölteni xml formában a kapott színeket. Annyit érdemes tudni, hogy az “*accent*” színt csak a leghangsúlyosabb elemek kaphatják meg. Tipikusan ilyen a Floating Action Button, ami a képernyő legfontosabb funkcióját kell jelentse, ha van ilyen. Ugyanúgy másodlagos színt kapnak a Switch és a Slider nézetek is.
-* Ikonokat tervezni külön szakma, de mivel a legtöbb fejlesztő nem foglalkozik ilyesmivel másodállásban, ezért a Google nem csak néhány ikont készített el előre, hanem rengeteget. Innen letölthetők: [http://www.google.com/design/spec/resources/sticker-sheets-icons.html#sticker-sheets-icons-system-icons](http://www.google.com/design/spec/resources/sticker-sheets-icons.html#sticker-sheets-icons-system-icons). Valószínűleg megtaláljuk a nekünk kellőt. Alapszabály, hogy ne használjunk olyan ikont (bármennyire is jó lenne), ami már másik ismert funkciót jelöl. Hasonlóan kinéző komponenstől a felhasználó azt várja, hogy hasonlóan fog működni. A Floating Action Button funkciójának alapvetően egy pozitív cselekedetnek kell lennie (jó példa az új elem létrehozása, rossz példa a szín módosítása vagy a kuka törlése), így válasszunk ennek megfelelő ikont. A fentebb linkelt zipben rengeteg fájl van (több, mint 72.000). A laborhoz mellékeljük a szükséges ikonokat, de az otthoni használathoz a javasolt mód az alábbi:
- * Nyissuk meg a kitömörített mappa gyökerében az index.html-t
- * Válasszunk egy ikont (például az add ikon)
- * Menjünk a szekciójának mappájába (esetünkben ez a “content”)
- * Válasszuk ki a nekünk kellő variánst. Szerepel fehérben, feketében, szürkében és mindhárom színhez 4 féle méretben (nekünk az “*ic_add_white_24dp.png*” kell)
- * Menjünk egy könyvtárral feljebb és Total Commanderrel másoljuk az összes minősített mappát a célhelyre, de úgy, hogy megadjuk milyen illeszkedő fájlokat másoljon csak. Oda írjuk be a kiválasztott formátum fájlnevét.
+
+* Ikonokat tervezni külön szakma, de mivel a legtöbb fejlesztő nem foglalkozik ilyesmivel másodállásban, ezért a Google nem csak néhány ikont készített el előre, hanem rengeteget. Innen letölthetőka hivatalos ikonok: [http://www.google.com/design/spec/resources/sticker-sheets-icons.html#sticker-sheets-icons-system-icons](http://www.google.com/design/spec/resources/sticker-sheets-icons.html#sticker-sheets-icons-system-icons). 
+
+* A fejlesztői közösség az előbbit tovább gondolta, és létrehoztak egy oldalt ezen ikonok egyszerű kezelésére, illetve számos továbbival ki is egészítettek. [https://materialdesignicons.com/](https://materialdesignicons.com/) Valószínűleg megtaláljuk a nekünk kellőt. Alapszabály, hogy ne használjunk olyan ikont (bármennyire is jó lenne), ami már másik ismert funkciót jelöl. Hasonlóan kinéző komponenstől a felhasználó azt várja, hogy hasonlóan fog működni. A Floating Action Button funkciójának alapvetően egy pozitív cselekedetnek kell lennie (jó példa az új elem létrehozása, rossz példa a szín módosítása vagy a kuka törlése), így válasszunk ennek megfelelő ikont. A laborhoz mellékeljük a szükséges ikonokat, de az otthoni használathoz a javasolt mód az alábbi:
+
+ * Az Android 5.0 változatot töltsük le.
+ * Válasszuk ki a nekünk kellő variánst. Szerepel fehérben, feketében, szürkében és mindhárom színhez 4 féle méretben (nekünk az `ic_add_white_24dp.png` kell)
+ * Menjünk egy könyvtárral feljebb másoljuk az összes minősített mappát a célhelyre.
 
 * Tartsunk megfelelő távolságokat az elemek között, különösen ügyelve az interaktív elemekre. Lesz olyan, akinek nálunk nagyobb az ujjbegye, gondoljunk rá is! A tartalom ne kezdődjön a képernyő 0. pixelénél! Az ajánlásokban elég részletesen taglalják a számokat: az új *guideline* szerint minden elem egy 8dp-s rácsban helyezkedik el. Ez alól kivételek a szövegek (amiknek alapvonala igazodik 4dp-hez) és a *toolbar* ikonjai (szintén 4 dp). Tehát alapvetően mindennek a mérete vagy a távolsága n x 8dp. A kijelző szélétől tartandó margó például 16dp, az érinthető területek minimum mérete 48 x 48dp, a köztük tartandó távolság pedig minimum 8dp, de inkább több.
 * A képi elemek legyen inkább személyesek. Ne használjunk pár élettelen mosolyú modell arcát mutató sotck fotókat, a képnek legyen köze a tartalomhoz. A személyes (felhasználó készítette) képek még jobbak. A képek töltsék ki a teret, amennyire csak lehet! Ez azt jelenti, hogy szélességben a teljes kijelzőt fedje, magasságban pedig lehetőleg valamilyen jellegzetes arány vonalát kövesse. Van néhány ajánlás, ezekre az arányokra – mármint arra hogy bizonyos képarányú elemek magassága hol helyezkedik el.
@@ -57,8 +62,6 @@ Most, hogy néhány hasznos dolgot megismertünk, ideje letöltenünk a prototí
 Tömörítsük ki a mappát, indítsuk el az Android Studio-t, majd az Open segítségével nyissuk meg az alkalmazást.
 
 <img src="./images/screen1_framed.png" width="200" align="middle">
-
-A kezdőalkalmazás.
 
 Ennek az alkalmazásnak az a feladata, hogy meglátogatandó helyeket gyűjtsünk benne. A prototípus arra koncentrál, hogy minimális funkcionalitást valósítson meg gyorsan. Az adatok perzisztens tárolásához a *Sugar ORM* ([http://satyan.github.io/sugar/](http://satyan.github.io/sugar/)) könyvtárat használja . Laborvezetővel tekintsék át a kódot és a működést! Főbb elemei:
 
@@ -110,7 +113,7 @@ FloatingActionButton fab =
 ```
 
 
-Az activity_places_list.xmlben az include után:
+Az `activity_places_list.xml`ben az include után:
 
 ```xml
 <android.support.design.widget.FloatingActionButton
@@ -130,7 +133,7 @@ A Floating Action Button ikonja fontos szerepet játszik. A felhasználónak  el
 
 [Drawable.zip](./assets/drawable.zip)
 
-Tömörítsük ki és tegyük a projektünkbe, majd állítsuk be a FAB ikonját az activity_places_list.xml-ben:
+Tömörítsük ki és tegyük a projektünkbe, majd állítsuk be a FAB ikonját az `activity_places_list.xml`-ben:
 
 ```xml
 app:srcCompat="@drawable/ic_add_white_24dp"
@@ -141,7 +144,7 @@ app:srcCompat="@drawable/ic_add_white_24dp"
 
 Jelenleg a Toolbaron megjelenik az Activity neve, ami "PlacesToVisit", alatta egy TextView-ban pedig a szöveg, hogy "Places to visit". Ezek közül az egyik felesleges, és szebb, ha a normál helyesírás szerinti "Places to visit"-et hagyjuk meg. Azonban egy üres Toolbarnak nincs sok értelme, úgyhogy inkább rakjuk fel ezt a szöveget oda.
 
-Ehhez először is az activity_places_list.xml-ben a Toolbar tagen belül vegyük fel az app:title attribútumot, és vegyük fel a string erőforrást.
+Ehhez először is az `activity_places_list.xml`-ben a Toolbar tagen belül vegyük fel az app:title attribútumot, és vegyük fel a string erőforrást.
 
 ```xml
 app:title="@string/places_to_visit"
@@ -151,7 +154,7 @@ app:title="@string/places_to_visit"
 <string name="places_to_visit">Places to visit</string>
 ```
 
-Majd töröljük a content_places_list.xmlből a TextViewt, a RecyclerView-t pedig igazítsuk a szülője tetejéhez.
+Majd töröljük a `content_places_list.xml`-ből a TextViewt, a RecyclerView-t pedig igazítsuk a szülője tetejéhez.
 
 ```xml
 android:layout_alignParentTop="true"
@@ -166,7 +169,7 @@ Próbáljuk ki az alkalmazást!
 
 ### Üres lista
 
-Kevesen készülnek arra a lehetőségre, hogy mi fogadja a felhasználót akkor, ha üres a listanézet. Célszerű ilyenkor az üres lista helyett valamilyen szöveget megjeleníteni. Írjuk tehát át a content_places_list.xmlt.
+Kevesen készülnek arra a lehetőségre, hogy mi fogadja a felhasználót akkor, ha üres a listanézet. Célszerű ilyenkor az üres lista helyett valamilyen szöveget megjeleníteni. Írjuk tehát át a `content_places_list.xml`-t.
 
 ```xml
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -313,7 +316,7 @@ Hozzunk létre egy új erőforrás mappát! A neve legyen **values-v21**! Ebbe m
 
 ```
 
-Most meg kell adjuk az xml erőforrásokban, hogy miből-mit kell animálni. Ehhez úgy párosítjuk össze őket, hogy új attribútumot veszünk fel mind a Floating Action Button-hez, mind az activity_create_place_to_visit.xml gyökér eleméhez (Ez ugye a LinearLayout).
+Most meg kell adjuk az xml erőforrásokban, hogy miből-mit kell animálni. Ehhez úgy párosítjuk össze őket, hogy új attribútumot veszünk fel mind a Floating Action Button-hez, mind az `activity_create_place_to_visit.xml` gyökér eleméhez (Ez ugye a LinearLayout).
 
 ```xml
 android:transitionName="create"
@@ -347,7 +350,7 @@ Nem a legjobb, hiszen az alkalmazás második képernyője eredetileg dialógus 
 
 Az Activity azonban még így sem tökéletes, hiszen ha nagyon hosszú leírást adunk neki, akkor a Save gomb kicsúszik a képernyőről és használhatatlan lesz. Rögzítsük tehát a gombot a képernyő aljára, a fölötte lévő tartalmat pedig tegyük görgethetővé!
 
-Az activity_create_place_to_visit.xml gyökérelemét változtassuk RelativeLayout-ra, a benne lévő gombot pedig kössük az aljához.
+Az `activity_create_place_to_visit.xml` gyökérelemét változtassuk RelativeLayout-ra, a benne lévő gombot pedig kössük az aljához.
 
 ```xml
 android:layout_alignParentBottom="true"
@@ -379,13 +382,13 @@ private void showText(String text) {
 }
 ```
 
-Hívás:
+Hívás:s
 
 ```java
 showText(getResources().getString(R.string.cancelled));
 ```
 
-A Snackbar.make(...) függvény első paramétere egy View. Adjuk meg ide az Activitynk CoordinatorLayout-ját. Ehhez az activity_places_list.xml-ben id-t kell neki adni, a PlacesListActivityben felvenni változóként, majd az onCreate-ben referenciát szerezni rá.
+A Snackbar.make(...) függvény első paramétere egy View. Adjuk meg ide az Activitynk CoordinatorLayout-ját. Ehhez az `activity_places_list.xml`-ben id-t kell neki adni, a PlacesListActivityben felvenni változóként, majd az onCreate-ben referenciát szerezni rá.
 
 Próbáljuk ki a Snakcbart!
 
@@ -394,12 +397,14 @@ Próbáljuk ki a Snakcbart!
 
 ## Önálló feladat
 
+### Feladat 1 - Továbbfejlesztés
+
 A fenti alapok segítségével alakítsa tovább az alkalmazást!
 
 * Csökkentse a listában megjelenített információkat
 * Készítsen új képernyőt, ahol részletesen jeleníti meg az adott helyet
 * Készítse fel a felületet arra, hogy később a felhasználónak lehetősége lesz képet rögzíteni a helyről
 
-### Feladatok haladóknak:
+### Feladat 2 - Swipe to delete
 
 Valósítsa meg a swipe gesztussal való törlést (és esetleg módosítást). Használhatja például a következő osztálykönyvtárat: [https://github.com/wdullaer/SwipeActionAdapter](https://github.com/wdullaer/SwipeActionAdapter)
