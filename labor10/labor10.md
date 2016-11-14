@@ -28,14 +28,13 @@ Először is, akinek szándékában áll végigolvasni a teljes útmutatót kés
  * Válasszuk ki a nekünk kellő variánst. Szerepel fehérben, feketében, szürkében és mindhárom színhez 4 féle méretben (nekünk az “*ic_add_white_24dp.png*” kell)
  * Menjünk egy könyvtárral feljebb és Total Commanderrel másoljuk az összes minősített mappát a célhelyre, de úgy, hogy megadjuk milyen illeszkedő fájlokat másoljon csak. Oda írjuk be a kiválasztott formátum fájlnevét.
 
-<img src="./images/tc_material_icons.png" width="1009" height="571" align="middle">
-Total Commander használata a material ikon csomaggal
-
 * Tartsunk megfelelő távolságokat az elemek között, különösen ügyelve az interaktív elemekre. Lesz olyan, akinek nálunk nagyobb az ujjbegye, gondoljunk rá is! A tartalom ne kezdődjön a képernyő 0. pixelénél! Az ajánlásokban elég részletesen taglalják a számokat: az új guideline szerint minden elem egy 8dp-s rácsban helyezkedik el. Ez alól kivételek a szövegek (amiknek alapvonala igazodik 4dp-hez) és a toolbar ikonjai (szintén 4 dp). Tehát alapvetően mindennek a mérete vagy a távolsága n x 8dp. A kijelző szélétől tartandó margó például 16dp, az érinthető területek minimum mérete 48 x 48dp, a köztük tartandó távolság pedig minimum 8dp, de inkább több.
 * A képi elemek legyen inkább személyesek. Ne használjunk pár élettelen mosolyú modell arcát mutató sotck fotókat, a képnek egyen köze a tartalomhoz. A személyes (felhasználó készítette) képek még jobbak. A képek töltsék ki a teret, amennyire csak lehet! Ez azt jelenti, hogy szélességben a teljes kijelzőt fedje, magasságban pedig lehetőleg valamilyen jellegzetes arány vonalát kövesse. Van néhány ajánlás, ezekre az arányokra – mármint arra hogy bizonyos képarányú elemek magassága hol helyezkedik el.
 
-<img src="./images/keylines.png" width="771" height="650" align="middle">
-Néhány arány magasságvonala az útmutatóból.
+<img src="./images/keylines.png" width="300" " align="middle">
+
+
+
 
 * Ne használjuk a kártyanézeteket (tipikusan Google asszisztens) olyan elemekre, amik megjelenése azonos! Ezesetben egy listáról beszélünk, aminek használatát megnehezíti, hogy a kártyák közt van kihagyott terület és árnyékot is vetnek.
 
@@ -56,11 +55,11 @@ Próbálják ki ezeket a funkciókat!
 
 Most, hogy néhány hasznos dolgot megismertünk, ideje letöltenük a prototípust:
 
-[PlacesToVisit.zip](./PlacesToVisit.zip)
+[PlacesToVisit.zip](./assets/PlacesToVisit.zip)
 
 Tömörítsük ki a mappát, indítsuk el az Android Studio-t, majd az Open segítségével nyissuk meg az alkalmazást.
 
-<img src="./images/screen1.jpg" width="350" align="middle">
+<img src="./images/screen1.jpg" width="200" align="middle">
 
 A kezdőalkalmazás.
 
@@ -132,7 +131,7 @@ Az activity_places_list.xmlben az include után:
 
 A Floating Action Button ikonja fontos szerepet játszik. A felhasználónak  első ránézére tudnia kell belőle, hogy mire szolgál a gomb. Így tehát olyan ikont kell választanunk, amiből rögtön látszik, hogy a gomb elem hozzáadására szolgál. Töltsük le az alábbi zipet:
 
-[Drawable.zip](./drawable.zip)
+[Drawable.zip](./assets/drawable.zip)
 
 Tömörítsük ki és tegyük a projektünkbe, majd állítsuk be a FAB ikonját az activity_places_list.xml-ben:
 
@@ -165,7 +164,7 @@ Ahhoz, hogy a Toolbar vetett árnyéka érvényesüljön, és úgy tűnjön, hog
 
 Próbáljuk ki az alkalmazást!
 
-<img src="./images/screen2.jpg" width="350" align="middle">
+<img src="./images/screen2.jpg" width="200" align="middle">
 
 
 ### Üres lista
@@ -217,7 +216,7 @@ Figyeljük meg a FrameLayoutot! Egyszerre csak egyik gyermeke látható. Most m�
 Először is hozzunk létre egy privát TextView-t, majd szerezzünk rá referenciát az onCreate-ben.
 
 ```java
-    private TextView emptyTV;
+private TextView emptyTV;
 ```
 
 ```java
@@ -258,11 +257,11 @@ Következő lépésként vegyünk föl egy listenert privát tagváltozóként a
 Írjunk egy függvényt, ami ezen a listener objektumon keresztül viszaszól a változásról, majd **hívjuk is meg** az addPlace, az updatePlace és a removePlace függvényben.
 
 ```java
-    private void dataSetChanged() {
-        if (dataSetChangedListener instanceof DataSetChangedListener) {
-            dataSetChangedListener.onDataSetChanged();
-        }
+private void dataSetChanged() {
+    if (dataSetChangedListener instanceof DataSetChangedListener) {
+        dataSetChangedListener.onDataSetChanged();
     }
+}
 ```
 
 Ezzel készen is vagyunk, már csak az Activityt kell beregisztrálni. Ezt az OnCreate-ben az adapter példányosítása után meg is tehetjük.
@@ -284,7 +283,7 @@ Segíthetünk a felhasználónak még annyiban, hogy megengedjük, hogy erre a f
 
 ```
 
-<img src="./images/screen3.jpg" width="350" align="middle">
+<img src="./images/screen3.jpg" width="200" align="middle">
 
 ### Dialógus és animációja
 
@@ -379,6 +378,7 @@ private void showText(String text) {
 ```
 
 Hívás:
+
 ```java
 showText(getResources().getString(R.string.cancelled));
 ```
@@ -387,7 +387,7 @@ A Snackbar.make(...) függvény első paramétere egy View. Adjuk meg ide az Act
 
 Próbáljuk ki a Snakcbart!
 
-<img src="./images/screen4.jpg" width="350" align="middle">
+<img src="./images/screen4.jpg" width="200" align="middle">
 
 
 ## Önálló feladat
