@@ -393,7 +393,7 @@ A renderelés kezdete és vége előtt eltelt időt nézzük és ha ez kisebb mi
 
 <img src="./images/animate.gif" width="500" " align="middle">
 
-## Bónusz feladat
+## Önálló feladatok
 
 ### Feladat 1 - Ütközés detektálás
 
