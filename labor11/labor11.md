@@ -17,7 +17,7 @@ Tekintve a platform adottságait, az egyébként elérhető és sikeres megoldá
 
 Elsőnek töltsük le a labor során használt kiinduló projektet, majd nyissuk meg Android Studio-val. 
 
-[Kiinduló projekt](http://noisyman.aut.bme.hu/autwp/wp-content/uploads/2015/11/SpaceShipGame_skeleton.zip) 
+[Kiinduló projekt](./assets/SpaceShipGame_skeleton.zip) 
 
 A Laborvezető segítségével vizsgáljuk meg a projekt felépítését.
 
