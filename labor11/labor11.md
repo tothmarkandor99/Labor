@@ -15,7 +15,11 @@ Tekintve a platform adottságait, az egyébként elérhető és sikeres megoldá
 
 ## Kiinduló projekt
 
-Elsőnek töltsük le a labor során használt kiinduló projektet, majd nyissuk meg Android Studio-val. [Kiinduló projekt](http://noisyman.aut.bme.hu/autwp/wp-content/uploads/2015/11/SpaceShipGame_skeleton.zip) A Laborvezető segítségével vizsgáljuk meg a projekt felépítését.
+Elsőnek töltsük le a labor során használt kiinduló projektet, majd nyissuk meg Android Studio-val. 
+
+[Kiinduló projekt](http://noisyman.aut.bme.hu/autwp/wp-content/uploads/2015/11/SpaceShipGame_skeleton.zip) 
+
+A Laborvezető segítségével vizsgáljuk meg a projekt felépítését.
 
 ### Általános
 
@@ -40,67 +44,67 @@ Készítsük el az objektumok kirajzolását végző **Renderer** osztályt a _r
 
 ```java
 public class Renderer {
-private Context context;
+    private Context context;
 
-private int width;
-private int height;
+    private int width;
+    private int height;
 
-private Random random;
+    private Random random;
 
-private List<Renderable> entitiesToDraw;
+    private List<Renderable> entitiesToDraw;
 
-private Background background;
-private Player player;
+    private Background background;
+    private Player player;
 
-public Renderer(Context context) {
-  this.context = context;
-  init(0, 0);
-}
+    public Renderer(Context context) {
+        this.context = context;
+        init(0, 0);
+    }
 
-public void init(int width, int height) {
-  this.width = width;
-  this.height = height;
-  entitiesToDraw = new ArrayList<>();
-  background = new Background(context);
-  background.size(width, height);
-  player = new Player(context);
-  player.size(width, height);
+    public void init(int width, int height) {
+        this.width = width;
+        this.height = height;
+        entitiesToDraw = new ArrayList<>();
+        background = new Background(context);
+        background.size(width, height);
+        player = new Player(context);
+        player.size(width, height);
 
-  Enemy enemy = new Enemy(context);
-  enemy.size(width, height);
-  entitiesToDraw.add(enemy);
-  entitiesToDraw.add(player);
-  random = new Random();
-}
+        Enemy enemy = new Enemy(context);
+        enemy.size(width, height);
+        entitiesToDraw.add(enemy);
+        entitiesToDraw.add(player);
+        random = new Random();
+    }
 
-public void step() {
-  if (random.nextFloat() > (0.993)) {
-    Enemy enemy = new Enemy(context);
-    enemy.size(width, height);
-    entitiesToDraw.add(enemy);
-  }
-  
-  for (Renderable object : entitiesToDraw) {
-    object.step();
-  }
-}
+    public void step() {
+        if (random.nextFloat() > (0.993)) {
+            Enemy enemy = new Enemy(context);
+            enemy.size(width, height);
+            entitiesToDraw.add(enemy);
+        }
 
-public void draw(Canvas canvas) {
-  background.render(canvas);
-  for (Renderable object : entitiesToDraw) {
-    object.render(canvas);
-  }
-}
+        for (Renderable object : entitiesToDraw) {
+            object.step();
+        }
+    }
 
-public void setElevation(float elevation) {
-  player.setElevation(elevation);
-}
+    public void draw(Canvas canvas) {
+        background.render(canvas);
+        for (Renderable object : entitiesToDraw) {
+            object.render(canvas);
+        }
+    }
+
+    public void setElevation(float elevation) {
+        player.setElevation(elevation);
+    }
 }
 ```
 
 ### A kirajzoló szál
 
-Készítsük el a kirajzolás ütemezéséért felelős szálat. Ezen a szálon fognak kirajzolásra kerülni a **Renderer** objektumai. Ez tartalmaz egy referenciát a **GameView**-ra, hogy abban megjelenítse a kirajzolt képet, valamint az előbb létrehozott **Renderer**-t használja fel. Maga is egy szálból származik, és a _run()_ függvényében egy végtelen ciklusban rajzolja ki újra és újra a játékelemeket. A rajzolás kezdetén először lépteti a játéktér állapotát, majd a **SurfaceView** **SurfaceHolder** objektuma segítségével kirajzolja magát. Fontos, hogy a kirajzolás előtt és után le kell zárni a **SurfaceHolder**-hez tartozó **Canvas**-t. 
+Készítsük el a kirajzolás ütemezéséért felelős szálat, a *rendering* csomagban **RenderLoop** néven.. Ezen a szálon fognak kirajzolásra kerülni a **Renderer** objektumai. Ez tartalmaz egy referenciát a **GameView**-ra, hogy abban megjelenítse a kirajzolt képet, valamint az előbb létrehozott **Renderer**-t használja fel. Maga is egy szálból származik, és a _run()_ függvényében egy végtelen ciklusban rajzolja ki újra és újra a játékelemeket. A rajzolás kezdetén először lépteti a játéktér állapotát, majd a **SurfaceView** **SurfaceHolder** objektuma segítségével kirajzolja magát. Fontos, hogy a kirajzolás előtt és után le kell zárni a **SurfaceHolder**-hez tartozó **Canvas**-t. 
 
 
 
@@ -165,35 +169,40 @@ Módosítsuk a **GameView** _init()_ függvényét, hogy a kontextust paraméter
 
 `init(context);` 
  
-Ezután a **SurfaceHolder** callback eseményeit valósítsuk meg. 
+Ezután a **SurfaceHolder** callback eseményeit valósítjuk meg. 
   
 ```java
-holder.addCallback(new SurfaceHolder.Callback() {
-  @Override
-  public void surfaceCreated(SurfaceHolder holder) {
-    renderLoop.setRunning(true);
-    renderLoop.start();
-  }
+private void init(final Context context) {
+	SurfaceHolder holder = getHolder();
+	holder.addCallback(new SurfaceHolder.Callback() {
+		@Override
+		public void surfaceCreated(SurfaceHolder holder) {
+			renderLoop = new RenderLoop(context,GameView.this);
+			renderLoop.setRunning(true);
+			renderLoop.start();
+		}
 
-  @Override
-  public void surfaceDestroyed(SurfaceHolder holder) {
-    boolean retry = true;
-    renderLoop.setRunning(false);
-    while (retry) {
-      try {
-        renderLoop.join();
-        retry = false;
-      } catch (InterruptedException e) {
-        e.printStackTrace();
-      }
-    }
-  }
+		@Override
+		public void surfaceDestroyed(SurfaceHolder holder) {
+			boolean retry = true;
+			renderLoop.setRunning(false);
+			while (retry) {
+				try {
+					renderLoop.join();
 
-  @Override
-  public void surfaceChanged(SurfaceHolder holder, int format,int width, int height) {
-    renderLoop.init(width,height);
-  }
-});
+					retry = false;
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+
+		@Override
+		public void surfaceChanged(SurfaceHolder holder, int format,int width, int height) {
+			renderLoop.init(width,height);
+		}
+	});
+}
 ```
   
   
@@ -207,7 +216,7 @@ public void setElevation(float elevation){
 
 **Próbáljuk ki az alkalmazást**
 
-SCREENSHOT
+<img src="./images/screen1.png" width="600" " align="middle">
 
 ## Irányítás
 
@@ -305,11 +314,11 @@ public class GameActivity extends AppCompatActivity {
 
 **Próbáljuk ki az alkalmazást.**
 
-SCREENSHOT
+<img src="./images/screen2.png" width="600" " align="middle">
 
 ### Animáció
 
-A **Ship** osztály valamint a **Player** és **Enemy** már fel vannak készítve arra hogy különböző állapotok között animáljanak. A megfelelő képi erőforrások is biztosítottak, már csak a képeket kell elcsúsztatni a megfelelő állapotba, a Ship osztály render függvényéban: 
+A **Ship** osztály valamint a **Player** és **Enemy** már fel vannak készítve arra hogy különböző állapotok között animáljanak. A megfelelő képi erőforrások is biztosítottak, már csak a képeket kell elcsúsztatni a megfelelő állapotba, a Ship osztály render függvényében: 
 
 ```java
 @Override
@@ -325,20 +334,18 @@ public void render(Canvas canvas) {
   Rect src = new Rect(x, y, x + spriteWidth, y + spriteHeight);
   Rect dst = new Rect(posX, posY, posX + spriteWidth * 4, posY + spriteHeight * 4);
 
-  canvas.drawBitmap(image, src, dst, null);
+  if(canvas!=null) {
+      canvas.drawBitmap(image, src, dst, null);
+  }
 }
 ```
 
 **Próbáljuk ki az alkalmazást!** 
 
-![Animate]
-(./images/animate.gif)
+<img src="./images/animate.gif" width="500" " align="middle">
 
-TODO GIF
 
-## Otthoni feladat
-
-### FPS korlát elhelyezése
+## FPS korlát elhelyezése
 
 Azért hogy a kirajzolás sebességét egy fix értékre állítsuk két kirajzolás között aludnia kell a kirajzoló szálnak, amennyiben a kirajzolás nem tartott annyi ideig mint a kívánt FPS érték időköze. 
 
@@ -382,12 +389,16 @@ public void run() {
  
 A renderelés kezdete és vége előtt eltelt időt nézzük és ha ez kisebb mint amennyi az adott FPS számhoz szükséges, úgy a megfelelő ideig altatjuk a szálat. Amennyiben tovább tartott a renderelés, akkor is adunk valamennyi alvás időt a CPU-nak.
 
+**Próbáljuk ki az alkalmazást!** 
+
+<img src="./images/animate.gif" width="500" " align="middle">
+
 ## Bónusz feladat
 
-### Ütközés detektálás
+### Feladat 1 - Ütközés detektálás
 
 Detektálja, ha a felhasználó űrhajója ütközik egy ellenséges űrhajóval, ekkor jelenítsen meg egy **Toast** üzenetet, majd állítsa le a játékot!
 
-### Képernyőn maradás
+### Feladat 2 - Képernyőn maradás
 
-Biztosítsa, hogy a játékos űrhajóját ne lehessen kimozgatni a játéktérből!
+Biztosítsa, hogy a játékos űrhajóját ne lehessen kimozgatni a játéktérből!	
