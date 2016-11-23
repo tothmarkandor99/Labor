@@ -1,40 +1,40 @@
 # Labor 12 - Launcher++
 
-## Bevezetõ
+## BevezetÅ‘
 
-A labor célja az 5. laboron elkészített home screen alkalmazás kibõvítése.
+A labor cÃ©lja az 5. laboron elkÃ©szÃ­tett home screen alkalmazÃ¡s kibÅ‘vÃ­tÃ©se.
 
-A kiinduló projekt letölthetõ innen: [Kiinduló projekt](./assets/LauncherLabor_uptodate.zip) 
+A kiindulÃ³ projekt letÃ¶lthetÅ‘ innen: [KiindulÃ³ projekt](./assets/LauncherLabor_uptodate.zip) 
 
-Az ötös eléréséhez a minimum követelményeken túl egy további, szabadon válaszott funkció beépítése szükséges. Az alkalmazások elkészítéséhez érdemes az óra anyagát és a példakódokat alapul venni az android.telephony csomag használata során.
-[Telefónia Példa](./assets/TelefoniaPelda.zip) 
+Az Ã¶tÃ¶s elÃ©rÃ©sÃ©hez a minimum kÃ¶vetelmÃ©nyeken tÃºl egy tovÃ¡bbi, szabadon vÃ¡laszott funkciÃ³ beÃ©pÃ­tÃ©se szÃ¼ksÃ©ges. Az alkalmazÃ¡sok elkÃ©szÃ­tÃ©sÃ©hez Ã©rdemes az Ã³ra anyagÃ¡t Ã©s a pÃ©ldakÃ³dokat alapul venni az android.telephony csomag hasznÃ¡lata sorÃ¡n.
+[TelefÃ³nia PÃ©lda](./assets/TelefoniaPelda.zip) 
 
-Két nézettel kell kibõvíteni az alkalmazást (a ViewPager-t). A két új nézettel szemben támasztott követelményeket az alábbi fejezetek tartalmazzák.
+KÃ©t nÃ©zettel kell kibÅ‘vÃ­teni az alkalmazÃ¡st (a ViewPager-t). A kÃ©t Ãºj nÃ©zettel szemben tÃ¡masztott kÃ¶vetelmÃ©nyeket az alÃ¡bbi fejezetek tartalmazzÃ¡k.
 
-## Hívásnapló
+## HÃ­vÃ¡snaplÃ³
 
-A feladat egy hívásnapló nézet megvalósítása.
+A feladat egy hÃ­vÃ¡snaplÃ³ nÃ©zet megvalÃ³sÃ­tÃ¡sa.
 
-A nézet legyen képes megjeleníteni a részletes hívásnaplót, külön jelezve az egyes hívás típusokat (bejövõ, kimenõ, nem fogadott)
-Extra feladatok lehetnek például:
+A nÃ©zet legyen kÃ©pes megjelenÃ­teni a rÃ©szletes hÃ­vÃ¡snaplÃ³t, kÃ¼lÃ¶n jelezve az egyes hÃ­vÃ¡s tÃ­pusokat (bejÃ¶vÅ‘, kimenÅ‘, nem fogadott)
+Extra feladatok lehetnek pÃ©ldÃ¡ul:
 
-    A hívásnapló ne csak a telefonszámokat mutassa, hanem nevet, képet is, amennyiben a névjegyzékben megtalálható
-    Hívásnapló szûrése, rendezése
+*   A hÃ­vÃ¡snaplÃ³ ne csak a telefonszÃ¡mokat mutassa, hanem nevet, kÃ©pet is, amennyiben a nÃ©vjegyzÃ©kben megtalÃ¡lhatÃ³
+*   HÃ­vÃ¡snaplÃ³ szÅ±rÃ©se, rendezÃ©se
 
-## Kedvencek nézet
+## Kedvencek nÃ©zet
 
-Egy egyszerû lista nézet rajta egy hozzáadás gombbal. A hozzáadás gombra kattintva ki lehet választani egy contact-ot, majd sikeres kiválasztás után bekerül a listába a contact a telefonszámával együtt. Az adott elem jobb oldalán legyen egy hívás gomb, amire rákattintva fel lehet hívni az adott telefonszámot.
+Egy egyszerÅ± lista nÃ©zet rajta egy hozzÃ¡adÃ¡s gombbal. A hozzÃ¡adÃ¡s gombra kattintva ki lehet vÃ¡lasztani egy contact-ot, majd sikeres kivÃ¡lasztÃ¡s utÃ¡n bekerÃ¼l a listÃ¡ba a contact a telefonszÃ¡mÃ¡val egyÃ¼tt. Az adott elem jobb oldalÃ¡n legyen egy hÃ­vÃ¡s gomb, amire rÃ¡kattintva fel lehet hÃ­vni az adott telefonszÃ¡mot.
 
-### Példa kód a contact kiválasztásához
+### PÃ©lda kÃ³d a contact kivÃ¡lasztÃ¡sÃ¡hoz
 
-Kontakt választó feldobása:
+Kontakt vÃ¡lasztÃ³ feldobÃ¡sa:
 
 ```java	
 Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
 startActivityForResult(intent, REQUEST_PICK_CONTACT);
 ```
 
-Eredmény lekezelése:
+EredmÃ©ny lekezelÃ©se:
 
 ```java		
 @Override
@@ -89,9 +89,9 @@ protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 }
 ```
 
-A példa kód lekérdezi a kiválasztott contact-ot és megkeresi hozzá azt a telefonszámát, ami mobilként van megjelölve.
+A pÃ©lda kÃ³d lekÃ©rdezi a kivÃ¡lasztott contact-ot Ã©s megkeresi hozzÃ¡ azt a telefonszÃ¡mÃ¡t, ami mobilkÃ©nt van megjelÃ¶lve.
 
-## Feltöltendõ anyag
+## FeltÃ¶ltendÅ‘ anyag
 
-Az AUT portálra feltöltendõ az alkalmazás projekt könyvtárán felül egy 2-3 oldalas felhasználói kézikönyv, ami leírja az elkészített szoftver funkcióit, és képeket is tartalmaz minden releváns képernyõrõl. A felhasználói kézikönyv is kötelezõ része a feladatnak, nélküle az anyag nem értékelhetõ!
-A feltöltés határideje: vasárnap 23:59
+Az AUT portÃ¡lra feltÃ¶ltendÅ‘ az alkalmazÃ¡s projekt kÃ¶nyvtÃ¡rÃ¡n felÃ¼l egy 2-3 oldalas felhasznÃ¡lÃ³i kÃ©zikÃ¶nyv, ami leÃ­rja az elkÃ©szÃ­tett szoftver funkciÃ³it, Ã©s kÃ©peket is tartalmaz minden relevÃ¡ns kÃ©pernyÅ‘rÅ‘l. A felhasznÃ¡lÃ³i kÃ©zikÃ¶nyv is kÃ¶telezÅ‘ rÃ©sze a feladatnak, nÃ©lkÃ¼le az anyag nem Ã©rtÃ©kelhetÅ‘!
+A feltÃ¶ltÃ©s hatÃ¡rideje: vasÃ¡rnap 23:59
