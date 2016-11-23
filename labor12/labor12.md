@@ -2,7 +2,7 @@
 
 ## Bevezető
 
-A labor célja az 5. laboron elkészített home screen alkalmazás kibővítése.
+A labor célja az 5. laboron elkészített Home Screen alkalmazás kibővítése.
 
 A kiinduló projekt letölthető innen: [Kiinduló projekt](./assets/LauncherLabor_uptodate.zip) 
 
@@ -94,4 +94,4 @@ A példa kód lekérdezi a kiválasztott contact-ot és megkeresi hozzá azt a t
 ## Feltöltendő anyag
 
 Az AUT portálra feltöltendő az alkalmazás projekt könyvtárán felül egy 2-3 oldalas felhasználói kézikönyv, ami leírja az elkészített szoftver funkcióit, és képeket is tartalmaz minden releváns képernyőről. A felhasználói kézikönyv is kötelező része a feladatnak, nélküle az anyag nem értékelhető!
-A feltöltés határideje: vasárnap 23:59
+**A feltöltés határideje: vasárnap 23:59**
