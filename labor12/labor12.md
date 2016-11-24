@@ -36,56 +36,62 @@ startActivityForResult(intent, REQUEST_PICK_CONTACT);
 
 Eredmény lekezelése:
 
-```java		
+```java
 @Override
 protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-    super.onActivityResult(requestCode, resultCode, data);
-    if (resultCode == RESULT_OK) {
-        switch (requestCode) {
-            case REQUEST_PICK_CONTACT:
-                Uri contactUri = data.getData();
-                if (contactUri != null) {
-                    Cursor c = null;
-                    Cursor addrCur = null;
-                    try {
-                        ContentResolver cr = getContentResolver();
-                        c = cr.query(contactUri,null,null, null, null);
-                        if (c != null && c.moveToFirst()) {
-                            String id = c.getString(c.getColumnIndex(BaseColumns._ID));
-                            String name = c.getString(c.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
-                            Log.d("Launcher", "name: " + name);
-                            String contactNumber = null;
-                            Cursor cursorPhone = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-                                    new String[]{ContactsContract.CommonDataKinds.Phone.NUMBER},
- 
-                                    ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ? AND " +
-                                            ContactsContract.CommonDataKinds.Phone.TYPE + " = " +
-                                            ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE,
- 
-                                    new String[]{id},
-                                    null);
- 
-                            if (cursorPhone.moveToFirst()) {
-                                contactNumber = cursorPhone.getString(cursorPhone.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-                            }
-                            Log.d("Launcher", "contactNumber: " + contactNumber);
-                            cursorPhone.close();
-                        }
-                    } finally {
-                        if (c != null) {
-                            c.close();
-                        }
-                        if (addrCur != null) {
-                            addrCur.close();
-                        }
-                    }
-                }
- 
-                break;
-            default:
-                break;
-        }
-    }
+	super.onActivityResult(requestCode, resultCode, data);
+	if (resultCode == RESULT_OK) {
+		switch (requestCode) {
+			case REQUEST_PICK_CONTACT:
+				Uri contactUri = data.getData();
+				if (contactUri != null) {
+					Cursor c = null;
+					Cursor addrCur = null;
+					try {
+						ContentResolver cr = getContentResolver();
+						c = cr.query(contactUri,null,null, null, null);
+						extractContact(c);
+					} finally {
+						if (c != null) {
+							c.close();
+						}
+						if (addrCur != null) {
+							addrCur.close();
+						}
+					}
+				}
+				break;
+			default:
+				break;
+		}
+	}
+}
+
+private void extractContact(Cursor c) {
+	if (c != null && c.moveToFirst()) {
+		String id = c.getString(c.getColumnIndex(BaseColumns._ID));
+		String name = c.getString(c.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
+		Log.d("Launcher", "name: " + name);
+		String contactNumber = null;
+		Cursor cursorPhone = queryPhoneData(id);
+		if (cursorPhone.moveToFirst()) {
+			contactNumber = cursorPhone.getString(cursorPhone.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+		}
+		Log.d("Launcher", "contactNumber: " + contactNumber);
+		cursorPhone.close();
+	}
+}
+
+private Cursor queryPhoneData(String id) {
+	return getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+			new String[]{ContactsContract.CommonDataKinds.Phone.NUMBER},
+
+			ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ? AND " +
+					ContactsContract.CommonDataKinds.Phone.TYPE + " = " +
+					ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE,
+
+			new String[]{id},
+			null);
 }
 ```
 
