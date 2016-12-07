@@ -13,3 +13,5 @@
 [11. labor - Játékfejlesztés](./labor11/labor11.md)
 
 [12. labor - Launcher++](./labor12/labor12.md)
+
+[13. labor - Futásidejű engedélyek](./labor13/labor13.md)
