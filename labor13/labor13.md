@@ -29,8 +29,6 @@ Az Android rendszer számos metódust biztosít egy jogosultság elkérésére. 
 Egyes esetekben szükséges lehet a felhasználót tájékoztatni, hogy miért kér az alkalmazás veszélyes engedélyeket.
 **ActivityCompat.shouldShowRequestPermissionRationale()**
 
-## Feladat
-
 ## Kezdő lépések
 
 A labor során egy egyszerű telefonkönyv alkalmazást kell elkészíteni. Az alkalmazás listázni tudja a telefonon tárolt névjegyeket, majd egy adott elemre kattintva hívást lehet kezdeményezni.
@@ -87,7 +85,7 @@ onCreate() metódusba:
 contactsRV = (RecyclerView) findViewById(R.id.contactsRV);
 ```
 
-## Modell
+## Model
 
 Készítsük el a Contact osztályt, mely az eszközön található névjegyeket fogja reprezentálni. Az egyszerűség kedvéért most csak a név és telefonszám adatokat tároljuk el benne.
 
@@ -116,7 +114,7 @@ public class Contact {
 
 ## Adapter
 
-Készítsük el a listát feltöltő adaptert ContactsAdapter néven, **adapter** nevű csomagba.
+Készítsük el a listát feltöltő adaptert **ContactsAdapter **néven, **adapter** nevű csomagba.
 
 ```java
 public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ContactViewHolder> {
@@ -166,7 +164,7 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.Contac
 }
 ```
 
-Az adapter az onCreateViewHolder() metódusában hivatkozik a listaelem felületleírójára, hozzuk létre a hiányzó **contact_item** xml erőforrást:
+Az adapter az **onCreateViewHolder()** metódusában hivatkozik a listaelem felületleírójára, hozzuk létre a hiányzó **contact_item** xml erőforrást:
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -222,17 +220,16 @@ Az adapter az onCreateViewHolder() metódusában hivatkozik a listaelem felület
 Adjuk hozzá a két hiányzó szöveges erőforrást, és másoljuk be a drawables mappába a hiányzó képet!
 
 strings.xml-be:
+
 ```xml
-...
 <string name="name">Name</string>
 <string name="phone">Phone</string>
-...
 ```
 
 drawables mappába:
-[ic_contact_phone_black_48dp](./assets/ic_contact_phone_black_48dp.png)
+[`ic_contact_phone_black_48dp`](./assets/ic_contact_phone_black_48dp.png)
 
-A névjegyek megjelenítéséhez az utolsó lépés az adapter pélányosítása, és beállítása a recyclerview komponenshez. Szükség van az eszközön tárolt névjegyek megszerzésére, ehhez adjuk hozzá a ContactsActivity-be az alábbi metódust:
+A névjegyek megjelenítéséhez az utolsó lépés az adapter pélányosítása, és beállítása a recyclerview komponenshez. Szükség van az eszközön tárolt névjegyek megszerzésére, ehhez adjuk hozzá a **ContactsActivity**-be az alábbi metódust:
 
 ```java
 private List<Contact> getAllContacts() {
@@ -268,8 +265,8 @@ private List<Contact> getAllContacts() {
 }
 ```
 
-Ez után a kapott névjegylistával példányosítsuk az adaptert, és állítsuk be a recyclerview komponenshez.
-ContactsActivity onCreate() metódusába:
+Ez után a kapott névjegylistával példányosítsuk az adaptert, és állítsuk be a RecyclerView komponenshez.
+**ContactsActivity** **onCreate()** metódusába:
 
 ```java
 ContactsAdapter contactsAdapter = new ContactsAdapter(getAllContacts(), this);
@@ -278,11 +275,12 @@ contactsRV.setAdapter(contactsAdapter);
 ```
 
 Névjegyek olvasásához szükséges engedély a manifest-be:
+
 ```xml
 <uses-permission android:name="android.permission.READ_CONTACTS" />
 ```
 
-## Próba
+## Teszt
 
 Egyelőre semmilyen jogosulságkezelést nem valósítottunk meg a kódban, ezért az alkalmazás pillanatnyi állapotának kipróbálásához Android 6.0 előtti verzióra van szükség, különben hibát kapunk az indulás során.
 
@@ -293,9 +291,15 @@ Amennyiben az eszközön nincsenek névjegyek, adjunk hozzá legalább egyet tel
 
 Android 6.0 vagy magasabb verzión futtatva az alkalmazást hibát kapunk, hiszen a névjegyek beolvasásához szükséges engedély a veszélyes kategóriába tartozik, ezért ezt külön kell kezelni a kódban. (6.0 felett ÉS target SDK 23+ esetén)
 
-hiba:
+A hiba:
+
 ```java
-java.lang.SecurityException: Permission Denial: opening provider com.android.providers.contacts.ContactsProvider2 from ProcessRecord{b077ff8 21678:hu.bme.aut.amorg.examples.permissionslabor/u0a264} (pid=21678, uid=10264) requires android.permission.READ_CONTACTS or android.permission.WRITE_CONTACTS
+java.lang.SecurityException: Permission Denial: 
+opening provider com.android.providers.contacts.ContactsProvider2
+from ProcessRecord{b077ff821678:
+hu.bme.aut.amorg.examples.permissionslabor/u0a264} 
+(pid=21678, uid=10264) requires android.permission.READ_CONTACTS or
+android.permission.WRITE_CONTACTS
 ```
 
 ## Jogosultságkezelés
@@ -314,6 +318,7 @@ private void loadContacts() {
 ```
 
 onCreate():
+
 ```java
 @Override
 protected void onCreate(Bundle savedInstanceState) {
@@ -325,7 +330,7 @@ protected void onCreate(Bundle savedInstanceState) {
 }
 ```
 
-Ahelyett hogy az onCreate()-ben azonnal meghívnánk a loadContacts() függvényt, kérjünk a felhasználótól engedélyt a névjegyek olvasására!
+Ahelyett hogy az **onCreate()**-ben azonnal meghívnánk a **loadContacts()** függvényt, kérjünk a felhasználótól engedélyt a névjegyek olvasására!
 
 Adjuk hozzá az alábbi metódust a ContactsActivityhez!
 
@@ -371,7 +376,7 @@ private void handleReadContactsPermission() {
 }
 ```
 
-A MY_PERMISSIONS_REQUEST_READ_CONTACTS egy általunk definiálandó requestCode. Amikor engedélyt kérünk, meg kell adni mellé egy requestCode-ot is, és amikor az operációs rendszer visszatér a onRequestPermissionsResult() metódusban, akkor ez alapján tudjuk kezelni, hogy éppen melyik engedélykérésre érkezett válasz.
+A `MY_PERMISSIONS_REQUEST_READ_CONTACTS` egy általunk definiálandó requestCode. Amikor engedélyt kérünk, meg kell adni mellé egy requestCode-ot is, és amikor az operációs rendszer visszatér a **onRequestPermissionsResult()** metódusban, akkor ez alapján tudjuk kezelni, hogy éppen melyik engedélykérésre érkezett válasz.
 
 Bármilyen érték adható neki, jelen esetben legyen 100.
 
@@ -379,7 +384,8 @@ Bármilyen érték adható neki, jelen esetben legyen 100.
 private static final int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 100;
 ```
 
-strings.xml-be:
+**strings.xml**-be:
+
 ```xml
 <string name="dialogTitle">Figyelem!</string>
 <string name="explanation">Az alkalmazásnak szüksége van az engedélyre a névjegyek beolvasásához!</string>
@@ -387,12 +393,12 @@ strings.xml-be:
 <string name="forward">Tovább</string>
 ```
 
-A handleReadContactsPermission() metódus megvizsgálja a checkSelfPermission() segítségével, hogy az alkalmazás rendelkezik-e már a READ_CONTACTS engedéllyel. Ha igen, akkor meghívja a loadContacts() metódust, és a névjegyek betöltődnek. Ellenkező esetben nézzük meg, hogy a felhasználót kell-e tájékoztatni az engedélykérés létjogosultságáról (shouldShowRequestPermissionRationale()). Ez a metódus akkor tér vissza true értékkel, ha korábban a felhasználó megtagadta az engedélyt az alkalmazástól. (Például mert nem gondolta, hogy az adott funkcióhoz feltétlenül szükséges az engedély.) Ilyenkor érdemes egy magyarázatot adni, melyben leírjuk, hogy miért van feltétlen szükség az engedélyre. (Legyünk tömörek, a hosszú magyarázatokat nem fogja a felhasználó elolvasni, inkább letörli az alkalmazást...) A magyarázat jelen esetben egy dialógus, mely rövid leírást ad az engedély szükségességéről.
-Amennyiben nincs szükség magyarázatra, vagy a magyarázat dialógusablakában a Tovább gombra nyomott a felhasználó, akkor kérjük el az engedélyt (requestPermissions()).
+A **handleReadContactsPermission()** metódus megvizsgálja a **checkSelfPermission()** segítségével, hogy az alkalmazás rendelkezik-e már a `READ_CONTACTS` engedéllyel. Ha igen, akkor meghívja a **loadContacts()** metódust, és a névjegyek betöltődnek. Ellenkező esetben nézzük meg, hogy a felhasználót kell-e tájékoztatni az engedélykérés létjogosultságáról (*shouldShowRequestPermissionRationale()*). Ez a metódus akkor tér vissza true értékkel, ha korábban a felhasználó megtagadta az engedélyt az alkalmazástól. (Például mert nem gondolta, hogy az adott funkcióhoz feltétlenül szükséges az engedély.) Ilyenkor érdemes egy magyarázatot adni, melyben leírjuk, hogy miért van feltétlen szükség az engedélyre. (Legyünk tömörek, a hosszú magyarázatokat nem fogja a felhasználó elolvasni, inkább letörli az alkalmazást...) A magyarázat jelen esetben egy dialógus, mely rövid leírást ad az engedély szükségességéről.
+Amennyiben nincs szükség magyarázatra, vagy a magyarázat dialógusablakában a Tovább gombra nyomott a felhasználó, akkor kérjük el az engedélyt (*requestPermissions()*).
 
-Cseréljük ki az activity onCreate()-ben található loadContacts() metódust az újonnan létrehozottra (handleReadContactsPermission();)!
+Cseréljük ki az activity **onCreate()**-ben található **loadContacts() **metódust az újonnan létrehozottra (**handleReadContactsPermission();**)!
 
-Kezeljük le az engedélykérés válaszát (onRequestPermissionsResult()) is az alábbi kóddal:
+Kezeljük le az engedélykérés válaszát (**onRequestPermissionsResult()**) is az alábbi kóddal:
 
 ```java
 @Override
@@ -417,8 +423,6 @@ public void onRequestPermissionsResult(int requestCode,
 ```
 
 Amennyiben az engedélyt az alkalmazás megkapta, a névjegyek a loadContacts() segítségével betöltésre kerülnek.
-
-## Próba
 
 Próbáljuk ki az alkalmazást 6.0+/API level 23+ eszközön!
 Figyeljük meg a magyarázódialógust abban az esetben, ha megtagadjuk az engedélyt, majd újraindítjuk az alkalmazást!
@@ -527,15 +531,14 @@ holder.container.setOnClickListener(new View.OnClickListener() {
 });
 ```
 
-## Próba
-
 Teszteljük a hívás funkcionalitást 6.0+/API level 23+ eszközön!
 
 ## Önálló feladatok
 
-*   Valósítsa meg az SMS küldés funkcionalitást!
+### Feladat:  Valósítsa meg az SMS küldés funkcionalitást!
 
-...például hosszú érintés eseménykezelő segítségével. A szükséges engedély:
+Például hosszú érintés eseménykezelő segítségével. 
+A szükséges engedély:
 
 ```xml
 <uses-permission android:name="android.permission.SEND_SMS"/>

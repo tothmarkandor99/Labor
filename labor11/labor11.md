@@ -399,6 +399,12 @@ A renderelés kezdete és vége előtt eltelt időt nézzük és ha ez kisebb mi
 
 Detektálja, ha a felhasználó űrhajója ütközik egy ellenséges űrhajóval, ekkor jelenítsen meg egy **Toast** üzenetet, majd állítsa le a játékot!
 
-### Feladat 2 - Képernyőn maradás
+### Feladat 2 - Játékos képernyőn maradása
 
 Biztosítsa, hogy a játékos űrhajóját ne lehessen kimozgatni a játéktérből!	
+### Feladat 3 - Képernyő ébrenmaradás
+
+Biztosítsa, hogy a jaték alatt ne aludjon el a képernyő, akkor sem ha huzamosabb időn át nem érünk hozzá!
+
+Segítség: [Keeping the Device Awake](https://developer.android.com/training/scheduling/wakelock.html)
+

@@ -667,8 +667,39 @@ public class WriteMessageResponseEvent {
 }
 ```
 
+Ezután az eseményeket a külön szálakban az `EventBus.getDefault().post(...)` segítségével küldjük ki. Minden eseményt a fenti osztályok 1-1 példánya reprezentál.
 
-A MainActivityben definiáljuk az eseménybusz elkapó esemnyeit.
+```java
+private void asyncMoveUser(final String username, final int direction) {
+    new Thread(new Runnable() {
+        @Override
+        public void run() {
+            final String response = labyrinthAPI.moveUser(username, direction);
+
+            MoveUserResponseEvent moveUserResponseEvent = new MoveUserResponseEvent();
+            moveUserResponseEvent.setResponse(response);
+            EventBus.getDefault().post(moveUserResponseEvent);
+
+        }
+    }).start();
+}
+
+private void asyncWriteMessage(final String username, final String message) {
+    new Thread(new Runnable() {
+        @Override
+        public void run() {
+            final String response = labyrinthAPI.writeMessage(username, message);
+
+            WriteMessageResponseEvent writeMessageResponseEvent = new WriteMessageResponseEvent();
+            writeMessageResponseEvent.setResponse(response);
+            EventBus.getDefault().post(writeMessageResponseEvent);
+
+        }
+    }).start();
+}
+```
+
+Ahhoz, hogy a kiváltott eseményeket el tudjuk kapni, a **MainActivity**ben definiáljuk az eseménybusz elkapó függvényeit.
 
 ```java
 @Subscribe(threadMode = ThreadMode.MAIN)
@@ -698,38 +729,6 @@ protected void onResume() {
 protected void onPause() {
     EventBus.getDefault().unregister(this);
     super.onPause();
-}
-```
-
-Mostmár elkapjuk az eseményeket, nincs más hátra mint kiváltani őket. A különszálakban az `EventBus.getDefault().post(...)` segítségével küldjük ki az eseményeket.
-
-```java
-private void asyncMoveUser(final String username, final int direction) {
-    new Thread(new Runnable() {
-        @Override
-        public void run() {
-            final String response = labyrinthAPI.moveUser(username, direction);
-
-            MoveUserResponseEvent moveUserResponseEvent = new MoveUserResponseEvent();
-            moveUserResponseEvent.setResponse(response);
-            EventBus.getDefault().post(moveUserResponseEvent);
-
-        }
-    }).start();
-}
-
-private void asyncWriteMessage(final String username, final String message) {
-    new Thread(new Runnable() {
-        @Override
-        public void run() {
-            final String response = labyrinthAPI.writeMessage(username, message);
-
-            WriteMessageResponseEvent writeMessageResponseEvent = new WriteMessageResponseEvent();
-            writeMessageResponseEvent.setResponse(response);
-            EventBus.getDefault().post(writeMessageResponseEvent);
-
-        }
-    }).start();
 }
 ```
 
