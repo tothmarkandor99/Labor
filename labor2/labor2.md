@@ -14,13 +14,17 @@ A laborhoz kapcsolódó önálló feladat:
 
 A megvalósítandó játék felhasználói felületét az alábbi képernyőképek szemléltetik:
 
+![alt text](images/main.png "Főképernyő")
+![alt text](images/dialog.png "Készítők")
+![alt text](images/game.png "Játék")
+
 ## Projekt létrehozása
 
 Első lépésként indítsuk el az Android Studio-t, majd:
 
 1. Hozzunk létre egy **TicTacToe** nevű projektet.
 2. A kezdő package legyen például **hu.bme.aut.amorg.examples.tictactoe**
-3. A projekt létrehozásakor válasszuk a kezdeti Blank Activity-vel rendelkező konfigurációt.
+3. A projekt létrehozásakor válasszuk a kezdeti Empty Activity-vel rendelkező konfigurációt.
 4. A kezdeti *Activity* neve legyen *MainMenuActivity*.
 
 Sikeres projekt létrehozás után a laborvezető vezetésével vizsgálja meg a forrás felépítését.
@@ -34,7 +38,7 @@ A megvalósítandó alkalmazás működési elve a következő:
 4. A *MainMenuActivity*-ről meg lehet nézni az alkalmazás készítőiről szóló információkat az “About” menüt választva. Ez a funkció gyakorlatilag átnavigál az *AboutActivity*-re, ami viszont *Manifest* beállítás miatt csak dialógus formában fog megjelenni.
 
 ### Szükséges további Activity-k létrehozása
-A fentiek alapján látható tehát, hogy a meglevő MainMenuActivity mellett még két másik Activity-t, a GameActivity-t és az AboutActivity-t kell létrehoznunk. Activity létrehozásakor tipikusan az alábbi forrás állományok változnak:
+A fentiek alapján látható tehát, hogy a meglevő MainMenuActivity mellett még két másik Activity-t, a *GameActivity*-t és az *AboutActivity*-t kell létrehoznunk. Activity létrehozásakor tipikusan az alábbi forrás állományok változnak:
 
 * Létrejön az Activiy-hez tartozó Java file.
 * Létrejön az Activity-hez tartozó layout XML.
@@ -43,19 +47,20 @@ A fentiek alapján látható tehát, hogy a meglevő MainMenuActivity mellett m�
 
 Az Activity létrehozást azonban megkönnyíti az Andriod Studio és a fenti lépéseket nem kell egyesével elvégeznie a fejlesztőnek.
 
-1. Az Android Studioban a forrásra állva válasszuk a “jobbegér->New->Activity->Blank Activity” menüt és hozzuk létre a két Activity-t (*AboutActivity, GameActivity*). Activity létrehozásakor megadható, hogy melyik legyen a “szülő” Activity, amihez a vissza gomb visszanavigálja a felhasználót. Mindkét esetben legyen ez a *MainMenuActivity*.
-2. Létrehozás után az *AndroidManifest.xml*-ben állítsuk be a két új Activity címét egy választott szövegre.
-3. Nyissuk meg a meglevő Activity-k kódját, vizsgáljuk meg azokat és a fölösleges részek (default menü kezelés – *onCreateOptionsMenu()* és *onOptionsItemSelected()*) törölhető.
-4. Állítsuk be szintén a manifest-ben, hogy az *AboutActivity* dialógus formában jelenjen meg:
+1. Az Android Studioban a forrásra állva válasszuk a “jobbegér->New->Activity->Basic Activity” menüt és hozzuk létre a két Activity-t (*AboutActivity, GameActivity*). Activity létrehozásakor megadható, hogy melyik legyen a “szülő” Activity, amihez a vissza gomb visszanavigálja a felhasználót. Mindkét esetben legyen ez a *MainMenuActivity*.
+2. Létrehozás után az *res/values/strings.xml*-ben állítsuk be a két új Activity címét amelyet a létrehozáskor a Studio automatikusan kigenerált nekünk mint erőforrás (Például: *Az alkalmazásról* illetve *Játék* ).
+3. Nyissuk meg a két új Activity kódját, vizsgáljuk meg azokat és a fölösleges *FloatingActionButton*-t illetve annak *listener*-ét távolítsik el. Ha ez kész akkor az *Activity*-hez rendelt layout-ból is töröljük a widgetet (Tipp: az adott *Activity* *onCreate()* metódusában a *setContentView()*-ban az adott layout-ra CTRL + kattintással könnyen megnyithatjuk az XML leírót).
+4. Állítsuk be a manifest-ben, hogy az *AboutActivity* dialógus formában jelenjen meg:
 
 ```xml
-<activity android:name=".AboutActivity"
-  android:label="@string/title_activity_about"
-  android:parentActivityName=".MainMenuActivity"
-  android:theme="@android:style/Theme.Dialog">
-  <meta-data
-    android:name="android.support.PARENT_ACTIVITY"
-    android:value="hu.bme.aut.amorg.examples.tictactoe.MainMenuActivity" />
+<activity
+    android:name=".AboutActivity"
+    android:label="@string/title_activity_about"
+    android:parentActivityName=".MainActivity"
+    android:theme="@android:style/Theme.Dialog">
+    <meta-data
+        android:name="android.support.PARENT_ACTIVITY"
+        android:value="hu.bme.aut.amorg.examples.tictactoe.MainActivity" />
 </activity>
 ```
 
@@ -66,39 +71,42 @@ Az Activity létrehozást azonban megkönnyíti az Andriod Studio és a fenti l�
 A *MainMenuActivity* a fenti ábra alapján három menüpontot tartalmaz középre igazodva. Ez a három menüpont gyakorlatilag három gomb egymás alatt egy *LinearLayout*-ban, mely kitölti a szülőt (*match_parent*) és benne az elemek középre vannak rendezve:
 
 ```xml
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-  xmlns:tools="http://schemas.android.com/tools"
-  android:layout_width="match_parent"
-  android:layout_height="match_parent"
-  android:gravity="center"
-  android:orientation="vertical"
-  android:paddingBottom="@dimen/activity_vertical_margin"
-  android:paddingLeft="@dimen/activity_horizontal_margin"
-  android:paddingRight="@dimen/activity_horizontal_margin"
-  android:paddingTop="@dimen/activity_vertical_margin"
-  tools:context=".MainMenuActivity">
-
-  <Button
-    android:id="@+id/btnStart"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_main"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:text="@string/btn_start" />
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="hu.bme.aut.amorg.examples.tictactoe.MainMenuActivity">
 
-  <Button
-    android:id="@+id/btnHighscore"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:text="@string/btn_highscore" />
+    <Button
+        android:id="@+id/btnStart"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/btn_start" />
 
-  <Button
-    android:id="@+id/btnAbout"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:text="@string/btn_about" />
+    <Button
+        android:id="@+id/btnHighscore"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/btn_highscore" />
 
+    <Button
+        android:id="@+id/btnAbout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/btn_about" />
 </LinearLayout>
+
 ```
 
+A Studio egyből jelezni fogja nekünk, hogy a három string erőforrás amit használni szeretnénk, nem létezik, hozzuk létre őket a *strings.xml*-ben (Tipp: ha az erőforrás nevén áll a kurzor az XML-ben és ALT + ENTER -t nyomunk akkor a Studio felajánjla a string resource automatikus elkészítését az értékének megadásával)
 ### Highscore gomb eseménykezelő
 
 A Highscore menüpontra kattintva ahogy említettük egy *Toast* üzenet jelenjen meg. Ehhez meg kell keresni a Highscore menüpont gombját és be kell állítani az alábbi eseménykezelőt neki a *MainMenuActivity onCreate()* függvényén belül:
@@ -113,26 +121,32 @@ btnHighscore.setOnClickListener(new View.OnClickListener() {
 });
 ```
 
+(Tipp: az ALT + ENTER itt is működik a hiányzó string-re állítva a kurzort)
 ### AboutActivity felület
 
 Ahogy korábban említettük az About menü elindítja az új *AboutActivity*-t, ezért elsőként készítsük el az *AboutActivity* felületét, melyet az *activity_about.xml* ír le:
 ```xml
+<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-  xmlns:tools="http://schemas.android.com/tools"
-  android:layout_width="match_parent"
-  android:layout_height="match_parent"
-  android:paddingLeft="@dimen/activity_horizontal_margin"
-  android:paddingRight="@dimen/activity_horizontal_margin"
-  android:paddingTop="@dimen/activity_vertical_margin"
-  android:paddingBottom="@dimen/activity_vertical_margin"
-  tools:context="hu.bme.aut.amorg.examples.tictactoe.AboutActivity">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/content_about"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="hu.bme.aut.amorg.examples.tictactoe.AboutActivity"
+    tools:showIn="@layout/activity_about">
 
-  <TextView
-    android:text="@string/txt_about"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:textSize="30sp"
-    android:layout_centerInParent="true"/>
+    <TextView
+        android:text="@string/txt_about"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="30sp"
+        android:layout_centerInParent="true"/>
 
 </RelativeLayout>
 ```
@@ -141,7 +155,7 @@ Ahogy korábban említettük az About menü elindítja az új *AboutActivity*-t,
 
 A TicTacToe, 3*3-as táblajáték logikáját egy külön osztályban valósítjuk meg *Singleton* (amennyiben nem ismeri ezt a Design pattern-t, érdemes utána olvasni, illetve rákérdezni a laborvezetőnél) formájában, így könnyen hozzáférhetünk.
 
-Készítsünk a forráson belül egy *model* package-t, majd abba egy *TicTacToeModel* osztályt. Az osztály gyakorlatilag egy 3*3-as mátrixban tárolja a játéktér mezőinek tartalmát és különféle publikus függvényeket biztosít a játéktér lekérdezéséhez és módosításához. A modell a *getInstance()* statikus függvénnyel elérhető el.
+Készítsünk a forráson belül egy *model* package-t, majd abba egy *TicTacToeModel* osztályt (model package-en *jobb gomb->new->Java class*). Az osztály gyakorlatilag egy 3*3-as mátrixban tárolja a játéktér mezőinek tartalmát és különféle publikus függvényeket biztosít a játéktér lekérdezéséhez és módosításához. A modell a *getInstance()* statikus függvénnyel elérhető el.
 ```java
 public class TicTacToeModel {
 
@@ -293,25 +307,31 @@ Az *onMeasure()* függvény felüldefiniálásával biztosítható, hogy a néze
 
 Végül az *onTouchEvent()* függvényben tudjuk kezelni az érintés eseményeket. Jelenleg az  *ACTION_DOWN* eseményt vizsgáljuk, de más érintés események is elkaphatóak itt.
 
-Ahhoz, hogy a *GameActivity* ezt a játékteret megjelenítse, módosítsuk a hozzá tartozó layout filet (*res/layout/activity_game.xml*). A felület egy szürkés hátterű *RelativeLayout* közepén jelenítse meg a *TicTacToeView* nézetünket:
+Ahhoz, hogy a *GameActivity* ezt a játékteret megjelenítse, módosítsuk a hozzá tartozó layout filet (*res/layout/content_game.xml*). A felület egy szürkés hátterű *RelativeLayout* közepén jelenítse meg a *TicTacToeView* nézetünket:
 ```xml
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-  xmlns:tools="http://schemas.android.com/tools"
-  android:layout_width="match_parent"
-  android:layout_height="match_parent"
-  tools:context="hu.bme.aut.amorg.examples.tictactoe.GameActivity"
-  android:orientation="vertical"
-  android:background="#888888"
-  android:gravity="center_vertical"
-  android:padding="20dp">
-
-  <hu.bme.aut.amorg.examples.tictactoe.view.TicTacToeView
-    android:id="@+id/ticView"
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/content_game"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-  />
+    android:layout_height="match_parent"
+    android:background="#888888"
+    android:gravity="center_vertical"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="hu.bme.aut.amorg.examples.tictactoe.GameActivity"
+    tools:showIn="@layout/activity_game">
 
-</LinearLayout>
+    <hu.bme.aut.amorg.examples.tictactoe.view.TicTacToeView
+        android:id="@+id/ticView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+</RelativeLayout>
 ```
 Következő lépésként valósítsuk meg a játéktér kirajzolását a *drawGameArea()* függvényben, mely gyakorlatilag vízszintes és függőleges vonalak rajzolását jelenti:
 ```java
