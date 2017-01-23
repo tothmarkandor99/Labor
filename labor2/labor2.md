@@ -196,6 +196,7 @@ public class TicTacToeModel {
   }
 
   public short setFieldContent(int x, int y, short content) {
+    changeNextPlayer();
     return model[x][y] = content;
   }
 
@@ -390,7 +391,6 @@ Végül valósítsuk meg az érintés eseményre való reagálást úgy, hogy a 
             int tY = ((int) event.getY()) / (getHeight() / 3);
             if (tX < 3 && tY < 3 && TicTacToeModel.getInstance().getFieldContent(tX, tY) == TicTacToeModel.EMPTY) {
                 TicTacToeModel.getInstance().setFieldContent(tX, tY, TicTacToeModel.getInstance().getNextPlayer());
-                TicTacToeModel.getInstance().changeNextPlayer();
                 invalidate();
             }
         }
