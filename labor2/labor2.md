@@ -14,9 +14,9 @@ A laborhoz kapcsolódó önálló feladat:
 
 A megvalósítandó játék felhasználói felületét az alábbi képernyőképek szemléltetik:
 
-![alt text](images/main.png "Főképernyő")
-![alt text](images/dialog.png "Készítők")
-![alt text](images/game.png "Játék")
+![](images/main.png =480x640)
+![](images/dialog.png =480x640)
+![](images/game.png =480x640)
 
 ## Projekt létrehozása
 
