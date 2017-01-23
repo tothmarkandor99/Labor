@@ -385,17 +385,17 @@ Végül valósítsuk meg az érintés eseményre való reagálást úgy, hogy a 
 > **A modell frissítése után az újrarajzolást a *invalidate()* függvényének hívásával tudjuk elérni.**
 ```java
 @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        if (event.getAction() == MotionEvent.ACTION_DOWN) {
-            int tX = ((int) event.getX()) / (getWidth() / 3);
-            int tY = ((int) event.getY()) / (getHeight() / 3);
-            if (tX < 3 && tY < 3 && TicTacToeModel.getInstance().getFieldContent(tX, tY) == TicTacToeModel.EMPTY) {
-                TicTacToeModel.getInstance().setFieldContent(tX, tY, TicTacToeModel.getInstance().getNextPlayer());
-                invalidate();
-            }
+public boolean onTouchEvent(MotionEvent event) {
+    if (event.getAction() == MotionEvent.ACTION_DOWN) {
+        int tX = ((int) event.getX()) / (getWidth() / 3);
+        int tY = ((int) event.getY()) / (getHeight() / 3);
+        if (tX < 3 && tY < 3 && TicTacToeModel.getInstance().getFieldContent(tX, tY) == TicTacToeModel.EMPTY) {
+            TicTacToeModel.getInstance().setFieldContent(tX, tY, TicTacToeModel.getInstance().getNextPlayer());
+            invalidate();
         }
-        return super.onTouchEvent(event);
     }
+    return super.onTouchEvent(event);
+}
 ```
 
 ### Alkalmazás ikon lecserélése
@@ -405,7 +405,8 @@ Az alkalmazás ikonját jelenleg a *res/drawable[-ldpi/mdpi/hdpi/xhdpi/...]* map
 Valósítson meg egy függvényt, mely minden lépés után leellenőrzi, hogy nem győzött-e valamelyik játékos, vagy nincs-e döntetlen. Amennyiben vége a játéknak egy *Toast* üzenettel jelezze ezt a felhasználónak és lépjen vissza a főmenübe. A laborvezető segítségével vizsgálja meg, hogy a *View* osztályból hogyan érhető el az őt tartalmazó "host" Activity, aminek így például egy *endGame()* függvénye meghívható, ami megvalósítja a fent leírt játék befejezést.
 
 ```java
-GameActivity gameActivity = (GameActivity) view.getContext(); gameActivity.endGame();
+GameActivity gameActivity = (GameActivity) view.getContext();
+gameActivity.endGame();
 ```
 
 #Jó munkát kívánunk!
