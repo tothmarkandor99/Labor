@@ -1,8 +1,10 @@
-# Labor 8 - Egyszerű felhasználói felület több Activity segítségével (TicTacToe)
+# Labor 2 - Egyszerű felhasználói felület több Activity segítségével (TicTacToe)
 
 ## Bevezetés
 
-A labor célja a több Activity-ből álló Android alkalmazás készítésének bemutatása, valamint az egyszerű rajzolás bemutatása egy TicTacToe játék segítéségével. A labor során a következő funkciókat fogjuk megvalósítani:
+A labor célja a több Activity-ből álló Android alkalmazás készítésének bemutatása, valamint az egyszerű rajzolás bemutatása egy TicTacToe játék segítéségével.
+
+A labor során a következő funkciókat fogjuk megvalósítani:
 
 * Menü Activity
 * Játéktér Activity
@@ -56,11 +58,11 @@ Az Activity létrehozást azonban megkönnyíti az Andriod Studio és a fenti l�
 <activity
     android:name=".AboutActivity"
     android:label="@string/title_activity_about"
-    android:parentActivityName=".MainActivity"
-    android:theme="@android:style/Theme.Dialog">
+    android:parentActivityName=".MainMenuActivity"
+    android:theme="@style/Theme.AppCompat.Light.Dialog">
     <meta-data
         android:name="android.support.PARENT_ACTIVITY"
-        android:value="hu.bme.aut.amorg.examples.tictactoe.MainActivity" />
+        android:value="hu.bme.aut.amorg.examples.tictactoe.MainMenuActivity" />
 </activity>
 ```
 
@@ -153,7 +155,7 @@ Ahogy korábban említettük az About menü elindítja az új *AboutActivity*-t,
 
 ### Játék logika
 
-A TicTacToe, 3*3-as táblajáték logikáját egy külön osztályban valósítjuk meg *Singleton* (amennyiben nem ismeri ezt a Design pattern-t, érdemes utána olvasni, illetve rákérdezni a laborvezetőnél) formájában, így könnyen hozzáférhetünk.
+A TicTacToe, 3x3-as táblajáték logikáját egy külön osztályban valósítjuk meg *Singleton* (amennyiben nem ismeri ezt a Design pattern-t, érdemes utána olvasni, illetve rákérdezni a laborvezetőnél) formájában, így könnyen hozzáférhetünk.
 
 Készítsünk a forráson belül egy *model* package-t, majd abba egy *TicTacToeModel* osztályt (model package-en *jobb gomb->new->Java class*). Az osztály gyakorlatilag egy 3*3-as mátrixban tárolja a játéktér mezőinek tartalmát és különféle publikus függvényeket biztosít a játéktér lekérdezéséhez és módosításához. A modell a *getInstance()* statikus függvénnyel elérhető el.
 ```java
