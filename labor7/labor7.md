@@ -37,3 +37,8 @@ eltérés van a két API között, teljesen hasonlók az osztályok és az inter
 A labor során első lépésként egy egyszerű szolgáltatást hozunk létre a szabad lemezterület lekérdezésére,
 majd egy helymeghatározásért felelős szolgáltatást készítünk, megjelenítjük a pozíció adatokat és egy értesítést,
 valamint “lebegő ablak”-ot is létrehozunk a szolgáltatáshoz.
+![](images/overview.png)
+
+Projekt felépítése:
+![](images/leiro.png)
+
