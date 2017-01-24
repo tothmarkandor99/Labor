@@ -8,8 +8,8 @@ A bal oldali egy tárcsázó, a jobb oldali pedig az alkalmazásokat listázza k
 Első lépésben készítsünk egy új alkalmazást, package név legyen:
 > hu.bme.aut.amorg.examples.intentlabor
 
-Készítsünk egy új Activity-t (akár projekt létrehozásakor, akár később **LauncherActivity** néven, de gondoskodjunk róla,
-hogy a **FragmentActivity**-ből származik le! Töröljünk ki mindent, ami az Actionbar menühöz kell, nem lesz rájuk szükségünk (két metódus az Activity-ben, menu erőforrás mappa)
+Készítsünk egy új Empty Activity-t ,akár projekt létrehozásakor, akár később **LauncherActivity** néven, de gondoskodjunk róla,
+hogy a **FragmentActivity**-ből származik le!
 
 A projektünkben ez az egy Activity lesz. Nem szeretnénk, hogy el lehessen forgatni, illetve szeretnénk, ha home alkalmazásként viselkedhetne,
 de nem jelenne meg az alkalmazások menüben. Mindhárom igény miatt a Manifest állományunkat kell módosítani.
@@ -19,23 +19,23 @@ Az activity elem az alábbi legyen:
 <activity
     android:name=".LauncherActivity"
     android:label="@string/app_name"
-    android:screenorientation="portrait">
+    android:launchMode="singleTask"
+    android:screenOrientation="portrait">
     <intent-filter>
-        <action android:name="android.intent.action.MAIN">
-            <category android:name="android.intent.category.HOME">
-                <category android:name="android.intent.category.DEFAULT" />
-            </category>
-        </action>
+        <action android:name="android.intent.action.MAIN" />
+
+        <category android:name="android.intent.category.LAUNCHER" />
+        <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.HOME" />
     </intent-filter>
 </activity>
 ```
-Az Activity szempontjából egyetlen View kell az XML-be: egy ViewPager
+Az Activity szempontjából egyetlen View kell az *activity_main* XML-be: egy ViewPager
 ```xml
-<android.support.v4.view.viewpager xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<android.support.v4.view.ViewPager xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/pager"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent" />
 ```
 Ebben a ViewPagerben két Fragment jelenik meg. Készítsünk egy fragments nevű java package-t!
 Hozzunk létre benne 2 Fragment osztályt DialerFragment és AppDrawerFragment néven!
@@ -167,110 +167,112 @@ A tárcsázó gombjainak (12 darab) stílusát fogjuk össze, illetve egy kicsit
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-     xmlns:app="http://schemas.android.com/apk/res-auto"
-     xmlns:tools="http://schemas.android.com/tools"
-     android:layout_width="match_parent"
-     android:layout_height="match_parent"
-     android:background="@color/apptheme_color"
-     tools:context="hu.bute.daai.amorg.intentlabor.fragments.DialerFragment">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/apptheme_color"
+    tools:context="hu.bme.aut.amorg.examples.intentlabor.fragments.DialerFragment">
 
     <com.devspark.robototextview.widget.RobotoEditText
-         android:layout_width="match_parent"
-         android:layout_height="wrap_content"
-         android:textSize="@dimen/dialer_text_size"
-         android:layout_toStartOf="@+id/callBackSpaceButton"
-         android:layout_toLeftOf="@+id/callBackSpaceButton"
-         android:layout_above="@+id/tableLayout"
-         android:layout_alignParentLeft="true"
-         android:layout_alignParentStart="true"
-         android:id="@+id/callEditText" />
+        android:id="@+id/callEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/tableLayout"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_toLeftOf="@+id/callBackSpaceButton"
+        android:layout_toStartOf="@+id/callBackSpaceButton"
+        android:textSize="@dimen/dialer_text_size" />
+
     <ImageButton
-         android:layout_width="wrap_content"
-         android:layout_height="wrap_content"
-         android:id="@+id/callBackSpaceButton"
-         android:layout_alignTop="@+id/callEditText"
-         android:layout_alignParentRight="true"
-         android:layout_alignParentEnd="true"
-         android:layout_above="@+id/tableLayout"
-         android:src="@drawable/ic_backspace_black_24dp" />
+        android:id="@+id/callBackSpaceButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/tableLayout"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignTop="@+id/callEditText"
+        android:src="@drawable/ic_backspace_black_24dp" />
 
     <com.devspark.robototextview.widget.RobotoButton
-         android:id="@+id/call_button"
-         android:layout_width="match_parent"
-         android:layout_height="wrap_content"
-         android:layout_alignParentBottom="true"
-         android:text="@string/call"
-         android:textSize="30sp"
-         app:fontFamily="roboto"
-         app:textStyle="normal"
-         app:textWeight="normal"
-         android:padding="15dp" />
+        android:id="@+id/call_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:gravity="center"
+        android:padding="15dp"
+        android:text="@string/call"
+        android:textSize="30sp"
+        app:fontFamily="roboto"
+        app:textStyle="normal"
+        app:textWeight="normal" />
 
     <TableLayout
-         android:layout_width="match_parent"
-         android:layout_height="wrap_content"
-         android:layout_above="@id/call_button"
-         android:stretchColumns="*"
-         android:id="@+id/tableLayout">
+        android:id="@+id/tableLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/call_button"
+        android:stretchColumns="*">
 
         <TableRow>
 
             <com.devspark.robototextview.widget.RobotoButton
-                 style="@style/DialerButton"
-                 android:text="1" />
+                style="@style/DialerButton"
+                android:text="1" />
 
             <com.devspark.robototextview.widget.RobotoButton
-                 style="@style/DialerButton"
-                 android:text="2" />
+                style="@style/DialerButton"
+                android:text="2" />
 
             <com.devspark.robototextview.widget.RobotoButton
-                 style="@style/DialerButton"
-                 android:text="3" />
+                style="@style/DialerButton"
+                android:text="3" />
         </TableRow>
 
         <TableRow>
 
             <com.devspark.robototextview.widget.RobotoButton
-                 style="@style/DialerButton"
-                 android:text="4" />
+                style="@style/DialerButton"
+                android:text="4" />
 
             <com.devspark.robototextview.widget.RobotoButton
-                 style="@style/DialerButton"
-                 android:text="5" />
+                style="@style/DialerButton"
+                android:text="5" />
 
             <com.devspark.robototextview.widget.RobotoButton
-                 style="@style/DialerButton"
-                 android:text="6" />
+                style="@style/DialerButton"
+                android:text="6" />
         </TableRow>
 
         <TableRow>
 
             <com.devspark.robototextview.widget.RobotoButton
-                 style="@style/DialerButton"
-                 android:text="7" />
+                style="@style/DialerButton"
+                android:text="7" />
 
             <com.devspark.robototextview.widget.RobotoButton
-                 style="@style/DialerButton"
-                 android:text="8" />
+                style="@style/DialerButton"
+                android:text="8" />
 
             <com.devspark.robototextview.widget.RobotoButton
-                 style="@style/DialerButton"
-                 android:text="9" />
+                style="@style/DialerButton"
+                android:text="9" />
         </TableRow>
 
         <TableRow>
 
             <com.devspark.robototextview.widget.RobotoButton
-                 style="@style/DialerButton"
-                 android:text="*" />
+                style="@style/DialerButton"
+                android:text="*" />
 
             <com.devspark.robototextview.widget.RobotoButton
-                 style="@style/DialerButton"
-                 android:text="0" />
+                style="@style/DialerButton"
+                android:text="0" />
 
             <com.devspark.robototextview.widget.RobotoButton
-                 style="@style/DialerButton"
-                 android:text="#" />
+                style="@style/DialerButton"
+                android:text="#" />
         </TableRow>
 
     </TableLayout>
@@ -279,15 +281,16 @@ A tárcsázó gombjainak (12 darab) stílusát fogjuk össze, illetve egy kicsit
 ```
 
 Ez az elrendezés hivatkozik az ic_action_backspace erőforrásra. Töltsük le az actionbar icon packot az alábbi linkről:
-https://design.google.com/icons/index.html#ic_backspace   (Alternatív link)
+https://storage.googleapis.com/material-icons/external-assets/v4/icons/zip/ic_backspace_black_24dp.zip
 
-Tömörítsük ki, majd a a holo light mappából másoljuk be a szükséges erőforrásokat (a számozott mappa nem kell, csak a tartalma) a visszatörlés gombhoz!
+Tömörítsük ki, majd az android mappából másoljuk be az összes erőforrást a res mappánkba illetve készítsük el a *call* string erőforrást.
 
 Laborvezető segítségével vizsgáljuk meg az elrendezést!
 
 Próbáljuk ki az alkalmazást! Mit tapasztalunk?
 
-Alakítsuk át a Fragment kódját, hogy ne jöjjön fel a billentyűzet, amikor fókuszt kap az EditText! Hogyan is működik ez a megoldás?
+Alakítsuk át a Fragment kódját, hogy ne jöjjön fel a billentyűzet, amikor fókuszt kap az EditText!
+Hogyan is működik ez a megoldás (emulátoron nem feltétlenül jön elő a billenytűzet de készüléken tesztelve mindenképp)?
 
 ```java
 public class DialerFragment extends Fragment {
@@ -664,7 +667,7 @@ Vegyünk fel egy Intent filtert a Manifestünkbe (application node-on belülre):
 ```xml
 <receiver android:name="[BR osztály neve]" >
     <intent-filter>
-        <action android:name="android.provider.Telephony.SMS_RECEIVED"
+        <action android:name="android.provider.Telephony.SMS_RECEIVED"/>
     </intent-filter>
 </receiver>
 ```
