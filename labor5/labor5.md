@@ -11,8 +11,8 @@ Első lépésben készítsünk egy új alkalmazást, package név legyen:
 Készítsünk egy új Empty Activity-t ,akár projekt létrehozásakor, akár később **LauncherActivity** néven, de gondoskodjunk róla,
 hogy a **FragmentActivity**-ből származik le!
 
-A projektünkben ez az egy Activity lesz. Nem szeretnénk, hogy el lehessen forgatni, illetve szeretnénk, ha home alkalmazásként viselkedhetne,
-de nem jelenne meg az alkalmazások menüben. Mindhárom igény miatt a Manifest állományunkat kell módosítani.
+A projektünkben ez az egy Activity lesz. Nem szeretnénk, hogy el lehessen forgatni, illetve szeretnénk, ha home alkalmazásként viselkedhetne.
+Mindkét igény miatt a Manifest állományunkat kell módosítani.
 
 Az activity elem az alábbi legyen:
 ```xml
