@@ -213,6 +213,7 @@ feladatokat hajtunk végre a Service-ben (pl. hálózati kommunikáció, letölt
 permission kezeléssel még nem foglalkozunk.
 
 Próbáljuk ki az alkalmazást működés közben!
+
 ![](images/freespace.png)
 
 **Feladat**: Igazoljuk a laborvezető segítségével, hogy az **IntentService** valóban külön szálban, sorosítva hajtja végre a kéréseket!
@@ -623,6 +624,7 @@ egészítsük ki az *IntentFilter*-rel):
 
 ```
 **Próbáljuk ki** a beállítások nézetet!
+
 ![](images/settings.png)
 
 ## 5. Helymeghatározás megvalósítása Service-el
@@ -747,6 +749,7 @@ if (startService) {
 *Próbáljuk ki* az alkalmazást! Régi típusú emulátoron teszteléshez nyissuk meg az Android Device Monitor-t
 és küldjünk pozíció információkat az emulátornak új típusú emulátoron az oldalsó vezérlő sáv
 további lehetőségeit választva (**...**) tudunk pozíciót küldeni egyszerűen az emulátornak.
+
 ![](images/overview.png)
 
 ## 6. Értesítés megjelenítése
@@ -814,7 +817,9 @@ public void onProviderDisabled(String provider) {
 **Próbáljuk ki** az alkalmazást működés közben és vizsgáljuk meg a Notification működését?
 
 **Próbáljuk ki** mi történik, ha rákattintunk az értesítésre!
+
 ![](images/notification.png)
+
 ## 7. Lebegő ablak megjelenítése
 Egészítsük ki a megoldást, hogy bekapcsolható legyen egy áthelyezhető lebegő ablak is
 a beállítások nézetben mely a (Facebook értesítőhöz hasonlóan) mindig előtérben van
@@ -980,7 +985,9 @@ hideFloatingWindow();
 ```
 Próbáljuk ki az alkalmazást működés közben! Figyeljük meg, hogy az alkalmazás  háttérbe helyezésekor
 is mindig látszik a lebegő ablak.
+
 ![](images/floating.png)
+
 ## 8. GeoCoding és Bind Service kiegészítés
 (Amennyiben a labor idejébe belefér valósítsuk meg közösen, ha nem, házi feladatként érdemes
 végigkövetni az alábbiakat.)
@@ -1118,10 +1125,12 @@ btnGeocode.setOnClickListener(new View.OnClickListener() {
 });
 ```
 Próbáljuk ki a Geocoding működését!
+
 ![](images/geocode.png)
+
 ### Feladatok
-**Önálló feladat**: Jelenítsünk meg további két adatot a LocationDashboard-on!
-**Bonusz feladat**: Jelenítsünk meg további adatokat a lebegő ablakon!
+* **Önálló feladat**: Jelenítsünk meg további két adatot a LocationDashboard-on!
+* **Bonusz feladat**: Jelenítsünk meg további adatokat a lebegő ablakon!
 
 
 
