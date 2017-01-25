@@ -11,13 +11,13 @@ A sablonválasztónál válasszuk a Master/Detail Flow opciót!
 
 <img src="./images/master-detail-choose_new.PNG" width="200" align="middle">
 
-A következő ablakban írjuk be rendre, hogy Todo, Todos, Todos! Ennek csak a generált sablonban van szerepe, de legalább az activity nevét nem kell később átírjuk.
+A következő ablakban írjuk be rendre, hogy **Todo, Todos, Todos**! Ennek csak a generált sablonban van szerepe, de legalább az activity nevét nem kell később átírjuk.
 
 Laborvezetővel elemezzék a generált alkalmazás működését, próbálják ki emulátoron, készüléken! A Master/Detail nézet célja, hogy egyetlen alkalmazással megoldjunk egy lista és annak egy elemének megjelenítését tableten és mobiltelefonon egyaránt. Működésének a lényege, hogy egy activity-hez tartozó layoutnak kétféle változata van. Egy kétpaneles és egy egypaneles változat. Egy módszer az, ha erőforrás minősítőkkel biztosítjuk, hogy tableten a kétpaneles változat töltődjön be, míg mobilon az egypaneles. Az activityben megpróbálunk referenciát szerezni a második panelre, és ha sikerül, akkor tableten vagyunk, ha nem, akkor mobilon. Az első panel tartalma egy **RecyclerView** a másodiké pedig egy sima Fragment a lista egy elemének megjelenítésére. Ha mobilon vagyunk, akkor a listaelemre kattintva új activitybe töltjük a részletező fragmentet, míg tableten egyszerűen betöltjük a jobb oldali panelbe. (a generált kód másképpen működik, ott a refs.xml állomány-t minősíti)
 
 ## Átalakítás Todo alkalmazássá
 
-Készítsen egy új package-t **data** néven, ebbe pedig hozza létre a **Todo** osztályt! (Getter és Setter Android Studióban automatikusan is generálható: Alt + Insert -> Getter And Setter -> az összes tagváltozó kijelölése majd OK)
+Készítsen egy új package-t **data** néven, ebbe pedig hozza létre a **Todo** osztályt! (Getter és Setter Android Studióban automatikusan is generálható: *Alt + Insert -> Getter And Setter -> az összes tagváltozó kijelölése majd OK*)
 
 ```java
 public class Todo {
@@ -126,16 +126,21 @@ arguments.putString(TodoDetailFragment.KEY_TODO_DESCRIPTION, getIntent().getStri
 
 A két Activity és a jobb oldali panel már fel van készítve az új működésre. A Listactivity el tudja dönteni, hogy egy vagy két panel jelenik meg, listenerként pedig majd betölti a DetailActivityt vagy a jobb oldali fragmentet.
 
-Már csak egy dolog van hátra: ahhoz, hogy a Todoink megfelelően jelenjenek meg a listában, módosítanunk kell a sablonban létrejött **SimpleItemRecyclerViewAdapter**-t a TodoListActivity-ben, tartalma legyen a következő:
+Már csak egy dolog van hátra: ahhoz, hogy a Todoink megfelelően jelenjenek meg a listában, módosítanunk kell a sablonban létrejött *SimpleItemRecyclerViewAdapter*-t. Először is töröljük a TodoListActivity-ből az SimpleItemRecyclerViewAdapter belső osztályt és hozzunk létre a **SimpleItemRecyclerViewAdapter** osztályt az **adapter** package-ben. Ennek tartalma legyen a következő:
 
 ```java
 public class SimpleItemRecyclerViewAdapter
-            extends RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder> {
+        extends RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder> {
+
+    private boolean mTwoPane;
+    private AppCompatActivity activity;
 
     private final List<Todo> todos;
 
-    public SimpleItemRecyclerViewAdapter(List<Todo> todos) {
+    public SimpleItemRecyclerViewAdapter(List<Todo> todos, boolean mTwoPane, AppCompatActivity activity) {
         this.todos = todos;
+        this.mTwoPane = mTwoPane;
+        this.activity = activity;
     }
 
     @Override
@@ -144,6 +149,7 @@ public class SimpleItemRecyclerViewAdapter
                 .inflate(R.layout.todorow, parent, false);
         return new ViewHolder(view);
     }
+
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
@@ -174,7 +180,7 @@ public class SimpleItemRecyclerViewAdapter
                     arguments.putString(TodoDetailFragment.KEY_TODO_DESCRIPTION, todos.get(position).getDescription());
                     TodoDetailFragment fragment = new TodoDetailFragment();
                     fragment.setArguments(arguments);
-                    getSupportFragmentManager().beginTransaction()
+                    activity.getSupportFragmentManager().beginTransaction()
                             .replace(R.id.todo_detail_container, fragment)
                             .commit();
                 } else {
@@ -186,19 +192,37 @@ public class SimpleItemRecyclerViewAdapter
                 }
             }
         });
+
+        holder.mView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                PopupMenu popup = new PopupMenu(v.getContext(), v);
+                popup.inflate(R.menu.long_click_menu);
+                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        if (R.id.delete == item.getItemId()) {
+                            deleteRow(position);
+                        }
+                        return false;
+                    }
+                });
+                popup.show();
+                return false;
+            }
+        });
     }
 
     /**
      * Egy elem törlése
      */
-    public void deleteRow(int position){
+    public void deleteRow(int position) {
         todos.remove(position);
         notifyDataSetChanged();
     }
 
 
-    public void addItem(Todo aTodo)
-    {
+    public void addItem(Todo aTodo) {
         todos.add(aTodo);
     }
 
@@ -224,6 +248,7 @@ public class SimpleItemRecyclerViewAdapter
     }
 }
 ```
+Figyeljük meg a ViewHolder patternt az adapterben. A RecyclerView már kikényszeríti ennek használatát, mivel így jóval gyorsabb szoftvert kapunk.
 
 Ez az adapter hivatkozik egy todorow.xml-re. Hozzuk létre ezt az álloimányt a _res/layout_ mappába (new -> layout resource file -> Filename: todorow.xml -> OK):
 ```xml
@@ -284,7 +309,7 @@ private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
     todos.add(new Todo("title1", Todo.Priority.LOW, "2011. 09. 26.", "description1"));
     todos.add(new Todo("title2", Todo.Priority.MEDIUM, "2011. 09. 27.", "description2"));
     todos.add(new Todo("title3", Todo.Priority.HIGH, "2011. 09. 28.", "description3"));
-    recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(todos));
+    recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(todos, mTwoPane, TodoListActivity.this));
 }
 ```
 Próbálja ki az alkalmazást!
