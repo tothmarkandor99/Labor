@@ -230,7 +230,9 @@ try {
 hogy valóban nem foglalja a hívás a UI szálat, illetve hogy sorba hajtja végre a kéréseket!
 ## 3. Felhasználói felület előkészítése helymeghatározáshoz
 Készítsük el az alábbi felhasználói felületet Fragment-el.
+
 ![](images/dashboardui01.png)
+
 Töltsük le a kék [lekerekített négyzetet jelképező 9-patch képet](images/tile_bg.9.png) és tegyük be a
 minősítő nélküli drawable könyvtárba, amit most hozzunk létre.
 
@@ -487,7 +489,8 @@ if (savedInstanceState == null) {
 ```
 **Próbáljuk ki** az alkalmazást és ellenőrizzük, hogy valóban a kívánt felület jelenik-e meg.
 
-(Az onResume() LocalBroadcastManager.getInstance(…) metódushívását és az anonim new BroadcastReceiver() onReceive(…) metódusának tartalmát ehhez átmenetileg kommenteljük ki. A teszt után ne felejtsük törölni a kommentelő karaktereket.)
+(Az onResume() LocalBroadcastManager.getInstance(…) metódushívását és az anonim new BroadcastReceiver()
+onReceive(…) metódusának tartalmát ehhez átmenetileg kommenteljük ki. A teszt után ne felejtsük törölni a kommentelő karaktereket.)
 
 ## 4. Beállítások nézet létrehozása helymeghatározás vezérléséhez
 Valósítsuk meg, hogy az alkalmazás egy beállítások nézeten vezérelhesse a háttérben történő helymeghatározást.
