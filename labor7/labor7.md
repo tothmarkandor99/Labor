@@ -37,6 +37,7 @@ eltérés van a két API között, teljesen hasonlók az osztályok és az inter
 A labor során első lépésként egy egyszerű szolgáltatást hozunk létre a szabad lemezterület lekérdezésére,
 majd egy helymeghatározásért felelős szolgáltatást készítünk, megjelenítjük a pozíció adatokat és egy értesítést,
 valamint “lebegő ablak”-ot is létrehozunk a szolgáltatáshoz.
+
 ![](images/overview.png)
 
 Projekt felépítése:
@@ -80,11 +81,11 @@ A Manifest-be vegyük fel az alábbi engedélyeket, ezekre később még szüks�
 <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 ```
 ## 2. Szabad lemezterület lekérdezése IntentService-el
-A következőkben készítsünk egy IntentService-t, mely lehetőséget biztosít a szabad lemezterület lekérdezésére.
+A következőkben készítsünk egy *IntentService*-t, mely lehetőséget biztosít a szabad lemezterület lekérdezésére.
 
-Újdonság: A választ messenger-handler megoldás segítségével juttassuk el az Activity számára!
+**Újdonság**: A választ messenger-handler megoldás segítségével juttassuk el az Activity számára!
 
-Első lépésként hozzunk létre egy service package-t és készítsünk egy IntentService-t IntentServiceFileSystemStats néven, mely:
+Első lépésként hozzunk létre egy service package-t és készítsünk egy *IntentService*-t *IntentServiceFileSystemStats* néven, mely:
 * Kérés hatására lekérdezi a szabad lemezterületet a külső adattárolón.
 * A választ egy messenger-en keresztül (amit az indító Intent-ben kapott) küldi vissza.
 
@@ -139,9 +140,10 @@ public class IntentServiceFileSystemStats extends IntentService {
 ```xml
 <service android:name=".service.IntentServiceFileSystemStats" />
 ```
-Következő lépésként készítsünk egy menüt main.xml néven az Activity-hez, amely elindítja az IntentService-t.
+Következő lépésként készítsünk egy menüt *main.xml* néven (res-en jobb gomb -> new -> Android resource file) az Activity-hez, amely elindítja az IntentService-t.
 Az Activity-hez tartozó menü XML így nézzen ki (hagyjuk meg a beállítások menüt, szükség lesz rá később):
 ```xml
+<?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
      xmlns:tools="http://schemas.android.com/tools"
      xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -202,8 +204,13 @@ public class MainActivity extends AppCompatActivity {
 ```
 Vegyük ki az activity layout-jából a Hello World-re hivatkozó TextView-t!
 
-Figyeljük meg a messenger, valamint a handler objektumok működését. Szintén figyeljük meg, hogy kerül átadásra a messenger az IntentService számára!
-Fontos: Látható, hogy az IntentService milyen módon paraméterezhető, amennyiben összetettebb feladatokat hajtunk végre a Service-ben (pl. hálózati kommunikáció, letöltés, stb.), hasonlóan adhatók át a kérések paraméterei, például az URL.
+Figyeljük meg a messenger, valamint a handler objektumok működését. Szintén figyeljük meg, hogy kerül
+átadásra a messenger az *IntentService* számára!
+Fontos: Látható, hogy az IntentService milyen módon paraméterezhető, amennyiben összetettebb
+feladatokat hajtunk végre a Service-ben (pl. hálózati kommunikáció, letöltés, stb.), hasonlóan adhatók át a kérések paraméterei, például az URL.
+
+**Fontos**: az APP modul gradle beállításai között a *targetSdkVersion*-t állítsuk vissza 22-re, mivel a
+permission kezeléssel még nem foglalkozunk.
 
 Próbáljuk ki az alkalmazást működés közben!
 ![](images/freespace.png)
@@ -224,60 +231,59 @@ hogy valóban nem foglalja a hívás a UI szálat, illetve hogy sorba hajtja vé
 ## 3. Felhasználói felület előkészítése helymeghatározáshoz
 Készítsük el az alábbi felhasználói felületet Fragment-el.
 ![](images/dashboardui01.png)
-Töltsük le a kék lekerekített négyzetet jelképező 9-patch képet és tegyük be a
+Töltsük le a kék [lekerekített négyzetet jelképező 9-patch képet](images/tile_bg.9.png) és tegyük be a
 minősítő nélküli drawable könyvtárba, amit most hozzunk létre.
 
 A res/layout mappába hozzunk létre egy tile_info.xml-t, ami egy “kék téglalapot” jelképez két
-TextView-val. A tile_info.xml kódja az alábbi:
+TextView-val. A **tile_info.xml** kódja az alábbi:
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-   xmlns:android="http://schemas.android.com/apk/res/android"
-       android:layout_width="match_parent"
-       android:layout_height="wrap_content"
-       android:gravity="center"
-       android:orientation="vertical"
-       android:background="@drawable/tile_bg"
-       android:layout_margin="5dp">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="5dp"
+    android:background="@drawable/tile_bg"
+    android:gravity="center"
+    android:orientation="vertical">
 
     <TextView
-           android:id="@+id/tvHead"
-           android:layout_width="wrap_content"
-           android:layout_height="wrap_content"
-           android:textColor="@android:color/white"
-           android:textSize="24sp"
-           android:text="Data:" />
+        android:id="@+id/tvHead"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Data:"
+        android:textColor="@android:color/white"
+        android:textSize="24sp" />
 
     <TextView
-           android:id="@+id/tvValue"
-           android:layout_width="wrap_content"
-           android:layout_height="wrap_content"
-           android:textColor="@android:color/white"
-           android:textSize="24sp"
-           android:text="0" />
+        android:id="@+id/tvValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="0"
+        android:textColor="@android:color/white"
+        android:textSize="24sp" />
 
 </LinearLayout>
 ```
 Ezt követően készítsük el a fragment felületét, mely az imént létrehozott tile_info elemekből felépíti
-a Dashboard felületet. Ehhez szintén a layout mappába hozzuk létre a fragment_location_dashboard.xml-t a
+a Dashboard felületet. Ehhez szintén a layout mappába hozzuk létre a *fragment_location_dashboard.xml*-t a
 következő tartalommal:
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-       xmlns:tools="http://schemas.android.com/tools"
-       android:layout_width="match_parent"
-       android:layout_height="match_parent" >
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
     <ScrollView
         android:id="@+id/scroller"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:fillViewport="true" >
+        android:fillViewport="true">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical" >
+            android:orientation="vertical">
 
             <include
                 android:id="@+id/fieldProvider"
@@ -287,12 +293,12 @@ következő tartalommal:
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:baselineAligned="false"
-                android:weightSum="2" >
+                android:weightSum="2">
 
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1" >
+                    android:layout_weight="1">
 
                     <include
                         android:id="@+id/fieldLat"
@@ -303,7 +309,7 @@ következő tartalommal:
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1" >
+                    android:layout_weight="1">
 
                     <include
                         android:id="@+id/fieldLng"
@@ -316,28 +322,28 @@ következő tartalommal:
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:baselineAligned="false"
-                android:weightSum="2" >
+                android:weightSum="2">
 
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1" >
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1">
 
-                        <include
-                            android:id="@+id/fieldSpeed"
-                            layout="@layout/tile_info" />
-                    </LinearLayout>
+                    <include
+                        android:id="@+id/fieldSpeed"
+                        layout="@layout/tile_info" />
+                </LinearLayout>
 
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1" >
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1">
 
-                        <include
-                            android:id="@+id/fieldAlt"
-                            layout="@layout/tile_info" />
+                    <include
+                        android:id="@+id/fieldAlt"
+                        layout="@layout/tile_info" />
 
-                    </LinearLayout>
+                </LinearLayout>
             </LinearLayout>
 
             <include
@@ -355,16 +361,16 @@ A mostani példában dinamikusan fogjuk rácsatolni a Fragmentet, ezért elegend
 az *activity_main.xml*-be:
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout  xmlns:android="http://schemas.android.com/apk/res/android"
-       xmlns:tools="http://schemas.android.com/tools"
-       android:id="@+id/layoutContainer"
-       android:layout_width="match_parent"
-       android:layout_height="match_parent"
-       android:paddingLeft="@dimen/activity_horizontal_margin"
-       android:paddingRight="@dimen/activity_horizontal_margin"
-       android:paddingTop="@dimen/activity_vertical_margin"
-       android:paddingBottom="@dimen/activity_vertical_margin"
-       tools:context=".MainActivity"/>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layoutContainer"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context=".MainActivity" />
 ```
 Hozzuk létre a LocationDashboardFragment Fragment-et az alábbi kóddal:
 ```java
@@ -485,8 +491,8 @@ if (savedInstanceState == null) {
 
 ## 4. Beállítások nézet létrehozása helymeghatározás vezérléséhez
 Valósítsuk meg, hogy az alkalmazás egy beállítások nézeten vezérelhesse a háttérben történő helymeghatározást.
- A PreferencesFramework használatával hozzunk létre egy SettingsActivity-t, ahol egy Switch-csel lehessen indítani
-  és leállítani a szolgáltatást.
+A PreferencesFramework használatával hozzunk létre egy SettingsActivity-t, ahol egy Switch-csel lehessen indítani
+és leállítani a szolgáltatást.
 
 A Beállításokat is Fragment-el fogjuk megoldani úgy, hogy csak egy Fragment-et fog tartalmazni
 a SettingsActivity és az fog megjelenni alapértelmezetten fej nélkül.
@@ -495,13 +501,13 @@ Első lépésként a res mappába hozzunk létre egy xml almappát, abban pedig 
 a PreferenceScreen-t írja le:
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
-    <PreferenceCategory android:title="@string/title_settings" >
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="@string/title_settings">
         <SwitchPreference
-               android:title="@string/title_start_service"
-               android:key="start_service"
-               android:summaryOff="@string/label_off"
-               android:summaryOn="@string/label_on"/>
+            android:key="start_service"
+            android:summaryOff="@string/label_off"
+            android:summaryOn="@string/label_on"
+            android:title="@string/title_start_service" />
     </PreferenceCategory>
 </PreferenceScreen>
 ```
@@ -567,19 +573,21 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
 az beállítások tárolását **SharedPrefernces**-ben, ezt nem kell külön lekódolni!
 
 Figyeljük meg, hogy iratkozunk fel *Preference* változásra az *onStart(…)*-ban, mely majd az állapottól
- függően indítani/leállítani fogja a Service-t!
+függően indítani/leállítani fogja a Service-t!
 Fontos, hogy ha feliratkoztunk a *Preference* változásra, akkor iratkozzunk is le róla
 a megfelelő helyen (pl. *onStop(…)*), egyébként beragadhat ez a listener!
 
 A fenti kód hiányolja a *fragmentsettings* erőforrást, ezért következő lépésként a res/xml mappában
 hozzunk létre egy *fragmentsettings.xml*-t a következő tartalommal, ez írja le a *SettingsActivity* tartalmát.
 ```xml
-<preference-headers     xmlns:android="http://schemas.android.com/apk/res/android">
+<preference-headers xmlns:android="http://schemas.android.com/apk/res/android">
     <header
         android:fragment="hu.bme.aut.amorg.examples.servicedemo.SettingsActivity$FragmentSettingsBasic"
         android:icon="@mipmap/ic_launcher"
         android:title="@string/title_settings">
-        <extra android:name="extraKey" android:value="extraValue" />
+        <extra
+            android:name="extraKey"
+            android:value="extraValue" />
     </header>
 </preference-headers>
 ```
@@ -600,14 +608,16 @@ case R.id.action_settings:
 **Figyeljük meg**, hogy érjük el, hogy címkék nélkül induljon el a SettingsActivity és behozzon
 egy alapértelmezett beállítások Fragment-et.
 
-A **Manifest** állományba vegyük fel az új activity-t:
+A **Manifest** állományba vegyük fel az új activity-t (ha az Empty Activity varázslót használtuk, akkor csak
+egészítsük ki az *IntentFilter*-rel):
 ```xml
 <activity android:name=".SettingsActivity">
-         <intent-filer>
-             <action android:name=".Preferences" />
-             <category android:name="android.intent.cetagory.PREFERENCE" />
-         </intent-filer>
+    <intent-filter>
+        <action android:name=".Preferences" />
+        <category android:name="android.intent.cetagory.PREFERENCE" />
+    </intent-filter>
 </activity>
+
 ```
 **Próbáljuk ki** a beállítások nézetet!
 ![](images/settings.png)
@@ -616,7 +626,8 @@ A **Manifest** állományba vegyük fel az új activity-t:
 A következőkben hozzuk létre a helymeghatározásért felelős osztályt, valamint egy *Service*-t
 ami a háttérben vezérli a helymeghatározást.
 
-Első lépésként hozzunk létre egy location package-t és benne egy *LDLocationManager* osztályt az alábbi kóddal:
+Első lépésként hozzunk létre egy location package-t és benne egy *LDLocationManager*
+osztályt az alábbi kóddal:
 ```java
 public class LDLocationManager  {
 
@@ -649,7 +660,7 @@ public class LDLocationManager  {
 ```
 Vizsgáljuk meg az osztály felépítését.
 
-Következő lépésként a service package-ben hozzuk létre a ServiceLocation osztályt, mely
+Következő lépésként a service package-ben hozzuk létre a _ServiceLocation_ osztályt, mely
 implementálja a LocationListener interfészt.
 ```java
 public class ServiceLocation extends Service implements LocationListener {
@@ -730,8 +741,9 @@ if (startService) {
     stopService(i);
 }
 ```
-*Próbáljuk ki* az alkalmazást! Emulátoron teszteléshez nyissuk meg az Android Device Monitor-t
-és küldjünk pozíció információkat az emulátornak.
+*Próbáljuk ki* az alkalmazást! Régi típusú emulátoron teszteléshez nyissuk meg az Android Device Monitor-t
+és küldjünk pozíció információkat az emulátornak új típusú emulátoron az oldalsó vezérlő sáv
+további lehetőségeit választva (**...**) tudunk pozíciót küldeni egyszerűen az emulátornak.
 ![](images/overview.png)
 
 ## 6. Értesítés megjelenítése
@@ -796,12 +808,14 @@ public void onProviderDisabled(String provider) {
     updateNotification("Provider disabled: "+provider);
 }
 ```
-**Próbáljuk ki** az alkalmazást működés közben és vizsgáljuk meg a Notification működését? **Próbáljuk ki** mi történik,
-ha rákattintunk az értesítésre!
+**Próbáljuk ki** az alkalmazást működés közben és vizsgáljuk meg a Notification működését?
+
+**Próbáljuk ki** mi történik, ha rákattintunk az értesítésre!
 ![](images/notification.png)
 ## 7. Lebegő ablak megjelenítése
-Egészítsük ki a megoldást, hogy bekapcsolható legyen egy áthelyezhető lebegő ablak is a beállítások nézetben
-mely a (Facebook értesítőhöz hasonlóan) mindig előtérben van és megjeleníti az aktuális pozíció információt.
+Egészítsük ki a megoldást, hogy bekapcsolható legyen egy áthelyezhető lebegő ablak is
+a beállítások nézetben mely a (Facebook értesítőhöz hasonlóan) mindig előtérben van
+és megjeleníti az aktuális pozíció információt.
 
 Ehhez szükséges a SYSTEM_ALERT_WINDOW engedély, amit korábban már felvettünk.
 
@@ -890,27 +904,29 @@ A kód hivatkozik egy float_layout.xml-re. Ezt a tile_info.xml mintájára hozzu
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-     android:layout_width="match_parent"
-     android:layout_height="wrap_content"
-     xmlns:tools="http://schemas.android.com/tools"
-     android:gravity="center"
-     android:orientation="vertical"
-     android:background="@drawable/tile_bg"
-     android:layout_margin="5dp">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="5dp"
+    android:background="@drawable/tile_bg"
+    android:gravity="center"
+    android:orientation="vertical">
+
     <TextView
-         android:id="@+id/tvFloatLat"
-         android:layout_width="wrap_content"
-         android:layout_height="wrap_content"
-         android:textColor="@android:color/white"
-         android:textSize="24sp"
-         tools:text="Lat: 0" />
+        android:id="@+id/tvFloatLat"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@android:color/white"
+        android:textSize="24sp"
+        tools:text="Lat: 0" />
+
     <TextView
-         android:id="@+id/tvFloatLng"
-         android:layout_width="wrap_content"
-         android:layout_height="wrap_content"
-         android:textColor="@android:color/white"
-         android:textSize="24sp"
-         tools:text="Lng: 0" />
+        android:id="@+id/tvFloatLng"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@android:color/white"
+        android:textSize="24sp"
+        tools:text="Lng: 0" />
 </LinearLayout>
 ```
 Következő lépésként egészítsük ki a beállítások nézetet, hogy egy CheckBox-al, melyben megadhatjuk,
@@ -927,18 +943,19 @@ Egészítsük ki a SettingsActivity kódját az elején egy konstanssal:
 public static final String KEY_WITH_FLOATING = "with_floating";
 ```
 Valamint a SettingsActivity onShardPrefernceChanged(…) függvényt valósítsuk meg úgy, hogy ellenőrizzük
-a CheckBox állapotát és a Service-t indító Intent paramétereként adjuk meg, hogy megjelenjen-e a lebegő ablak vagy sem:
+a CheckBox állapotát és a Service-t indító Intent paramétereként adjuk meg, hogy megjelenjen-e
+a lebegő ablak vagy sem:
 ```java
 @Override
 public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-   if (KEY_START_SERVICE.equals(key)) {
+    if (KEY_START_SERVICE.equals(key)) {
         boolean startService = sharedPreferences.getBoolean(KEY_START_SERVICE, false);
         boolean withFloating = sharedPreferences.getBoolean(KEY_WITH_FLOATING, false);
 
-        Intent i = new Intent(getApplicationContext(),ServiceLocation.class);
+        Intent i = new Intent(getApplicationContext(), ServiceLocation.class);
 
         if (startService) {
-            i.putExtra(KEY_WITH_FLOATING,withFloating);
+            i.putExtra(KEY_WITH_FLOATING, withFloating);
             startService(i);
         } else {
             stopService(i);
@@ -960,14 +977,16 @@ hideFloatingWindow();
 ```
 Próbáljuk ki az alkalmazást működés közben! Figyeljük meg, hogy az alkalmazás  háttérbe helyezésekor
 is mindig látszik a lebegő ablak.
-![](images/floating1.png)
-## 8. GeoCoding – Bind Service kiegészítés
-(Amennyiben a labor idejébe belefér valósítsuk meg közösen, ha nem, házi feladatként érdemes végigkövetni az alábbiakat.)
+![](images/floating.png)
+## 8. GeoCoding és Bind Service kiegészítés
+(Amennyiben a labor idejébe belefér valósítsuk meg közösen, ha nem, házi feladatként érdemes
+végigkövetni az alábbiakat.)
 
 Egészítsük ki a megoldást úgy, hogy a felületen helyezzünk el egy gombot az alábbi ábrának megfelelően,
 melyre kattintva az utolsó pozíció alapján (ha van), Geocoder segítségével kérdezzük le az aktuális címet.
 
-Első lépésként a ServiceLocation osztályba vegyünk fel egy belső osztályt, mely reprenzentálja a Binder-t:
+Első lépésként a ServiceLocation osztályba vegyünk fel egy belső osztályt,
+mely reprenzentálja a Binder-t:
 ```java
 public class BinderServiceLocation extends Binder {
     public ServiceLocation getSerivce() {
@@ -997,7 +1016,7 @@ public Location getLastLocation() {
 }
 ```
 A fenti megoldás egy nagyon egyszerű Binder megoldás, összetettebb esetben érdemes olyan Binder-t kialakítani,
-mely nem feltétlenül a Service-t téríti vissza, hanem feladat specifikus függvényeket tartalmaz.
+mely nem feltétlenül a Service-t téríti vissza, hanem feladata specifikus függvényeket tartalmaz.
 
 A fragment_location_dashboard.xml-ben a ScrollView-n belüli LinearLayout-ba első elemként vegyük fel a gombot:
 ```xml
@@ -1050,13 +1069,13 @@ public void onPause() {
 }
 ```
 Utolsó lépésként egészítsük ki a LocationDashboardFragment onViewCreated(…) függvényét,
-hogy a gomb eseménykezelő hatására egy kérdezze le a csatolt Service által ismert utolsó pozíciót
+hogy a gomb eseménykezelő hatására kérdezze le a csatolt Service által ismert utolsó pozíciót
  és egy anonym AsyncTask-al Geocodol-ja azt, majd az eredményt jelenítse meg egy Toast-ban.
 
 Fontos kiemelni, hogy a Geocoding hálózati kommunikációt használ, ezért kell külön szálban futtatni.
 Az AsyncTask doInBackground(…) függvénye külön szálon fut, míg az onPostExecute(…) már a főszálon.
 ```java
-Button btnGeocode = (Button) rootView.findViewById(R.id.btnGeocode);
+Button btnGeocode = (Button) view.findViewById(R.id.btnGeocode);
 btnGeocode.setOnClickListener(new View.OnClickListener() {
     @Override
     public void onClick(View v) {
