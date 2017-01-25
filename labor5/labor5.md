@@ -3,6 +3,9 @@
 A labor során egy launcher vagy home screen alkalmazást fogunk készíteni, amelyben egy *ViewPager* található, benne 2 *fragment*-tel.
 A bal oldali egy tárcsázó, a jobb oldali pedig az alkalmazásokat listázza ki.
 
+![](images/dialer.png)
+![](images/appdrawer.png)
+
 ! A *ViewPager* használatához szükség van a support v4 csomagra. Importoknál ha lehetséges mindig a supportos változatot használjuk !
 
 Első lépésben készítsünk egy új alkalmazást, package név legyen:
@@ -112,7 +115,7 @@ A tárcsázó gombjainak (12 darab) stílusát fogjuk össze, illetve egy kicsit
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="text_color">#ff051b3e</color>
-    <color name="apptheme_color">#99cc00</color>
+    <color name="apptheme_color">#512DA8</color>
 </resources>
 ```
 
