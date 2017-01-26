@@ -57,7 +57,7 @@ Fordítás menete Android platformon
 
 A [d.android.com/sdk](https://developer.android.com/studio) oldalról letölthető az IDE és az SDK. Ennek fontosabb mappáit, eszközeit tekintsék át a laborvezető segítségével!
 
-<img src="/images/ide_android.png" width= "700" align="middle">
+![](images/ide_android.png)
 
 SDK felépítése
 
