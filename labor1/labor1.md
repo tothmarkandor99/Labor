@@ -1,6 +1,6 @@
 
 
-# 1\. Labor: A fejlesztői környezet és a Hello World
+# 1\. Labor: Hello World
 
 A mérés célja, hogy bemutassa az Android fejlesztőkörnyezetet, az alkalmazáskészítés, illetve a tesztelés és fordítás folyamatát, az alkalmazás felügyeletét, valamint az emulátor és a fejlesztőkörnyezet funkcióit. Továbbá, hogy ismertesse egy Hello World alkalmazás elkészítésének módját.
 A mérés során a laborvezető részletesen bemutatja az eszközöket.
@@ -57,11 +57,7 @@ Fordítás menete Android platformon
 
 A [d.android.com/sdk](https://developer.android.com/studio) oldalról letölthető az IDE és az SDK. Ennek fontosabb mappáit, eszközeit tekintsék át a laborvezető segítségével!
 
-![](images/ide_android.png)
-
-SDK felépítése
-
-![](images/sdk-folder.png)
+![](assets/ide_android.png)
 
 SDK szerkezet
 
@@ -78,13 +74,13 @@ Az SDK kezelésére az SDK managert használjuk, ezzel lehet letölteni és fris
 
 SDK manager ikon:
 
-![](images/sdk_manager_icon.png)
+![](assets/sdk_manager_icon.png)
 
 SDK manager felülete:
 
-![](images/sdk_manager.png)
+![](assets/sdk_manager.png)
 
-![](images/sdk_manager_stendalone.png)
+![](assets/sdk_manager_stendalone.png)
 
 Indítsuk el, és vizsgáljuk meg a laborvezetővel, rendelkezésre áll-e minden, ami az első alkalmazásunkhoz kelleni fog.
 
@@ -94,9 +90,9 @@ Az AVD az Android Virtual Device rövidítése. Ahogy arról már előadáson is
 
 AVD ikon:
 
-![](images/avd_icon.png)
+![](assets/avd_icon.png)
 
-![](images/avd.png)
+![](assets/avd.png)
 
 Az AVD bal oldali tabfülén a létező virtuális eszközök listáját találjuk, jobb oldalon pedig az ún. eszköz definíciókét. Itt néhány előre elkészített sablon áll rendelkezésre, magunk is készíthetünk ilyet, ha tipikusan adott eszközre szeretnénk fejleszteni (pl. galaxy s4). Készítsünk új emulátort (értelemszerűen csak olyan API szintű eszközt készíthetünk, amilyenek rendelkezésre állnak az SDK manageren keresztül)!
 
@@ -114,7 +110,7 @@ Az AVD bal oldali tabfülén a létező virtuális eszközök listáját találj
     10.  GPU segítsége: Kizáró vagy kapcsolatban áll a Snapshot funkcióval, viszont nem csak a megjelenésen tud javítani, az emulátor sebessége is javulhat tőle. Gyengébb GPU és IO teljesítmény esetén inkább a snapshotot válasszuk. (Intel HD4000 és alatta, például)
 3.  Ha mindent rendben talál az ablak, akkor OK!
 
-![](images/avd_create.png)
+![](assets/avd_create.png)
 
 Új emulátor készítése
 
@@ -126,9 +122,8 @@ Megjegyzés: A gyári emulátoron kívül több alternatíva is létezik, a Geny
 
 ## Fejlesztői környezet
 
-Android fejlesztésre a labor során a JetBrains IntelliJ alapjain nyugvó Android Studio-t fogjuk használni. A Studio-val ismerkedők számára kivételesen hasznos funkció a “Tip of the day”, érdemes egyből kipróbálni, megnézni az adott funkciót. Induláskor a legutóbbi projekt nyílik meg, ha nincs ilyen, vagy minden projektünket bezártuk, az alábbi ablak fogad, a menüpontok értelemszerűek:
+Android fejlesztésre a labor során a JetBrains IntelliJ alapjain nyugvó Android Studio-t fogjuk használni. A Studio-val ismerkedők számára kivételesen hasznos funkció a “Tip of the day”, érdemes egyből kipróbálni, megnézni az adott funkciót. Induláskor a legutóbbi projekt nyílik meg, ha nincs ilyen, vagy minden projektünket bezártuk, a menüpontok értelemszerűek.
 
-![](images/opening-studio.png)
 
 ## Hello World
 
