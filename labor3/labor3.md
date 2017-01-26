@@ -1,4 +1,4 @@
-# Bevezető
+# 3\. Labor: Nézetek
 
 A labor során egy regisztrációs nézetet készítünk el, melyben számos egyedi View található. Ezek az egyedi nézetek az előző laborhoz képest nem a View osztályt bővítik, hanem egy meglévő, komplexebb View elemet bővítenek.
 
@@ -12,11 +12,11 @@ A labor során az alábbi dolgokat nézzük meg:
 
 A labor során az alábbi regisztrációs nézetet rakjuk össze az egyedi View-k segítségével.
 
-<img src="./images/labor_3_ss1.png" width="200" align="middle">
+<img src="./assets/labor_3_ss1.png" width="200" align="middle">
 
 Alkalmazás felülete
 
-# Kezdő nézet
+## Kezdő nézet
 
 Hozzunk létre egy új Android Studio Projektet **ViewLabor** néven.
 A Company Domain mező tartalmát töröljük ki és hagyjuk is üresen.
@@ -131,11 +131,11 @@ Figyeljük meg hogy az editText is követi a beállított értékeket (Kiválasz
 <item name="android:textColorSecondary">@color/accent</item>
 ```
 
-# Saját View létrehozása
+## Saját View létrehozása
 
 A következő lépés az egyedi nézetek létrehozása.
 
-## Egyedi jelszó nézet
+### Egyedi jelszó nézet
 
 Elsőként az egyedi jelszó nézetet valósítjuk meg. Ez a nézet egy beviteli mezőből áll és egy képből, amelyre rákattintva a jelszó mező megmutatja, hogy mit gépeltünk a mezőbe.
 
@@ -272,7 +272,7 @@ Ezután az Activity-ből az alábbi kóddal érhetjük el a saját osztályunkat
 PasswordEditText passwordEditText = (PasswordEditText) findViewById(R.id.registrationPET);
 ```
 
-## ChoiceLayout
+### ChoiceLayout
 
 A második egyedi nézet egy különleges választó. Ez egy olyan nézet, amelyhez XML-ben adhatunk gyermek elemeket, amelyek így kiválaszhatóvá válnak a szülőben. A szülő elemben pedig egyedi attribútumok segítségével módosíthatjuk a működést. A **multiple** attribútummal azt szeretnék beállítani, hogy hány elem legyen kijelölhető a ViewGroup-on belül. A **dividerType** attribútum pedig azt adja meg, hogy mi válassza el a benne lévő elemeket (lehet semmilyen, szimpla vonal, dupla vonal).
 
@@ -281,7 +281,7 @@ Ezek alapján az activity elrendezésében kétszer szeretnénk ezt a nézetet f
 *   Először egy nem választó nézetet szeretnénk. Itt 3 lehetőség legyen, amik közül a felhasználó maximum 1-et választhat. Az elválasztó elem jelen esetben legyen szimpla vonalas.
 *   Másodszor pedig egy 6 opciós választást szeretnénk a felhasználónak nyújtani. Itt a 6 opcióból maximum 3 választható ki. Ebben az esetben az elválasztó elem dupla vonalas.
 
-### Stílusok definiálása
+#### Stílusok definiálása
 
 Első lépésben hozzuk létre a színeket és stílusokat, amiket a nézetünk használni fog.
 
@@ -319,7 +319,7 @@ Szükséges stílus hozzáadása a _styles.xml_ fájlhoz:
 
 Ez a stílus a selector-t használja háttérként, tehát az a View, amely ezt a stílust használja az állapota alapján változtatja majd automatikusan a hátterét.
 
-### Osztály létrehozása
+#### Osztály létrehozása
 
 Kezdetben a dividerType attribútumot a Java osztályban kihagyjuk és csak a multiple attribútumot implementáljuk.
 
@@ -447,7 +447,7 @@ Az obtainStyledAttributes függvény visszatérési értéke egy TypedArray. Ez 
 Az osztály végén található OnClickListener felelős az egyes elemek kiválasztásáért. Az implementáció két részre oszlik. Amennyiben a multiple változó értéke nagyobb mint 1, tehát több mint 1 elem választható ki: ha éppen kikattintunk egy elemet, akkor megváltoztatjuk a selected értékét az ellentétjére; ha pedig kiválasztunk egy elemet, akkor megnézzük, hogy elértük-e már a maximumot és ez alapján választjuk ki.
 A másik esetben a multiple értéke 1\. Ilyenkor csak egyetlen elem választható ki; a kiválasztás során az előző kiválasztást kiszedjük és csak az újat hagyjuk bent.
 
-### Használat XML-ből
+#### Használat XML-ből
 
 ```xml
 <hu.bme.aut.amorg.examples.viewlabor.ChoiceLayout
@@ -527,7 +527,7 @@ A saját attribútumok saját névtéren keresztül érhetőek el, ez konvekció
 
 Látható, hogy a saját View behivatkozás szintén a teljes, package nevet is tartalmazó osztálynév segítségével történik. A multiple attribútum használatára mindkét esetben látunk példát az erőforrásban. A **app** attribútumhoz is működik Android Studio alatt a kódkiegészítés, érdemes kipróbálni.
 
-### ChoiceLayout kiegészítése a dividerType attribútummal
+#### ChoiceLayout kiegészítése a dividerType attribútummal
 
 Azt szeretnénk megoldani, hogy az egyes kiválasztható elemek között egyedi, a nézet által definiált elválasztó elem legyen, ahol több lehetőség közül választhatunk.
 
@@ -644,7 +644,7 @@ app:dividerType="double_divider"
 
 Érdemes megfigyelni, hogy az enumeráció lehetséges értékeiben segít a kódkiegészítés.
 
-# Plusz feladat
+## Önálló feladat
 
 Módosítsa a PasswordEditText osztályt úgy, hogy attribútumként megadható legyen a jelszó mezőben található kép cseréje.
 Segítség:
