@@ -8,6 +8,8 @@
 
 [2. labor - Egyszerű felhasználói felület](./labor2/labor2.md)
 
+[3. labor - Nézetek](./labor3/labor3.md)
+
 [5. labor - Intentek, Broadcast receiverek](./labor5/labor5.md)
 
 [7. labor - Service, Location](./labor7/labor7.md)
