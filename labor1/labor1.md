@@ -61,7 +61,7 @@ A [d.android.com/sdk](https://developer.android.com/studio) oldalról letölthet
 
 SDK felépítése
 
-<img src="/images/sdk-folder.png" width= "250" align="middle">
+![](images/sdk-folder.png)
 
 SDK szerkezet
 
@@ -80,14 +80,13 @@ SDK manager ikon:
 
 ![](images/sdk_manager_icon.png)
 
-<img src="/images/sdk_manager_icon.PNG" width="30" align="middle">
+![](images/sdk_manager_icon.PNG)
 
 SDK manager felülete:
 
-<img src="./images/sdk_manager.png" width= "777" align="middle">
+![](images/sdk_manager.png)
 
-<img src="./images/sdk_manager_stendalone.png" width= "777" align="middle">
-
+![](images/sdk_manager_stendalone.png)
 
 Indítsuk el, és vizsgáljuk meg a laborvezetővel, rendelkezésre áll-e minden, ami az első alkalmazásunkhoz kelleni fog.
 
@@ -97,9 +96,9 @@ Az AVD az Android Virtual Device rövidítése. Ahogy arról már előadáson is
 
 AVD ikon:
 
-<img src="./images/avd_icon.png" width= "25" align="middle">
+![](images/avd_icon.png)
 
-<img src="./images/avd.png" width= "777" align="middle">
+![](images/avd.png)
 
 Az AVD bal oldali tabfülén a létező virtuális eszközök listáját találjuk, jobb oldalon pedig az ún. eszköz definíciókét. Itt néhány előre elkészített sablon áll rendelkezésre, magunk is készíthetünk ilyet, ha tipikusan adott eszközre szeretnénk fejleszteni (pl. galaxy s4). Készítsünk új emulátort (értelemszerűen csak olyan API szintű eszközt készíthetünk, amilyenek rendelkezésre állnak az SDK manageren keresztül)!
 
@@ -117,7 +116,7 @@ Az AVD bal oldali tabfülén a létező virtuális eszközök listáját találj
     10.  GPU segítsége: Kizáró vagy kapcsolatban áll a Snapshot funkcióval, viszont nem csak a megjelenésen tud javítani, az emulátor sebessége is javulhat tőle. Gyengébb GPU és IO teljesítmény esetén inkább a snapshotot válasszuk. (Intel HD4000 és alatta, például)
 3.  Ha mindent rendben talál az ablak, akkor OK!
 
-<img src="./images/avd_create.png" width= "597" align="middle">
+![](images/avd_create.png)
 
 Új emulátor készítése
 
@@ -131,7 +130,7 @@ Megjegyzés: A gyári emulátoron kívül több alternatíva is létezik, a Geny
 
 Android fejlesztésre a labor során a JetBrains IntelliJ alapjain nyugvó Android Studio-t fogjuk használni. A Studio-val ismerkedők számára kivételesen hasznos funkció a “Tip of the day”, érdemes egyből kipróbálni, megnézni az adott funkciót. Induláskor a legutóbbi projekt nyílik meg, ha nincs ilyen, vagy minden projektünket bezártuk, az alábbi ablak fogad, a menüpontok értelemszerűek:
 
-<img src="./images/opening-studio.png" width= "630" align="middle">
+![](images/opening-studio.png)
 
 ## Hello World
 
@@ -161,7 +160,7 @@ Ez a rész azoknak szól, akik korábban már használták az Eclipse nevű IDE-
     *   CTRL-t lenyomva navigálhatunk a kódban (pl. osztályra, metódushívásra kattintva). Ezt a navigációt (és az egyszerű másik osztályba kattintást is) rögzíti, és a history előre-hátra gombokkal lehet lépkedni benne. Ha van az egerünkön/billentyűzetünkön ilyen gomb, és netes böngészés közben aktívan használjuk, ezt a funkciót nagyon hasznosnak fogjuk találni.
     *   Szín ikonja a sor elején; kiemelve jobb oldalon, hogy melyik nézeten vagyunk; szabadszavas kiegészítés; a “Hello world” igazából _“@string/very_very_very_long_hello_world”_
 
-<img src="./images/Nice-studio.png" width= "630" align="middle">
+![](images/Nice-studio.png)
 
 ### Billentyűkombinációk
 
@@ -213,14 +212,14 @@ A Studio sok sablont tartalmaz, röviden tekintsék át a lehetőségeket:
 
 A készülék erőforráashasználata [monitorozható](https://developer.android.com/studio/profile/android-monitor.html?utm_source=android-studio) ezen a felületen egyéb hasznos funkciók, mint a képernyőfelvétrel készítés (kamera ikon) mellett.
 
-<img src="./images/ADM.png" width= "630" align="middle">
+![](images/ADM.png)
 
 ## Fejlett Android Device monitor / DDMS
 
 Android studio -> Tools -> Android -> Android Device Monitor
 Itt lehetséges virtuális SMS vagy telefonhívás küldése, fake GPS pozíció beállítása, a fájlok monitoirozása egyébb fejlesztéshez hasznos eszközök mellett.
 
-<img src="./images/DDMS.png" width= "630" align="middle">
+![](images/DDMS.png)
 
 
 ## Feladatok:
