@@ -14,6 +14,8 @@
 
 [5. labor - Intentek, Broadcast receiverek](./labor5/labor5.md)
 
+[6. labor - Perzisztencia](./labor6/labor6.md)
+
 [7. labor - Service, Location](./labor7/labor7.md)
 
 [8. labor - Hálózatkezelés](./labor8/labor8.md)
