@@ -80,8 +80,6 @@ SDK manager ikon:
 
 ![](images/sdk_manager_icon.png)
 
-![](images/sdk_manager_icon.PNG)
-
 SDK manager felülete:
 
 ![](images/sdk_manager.png)
