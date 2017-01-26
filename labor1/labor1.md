@@ -153,7 +153,7 @@ Ez a rész azoknak szól, akik korábban már használták az Eclipse nevű IDE-
     *   CTRL-t lenyomva navigálhatunk a kódban (pl. osztályra, metódushívásra kattintva). Ezt a navigációt (és az egyszerű másik osztályba kattintást is) rögzíti, és a history előre-hátra gombokkal lehet lépkedni benne. Ha van az egerünkön/billentyűzetünkön ilyen gomb, és netes böngészés közben aktívan használjuk, ezt a funkciót nagyon hasznosnak fogjuk találni.
     *   Szín ikonja a sor elején; kiemelve jobb oldalon, hogy melyik nézeten vagyunk; szabadszavas kiegészítés; a “Hello world” igazából _“@string/very_very_very_long_hello_world”_
 
-![](images/Nice-studio.png)
+![](assets/Nice-studio.png)
 
 ### Billentyűkombinációk
 
@@ -205,14 +205,14 @@ A Studio sok sablont tartalmaz, röviden tekintsék át a lehetőségeket:
 
 A készülék erőforráashasználata [monitorozható](https://developer.android.com/studio/profile/android-monitor.html?utm_source=android-studio) ezen a felületen egyéb hasznos funkciók, mint a képernyőfelvétrel készítés (kamera ikon) mellett.
 
-![](images/ADM.png)
+![](assets/ADM.png)
 
 ## Fejlett Android Device monitor / DDMS
 
 Android studio -> Tools -> Android -> Android Device Monitor
 Itt lehetséges virtuális SMS vagy telefonhívás küldése, fake GPS pozíció beállítása, a fájlok monitoirozása egyébb fejlesztéshez hasznos eszközök mellett.
 
-![](images/DDMS.png)
+![](assets/DDMS.png)
 
 
 ## Feladatok:
