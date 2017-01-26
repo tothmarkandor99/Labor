@@ -1,4 +1,5 @@
-### 4. Labor: Todo alkalmazás telefonra és tabletre
+# 4. Labor: Todo Alkalmazás
+
 A labor célja, hogy bemutassa, hogyan lehet ún. Master/Detail nézetet tartalmazó alkalmazást készíteni Androidra, fragmentek és erőforrásminősítők segítségével.
 
 Első lépésben készítsünk egy új alkalmazást, package név legyen:
@@ -9,7 +10,7 @@ hu.bme.aut.examples
 
 A sablonválasztónál válasszuk a Master/Detail Flow opciót!
 
-<img src="./images/master-detail-choose_new.PNG" width="200" align="middle">
+<img src="./assets/master-detail-choose_new.PNG" width="200" align="middle">
 
 A következő ablakban írjuk be rendre, hogy **Todo, Todos, Todos**! Ennek csak a generált sablonban van szerepe, de legalább az activity nevét nem kell később átírjuk.
 
@@ -251,6 +252,8 @@ public class SimpleItemRecyclerViewAdapter
 Figyeljük meg a ViewHolder patternt az adapterben. A RecyclerView már kikényszeríti ennek használatát, mivel így jóval gyorsabb szoftvert kapunk.
 
 Ez az adapter hivatkozik egy todorow.xml-re. Hozzuk létre ezt az álloimányt a _res/layout_ mappába (new -> layout resource file -> Filename: todorow.xml -> OK):
+
+
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
@@ -295,11 +298,11 @@ Ez az adapter hivatkozik egy todorow.xml-re. Hozzuk létre ezt az álloimányt a
 
 A három kép, mely szükséges a nézetekhez (ezeket a _res/drawable_ mappába másoljuk be!):
 
-<img src="./images/high.png" align="middle">
+<img src="./assets/high.png" align="middle">
 
-<img src="./images/medium.png" align="middle">
+<img src="./assets/medium.png" align="middle">
 
-<img src="./images/low.png" align="middle">
+<img src="./assets/low.png" align="middle">
 
 Írjuk felül a TodoListActivity **SetupRecyclerView** metódusát az alábbi kóddal. (Ez a metódus felel az adapter példaadatokkal való feltöltéséért.)
 
@@ -313,7 +316,7 @@ private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
 }
 ```
 Próbálja ki az alkalmazást!
-Tipp: A gyorsabb teszteléshez, keresse ki a tablet mérethez tartozó (layout-w900dp) _todo_list.xml_ felületleírót, majd másolja a layount-land mappába (hozza létre a mappát!). Ezáltal a mobiltelefon álló orientációjában egy-, míg fekvtetve kétpaneles viselkedést kapunk.
+Tipp: A gyorsabb teszteléshez, keresse ki a tablet mérethez tartozó (layout-w900dp) `_todo_list.xml_` felületleírót, majd másolja a layount-land mappába (hozza létre a mappát!). Ezáltal a mobiltelefon álló orientációjában egy-, míg fekvtetve kétpaneles viselkedést kapunk.
 
 ## Todo törlése
 
@@ -341,7 +344,7 @@ holder.mView.setOnLongClickListener(new View.OnLongClickListener() {
 });
 ```
 
-Az onCreateContextMenu hivatkozik egy layout erőforrásra, ami tartalmazza a lehetséges menüpontokat. Hozzuk létre a long_click_menu.xml fájlt a menu mappában.
+Az onCreateContextMenu hivatkozik egy layout erőforrásra, ami tartalmazza a lehetséges menüpontokat. Hozzuk létre a `long_click_menu.xml` fájlt a menu mappában.
 (Legegyszerűbb módon az R.menu.long_click_listener piros részére helyezve a kurzort, majd ALT+ENTER -> “Create menu resource file…”)
 
 ```xml
@@ -528,6 +531,7 @@ private SimpleItemRecyclerViewAdapter adapter;
 ```
 
 _OnCreate_-ben, SetupRecyclerView metódus után:
+
 ```java
 adapter = (SimpleItemRecyclerViewAdapter) ((RecyclerView) recyclerView).getAdapter();
 ```
