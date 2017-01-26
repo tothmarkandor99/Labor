@@ -1,5 +1,6 @@
-Felkészülés a laborra
-=====================
+# 6. Labor - Perzisztencia
+
+## Felkészülés a laborra
 
 A labor célja a relációs adatbáziskezelés bemutatása Android-on, aminek
 szemléltetésére a korábban elkészített Todo lista alkalmazást
@@ -7,8 +8,7 @@ fejlesztjük tovább. A labor során SQLite adatbázisban fogjuk tárolni a
 Todo elemeinket, így azok nem fognak elveszni, ha a felhasználó
 elnavigál az alkalmazásunkból, vagy elforgatja azt.
 
-Kiinduló projekt
-================
+## Kiinduló projekt
 
 Töltsük le a kezdeti alkalmazást:
 
@@ -20,8 +20,8 @@ perzisztens módon el a létrehozott Todo objektumokat.
 Tömörítsük ki a mappát, indítsuk el az Android Studio-t, majd az Open
 segítségével nyissuk meg az alkalmazást.
 
-Adattárolás SQLite adatbázisban
-===============================
+## Adattárolás SQLite adatbázisban
+
 
 Célunk, hogy a memóriában tárolás helyett a Todo objektumaink egy SQLite
 adatbázisban legyenek perzisztensen mentve, így azok nem vesznek el
@@ -36,8 +36,8 @@ A feladat megvalósítása három részből áll:
     működővé
 3.  Workflow átírása
 
-Todo-k tárolása adatbázisban
-----------------------------
+### Todo-k tárolása adatbázisban
+
 
 Az SQLite adatbáziskezelő használatához segítséget nyújt a platform,
 mégpedig az SQLiteOpenHelper osztállyal. Ebből származtatva olyan saját
@@ -251,7 +251,7 @@ végű csomagban), másrészt az adatbázis konstansokat tároló belső
 osztályként (a *.db* végű csomagban). A bemásolt kód célja, hogy a Todo
 entitásokat létrehozza, módosítsa vagy törölje az adatbázisban, így az
 entitás osztályt importáljuk be
-(*examples.aut.bme.hu.todo.data.Todo*).
+(*hu.bme.aut.amorg.examples.todo.data.Todo*).
 
 Általában igaz, hogy szükséges olyan metódusok megírása, melyek képesek
 egy rekordot visszaadni, valamint egy kurzor objektummal visszatérni,
@@ -298,8 +298,8 @@ A kód bemásolása és importok rendezése után hibát kapunk a forrás
 végénél a getTodoByCursor(c) metódushívásra. Ez még valóban nincs
 implementálva, hamarosan pótoljuk.
 
-Lista feltöltése adatbázisból
------------------------------
+## Lista feltöltése adatbázisból
+
 
 Ha az Adapter osztályunkat adatbázisból szeretnénk feltölteni, akkor a
 BaseAdapter helyett a *CursorRecyclerViewAdapater* ősosztályból kell
@@ -408,8 +408,8 @@ public static Todo getTodoByCursor(Cursor c){
 }
 ```
 
-Egyedi Application objektum készítése
--------------------------------------
+## Egyedi Application objektum készítése
+
 
 Készítsünk egy egyedi Application osztályt, TodoApplication néven. Az
 Application az alkalmazás futása során folyamatosan jelen lévő objektum,
@@ -467,8 +467,8 @@ minősített (fully-qualified) osztálynevét:
 Ezt követően a TodoApplication osztály getTodoDbLoader() statikus
 metódusával bármikor elérhetjük az SQLite adatbáziskapcsolatunkat.
 
-TodoListActivity módosítása
----------------------------
+## TodoListActivity módosítása
+
 
 Az adatbázis perzisztencia használatához minden rendelkezésre áll, már
 csak az TodoListActivity-ben kell áttérnünk listáról SQL-re.
@@ -704,8 +704,7 @@ public void onTodoCreated(Todo newTodo) {
 immár forgatás után, illetve elnavigálás után is megmaradnak a
 létrehozott Todo-k.
 
-Önálló feladat
-==============
+## Önálló feladat
 
 Az eredeti funkcionalitás további részeinek megvalósítása önálló
 feladatként oldandók meg:
