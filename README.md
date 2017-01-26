@@ -4,6 +4,8 @@
 
 ## Laborfeladatok
 
+[1. labor - Hello World](./labor1/labor1.md)
+
 [2. labor - Egyszerű felhasználói felület](./labor2/labor2.md)
 
 [5. labor - Intentek, Broadcast receiverek](./labor5/labor5.md)
