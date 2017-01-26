@@ -57,11 +57,11 @@ Fordítás menete Android platformon
 
 A [d.android.com/sdk](https://developer.android.com/studio) oldalról letölthető az IDE és az SDK. Ennek fontosabb mappáit, eszközeit tekintsék át a laborvezető segítségével!
 
-<img src="./images/ide_android.png" width= "700" align="middle">
+<img src="/images/ide_android.png" width= "700" align="middle">
 
 SDK felépítése
 
-<img src="./images/sdk-folder.png" width= "250" align="middle">
+<img src="/images/sdk-folder.png" width= "250" align="middle">
 
 SDK szerkezet
 
@@ -78,7 +78,9 @@ Az SDK kezelésére az SDK managert használjuk, ezzel lehet letölteni és fris
 
 SDK manager ikon:
 
-<img src="./images/sdk_manager_icon.png" width="30" align="middle">
+![](images/sdk_manager_icon.png)
+
+<img src="/images/sdk_manager_icon.PNG" width="30" align="middle">
 
 SDK manager felülete:
 
