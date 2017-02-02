@@ -4,28 +4,28 @@
 
 ## Laborfeladatok
 
-[1. labor - Hello World](./labor1/labor1.md)
+[0. labor - Hello World](./labor0/labor0.md)
 
-[2. labor - Egyszerű felhasználói felület](./labor2/labor2.md)
+[1. labor - Egyszerű felhasználói felület](./labor1/labor2.md)
 
-[3. labor - Nézetek](./labor3/labor3.md)
+[2. labor - Nézetek](./labor2/labor2.md)
 
-[4. labor - TODO Alkalmazás](./labor4/labor4.md)
+[3. labor - TODO Alkalmazás](./labor3/labor3.md)
 
-[5. labor - Intentek, Broadcast receiverek](./labor5/labor5.md)
+[4. labor - Intentek, Broadcast receiverek](./labor4/labor4.md)
 
-[6. labor - Perzisztencia](./labor6/labor6.md)
+[5. labor - Perzisztencia](./labor5/labor5.md)
 
-[7. labor - Service, Location](./labor7/labor7.md)
+[6. labor - Service, Location](./labor6/labor6.md)
 
-[8. labor - Hálózatkezelés](./labor8/labor8.md)
+[7. labor - Hálózatkezelés](./labor7/labor7.md)
 
-[9. labor - Galéria](./labor9/labor9.md)
+[8. labor - Galéria](./labor8/labor8.md)
 
-[10. labor - UX Alapok](./labor10/labor10.md)
+[9. labor - UX Alapok](./labor9/labor9.md)
 
-[11. labor - Játékfejlesztés](./labor11/labor11.md)
+[10. labor - Játékfejlesztés](./labor10/labor10.md)
 
-[12. labor - Launcher++](./labor12/labor12.md)
+[11. labor - Launcher++](./labor11/labor11.md)
 
-[13. labor - Futásidejű engedélyek](./labor13/labor13.md)
+[12. labor - Futásidejű engedélyek](./labor12/labor12.md)

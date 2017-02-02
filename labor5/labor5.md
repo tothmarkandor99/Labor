@@ -1,720 +1,713 @@
-# 5. Android Labor: Intentek, Broadcast receiverek
+# Labor 5 - Perzisztencia
 
-A labor során egy launcher vagy home screen alkalmazást fogunk készíteni, amelyben egy *ViewPager* található, benne 2 *fragment*-tel.
-A bal oldali egy tárcsázó, a jobb oldali pedig az alkalmazásokat listázza ki.
+## Felkészülés a laborra
 
-![](images/dialer.png)
-![](images/appdrawer.png)
+A labor célja a relációs adatbáziskezelés bemutatása Android-on, aminek
+szemléltetésére a korábban elkészített Todo lista alkalmazást
+fejlesztjük tovább. A labor során SQLite adatbázisban fogjuk tárolni a
+Todo elemeinket, így azok nem fognak elveszni, ha a felhasználó
+elnavigál az alkalmazásunkból, vagy elforgatja azt.
 
-! A *ViewPager* használatához szükség van a support v4 csomagra. Importoknál ha lehetséges mindig a supportos változatot használjuk !
+## Kiinduló projekt
 
-Első lépésben készítsünk egy új alkalmazást, package név legyen:
-> hu.bme.aut.amorg.examples.intentlabor
+Töltsük le a kezdeti alkalmazást:
 
-Készítsünk egy új Empty Activity-t ,akár projekt létrehozásakor, akár később **LauncherActivity** néven, de gondoskodjunk róla,
-hogy a **FragmentActivity**-ből származik le!
+[Kiinduló project](./assets/Todo05Start.zip)
 
-A projektünkben ez az egy Activity lesz. Nem szeretnénk, hogy el lehessen forgatni, illetve szeretnénk, ha home alkalmazásként viselkedhetne.
-Mindkét igény miatt a Manifest állományunkat kell módosítani.
+Ez a Todo alkalmazás Fragment-es verziója, azonban nem tárolja
+perzisztens módon el a létrehozott Todo objektumokat.
 
-Az activity elem az alábbi legyen:
-```xml
-<activity
-    android:name=".LauncherActivity"
-    android:label="@string/app_name"
-    android:launchMode="singleTask"
-    android:screenOrientation="portrait">
-    <intent-filter>
-        <action android:name="android.intent.action.MAIN" />
+Tömörítsük ki a mappát, indítsuk el az Android Studio-t, majd az Open
+segítségével nyissuk meg az alkalmazást.
 
-        <category android:name="android.intent.category.LAUNCHER" />
-        <category android:name="android.intent.category.DEFAULT" />
-        <category android:name="android.intent.category.HOME" />
-    </intent-filter>
-</activity>
-```
-Az Activity szempontjából egyetlen View kell az *activity_main* XML-be: egy ViewPager
-```xml
-<android.support.v4.view.ViewPager xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/pager"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent" />
-```
-Ebben a ViewPagerben két Fragment jelenik meg. Készítsünk egy fragments nevű java package-t!
-Hozzunk létre benne 2 Fragment osztályt DialerFragment és AppDrawerFragment néven!
+## Adattárolás SQLite adatbázisban
 
-A ViewPager működéséhez szükségünk van egy adapterre, ami szolgáltatja a Fragmenteket. Az Activity-nk kódja az alábbi módon alakul:
+
+Célunk, hogy a memóriában tárolás helyett a Todo objektumaink egy SQLite
+adatbázisban legyenek perzisztensen mentve, így azok nem vesznek el
+kilépéskor sem. A *TodoAdapter* ezek után nem a memóriában tárolt listát
+fogja megjeleníteni, hanem az adatbázist olvassa és köti össze a
+*ListView*-al.
+
+A feladat megvalósítása három részből áll:
+
+1.  Todo objektumok tárolása adatbázisban
+2.  Listával dolgozó adapter átalakítása adatbázissal (*Cursor*-ral)
+    működővé
+3.  Workflow átírása
+
+### Todo-k tárolása adatbázisban
+
+
+Az SQLite adatbáziskezelő használatához segítséget nyújt a platform,
+mégpedig az SQLiteOpenHelper osztállyal. Ebből származtatva olyan saját
+osztályt hozhatunk létre, ami referenciát szolgáltat az általunk
+használt teljes adatbázisra, így tehát több entitás osztály és adatbázis
+tábla esetén is elég egy ilyen segédosztály.
+
+Hozzunk létre a projektben egy új package-et **db** (database) néven.
+
+Ezen belül hozzunk létre egy új osztályt *DatabaseHelper* néven, melyek
+ősosztálya az *SQLiteOpenHelper*. Tartalma:
+
 ```java
-/* Number of views in the viewpager */
-private static final int NUM_PAGES = 2;
+public class DatabaseHelper extends SQLiteOpenHelper {
 
-/* The viewpager that is the only view in the xml */
-private ViewPager pager;
-
-/* Pageradapter, that holds the fragments */
-private PagerAdapter pagerAdapter;
-```
-
-OnCreate metódusunk:
-```java
-@Override
-protected void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    setContentView(R.layout.activity_launcher);
-
-    /* Getting reference to the viewpager, creating new adapter, and setting it to the pager */
-    pager = (ViewPager) findViewById(R.id.pager);
-    pagerAdapter = new HomeScreenPagerAdapter(getSupportFragmentManager());
-    pager.setAdapter(pagerAdapter);
-}
-```
-Majd az adapter, mint belső osztály (csak a példa kedvéért, ajánlott kiszervezni):
-```java
-private class HomeScreenPagerAdapter extends FragmentStatePagerAdapter {
-
-    public HomeScreenPagerAdapter(FragmentManager manager) {
-        super(manager);
+    public DatabaseHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
+        super(context, name, factory, version);
+        // TODO Auto-generated constructor stub
     }
 
     @Override
-    public Fragment getItem(int position) {
-        switch (position){
-            case 0: return new DialerFragment();
-            case 1: return new AppDrawerFragment();
-            default: return new AppDrawerFragment();
+    public void onCreate(SQLiteDatabase db) {
+        // TODO Auto-generated method stub
+    }
+
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        // TODO Auto-generated method stub
+    }
+}
+```
+
+Az *SQLiteOpenHelper* osztályból történő származtatás a konstruktoron
+kívül két metódus kötelező felüldefiniálását írja elő. Az
+*.onCreate()*-ben kell futtatnunk a sémalétrehozó SQL szkriptet, míg az
+*.onUpgrade()*-ben kezelhetjük le az adatbázis verzióváltásával
+kapcsolatos feladatokat. Legegyszerűbb esetben itt töröljük, majd újra
+létrehozzuk az egész sémát, de ekkor az adatokat is elveszítjük.
+
+Az adatbáziskezelés során sok konstans jellegű változóval kell
+dolgoznunk, mint például a táblákban lévő oszlopok nevei, táblák neve,
+adatbázis fájl neve, séma létrehozó és törlő szkiptek, stb. Ezeket
+érdemes egy közös helyen tárolni, így szerkesztéskor vagy új entitás
+bevezetésekor nem kell a forrásfájlok között ugrálni, valamint
+egyszerűbb a teljes adatbázist létrehozó és törlő szkripteket generálni.
+Hozzunk létre egy új osztályt a **datastorage** csomagban *DbConstants*
+néven, és statikus tagváltozóként vegyünk fel minden szükséges
+konstanst:
+
+```java
+public class DbConstants {
+
+    // Broadcast Action, amely az adatbazis modosulasat jelzi
+    public static final String ACTION_DATABASE_CHANGED = "hu.bute.daai.amorg.examples.DATABASE_CHANGED";
+
+    // fajlnev, amiben az adatbazis lesz
+    public static final String DATABASE_NAME = "data.db";
+    // verzioszam
+    public static final int DATABASE_VERSION = 1;
+    // osszes belso osztaly DATABASE_CREATE szkriptje osszefuzve
+    public static String DATABASE_CREATE_ALL = Todo.DATABASE_CREATE;
+    // osszes belso osztaly DATABASE_DROP szkriptje osszefuzve
+    public static String DATABASE_DROP_ALL = Todo.DATABASE_DROP;
+
+    /* Todo osztaly DB konstansai */
+    public static class Todo{
+        // tabla neve
+        public static final String DATABASE_TABLE = "todo";
+        // oszlopnevek
+        public static final String KEY_ROWID = "_id";
+        public static final String KEY_TITLE = "title";
+        public static final String KEY_PRIORITY = "priority";
+        public static final String KEY_DUEDATE = "dueDate";
+        public static final String KEY_DESCRIPTION = "description";
+        // sema letrehozo szkript
+        public static final String DATABASE_CREATE =
+            "create table if not exists "+DATABASE_TABLE+" ( "
+            + KEY_ROWID +" integer primary key autoincrement, "
+            + KEY_TITLE + " text not null, "
+            + KEY_PRIORITY + " text, "
+            + KEY_DUEDATE +" text, "
+            + KEY_DESCRIPTION +" text"
+            + "); ";
+        // sema torlo szkript
+        public static final String DATABASE_DROP =
+            "drop table if exists " + DATABASE_TABLE + "; ";
+    }
+}
+```
+
+Figyeljük meg hogy a *DbConstants* osztályon belül létrehoztunk egy
+statikus belső Todo nevű osztályt, amiben a Todo entitásokat tároló
+tábla konstansait tároljuk. Amennyiben az alkalmazásunk több entitást is
+adatbázisban tárol (gyakori eset!), akkor érdemes az egyes osztályokhoz
+tartozó konstansokat külön-külön belső statikus osztályokban tárolni.
+Így sokkal átláthatóbb és karbantarthatóbb lesz a kód, mintha ömlesztve
+beírnánk a *DbConstants*-ba az összes tábla összes konstansát. Ezek a
+belső osztályok praktikusan ugyanolyan névvel léteznek mint az entitás
+osztályok (jelen esetben mindkettő neve Todo), azonban mivel más
+package-ben vannak ez nem okoz fordítási hibát (részben ezért is
+csináltuk a *db* végű csomagot).
+
+Ha megvannak a konstansok, írjuk meg a *DatabaseHelper* osztály
+metódusait. A konstruktor paraméterei közül törölhetjük a
+CursorFactory-t és a verziószámot, és az ősosztály konstruktorának
+hívásakor a megfelelő helyeken adjunk át null-t (így a default
+CursorFactory-t fogja használni), valamint a
+*DbConstants.DATABASE\_VERSION* stringet verzióként. Az onCreate() és
+onUpgrade() metódusokban használjuk a *DbConstants*-ban ebből a célból
+létrehozott konstansokat.
+
+```java
+public class DatabaseHelper extends SQLiteOpenHelper {
+
+    public DatabaseHelper(Context context, String name) {
+        super(context, name, null, DbConstants.DATABASE_VERSION);
+    }
+
+    @Override
+    public void onCreate(SQLiteDatabase db) {
+        db.execSQL(DbConstants.DATABASE_CREATE_ALL);
+    }
+
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        db.execSQL(DbConstants.DATABASE_DROP_ALL);
+        db.execSQL(DbConstants.DATABASE_CREATE_ALL);
+    }
+}
+```
+
+A séma létrehozásához és megnyitásához szükséges osztályok rendelkezésre
+állnak, a következő feladatunk az entitás osztályok felkészítése az
+adatbázisból történő használatra. Ehhez meg kell írnunk azokat a
+kódrészleteket, melyek egy memóriába lévő Todo objektumot képesek
+adatbázisba írni, onnan visszaolvasni, módosítani valamint törölni
+(természetesen más funkciók is szükségesek lehetnek). Ezt a kódot az
+entitás osztály (Todo) helyett érdemes egy külön osztályban
+megvalósítani a *datastorage* csomagon belül (TodoDbLoader, *SQL exceptionsból használjuk az android.database-t*):
+
+```java
+public class TodoDbLoader {
+
+    private Context ctx;
+    private DatabaseHelper dbHelper;
+    private SQLiteDatabase mDb;
+
+    public TodoDbLoader(Context ctx) {
+        this.ctx = ctx;
+    }
+
+    public void open() throws SQLException{
+        // DatabaseHelper objektum
+        dbHelper = new DatabaseHelper(
+                ctx, DbConstants.DATABASE_NAME);
+        // adatbázis objektum
+        mDb = dbHelper.getWritableDatabase();
+        // ha nincs még séma, akkor létrehozzuk
+        dbHelper.onCreate(mDb);
+    }
+
+    public void close(){
+        dbHelper.close();
+    }
+    // CRUD és egyéb metódusok
+}
+```
+
+A létrehozó, módosító és törlő metódusok (TodoDbLoader-en belül!):
+
+```java
+// INSERT
+public long createTodo(Todo todo){//data.Todo
+    ContentValues values = new ContentValues();
+    values.put(DbConstants.Todo.KEY_TITLE, todo.getTitle());
+    values.put(DbConstants.Todo.KEY_DUEDATE, todo.getDueDate());
+    values.put(DbConstants.Todo.KEY_DESCRIPTION, todo.getDescription());
+    values.put(DbConstants.Todo.KEY_PRIORITY, todo.getPriority().name());
+
+    return mDb.insert(DbConstants.Todo.DATABASE_TABLE, null, values);
+}
+
+// DELETE
+public boolean deleteTodo(long rowId){
+    return mDb.delete(
+            DbConstants.Todo.DATABASE_TABLE,
+            DbConstants.Todo.KEY_ROWID + "=" + rowId,
+            null) > 0;
+}
+
+// UPDATE
+public boolean updateProduct(long rowId, Todo newTodo){
+    ContentValues values = new ContentValues();
+    values.put(DbConstants.Todo.KEY_TITLE, newTodo.getTitle());
+    values.put(DbConstants.Todo.KEY_DUEDATE, newTodo.getDueDate());
+    values.put(DbConstants.Todo.KEY_DESCRIPTION, newTodo.getDescription());
+    values.put(DbConstants.Todo.KEY_PRIORITY, newTodo.getPriority().name());
+    return mDb.update(
+            DbConstants.Todo.DATABASE_TABLE,
+            values,
+            DbConstants.Todo.KEY_ROWID + "=" + rowId ,
+            null) > 0;
+}
+```
+
+Fussuk át és értelmezzük a bemásolt kódot!
+
+ A kód bemásolása után importáljuk be a megfelelő osztályokat. A *Todo*
+osztály két helyen is szerepel, egyrészt entitás osztályként (a .data
+végű csomagban), másrészt az adatbázis konstansokat tároló belső
+osztályként (a *.db* végű csomagban). A bemásolt kód célja, hogy a Todo
+entitásokat létrehozza, módosítsa vagy törölje az adatbázisban, így az
+entitás osztályt importáljuk be
+(*hu.bme.aut.amorg.examples.todo.data.Todo*).
+
+Általában igaz, hogy szükséges olyan metódusok megírása, melyek képesek
+egy rekordot visszaadni, valamint egy kurzor objektummal visszatérni,
+ami a teljes rekord halmazra mutat. Ezek implementációja (még mindig a
+TodoDbLoader osztályban):
+
+```java
+// minden Todo lekérése
+public Cursor fetchAll(){
+    // cursor minden rekordra (where = null)
+    return mDb.query(
+            DbConstants.Todo.DATABASE_TABLE,
+            new String[]{
+                    DbConstants.Todo.KEY_ROWID,
+                    DbConstants.Todo.KEY_TITLE,
+                    DbConstants.Todo.KEY_DESCRIPTION,
+                    DbConstants.Todo.KEY_DUEDATE,
+                    DbConstants.Todo.KEY_PRIORITY
+            }, null, null, null, null, DbConstants.Todo.KEY_TITLE);
+}
+
+// egy Todo lekérése
+public Todo fetchTodo(long rowId){
+    // a Todo-ra mutato cursor
+    Cursor c = mDb.query(
+            DbConstants.Todo.DATABASE_TABLE,
+            new String[]{
+                    DbConstants.Todo.KEY_ROWID,
+                    DbConstants.Todo.KEY_TITLE,
+                    DbConstants.Todo.KEY_DESCRIPTION,
+                    DbConstants.Todo.KEY_DUEDATE,
+                    DbConstants.Todo.KEY_PRIORITY
+            }, DbConstants.Todo.KEY_ROWID + "=" + rowId,
+            null, null, null, DbConstants.Todo.KEY_TITLE);
+    // ha van rekord amire a Cursor mutat
+    if(c.moveToFirst())
+        return getTodoByCursor(c);
+    // egyebkent null-al terunk vissza
+    return null;
+}
+```
+
+A kód bemásolása és importok rendezése után hibát kapunk a forrás
+végénél a getTodoByCursor(c) metódushívásra. Ez még valóban nincs
+implementálva, hamarosan pótoljuk.
+
+## Lista feltöltése adatbázisból
+
+
+Ha az Adapter osztályunkat adatbázisból szeretnénk feltölteni, akkor a
+BaseAdapter helyett a *CursorRecyclerViewAdapater* ősosztályból kell
+származtatnunk, amit a kiindulóprojekt tartalmaz. A megoldás hasonló a ListActivity-ben lévő adapter
+kódjához, de itt az onBindViewHolder metódusban egy Cursor-t kapunk
+pozíció helyett, és ennek segítségével szerezhetjük meg az aktuális Todo
+objektumot. Ezen felül a konstruktorában nem az elemeket adjuk át, hanem
+egy kontextust és egy Cursor-t.
+
+ Hozzuk létre a TodoAdapter osztályt az adapter mappában:
+
+```java
+public class TodoAdapter extends CursorRecyclerViewAdapter<TodoAdapter.ViewHolder> {
+    private boolean mTwoPane;
+
+    public TodoAdapter(Context context, Cursor cursor, boolean mTwoPane) {
+        super(context, cursor);
+        this.mTwoPane = mTwoPane;
+    }
+
+    @Override
+    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.todorow, parent, false);
+        return new ViewHolder(view);
+    }
+
+    @Override
+    public void onBindViewHolder(ViewHolder holder, Cursor cursor) {
+        final Todo todo = TodoDbLoader.getTodoByCursor(cursor);
+
+        holder.mTodo = todo;
+        holder.title.setText(todo.getTitle());
+        holder.dueDate.setText(todo.getDueDate());
+
+        switch (todo.getPriority()) {
+            case LOW:
+                holder.priority.setImageResource(R.drawable.low);
+                break;
+            case MEDIUM:
+                holder.priority.setImageResource(R.drawable.medium);
+                break;
+            case HIGH:
+                holder.priority.setImageResource(R.drawable.high);
+                break;
+            default:
+                holder.priority.setImageResource(R.drawable.high);
+                break;
         }
-    }
 
-    @Override
-    public int getCount() {
-        return NUM_PAGES;
-    }
-}
-```
-Próbáljuk ki az alkalmazást!
-
-### Saját téma és RobotoTextView
-
-Az Android hivatalos betűtípusa a Roboto család (annak ellenére, hogy beépítve nem szerepel):
-
-* Roboto
-* Roboto slab (talpas változat)
-* Roboto condensed (keskeny változat)
-
-Ahhoz, hogy saját betűtípust alkalmazzunk meg kell változtassuk kódból a TextView-n.
-Viszont ezt minden TextView-n és szöveget megjelnítő komponensen el kellene végezni, így ehelyett egy kész megoldást használunk:
-
-[RobotoTextView Github](https://github.com/johnkil/Android-RobotoTextView)
-
-Illesszük be a Gradle függőségek közé, leírása szerint (elvileg már rég szerepel ott a supportv4)!
-
-A tárcsázó gombjainak (12 darab) stílusát fogjuk össze, illetve egy kicsit szabjuk át a kinézetet!
-
-**colors.xml**
-```xml
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <color name="text_color">#ff051b3e</color>
-    <color name="apptheme_color">#512DA8</color>
-</resources>
-```
-
-**dimens.xml**
-```xml
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <!-- Default screen margins, per the Android Design guidelines. -->
-    <dimen name="activity_horizontal_margin">16dp</dimen>
-    <dimen name="activity_vertical_margin">16dp</dimen>
-    <dimen name="dialer_text_size">40sp</dimen>
-    <dimen name="drawer_text_size">15dp</dimen>
-</resources>
-```
-
-**styles.xml**
-```xml
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-
-    <!-- Base application theme. -->
-
-<style name="AppTheme" parent="android:Theme.Holo.Light.NoActionBar">
-        <!-- Customize your theme here. -->
-        <item name="android:textViewStyle">@style/DefaultText</item>
-    </style>
-
-<style name="DefaultText" parent="android:Widget.TextView">
-        <!-- Attributes of RobotoTextView -->
-        <item name="fontFamily">roboto</item>
-        <item name="textWeight">normal</item>
-        <item name="textStyle">normal</item>
-    </style>
-
-<style name="DialerButton" parent="android:Widget.Button">
-        <!-- Attributes of RobotoButton -->
-        <item name="fontFamily">roboto</item>
-        <item name="textWeight">thin</item>
-        <item name="textStyle">italic</item>
-
-        <item name="android:textColor">@color/text_color</item>
-        <item name="android:gravity">center</item>
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:textSize">@dimen/dialer_text_size</item>
-    </style>
-
-</resources>
-```
-
-**A DialerFragment layoutjának kódja:**
-```xml
-<?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/apptheme_color"
-    tools:context="hu.bme.aut.amorg.examples.intentlabor.fragments.DialerFragment">
-
-    <com.devspark.robototextview.widget.RobotoEditText
-        android:id="@+id/callEditText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/tableLayout"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_toLeftOf="@+id/callBackSpaceButton"
-        android:layout_toStartOf="@+id/callBackSpaceButton"
-        android:textSize="@dimen/dialer_text_size" />
-
-    <ImageButton
-        android:id="@+id/callBackSpaceButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/tableLayout"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignTop="@+id/callEditText"
-        android:src="@drawable/ic_backspace_black_24dp" />
-
-    <com.devspark.robototextview.widget.RobotoButton
-        android:id="@+id/call_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:gravity="center"
-        android:padding="15dp"
-        android:text="@string/call"
-        android:textSize="30sp"
-        app:fontFamily="roboto"
-        app:textStyle="normal"
-        app:textWeight="normal" />
-
-    <TableLayout
-        android:id="@+id/tableLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_above="@id/call_button"
-        android:stretchColumns="*">
-
-        <TableRow>
-
-            <com.devspark.robototextview.widget.RobotoButton
-                style="@style/DialerButton"
-                android:text="1" />
-
-            <com.devspark.robototextview.widget.RobotoButton
-                style="@style/DialerButton"
-                android:text="2" />
-
-            <com.devspark.robototextview.widget.RobotoButton
-                style="@style/DialerButton"
-                android:text="3" />
-        </TableRow>
-
-        <TableRow>
-
-            <com.devspark.robototextview.widget.RobotoButton
-                style="@style/DialerButton"
-                android:text="4" />
-
-            <com.devspark.robototextview.widget.RobotoButton
-                style="@style/DialerButton"
-                android:text="5" />
-
-            <com.devspark.robototextview.widget.RobotoButton
-                style="@style/DialerButton"
-                android:text="6" />
-        </TableRow>
-
-        <TableRow>
-
-            <com.devspark.robototextview.widget.RobotoButton
-                style="@style/DialerButton"
-                android:text="7" />
-
-            <com.devspark.robototextview.widget.RobotoButton
-                style="@style/DialerButton"
-                android:text="8" />
-
-            <com.devspark.robototextview.widget.RobotoButton
-                style="@style/DialerButton"
-                android:text="9" />
-        </TableRow>
-
-        <TableRow>
-
-            <com.devspark.robototextview.widget.RobotoButton
-                style="@style/DialerButton"
-                android:text="*" />
-
-            <com.devspark.robototextview.widget.RobotoButton
-                style="@style/DialerButton"
-                android:text="0" />
-
-            <com.devspark.robototextview.widget.RobotoButton
-                style="@style/DialerButton"
-                android:text="#" />
-        </TableRow>
-
-    </TableLayout>
-
-</RelativeLayout>
-```
-
-Ez az elrendezés hivatkozik az ic_action_backspace erőforrásra. Töltsük le az actionbar icon packot az alábbi linkről:
-https://storage.googleapis.com/material-icons/external-assets/v4/icons/zip/ic_backspace_black_24dp.zip
-
-Tömörítsük ki, majd az android mappából másoljuk be az összes erőforrást a res mappánkba illetve készítsük el a *call* string erőforrást.
-
-Laborvezető segítségével vizsgáljuk meg az elrendezést!
-
-Próbáljuk ki az alkalmazást! Mit tapasztalunk?
-
-Alakítsuk át a Fragment kódját, hogy ne jöjjön fel a billentyűzet, amikor fókuszt kap az EditText!
-Hogyan is működik ez a megoldás (emulátoron nem feltétlenül jön elő a billenytűzet de készüléken tesztelve mindenképp)?
-
-```java
-public class DialerFragment extends Fragment {
-
-    public DialerFragment() {
-        // Required empty public constructor
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View layout = inflater.inflate(R.layout.fragment_dialer, container, false);
-        RobotoEditText editText = (RobotoEditText) layout.findViewById(R.id.callEditText);
-        //Disabling soft keyboard
-        editText.setOnTouchListener(new View.OnTouchListener() {
+        holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                return true;
+            public void onClick(View v) {
+                if (mTwoPane) {
+                    Bundle arguments = new Bundle();
+                    arguments.putString(TodoDetailFragment.KEY_TODO_DESCRIPTION, todo.getDescription());
+                    TodoDetailFragment fragment = new TodoDetailFragment();
+                    fragment.setArguments(arguments);
+                    ((AppCompatActivity) v.getContext()).getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.todo_detail_container, fragment)
+                            .commit();
+                } else {
+                    Context context = v.getContext();
+                    Intent intent = new Intent(context, TodoDetailActivity.class);
+                    intent.putExtra(TodoDetailFragment.KEY_TODO_DESCRIPTION, todo.getDescription());
+
+                    context.startActivity(intent);
+                }
             }
         });
-        return layout;
     }
 
+    public class ViewHolder extends RecyclerView.ViewHolder {
+        public final View mView;
+        public final TextView dueDate;
+        public final TextView title;
+        public final ImageView priority;
+        public Todo mTodo;
+
+        public ViewHolder(View view) {
+            super(view);
+            mView = view;
+            title = (TextView) view.findViewById(R.id.textViewTitle);
+            dueDate = (TextView) view.findViewById(R.id.textViewDueDate);
+            priority = (ImageView) view.findViewById(R.id.imageViewPriority);
+        }
+    }
 }
 ```
 
-### Alkalmazások listája
-
-Az alkalmazásokat listázó Fragment tartalma egy GridView. Laborvezetővel tekintsük át az xml-jét!
-
-```xml
-<?xml version="1.0" encoding="utf-8"?>
-<GridView xmlns:android="http://schemas.android.com/apk/res/android"
-     xmlns:tools="http://schemas.android.com/tools"
-     android:layout_width="match_parent"
-     android:layout_height="match_parent"
-     tools:context="hu.bute.daai.amorg.intentlabor.fragments.AppDrawerFragment"
-     android:id="@+id/all_apps"
-     android:persistentDrawingCache="animation|scrolling"
-     android:alwaysDrawnWithCache="true"
-     android:scrollbars="none"
-     android:drawSelectorOnTop="false"
-     android:numColumns="auto_fit"
-     android:columnWidth="78dp"
-     android:stretchMode="spacingWidth"
-     android:layout_weight="1.0"
-     android:stackFromBottom="true"
-     android:visibility="visible">
-
-</GridView>
-```
-A GridView feltöltéséhez szükségünk lesz egy adapterre, annak pedig egy adatszerkezetre. Vegyük fel az alábbiakat az AppDrawerFragment osztály elejére:
+Az implementáció hivatkozik a *TodoLoader* még nem létező statikus
+*getTodoByCursor(Cursor)* metódusára, ami egy rekordra állított
+*Cursor*-t kap paraméterként, és egy *Todo* objektummal tér vissza.
+Ennek kódja triviális (visszatér egy adatbázisból lekért adatokkal
+példányosított Todo objektummal). Írjuk meg a metódust a
+***TodoDbLoader*** osztály végén.
 
 ```java
-private ArrayList<ApplicationInfo> mApplications;
-private GridView mGrid;
+public static Todo getTodoByCursor(Cursor c){
+    return new Todo(
+            c.getString(c.getColumnIndex(DbConstants.Todo.KEY_TITLE)), // title
+            Todo.Priority.valueOf(c.getString(c.getColumnIndex(DbConstants.Todo.KEY_PRIORITY))), // priority
+            c.getString(c.getColumnIndex(DbConstants.Todo.KEY_DUEDATE)), // dueDate
+            c.getString(c.getColumnIndex(DbConstants.Todo.KEY_DESCRIPTION)) // description
+            );
+}
 ```
-Az adapterünk kódja a következő kódrészlet, vegyük fel a Fragmentbe belső osztályként!
+
+## Egyedi Application objektum készítése
+
+
+Készítsünk egy egyedi Application osztályt, TodoApplication néven. Az
+Application az alkalmazás futása során folyamatosan jelen lévő objektum,
+melyet a futtatókörnyezet hoz létre automatikusan, élettartama az
+alkalmazáshoz tartozó process élettartamázhoz köthető. A TodoApplication
+fogja fenntartani az adatbáziskapcsolatot reprezentáló TodoDbLoader
+objektumot, így nem kell minden Activity-ből külön-külön, erőforrás
+pazarló módon példányosítani.
+
+Hozzunk létre tehát egy **application** package-et, majd abban készítsük el
+a **TodoApplication** osztályt:
 
 ```java
-/**
- * Custom grid adapter for ApplicationInfo array
- */
-private class ApplicationsAdapter extends ArrayAdapter<ApplicationInfo> {
-    private Rect mOldBounds = new Rect();
+public class TodoApplication extends Application {
+    private static TodoDbLoader dbLoader;
 
-    public ApplicationsAdapter(Context context, ArrayList<ApplicationInfo> apps) {
-        super(context, 0, apps);
+    public static TodoDbLoader getTodoDbLoader() {
+        return dbLoader;
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        final ApplicationInfo info = mApplications.get(position);
+    public void onCreate() {
+        super.onCreate();
 
-        // This is the already discussed method: using convertview for smoothness!
-        if (convertView == null) {
-            final LayoutInflater inflater = getActivity().getLayoutInflater();
-            convertView = inflater.inflate(R.layout.application, parent, false);
-        }
+        dbLoader = new TodoDbLoader(this);
+        dbLoader.open();
+    }
 
-        Drawable icon = info.getIcon();
+    @Override
+    public void onTerminate() {
+        // Close the internal db
+        dbLoader.close();
 
-        if (!info.isFiltered()) {
-            final Resources resources = getContext().getResources();
-            int width = (int) resources.getDimension(android.R.dimen.app_icon_size);
-            int height = (int) resources.getDimension(android.R.dimen.app_icon_size);
+        super.onTerminate();
+    }
+}
+```
 
-            final int iconWidth = icon.getIntrinsicWidth();
-            final int iconHeight = icon.getIntrinsicHeight();
+Az AndroidManifestben meg kell adnunk, hogy a rendszer melyik osztályt
+példányosítsa induláskor, mint Application objektum. Ehhez az xml-ben
+lévő node-ban fel kell vennünk egy új attribútumot android:name néven,
+és beállítani az újonnan elkészített saját Application példányunk
+minősített (fully-qualified) osztálynevét:
 
-            if (icon instanceof PaintDrawable) {
-                PaintDrawable painter = (PaintDrawable) icon;
-                painter.setIntrinsicWidth(width);
-                painter.setIntrinsicHeight(height);
-            }
+```xml
+....
+    <application
+        android:name=".application.TodoApplication"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme" >
+....
+```
 
-            if (width > 0 && height > 0 && (width < iconWidth || height < iconHeight)) {
-                 final float ratio = (float) iconWidth / iconHeight;
-                 if (iconWidth > iconHeight) {
-                    height = (int) (width / ratio);
-                } else if (iconHeight > iconWidth) {
-                    width = (int) (height * ratio);
+Ezt követően a TodoApplication osztály getTodoDbLoader() statikus
+metódusával bármikor elérhetjük az SQLite adatbáziskapcsolatunkat.
+
+## TodoListActivity módosítása
+
+
+Az adatbázis perzisztencia használatához minden rendelkezésre áll, már
+csak az TodoListActivity-ben kell áttérnünk listáról SQL-re.
+
+Adjuk hozzá a TodoListActivity-hez az alábbi mezőket:
+
+```java
+public class TodoListActivity extends AppCompatActivity implements TodoCreateFragment.ITodoCreateFragment {
+    // State
+    private TodoAdapter adapter;
+    private LocalBroadcastManager lbm;
+
+    // DBloader
+    private TodoDbLoader dbLoader;
+    private GetAllTask getAllTask;
+    ...
+```
+
+Töröljük ki a régi adaptert, és töröljük a hozzá tartozó két hívást is
+az onCreate metódusból.
+
+ Törölni:
+
+```java
+private SimpleItemRecyclerViewAdapter adapter;
+```
+
+Törölni (**onCreate metódusból**):
+
+```java
+setupRecyclerView(recyclerView);
+adapter = (SimpleItemRecyclerViewAdapter) recyclerView.getAdapter();
+```
+
+Módosítsuk a setupRecyclerView metódust, amely immár nem példaadatokkal
+fogja inicializálni a recyclerView-t, hanem az új adatbázist használó
+TodoAdapter-rel:
+
+```java
+private void setupRecyclerView(@NonNull RecyclerView recyclerView, TodoAdapter adapter) {
+    recyclerView.setAdapter(adapter);
+}
+```
+
+Ezek után már nincs szüksége a korábban használt adapterre, ezt
+törölhetjük a kódból (TodoListActivity-ben szerepel belső osztályként).
+
+ Törölni:
+
+```java
+public class SimpleItemRecyclerViewAdapter
+        extends RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder> {
+    ...
+}
+```
+
+Törölni kell még az onTodoCreated metódus belsejét is, mert az új
+adapternek más metódusai vannak.
+
+ Törölni (**onTodoCreated()**):
+
+```java
+adapter.addItem(newTodo);
+adapter.notifyDataSetChanged();
+
+```
+
+Ezt később újra meg fogjuk írni az új adapternek megfelelő hívásokkal.
+
+Az diszk I/O műveleteket javasolt külön szálon, aszinkron módon
+futtatni, mivel könnyen megakaszthatják a UI szálat lassú lefutásukkal.
+Készítsünk a *TodoListActivity* osztályban egy *AsyncTask* osztályból
+származó belső osztályt **GetAllTask** néven, amely aszinkron módon kérdezi
+le az adatbázisunktól az összes elmentett Todo rekordot:
+
+```java
+private class GetAllTask extends AsyncTask<Void, Void, Cursor> {
+
+    private static final String TAG = "GetAllTask";
+
+    @Override
+    protected Cursor doInBackground(Void... params) {
+        try {
+
+            Cursor result = dbLoader.fetchAll();
+
+            if (!isCancelled()) {
+                return result;
+            } else {
+                Log.d(TAG, "Cancelled, closing cursor");
+                if (result != null) {
+                    result.close();
                 }
 
-                final Bitmap.Config c =
-                        icon.getOpacity() != PixelFormat.OPAQUE ?
-                                Bitmap.Config.ARGB_8888 : Bitmap.Config.RGB_565;
-                final Bitmap thumb = Bitmap.createBitmap(width, height, c);
-                final Canvas canvas = new Canvas(thumb);
-                canvas.setDrawFilter(new PaintFlagsDrawFilter(Paint.DITHER_FLAG, 0));
-                // Copy the old bounds to restore them later
-                // If we were to do oldBounds = icon.getBounds(),
-                // the call to setBounds() that follows would
-                // change the same instance and we would lose the
-                // old bounds
-                mOldBounds.set(icon.getBounds());
-                icon.setBounds(0, 0, width, height);
-                icon.draw(canvas);
-                icon.setBounds(mOldBounds);
-                icon = new BitmapDrawable(thumb);
-                info.setIcon(icon);
-                info.setFiltered(true);
+                return null;
             }
+        } catch (Exception e) {
+            return null;
         }
-
-        final TextView textView = (TextView) convertView.findViewById(R.id.label);
-        textView.setText(info.getTitle());
-        final ImageView imageView = (ImageView) convertView.findViewById(R.id.icon);
-        imageView.setImageDrawable(info.getIcon());
-
-        return convertView;
-    }
-}
-```
-A getView metódus hivatkozik egy erőforrásra, alább egyetlen grid elem xml layoutja.
-
-```xml
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-     xmlns:app="http://schemas.android.com/apk/res-auto"
-     android:layout_width="match_parent"
-     android:layout_height="match_parent"
-     android:orientation="vertical">
-
-    <ImageView
-         android:id="@+id/icon"
-         android:layout_width="wrap_content"
-         android:layout_height="wrap_content" />
-
-    <com.devspark.robototextview.widget.RobotoTextView
-         android:id="@+id/label"
-         android:layout_width="wrap_content"
-         android:layout_height="wrap_content"
-         android:textSize="@dimen/drawer_text_size"
-         app:fontFamily="roboto_condensed"
-         app:textWeight="light" />
-
-</LinearLayout>
-```
-
-Össze kell gyűjtenünk az adatokat, amiből majd az adapter dolgozhat. Ehhez hozzunk létre egy data nevű java package-t,
-majd abban egy osztályt, amiben tárolhatjuk az alkalmazásinforációkat:
-```java
-public class ApplicationInfo {
-    /**
-     * The application name.
-     */
-    CharSequence title;
-
-    /**
-     * The intent used to start the application.
-     */
-    Intent intent;
-
-    /**
-     * The application icon.
-     */
-    Drawable icon;
-
-    /**
-     * When set to true, indicates that the icon has been resized.
-     */
-    boolean filtered;
-
-    /**
-     * Creates the application intent based on a component name and various launch flags.
-     *
-     * @param className the class name of the component representing the intent
-     * @param launchFlags the launch flags
-     */
-    public final void setActivity(ComponentName className, int launchFlags) {
-        intent = new Intent(Intent.ACTION_MAIN);
-        intent.addCategory(Intent.CATEGORY_LAUNCHER);
-        intent.setComponent(className);
-        intent.setFlags(launchFlags);
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof ApplicationInfo)) {
-            return false;
-        }
+    protected void onPostExecute(Cursor result) {
+        super.onPostExecute(result);
 
-        ApplicationInfo that = (ApplicationInfo) o;
-        return title.equals(that.title) &&
-                intent.getComponent().getClassName().equals(
-                        that.intent.getComponent().getClassName());
-    }
-
-    @Override
-    public int hashCode() {
-        int result;
-        result = (title != null ? title.hashCode() : 0);
-        final String name = intent.getComponent().getClassName();
-        result = 31 * result + (name != null ? name.hashCode() : 0);
-        return result;
-    }
-
-    public CharSequence getTitle() {
-        return title;
-    }
-
-    public void setTitle(CharSequence title) {
-        this.title = title;
-    }
-
-    public Intent getIntent() {
-        return intent;
-    }
-
-    public void setIntent(Intent intent) {
-        this.intent = intent;
-    }
-
-    public Drawable getIcon() {
-        return icon;
-    }
-
-    public void setIcon(Drawable icon) {
-        this.icon = icon;
-    }
-
-    public boolean isFiltered() {
-        return filtered;
-    }
-
-    public void setFiltered(boolean filtered) {
-        this.filtered = filtered;
-    }
-}
-```
-Ahhoz hogy a főképernyőn megjeleníthessünk minden szükséges alkalmazást, a PackageManager osztály queryIntentActivities()
-metódusát hívjuk segítségül. Ez a kapott Intentnek megfelelő összes Activity-t képes visszaadni egy listában, nekünk pedig
-éppen erre van szükségünk (Intent feloldást végez a háttérben). Az így visszakapott Activity-k adatait olvassuk be egy
-ApplicationInfo objektumokból álló kollekcióba, melyet a Fragmentünkben definiáltunk.
-Hozzunk létre a Fragmentben egy segédmetódust, ami összeszedi az információkat, majd listát készít az alkalmazásokból:
-```java
-private void loadApplications() {
-    // Reference to the PackageManager
-    PackageManager manager = getActivity().getPackageManager();
-
-    // creating a list of every application we want to display
-    Intent mainIntent = new Intent(Intent.ACTION_MAIN, null);
-    mainIntent.addCategory(Intent.CATEGORY_LAUNCHER);
-    final List<ResolveInfo> apps = manager.queryIntentActivities(mainIntent, 0);
-    // sorting by name
-    Collections.sort(apps, new ResolveInfo.DisplayNameComparator(manager));
-
-    // filling the ApplicationInfo array for every app (we want to display)
-    if (apps != null) {
-        final int count = apps.size();
-
-        if (mApplications == null) {
-            mApplications = new ArrayList<ApplicationInfo>(count);
-        }
-        mApplications.clear();
-
-        for (int i = 0; i < count; i++) {
-            ApplicationInfo application = new ApplicationInfo();
-            ResolveInfo info = apps.get(i);
-
-            // app's name
-            application.setTitle(info.loadLabel(manager));
-            // we need an Intent to start the app when touched the icon
-            application.setActivity(
-                    new ComponentName(info.activityInfo.applicationInfo.packageName, info.activityInfo.name),
-                    Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
-            // icon
-            application.setIcon(info.activityInfo.loadIcon(manager));
-
-            mApplications.add(application);
-        }
-    }
-}
-```
-Ezt a metódust hívjuk meg a Fragment onCreate életciklusfüggvényében.
-A Fragment onCreate metódusa tipikusan erre való: olyan feladatok elvégzése, ami még nem igényel valódi nézetet.
-
-Ezek után össze kell kössük az összeszedett információkat a GridView-val. Másoljuk be az alábbi metódust,
-majd hívjuk meg a Fragment onCreateView életciklus függvényében!
-
-```java
-/**
- * Creating and filling ApplicationsAdapter
- * Setting the onTouchListener
- */
-private void bindApplications(View root) {
-    if (mGrid == null) {
-        mGrid = (GridView) root.findViewById(R.id.all_apps);
-    }
-    mGrid.setAdapter(new ApplicationsAdapter(getActivity(), mApplications));
-    mGrid.setSelection(0);
-    mGrid.setOnItemClickListener(new ApplicationLauncher());
-}
-```
-Az előbbi függvénynek szüksége van egy onItemClickListenerre. Rögtön alá el is készíthetünk egy egyszerű implementációt:
-```java
-/**
- * Helper class that starts the new application
- */
-private class ApplicationLauncher implements AdapterView.OnItemClickListener {
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        ApplicationInfo app = (ApplicationInfo) parent.getItemAtPosition(position);
-        startActivity(app.getIntent());
-    }
-}
-```
-#### Próbáljuk ki az alkalmazást!
-
-## Önálló feladatok
-
-* Írja meg a tárcsázó működését!
-* Finomítsa az alkalmazások listáját, törekedjen esztétikus megjelenésre!
-
-Tárcsázó segítség:
-A gombokat lássuk el id-kkal!
-A gombok eseménykezelője legyen közös, a kattintott View objektum id-ja alapján állítsa
-be a felhívandó telefonszámot az EditTextben (ha kell töröljön is), majd indítsa a hívást ha a hívás gombot nyomtuk meg!
-```java
-//Hívás indítása Intenttel
-//Ez csak egy példa string
-String phoneNumber = "tel:+36205815693";
-Intent i = new Intent(
-    Intent.ACTION_CALL,
-    Uri.parse(phoneNumber)
-    );
-startActivity(i);
-```
-### Otthoni plusz feladat
-Készítsen egy egyszerű alkalmazást, aminek egyetlen Activity-je van és Toastot dob fel, amikor sms
-érkezik a készülékre! (emulátoron célszerű tesztelni)
-
-Segítség:
-A következő fejezet bemutatja hogyan lehet Broadcast Intent-eket kezelni, ezzel felkészítve az
-alkalmazásunkat rendszerszintű eseményekre. Célunk, hogy értesüljünk a bejövő SMS üzenekről, illetve Toast-ban jelenítsük meg a feladót és az SMS szövegét.
-
-Hozzunk létre egy új alkalmazást, és vegyünk fel egy új osztályt, ami a BroadcastReceiver-ből származik.
-Ez a származtatás kötelezően előírja az onReceive() metódus elüldefiniálását, aminek vázát megkapjuk az „Add unimplemented methods”
-kiválasztásával. Ahogy a függvény fejlécéből látszik, megkapjuk az Intent objektumot, amire feliratkoztunk
-a megfelelő Intent Filter beállításával.
-
-Vegyünk fel egy Intent filtert a Manifestünkbe (application node-on belülre):
-
-```xml
-<receiver android:name="[BR osztály neve]" >
-    <intent-filter>
-        <action android:name="android.provider.Telephony.SMS_RECEIVED"/>
-    </intent-filter>
-</receiver>
-```
-Mivel személyes adathoz szeretnénk hozzáférni, permission-t kell kérni a felhasználótól.
-A manifestben kérjük el az SMS fogadásához szükséges RECEIVE_SMS, olvasásához pedig a READ_SMS engedélyeket:
-
-```xml
-<uses-permission android:name="android.permission.RECEIVE_SMS"/>
-<uses-permission android:name="android.permission.READ_SMS"/>
-```
-
-#### Broadcastreceiver kód
-Az onReceive() metódusban kezeljük le a Broadcast üzenetet. SMS olvasásnál ez a következő módon történik (csak SMS kiolvasás esetén ilyen bonyolult az adat kinyerése):
-
-```java
-if(intent.getAction().equalsIgnoreCase("android.provider.Telephony.SMS_RECEIVED")){
-    // 'pdus' nevu extraban egy Object tombot kapunk, amibol kinyerheto az sms
-    Object[] pdus = (Object[]) intent.getExtras().get("pdus");
-    if(pdus == null){
-        Log.e("RECEIVER", "pdus are null");
-    } else {
-        Log.v("RECEIVER", "received " + pdus.length + " messages");
-        SmsMessage msg = null;
-        // Object tombot kaptunk, vegigmegyunk rajta
-        for (Object pdu : pdus) {
-            // a konkret SMS kinyerese
-            msg = SmsMessage.createFromPdu((byte[])pdu);
-            if(msg != null){
-                showToast(context, "Message from " +msg.getOriginatingAddress()+ ": " +msg.getDisplayMessageBody());
+        Log.d(TAG, "Fetch completed, displaying cursor results!");
+        try {
+            if (adapter == null) {
+                adapter = new TodoAdapter(getApplicationContext(), result, mTwoPane);
+                setupRecyclerView(recyclerView, adapter);
             } else {
-                Log.e("RECEIVER", "Sms is null");
+                adapter.changeCursor(result);
             }
+            getAllTask = null;
+        } catch (Exception e) {
         }
     }
 }
 ```
-A showToast(String) egy segédfüggvény, ami a Toast.makeText() metódust hívja megfelelően paraméterezve.
-Írja meg a showToast() függvényt, majd tesztelje az alkalmazást! (Az emulátorra a DDMS felületről tud SMS-t küldeni)
 
-Bővítse ki az alkalmazást további két eseményre való figyeléssel! Néhány példa:
+Most a fordító nem találja a *recyclerView* viewElement-et, amit eddig csak az *onCreate*-ben lokálisan deklaráltuk és használtunk. Deklaráljuk most *globálisan* az osztályban, ezzel megoldva a problémát!
 
-* Headset figyelése
-* Telefon elindulásának figyelése
-* Töltöttségi állpaot változása
-* Hálózati állapot változása
-* Kijelző ki-be
+Készítsünk egy helyi* BroadcastReceiver* osztályt (ezt is a
+*TodoListActivity*-n belül!), amely figyel azokra a Broadcast-üzenetekre,
+melyek az adatbázis módosulását jelzik. Erre az eseményre a
+BroadcastReceiver osztályunk a Todo-lista tartalmának újbóli
+lekérdezésével fog reagálni (az ehhez tartozó hiányzó *.refreshList()*
+metódust később készítjük el):
 
+```java
+private BroadcastReceiver updateDbReceiver = new BroadcastReceiver() {
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        refreshList();
+    }
+};
+```
+
+Ezt követően az Activity életciklus-hívásait az alábbi módon adjuk meg:
+
+Az *.onCreate()* hívásban kérjünk referenciát a Support Library-ben
+található LocalBroadcastManager osztály példányára, illetve kérjük el a
+referenciát a TodoApplication objektumunktól a nyitott adatbázis
+kapcsolatot tartalmazó TodoDbLoader-re.
+
+```java
+lbm = LocalBroadcastManager.getInstance(this);
+       dbLoader = TodoApplication.getTodoDbLoader();
+```
+
+Az *.onResume()* hívásban (még nincs implementálva) regisztráljuk be a
+korábban létrehozott BroadcastReceiver osztálypéldányunkat, illetve
+rögtön kérjük a Todo-lista tartalmának lekérdezését:
+
+```java
+@Override
+public void onResume() {
+    super.onResume();
+
+    // Kódból regisztraljuk az adatbazis modosulasara figyelmezteto     Receiver-t
+    IntentFilter filter = new IntentFilter(
+            DbConstants.ACTION_DATABASE_CHANGED);
+    lbm.registerReceiver(updateDbReceiver, filter);
+
+    // Frissitjuk a lista tartalmat, ha visszater a user
+    refreshList();
+}
+```
+
+Az *.onPause()* hívásban (ez sem létezik még) kiregisztráljuk a
+BroadcastReceiver-ünket, illetve ha van éppen folyamatban DB-lekérdezés,
+akkor azt megszakítjuk:
+
+```java
+@Override
+public void onPause() {
+    super.onPause();
+
+    // Kiregisztraljuk az adatbazis modosulasara figyelmezteto  Receiver-t
+    lbm.unregisterReceiver(updateDbReceiver);
+
+    if (getAllTask != null) {
+        getAllTask.cancel(false);
+    }
+}
+```
+
+Az *.onDestroy()* hívásban (szintén nincs még) bezárjuk az adapterhez
+csatolt, Todo elemeket tartalmazó Cursor objektumot, ha létezik ilyen:
+
+```java
+@Override
+public void onDestroy() {
+    super.onDestroy();
+
+    // Ha van Cursor rendelve az Adapterhez, lezarjuk
+    if (adapter != null && adapter.getCursor() != null) {
+        adapter.getCursor().close();
+    }
+}
+```
+
+Végül készítsük el a hiányzó .refreshList() metódust is, amely elindítja
+az adatbázist lekérdező aszinkron folyamatot:
+
+```java
+private void refreshList() {
+    if (getAllTask != null) {
+        getAllTask.cancel(false);
+    }
+
+    getAllTask = new GetAllTask();
+    getAllTask.execute();
+}
+```
+
+Ha minden kódrészlet a megfelelő helyen van, akkor az alkalmazás
+indulásakor ugyanaz a felhasználói felület jelenik meg, mint a kiinduló
+projekt esetén, azonban most még üres listát látunk, hiszen üres az
+adatbázis. Ahhoz, hogy működjön a Todo-elem létrehozása funkció újra,
+módosítanunk kell az *.onTodoCreated(…)* callbacket a következő módon:
+
+```java
+// ITodoCreateFragment
+@Override
+public void onTodoCreated(Todo newTodo) {
+    dbLoader.createTodo(newTodo);
+    refreshList();
+}
+```
+
+Így már képesek vagyunk új Todo elemeket létrehozni. Próbáljuk ki, hogy
+immár forgatás után, illetve elnavigálás után is megmaradnak a
+létrehozott Todo-k.
+
+## Önálló feladat
+
+Az eredeti funkcionalitás további részeinek megvalósítása önálló
+feladatként oldandók meg:
+
+-   Kiválasztott Todo elem törlése
+-   Összes Todo elem törlése funkció (pl. Options menüből elérve)
