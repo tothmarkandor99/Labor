@@ -6,7 +6,7 @@
 
 [0. labor - Hello World](./labor0/labor0.md)
 
-[1. labor - Egyszerű felhasználói felület](./labor1/labor2.md)
+[1. labor - Egyszerű felhasználói felület](./labor1/labor1.md)
 
 [2. labor - Nézetek](./labor2/labor2.md)
 
