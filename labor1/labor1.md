@@ -39,6 +39,21 @@ A megvalósítandó alkalmazás működési elve a következő:
 3. A *MainMenuActivity*-ről meg lehet tekinteni a “Highscore”-t, ami jelenleg csak egy *Toast*-ot dob fel egy üzenettel (ezt a funkciót opcionálisan később meg lehet valósítani, ha a perzisztencia témakört már vettük előadáson).
 4. A *MainMenuActivity*-ről meg lehet nézni az alkalmazás készítőiről szóló információkat az “About” menüt választva. Ez a funkció gyakorlatilag átnavigál az *AboutActivity*-re, ami viszont *Manifest* beállítás miatt csak dialógus formában fog megjelenni.
 
+
+## Szöveges erőforrások
+Navigáljunk a `res/values/strings.xml`-re, ahol a projekt szöveges erőforrásai találhatóak. Használjuk a következő szöveges erőforrásokat:
+
+```xml
+<resources>
+    <string name="app_name">TicTacToe</string>
+    <string name="btn_start">Új játék</string>
+    <string name="btn_highscore">Eredméyek</string>
+    <string name="btn_about">Infó</string>
+    <string name="toast_highscore">Eredmények</string>
+    <string name="txt_about">Made by Hallgató</string>
+</resources>
+```
+
 ### Szükséges további Activity-k létrehozása
 A fentiek alapján látható tehát, hogy a meglevő MainMenuActivity mellett még két másik Activity-t, a *GameActivity*-t és az *AboutActivity*-t kell létrehoznunk. Activity létrehozásakor tipikusan az alábbi forrás állományok változnak:
 
@@ -138,10 +153,7 @@ Ahogy korábban említettük az About menü elindítja az új *AboutActivity*-t,
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="hu.bme.aut.amorg.examples.tictactoe.AboutActivity"
-    tools:showIn="@layout/activity_about">
+    android:paddingTop="@dimen/activity_vertical_margin">
 
     <TextView
         android:text="@string/txt_about"
@@ -158,6 +170,7 @@ Ahogy korábban említettük az About menü elindítja az új *AboutActivity*-t,
 A TicTacToe, 3x3-as táblajáték logikáját egy külön osztályban valósítjuk meg *Singleton* (amennyiben nem ismeri ezt a Design pattern-t, érdemes utána olvasni, illetve rákérdezni a laborvezetőnél) formájában, így könnyen hozzáférhetünk.
 
 Készítsünk a forráson belül egy *model* package-t, majd abba egy *TicTacToeModel* osztályt (model package-en *jobb gomb->new->Java class*). Az osztály gyakorlatilag egy 3*3-as mátrixban tárolja a játéktér mezőinek tartalmát és különféle publikus függvényeket biztosít a játéktér lekérdezéséhez és módosításához. A modell a *getInstance()* statikus függvénnyel elérhető el.
+
 ```java
 public class TicTacToeModel {
 
@@ -219,6 +232,7 @@ public class TicTacToeModel {
 A következő lépésként valósítsuk meg a navigációt (váltást) az *Activity*-k között. Gyakorlatilag csak a Start game menüpont hatására kell átváltanunk a *GameActivity*-re, illetve az *About* menüpont hatására az *AboutActivity*-re. Acitivty-k közti váltást *Intent* segítségével tudunk megtenni, beszéljék meg a laborvezetővel az *Intent*-ek alapjait. Ezt a témát előadáson később mélyebben fogjuk még érinteni.
 
 Valósítsuk meg ezen két gomb eseménykezelőjét szintén a *MainMenuActivity onCreate()* függvényében:
+
 ```java
 Button btnStart = (Button) findViewById(R.id.btnStart);
 btnStart.setOnClickListener(new View.OnClickListener() {
@@ -244,6 +258,7 @@ btnAbout.setOnClickListener(new View.OnClickListener() {
 A következő lépés a játéktér kirajzolása és annak hozzárendelése a *GameActivity*-hez.
 
 Első lépésként hozzunk létre egy *view* package-t a meglévő package hierarchia alá, majd abban egy *TicTacToeView* osztály, mely a *View*-ból származik le az alábbi vázzal:
+
 ```java
 public class TicTacToeView extends View {
 
@@ -324,10 +339,7 @@ Ahhoz, hogy a *GameActivity* ezt a játékteret megjelenítse, módosítsuk a ho
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="hu.bme.aut.amorg.examples.tictactoe.GameActivity"
-    tools:showIn="@layout/activity_game">
+    android:paddingTop="@dimen/activity_vertical_margin">
 
     <hu.bme.aut.amorg.examples.tictactoe.view.TicTacToeView
         android:id="@+id/ticView"
