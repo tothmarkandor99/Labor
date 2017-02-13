@@ -19,11 +19,13 @@ Alkalmazás felülete
 ## Kezdő nézet
 
 Hozzunk létre egy új Android Studio Projektet **ViewLabor** néven.
+
 A Company Domain mező tartalmát töröljük ki és hagyjuk is üresen.
+
 A packagename legyen **hu.bme.aut.amorg.examples.viewlabor**
-A projektet a **D:\Users\Android\LaborX\Neved\ViewLabor** mappába hozzuk létre.
 
 A támogatott céleszközök a **Telefon és Tablet**, valamint a minimum SDK szint a **API15: Android 4.0.3**
+
 A kezdő projekthez adjuk hozzá egy **Empty Activity**-t, melynek neve legyen **ViewLaborActivity**.
 
 A legenerált projektből töröljük ki a teszteket (ezekre most nem lesz szükség).
@@ -210,10 +212,10 @@ public class PasswordEditText extends RelativeLayout {
 	}
 
 	public IBinder getWindowToken() {
-                if (passwordEditText != null) {
-		   ();
-                }
-                return null;
+       if (passwordEditText != null) {
+	        return passwordEditText.getWindowToken();
+       }
+       return null;
 	}
 }
 ```
