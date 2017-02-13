@@ -1,414 +1,657 @@
-# Labor 2 - Egyszerű felhasználói felület több Activity segítségével (TicTacToe)
+# Labor 2 - Nézetek
 
-## Bevezetés
+A labor során egy regisztrációs nézetet készítünk el, melyben számos egyedi View található. Ezek az egyedi nézetek az előző laborhoz képest nem a View osztályt bővítik, hanem egy meglévő, komplexebb View elemet bővítenek.
 
-A labor célja a több Activity-ből álló Android alkalmazás készítésének bemutatása, valamint az egyszerű rajzolás bemutatása egy TicTacToe játék segítéségével.
+A labor során az alábbi dolgokat nézzük meg:
 
-A labor során a következő funkciókat fogjuk megvalósítani:
+*   Színek és stílusok definiálása erőforrásokban
+*   Alapértelmezett téma módosítása
+*   Material Paletta színezés generálása
+*   Saját View létrehozása
+*   Egyedi attribútumok definiálása és kezelése
 
-* Menü Activity
-* Játéktér Activity
-* TicTacToe nézet
-* Játék logika elkezdése
+A labor során az alábbi regisztrációs nézetet rakjuk össze az egyedi View-k segítségével.
 
-A laborhoz kapcsolódó önálló feladat:
-* Játék logika megvalósítása: győzelem ellenőrzése
+<img src="./assets/labor_3_ss1.png" width="200" align="middle">
 
-A megvalósítandó játék felhasználói felületét az alábbi képernyőképek szemléltetik:
+Alkalmazás felülete
 
-![](images/main.png)
-![](images/dialog.png)
-![](images/game.png)
+## Kezdő nézet
 
-## Projekt létrehozása
+Hozzunk létre egy új Android Studio Projektet **ViewLabor** néven.
+A Company Domain mező tartalmát töröljük ki és hagyjuk is üresen.
+A packagename legyen **hu.bme.aut.amorg.examples.viewlabor**
+A projektet a **D:\Users\Android\LaborX\Neved\ViewLabor** mappába hozzuk létre.
 
-Első lépésként indítsuk el az Android Studio-t, majd:
+A támogatott céleszközök a **Telefon és Tablet**, valamint a minimum SDK szint a **API15: Android 4.0.3**
+A kezdő projekthez adjuk hozzá egy **Empty Activity**-t, melynek neve legyen **ViewLaborActivity**.
 
-1. Hozzunk létre egy **TicTacToe** nevű projektet.
-2. A kezdő package legyen például **hu.bme.aut.amorg.examples.tictactoe**
-3. A projekt létrehozásakor válasszuk a kezdeti Empty Activity-vel rendelkező konfigurációt.
-4. A kezdeti *Activity* neve legyen *MainMenuActivity*.
+A legenerált projektből töröljük ki a teszteket (ezekre most nem lesz szükség).
 
-Sikeres projekt létrehozás után a laborvezető vezetésével vizsgálja meg a forrás felépítését.
+A következő lépésben módosítsuk a az activity elrendezését (_activity_view_labor.xml_).
 
-## Activity-k létrehozása
-A megvalósítandó alkalmazás működési elve a következő:
+```XML
+<ScrollView
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent">
 
-1. Alkalmazás indításakor a *MainMenuActivity* jelenik meg.
-2. A *MainMenuActivity*-ről lehet új játékot indítani a “Start game” menüpont hatására, ez gyakorlatilag átnavigál a *GameActivity*-re.
-3. A *MainMenuActivity*-ről meg lehet tekinteni a “Highscore”-t, ami jelenleg csak egy *Toast*-ot dob fel egy üzenettel (ezt a funkciót opcionálisan később meg lehet valósítani, ha a perzisztencia témakört már vettük előadáson).
-4. A *MainMenuActivity*-ről meg lehet nézni az alkalmazás készítőiről szóló információkat az “About” menüt választva. Ez a funkció gyakorlatilag átnavigál az *AboutActivity*-re, ami viszont *Manifest* beállítás miatt csak dialógus formában fog megjelenni.
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:paddingLeft="@dimen/activity_horizontal_margin"
+		android:paddingRight="@dimen/activity_horizontal_margin"
+		android:paddingTop="@dimen/activity_vertical_margin"
+		android:paddingBottom="@dimen/activity_vertical_margin"
+		android:orientation="vertical">
 
-### Szükséges további Activity-k létrehozása
-A fentiek alapján látható tehát, hogy a meglevő MainMenuActivity mellett még két másik Activity-t, a *GameActivity*-t és az *AboutActivity*-t kell létrehoznunk. Activity létrehozásakor tipikusan az alábbi forrás állományok változnak:
+		<TextView
+			style="@style/Subtitle"
+			android:text="Registration"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"/>
 
-* Létrejön az Activiy-hez tartozó Java file.
-* Létrejön az Activity-hez tartozó layout XML.
-* Az *AndroidManifest.xml*-be bekerül az Activity az *<application>* tag-en belül.
-* Az Activity-hez tartozó menü XML létrejön (erre nem mindig van szükség).
+		<EditText
+			android:hint="Felhasználónév"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"/>
 
-Az Activity létrehozást azonban megkönnyíti az Andriod Studio és a fenti lépéseket nem kell egyesével elvégeznie a fejlesztőnek.
+		<!-- Ide jön majd a saját jelszó nézet -->
 
-1. Az Android Studioban a forrásra állva válasszuk a “jobbegér->New->Activity->Basic Activity” menüt és hozzuk létre a két Activity-t (*AboutActivity, GameActivity*). Activity létrehozásakor megadható, hogy melyik legyen a “szülő” Activity, amihez a vissza gomb visszanavigálja a felhasználót. Mindkét esetben legyen ez a *MainMenuActivity*.
-2. Létrehozás után az *res/values/strings.xml*-ben állítsuk be a két új Activity címét amelyet a létrehozáskor a Studio automatikusan kigenerált nekünk mint erőforrás (Például: *Az alkalmazásról* illetve *Játék* ).
-3. Nyissuk meg a két új Activity kódját, vizsgáljuk meg azokat és a fölösleges *FloatingActionButton*-t illetve annak *listener*-ét távolítsik el. Ha ez kész akkor az *Activity*-hez rendelt layout-ból is töröljük a widgetet (Tipp: az adott *Activity* *onCreate()* metódusában a *setContentView()*-ban az adott layout-ra CTRL + kattintással könnyen megnyithatjuk az XML leírót).
-4. Állítsuk be a manifest-ben, hogy az *AboutActivity* dialógus formában jelenjen meg:
+		<TextView
+			style="@style/Subtitle"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:text="Nem"/>
 
-```xml
-<activity
-    android:name=".AboutActivity"
-    android:label="@string/title_activity_about"
-    android:parentActivityName=".MainMenuActivity"
-    android:theme="@style/Theme.AppCompat.Light.Dialog">
-    <meta-data
-        android:name="android.support.PARENT_ACTIVITY"
-        android:value="hu.bme.aut.amorg.examples.tictactoe.MainMenuActivity" />
-</activity>
+		<!-- Ide jön single ChoiceLayout -->
+
+		<TextView
+			style="@style/Subtitle"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:text="Válassz max 3-at"/>
+
+		<!-- Ide jön multiple ChoiceLayout -->
+
+	</LinearLayout>
+</ScrollView>
+
 ```
 
-> ### __Létrehozás után ellenőrizzük a laborvezető segítségével a létrejött kódokat!__
+## Material Palette
 
-### MainMenuActivity felület:
+URL: [https://www.materialpalette.com/](https://www.materialpalette.com/)
 
-A *MainMenuActivity* a fenti ábra alapján három menüpontot tartalmaz középre igazodva. Ez a három menüpont gyakorlatilag három gomb egymás alatt egy *LinearLayout*-ban, mely kitölti a szülőt (*match_parent*) és benne az elemek középre vannak rendezve:
+A honlap segítségével saját Material színsémát generálhatunk az alkalmazásunkhoz, ahol két kiválasztott szín segítségével a Meterial színpalettáról állítja össze a holnap az alkalmazásunk szín világát.
+
+Nyissuk meg a honlapot, majd az alábbi beállításokkal generáljunk témát:
+
+1.  Elsődleges színnek válasszuk ki a **Green**-t
+2.  Másodlagos színnek pedig a **Light-Green**-t
+3.  Majd a **Download**-t kiválasztva …
+4.  … **XML** formátumban töltsük is le.
+5.  A kapott file tartalmát másoljuk az **colors.xml**-be.
+
+Az alkalmazásunkban használt stílusokat pedig a _styles.xml_ állományban definiáljuk.
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<!-- Base application theme. -->
+	<style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+		<!-- Customize your theme here. -->
+		<item name="colorPrimary">@color/primary</item>
+		<item name="colorPrimaryDark">@color/primary_dark</item>
+		<item name="colorAccent">@color/accent</item>
+		<item name="android:textViewStyle">@style/TextView</item>
+	</style>
+
+	<style name="TextView" parent="android:Widget.TextView">
+		<item name="android:textColor">@color/primary</item>
+	</style>
+
+	<style name="Subtitle">
+		<item name="android:textSize">20sp</item>
+		<item name="android:paddingTop">16dp</item>
+		<item name="android:paddingBottom">16dp</item>
+	</style>
+
+</resources>
+```
+
+Az AndroidManifest állományt megnézve látható, hogy az alkalmazásunk alapértelmezett témája az AppTheme. Így amit ebben a stílusban definiálunk, az alapértelmezett lesz az alkalmazásunkat tekintve. Az android:textViewStyle definiálja, hogy hogy néz ki az adott alkalmazásban az alapértelmezett TextView egy felüldefiniált stílus segítségével. Ezeknek a felüldefiniált stílusoknak minden esetben a beépített stílusból kell leszármaznia, jelen esetünkben a saját TextView stílusunknak az android:Widget.TextView stílusból. Itt felüldefiniáljuk a textColor attribútumot, aminek hatására minden TextView alapértelmezett betűszíne megváltozik az ott megadottra.
+
+Figyeljük meg hogy az editText is követi a beállított értékeket (Kiválasztott esetben az téma **accent** színét). Adjuk hozzá az AppTheme-hez a következőket, és figyeljük meg hogy megváltozott az EditText szöveg színe.
+
+```xml
+<item name="android:textColor">@color/accent</item>
+<item name="android:textColorPrimary">@color/accent</item>
+<item name="android:textColorSecondary">@color/accent</item>
+```
+
+## Saját View létrehozása
+
+A következő lépés az egyedi nézetek létrehozása.
+
+### Egyedi jelszó nézet
+
+Elsőként az egyedi jelszó nézetet valósítjuk meg. Ez a nézet egy beviteli mezőből áll és egy képből, amelyre rákattintva a jelszó mező megmutatja, hogy mit gépeltünk a mezőbe.
+
+Hozzunk létre egy PasswordEditText osztályt, melynek a kódja az alábbi:
+
+```java
+
+public class PasswordEditText extends RelativeLayout {
+
+	protected EditText passwordEditText;
+	protected ImageView eyeImageView;
+
+	public PasswordEditText(Context context) {
+		super(context);
+		init(context);
+	}
+
+	public PasswordEditText(Context context, AttributeSet attrs) {
+		super(context, attrs);
+		init(context);
+	}
+
+	public PasswordEditText(Context context, AttributeSet attrs, int defStyle) {
+		super(context, attrs, defStyle);
+		init(context);
+	}
+
+	private void init(Context context) {
+		LayoutInflater.from(context).inflate(R.layout.view_password_edittext, this, true);
+
+		passwordEditText = (EditText) findViewById(R.id.passwordET);
+		eyeImageView = (ImageView) findViewById(R.id.passwordIV);
+
+		eyeImageView.setOnTouchListener(new OnTouchListener() {
+
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				if (event.getAction() == MotionEvent.ACTION_DOWN) {
+					setTransformationMethod(null);
+					return true;
+				} else if (event.getAction() == MotionEvent.ACTION_UP || event.getAction() == MotionEvent.ACTION_CANCEL) {
+					setTransformationMethod(PasswordTransformationMethod.getInstance());
+					return true;
+				}
+				return false;
+			}
+		});
+
+		setTransformationMethod(PasswordTransformationMethod.getInstance());
+	}
+
+	private void setTransformationMethod(TransformationMethod method) {
+		int ss = passwordEditText.getSelectionStart();
+		int se = passwordEditText.getSelectionEnd();
+		passwordEditText.setTransformationMethod(method);
+		passwordEditText.setSelection(ss, se);
+	}
+
+	public Editable getText() {
+		if(passwordEditText != null)
+			return passwordEditText.getText();
+		else
+			return null;
+	}
+
+	public void setError(CharSequence str) {
+		passwordEditText.setError(str);
+	}
+
+	public void setText(CharSequence text) {
+		passwordEditText.setText(text);
+	}
+
+	public IBinder getWindowToken() {
+                if (passwordEditText != null) {
+		   ();
+                }
+                return null;
+	}
+}
+```
+
+
+Az osztály a RelativeLayout-ból származik. A RelativeLayout elemei pedig egy EditText és egy ImageView lenne úgy, hogy az ImageView-t jobbra rendezzük és az EditText kitölti bal oldalt a rendelkezésre álló helyet. Ahhoz, hogy egy felüldefiniált ViewGroup-ból származó osztálynak kódból meg tudjuk adni az elrendezését szükségünk van egy úgynevezett merge_layout-ra. Ezt a layout-ot a LayoutInflater.from(context).inflate(R.layout.view_password_edittext, this, true); kóddal tudjuk a RelativeLayout-ba felfújni, aminek hatására a RelativeLayout-nak lesz két gyerek nézete, egy ImageView és egy EditText.
+
+Az elrendezéshez hozzunk létre egy _view_password_edittext.xml_ layout erőforrást és a tartalma legyen az alábbi kód:
+
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/activity_main"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:gravity="center"
-    android:orientation="vertical"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="hu.bme.aut.amorg.examples.tictactoe.MainMenuActivity">
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <Button
-        android:id="@+id/btnStart"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/btn_start" />
+	<ImageView
+		android:id="@+id/passwordIV"
+		android:layout_alignParentRight="true"
+		android:layout_width="50dp"
+		android:layout_height="50dp"
+		android:layout_centerVertical="true"
+		android:src="@android:drawable/ic_menu_view"/>
 
-    <Button
-        android:id="@+id/btnHighscore"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/btn_highscore" />
+	<EditText
+		android:id="@+id/passwordET"
+		android:layout_alignParentLeft="true"
+		android:layout_toLeftOf="@+id/passwordIV"
+		android:layout_centerVertical="true"
+		android:layout_width="0dp"
+		android:layout_height="wrap_content"/>
 
-    <Button
-        android:id="@+id/btnAbout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/btn_about" />
-</LinearLayout>
+</merge>
 
 ```
 
-A Studio egyből jelezni fogja nekünk, hogy a három string erőforrás amit használni szeretnénk, nem létezik, hozzuk létre őket a *strings.xml*-ben (Tipp: ha az erőforrás nevén áll a kurzor az XML-ben és ALT + ENTER -t nyomunk akkor a Studio felajánjla a string resource automatikus elkészítését az értékének megadásával)
-### Highscore gomb eseménykezelő
+A laborvezetővel tekintsék át az ImageView és az EditText elhelyezését a RelativeLayout-on belül.
 
-A Highscore menüpontra kattintva ahogy említettük egy *Toast* üzenet jelenjen meg. Ehhez meg kell keresni a Highscore menüpont gombját és be kell állítani az alábbi eseménykezelőt neki a *MainMenuActivity onCreate()* függvényén belül:
+A java osztály fontosabb függvényei:
+
+*   Konstruktorok: ezek szükségesek az ősosztály megfelelő inicializálásához
+*   init: a saját nézetünket inicializálja. Megkeresi az EditText-et és az ImageView-t, valamint beállítja az onClickListener-t az ImageView-hoz.
+*   setTransformationMethod: átállítja az EditText-hez tartozó szöveg transzformációt, valamint elmenti és visszatölti a kijelölést.
+*   getText, setError, setText, getWindowToken: az EditText függvényei, melyet kiajánlunk a saját, RelativeLayout-ból származó osztályunkon kívülre.
+
+A használathoz az alábbi kódot adjuk hozzá az _activity_view_labor.xml_ elrendezés “Ide jön majd a saját jelszó nézet” kommentje után:
+
+```xml
+<hu.bme.aut.amorg.examples.viewlabor.PasswordEditText
+	android:id="@+id/registrationPET"
+	android:layout_width="match_parent"
+	android:layout_height="wrap_content"/>
+```
+
+Ezután az Activity-ből az alábbi kóddal érhetjük el a saját osztályunkat:
 
 ```java
-Button btnHighscore = (Button) findViewById(R.id.btnHighscore);
-btnHighscore.setOnClickListener(new View.OnClickListener() {
-  @Override
-  public void onClick(View view) {
-    Toast.makeText(MainMenuActivity.this,getString(R.string.toast_highscore),Toast.LENGTH_LONG).show();
-  }
-});
+PasswordEditText passwordEditText = (PasswordEditText) findViewById(R.id.registrationPET);
 ```
 
-(Tipp: az ALT + ENTER itt is működik a hiányzó string-re állítva a kurzort)
-### AboutActivity felület
+### ChoiceLayout
 
-Ahogy korábban említettük az About menü elindítja az új *AboutActivity*-t, ezért elsőként készítsük el az *AboutActivity* felületét, melyet az *activity_about.xml* ír le:
+A második egyedi nézet egy különleges választó. Ez egy olyan nézet, amelyhez XML-ben adhatunk gyermek elemeket, amelyek így kiválaszhatóvá válnak a szülőben. A szülő elemben pedig egyedi attribútumok segítségével módosíthatjuk a működést. A **multiple** attribútummal azt szeretnék beállítani, hogy hány elem legyen kijelölhető a ViewGroup-on belül. A **dividerType** attribútum pedig azt adja meg, hogy mi válassza el a benne lévő elemeket (lehet semmilyen, szimpla vonal, dupla vonal).
+
+Ezek alapján az activity elrendezésében kétszer szeretnénk ezt a nézetet felhasználni.
+
+*   Először egy nem választó nézetet szeretnénk. Itt 3 lehetőség legyen, amik közül a felhasználó maximum 1-et választhat. Az elválasztó elem jelen esetben legyen szimpla vonalas.
+*   Másodszor pedig egy 6 opciós választást szeretnénk a felhasználónak nyújtani. Itt a 6 opcióból maximum 3 választható ki. Ebben az esetben az elválasztó elem dupla vonalas.
+
+#### Stílusok definiálása
+
+Első lépésben hozzuk létre a színeket és stílusokat, amiket a nézetünk használni fog.
+
+Színek hozzáadása a _colors.xml_ fájlhoz:
+```xml
+<color name="choiceItemBackground">#DFDFDF</color>
+<color name="choiceItemActiveBackground">#FF45FB95</color>
+<color name="choiceItemPressedBackground">#FF3BC769</color>
+```
+
+Ezeket a színeket használjuk majd a különböző állapotok hátteréhez.
+
+A háttér megadására több lehetőség van. Megoldhatjuk, hogy kódból figyeljük az egyes állapotok (lenyomva, kiválasztva, normál) változását és kódból állítgatjuk az elemek háttérszínét. Azonban ez jelentős plusz munka. Android platformon van ennél egyszerűbb megoldás is. Használhatjuk az úgynevezett selector erőforrást. Ez egy olyan kirajzolható erőforrás, amely a View állapotától függ, amelyhez hozzárendeltük.
+
+Hozzunk létre a drawable mappában egy _selector_choice_item.xml_ fájlt, majd a következő selector kódot másoljuk bele:
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/content_about"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="hu.bme.aut.amorg.examples.tictactoe.AboutActivity"
-    tools:showIn="@layout/activity_about">
+<selector xmlns:android="http://schemas.android.com/apk/res/android" android:enterFadeDuration="100" android:exitFadeDuration="100">
+	<item android:drawable="@color/choiceItemPressedBackground" android:state_pressed="true"/>
+	<item android:drawable="@color/choiceItemActiveBackground" android:state_selected="true"/>
+	<item android:drawable="@color/choiceItemBackground"/>
+</selector>
+```
+Szükséges stílus hozzáadása a _styles.xml_ fájlhoz:
 
-    <TextView
-        android:text="@string/txt_about"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="30sp"
-        android:layout_centerInParent="true"/>
-
-</RelativeLayout>
+```xml
+<style name="ChoiceOptionStyle">
+    <item name="android:gravity">center</item>
+    <item name="android:textSize">16sp</item>
+    <item name="android:paddingTop">10dp</item>
+    <item name="android:paddingBottom">10dp</item>
+    <item name="android:background">@drawable/selector_choice_item</item>
+</style>
 ```
 
-### Játék logika
+Ez a stílus a selector-t használja háttérként, tehát az a View, amely ezt a stílust használja az állapota alapján változtatja majd automatikusan a hátterét.
 
-A TicTacToe, 3x3-as táblajáték logikáját egy külön osztályban valósítjuk meg *Singleton* (amennyiben nem ismeri ezt a Design pattern-t, érdemes utána olvasni, illetve rákérdezni a laborvezetőnél) formájában, így könnyen hozzáférhetünk.
+#### Osztály létrehozása
 
-Készítsünk a forráson belül egy *model* package-t, majd abba egy *TicTacToeModel* osztályt (model package-en *jobb gomb->new->Java class*). Az osztály gyakorlatilag egy 3*3-as mátrixban tárolja a játéktér mezőinek tartalmát és különféle publikus függvényeket biztosít a játéktér lekérdezéséhez és módosításához. A modell a *getInstance()* statikus függvénnyel elérhető el.
-```java
-public class TicTacToeModel {
+Kezdetben a dividerType attribútumot a Java osztályban kihagyjuk és csak a multiple attribútumot implementáljuk.
 
-  private static TicTacToeModel instance = null;
+Attribútumok (hozzuk létre az _attrs.xml_ fájlt):
 
-  private TicTacToeModel () {
-  }
-
-  public static TicTacToeModel getInstance() {
-    if (instance == null) {
-      instance = new TicTacToeModel();
-    }
-    return instance;
-  }
-
-  public static final short EMPTY = 0;
-  public static final short CIRCLE = 1;
-  public static final short CROSS = 2;
-
-  private short[][] model = {
-    { EMPTY, EMPTY, EMPTY },
-    { EMPTY, EMPTY, EMPTY },
-    { EMPTY, EMPTY, EMPTY }
-  };
-  private short nextPlayer = CIRCLE;
-
-  public void resetModel() {
-    for (int i = 0; i < 3; i++) {
-      for (int j = 0; j < 3; j++) {
-        model[i][j] = EMPTY;
-      }
-    }
-    nextPlayer = CIRCLE;
-  }
-
-  public short getFieldContent(int x, int y) {
-    return model[x][y];
-  }
-
-  public short setFieldContent(int x, int y, short content) {
-    changeNextPlayer();
-    return model[x][y] = content;
-  }
-
-  public short getNextPlayer() {
-    return nextPlayer;
-  }
-
-  public void changeNextPlayer() {
-    nextPlayer = (nextPlayer == CIRCLE) ? CROSS : CIRCLE;
-  }
-}
-```
-
-
-> ###__A laborvezetővel vegyék át az osztály működését.__
-
-### Navigáció megvalósítása Activity-k közt
-A következő lépésként valósítsuk meg a navigációt (váltást) az *Activity*-k között. Gyakorlatilag csak a Start game menüpont hatására kell átváltanunk a *GameActivity*-re, illetve az *About* menüpont hatására az *AboutActivity*-re. Acitivty-k közti váltást *Intent* segítségével tudunk megtenni, beszéljék meg a laborvezetővel az *Intent*-ek alapjait. Ezt a témát előadáson később mélyebben fogjuk még érinteni.
-
-Valósítsuk meg ezen két gomb eseménykezelőjét szintén a *MainMenuActivity onCreate()* függvényében:
-```java
-Button btnStart = (Button) findViewById(R.id.btnStart);
-btnStart.setOnClickListener(new View.OnClickListener() {
-  @Override
-  public void onClick(View view) {
-    TicTacToeModel.getInstance().resetModel(); // modell törlése új játék indításakor
-    Intent i = new Intent(MainMenuActivity.this,GameActivity.class);
-    startActivity(i);
-  }
-});
-
-Button btnAbout = (Button) findViewById(R.id.btnAbout);
-btnAbout.setOnClickListener(new View.OnClickListener() {
-  @Override
-  public void onClick(View view) {
-    Intent i = new Intent(MainMenuActivity.this,AboutActivity.class);
-    startActivity(i);
-  }
-});
-```
-
-### Játéktér kirajzolása
-A következő lépés a játéktér kirajzolása és annak hozzárendelése a *GameActivity*-hez.
-
-Első lépésként hozzunk létre egy *view* package-t a meglévő package hierarchia alá, majd abban egy *TicTacToeView* osztály, mely a *View*-ból származik le az alábbi vázzal:
-```java
-public class TicTacToeView extends View {
-
-  Paint paintBg;
-  Paint paintLine;
-
-  public TicTacToeView(Context context, AttributeSet attrs) {
-    super(context, attrs);
-
-    paintBg = new Paint();
-    paintBg.setColor(Color.BLACK);
-    paintBg.setStyle(Paint.Style.FILL);
-
-    paintLine = new Paint();
-    paintLine.setColor(Color.WHITE);
-    paintLine.setStyle(Paint.Style.STROKE);
-    paintLine.setStrokeWidth(5);
-  }
-
-  @Override
-  protected void onDraw(Canvas canvas) {
-    super.onDraw(canvas);
-
-    canvas.drawRect(0, 0, getWidth(), getHeight(), paintBg);
-
-    drawGameArea(canvas);
-
-    drawPlayers(canvas);
-  }
-
-  private void drawGameArea(Canvas canvas) {
-    // TBD
-  }
-
-  private void drawPlayers(Canvas canvas) {
-    // TBD
-  }
-
-  @Override
-  protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-    int w = MeasureSpec.getSize(widthMeasureSpec);
-    int h = MeasureSpec.getSize(heightMeasureSpec);
-    int d = w == 0 ? h : h == 0 ? w : w < h ? w : h;
-    setMeasuredDimension(d, d);
-  }
-
-  @Override
-  public boolean onTouchEvent(MotionEvent event) {
-
-    if (event.getAction() == MotionEvent.ACTION_DOWN) {
-      // TBD
-    }
-
-    return super.onTouchEvent(event);
-  }
-}
-```
-> ###__Vizsgálja meg a kódrészt a laborvezető segítségével.__
-Látható, hogy az osztály gyakorlatilag egy nézet kirajzolásáért felelős. A konstruktorban létrehozunk két *Paint* objektumot, melyek a háttér és a pályaelemek kirajzolásárért felelős. Fontos, hogy ezeket a konstruktorba hozzuk létre és ne például az *onDraw()*-ba, hiszen az *onDraw()* gyakran meghívódik és sokszor hozná létre feleslegesen az objektumokat, lassítva ezzel a működést és megnehezítve a *garbage collector* dolgát.
-
-Az osztály egyik leglényegesebb függvénye, az *onDraw(Canvas canvas)*, mely a kapott *canvas* objektumra rajzolja ki gyakorlatilag a nézet tartalmát. A jelenlegi implementáció feketére festi a területet és meghívja a játéktér kirajzolásért (négyzetrács) és a játékosok (X és O) kirajzolásáért felelős – egyenlőre még üres – függvényeket.
-
-Az *onMeasure()* függvény felüldefiniálásával biztosítható, hogy a nézet mindig négyzetes formában jelenjen meg (ugyanakkora legyen a szélessége, mint a magassága).
-
-Végül az *onTouchEvent()* függvényben tudjuk kezelni az érintés eseményeket. Jelenleg az  *ACTION_DOWN* eseményt vizsgáljuk, de más érintés események is elkaphatóak itt.
-
-Ahhoz, hogy a *GameActivity* ezt a játékteret megjelenítse, módosítsuk a hozzá tartozó layout filet (*res/layout/content_game.xml*). A felület egy szürkés hátterű *RelativeLayout* közepén jelenítse meg a *TicTacToeView* nézetünket:
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/content_game"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#888888"
-    android:gravity="center_vertical"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="hu.bme.aut.amorg.examples.tictactoe.GameActivity"
-    tools:showIn="@layout/activity_game">
-
-    <hu.bme.aut.amorg.examples.tictactoe.view.TicTacToeView
-        android:id="@+id/ticView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-</RelativeLayout>
+<resources>
+	<declare-styleable name="ChoiceLayout">
+		<attr name="multiple" format="integer" />
+	</declare-styleable>
+</resources>
 ```
-Következő lépésként valósítsuk meg a játéktér kirajzolását a *drawGameArea()* függvényben, mely gyakorlatilag vízszintes és függőleges vonalak rajzolását jelenti:
-```java
-private void drawGameArea(Canvas canvas) {
-  // border
-  canvas.drawRect(0, 0, getWidth(), getHeight(), paintLine);
-  // two horizontal lines
-  canvas.drawLine(0, getHeight() / 3, getWidth(), getHeight() / 3,
-    paintLine);
-  canvas.drawLine(0, 2 * getHeight() / 3, getWidth(),
-    2 * getHeight() / 3, paintLine);
 
-  // two vertical lines
-  canvas.drawLine(getWidth() / 3, 0, getWidth() / 3, getHeight(),
-    paintLine);
-  canvas.drawLine(2 * getWidth() / 3, 0, 2 * getWidth() / 3, getHeight(),
-    paintLine);
+Java kód:
+
+```java
+public class ChoiceLayout extends LinearLayout {
+
+	int multiple = 1;
+
+	public interface OnSelectionChangedListener {
+		public void onSelectionChanged();
+	}
+
+	public ChoiceLayout(Context context) {
+		super(context);
+		initLayout(context, null);
+	}
+
+	public ChoiceLayout(Context context, AttributeSet attrs) {
+		super(context, attrs);
+		initLayout(context, attrs);
+	}
+
+	public ChoiceLayout(Context context, AttributeSet attrs, int defStyle) {
+		super(context, attrs, defStyle);
+		initLayout(context, attrs);
+	}
+
+	protected void initLayout(Context context, AttributeSet attrs) {
+		setOrientation(LinearLayout.VERTICAL);
+		if (attrs != null) {
+			TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.ChoiceLayout);
+			try {
+				multiple = a.getInt(R.styleable.ChoiceLayout_multiple, 1);
+			} finally {
+				a.recycle();
+			}
+		}
+		Log.d("ChoiceLayout", "multiple: " + multiple);
+	}
+
+	@Override
+	public void addView(View child) {
+		super.addView(child);
+		refreshAfterAdd(child);
+	}
+
+	@Override
+	public void addView(View child, android.view.ViewGroup.LayoutParams params) {
+		super.addView(child, params);
+		refreshAfterAdd(child);
+	}
+
+	private void refreshAfterAdd(final View newChild) {
+		newChild.setClickable(true);
+		newChild.setOnClickListener(choiceOnClickListener);
+	}
+
+	private int getSelectedCount() {
+		int selectedCnt = 0;
+		int count = getChildCount();
+		for (int i = 0; i < count; i++) {
+			if (getChildAt(i).isSelected()) {
+				selectedCnt++;
+			}
+		}
+		return selectedCnt;
+	}
+
+	public List<View> getSelectedChilds() {
+		List<View> selectedChilds = new ArrayList<View>();
+		int count = getChildCount();
+		for (int i = 0; i < count; i++) {
+			View v = getChildAt(i);
+			if (v.isSelected()) {
+				selectedChilds.add(v);
+			}
+		}
+		return selectedChilds;
+	}
+
+	private OnClickListener choiceOnClickListener = new OnClickListener() {
+		@Override
+		public void onClick(View view) {
+			if(multiple > 1) {
+				if (view.isSelected() || getSelectedCount() < multiple) {
+					view.setSelected(!view.isSelected());
+				}
+			} else {
+				int count = getChildCount();
+				for (int i = 0; i < count; i++) {
+					View v = getChildAt(i);
+					v.setSelected(v == view);
+				}
+			}
+		}
+	};
 }
 ```
-Ezt követően valósítsuk meg a modell alapján a játéktérbe az X-ek és O-ok kirajzolását az *drawPlayers(…)* függvényben. A megvalósítás során gyakorlatilag végigmegyünk a játéktér mátrixon és a benne található értékek szerint O-t vagy X-et rajzolunk az adott mezőbe:
+
+Fontosabb függvények:
+
+*   Konstruktorok: szintén az ős View miatt szükséges a 3 implementáció
+*   initLayout: a saját inicializáló függvény. Beállítjuk az orientationt, majd kiolvassuk az attribútumokat (ha elérhetőek).
+*   addView felüldefiniálás: itt kapjuk el azt a hívást, ahol egy új View belekerül a Layout-ba. Itt meghívjuk az ős implementációját, majd a hozzáadott nézeten műveletet végzünk a refreshAfterAdd függvényben
+*   refreshAfterAdd: a paraméterként kapott View-t kattinthatóvá állítja, majd beállít egy onClickListener-t a View-ra.
+*   getSelectedCount: visszaadja, hogy hány gyerek elem van kiválasztva
+*   getSelectedChilds: visszaadja azokat a View-kat, amik ki vannak választva
+
+Az egyedi attribútumok eléréséhez a context obtainStyledAttributes függvényét használhatjuk. Ez 1\. paraméterként egy AttributeSet-et vár (amit az osztály konstruktorában kapunk meg), 2\. paraméterként pedig egy attribútum referencia tömböt. Ezt a tömböt a fordító automatikusan generálja az _attrs.xml_ fájlban megadott tag name attribútuma alapján. Tehát jelen esetben az R.styleable.ChoiceLayout reprezentálja ezt a tömböt.
+Az obtainStyledAttributes függvény visszatérési értéke egy TypedArray. Ez tartalmazza a lekért attribútumok értékét. A megfelelő get… függvény segítségével lekérhető a megfelelő integer, String vagy bármely egyéb érték, amit XML-ben megadtunk. **FONTOS, hogy a TypedArray használata után mindig kell az aktuális példányon egy recycle() függvényhívás**, amely felszabadítja a használt attribútumokat (erre van a try … finally megoldás a kódban).
+
+Az osztály végén található OnClickListener felelős az egyes elemek kiválasztásáért. Az implementáció két részre oszlik. Amennyiben a multiple változó értéke nagyobb mint 1, tehát több mint 1 elem választható ki: ha éppen kikattintunk egy elemet, akkor megváltoztatjuk a selected értékét az ellentétjére; ha pedig kiválasztunk egy elemet, akkor megnézzük, hogy elértük-e már a maximumot és ez alapján választjuk ki.
+A másik esetben a multiple értéke 1\. Ilyenkor csak egyetlen elem választható ki; a kiválasztás során az előző kiválasztást kiszedjük és csak az újat hagyjuk bent.
+
+#### Használat XML-ből
+
+```xml
+<hu.bme.aut.amorg.examples.viewlabor.ChoiceLayout
+	android:id="@+id/firstCL"
+	app:multiple="1"
+	android:layout_width="match_parent"
+	android:layout_height="wrap_content">
+
+	<TextView
+		style="@style/ChoiceOptionStyle"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:text="Férfi"/>
+
+	<TextView
+		style="@style/ChoiceOptionStyle"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:text="Nő"/>
+
+	<TextView
+		style="@style/ChoiceOptionStyle"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:text="Egyéb"/>
+</hu.bme.aut.amorg.examples.viewlabor.ChoiceLayout>
+```
+
+Második ChoiceLayout hozzáadása az activity_view_labor.xml-hez:
+
+```xml
+<hu.bme.aut.amorg.examples.viewlabor.ChoiceLayout
+	android:id="@+id/secondCL"
+	android:layout_width="match_parent"
+	android:layout_height="wrap_content"
+	app:multiple="3">
+
+	<TextView
+		style="@style/ChoiceOptionStyle"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:text="Akármi1"/>
+
+	<TextView
+		style="@style/ChoiceOptionStyle"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:text="Akármi2"/>
+
+	<TextView
+		style="@style/ChoiceOptionStyle"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:text="Akármi3"/>
+
+	<TextView
+		style="@style/ChoiceOptionStyle"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:text="Akármi4"/>
+
+	<TextView
+		style="@style/ChoiceOptionStyle"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:text="Akármi5"/>
+
+	<TextView
+		style="@style/ChoiceOptionStyle"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:text="Akármi6"/>
+</hu.bme.aut.amorg.examples.viewlabor.ChoiceLayout>
+```
+
+A saját attribútumok saját névtéren keresztül érhetőek el, ez konvekció szerint **app**, az app névtérre állva _Alt+Enter_ segítségével felvehető.
+
+Látható, hogy a saját View behivatkozás szintén a teljes, package nevet is tartalmazó osztálynév segítségével történik. A multiple attribútum használatára mindkét esetben látunk példát az erőforrásban. A **app** attribútumhoz is működik Android Studio alatt a kódkiegészítés, érdemes kipróbálni.
+
+#### ChoiceLayout kiegészítése a dividerType attribútummal
+
+Azt szeretnénk megoldani, hogy az egyes kiválasztható elemek között egyedi, a nézet által definiált elválasztó elem legyen, ahol több lehetőség közül választhatunk.
+
+Ehhez első lépésben az _attrs.xml_ állományt kell módosítani. Hozzá kell adni a **declare-styleable tag-en belül** az alábbi elemeket:
+
+```xml
+<attr name="dividerType" format="enum">
+			<enum name="none" value="0" />
+			<enum name="simple_divider" value="1" />
+			<enum name="double_divider" value="2" />
+</attr>
+```
+
+Ez most egy másik formátum. A multiple integer formátumú attribútum volt, most viszont 3 érték közül szeretnénk majd választani. Ehhez enum formátumot kell használni. Ezt megadva az adott attr tag gyerek elemei definiálják a lehetséges értékeket. Jelen esetben lehet none: kikapcsolt; simple_divider: egyszerű vonal; double_divider: dupla vonal.
+
+A két divider típushoz első lépésben definiálunk két kirajzolható erőforrást a drawable mappában. Ehhez xml-ben leírt drawable elemeket használunk.
+
+Az első elem a szimpla vonal, melyhez létrehozunk egy _choice_divider_simple.xml_ erőforrást az alábbi tartalommal:
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+	<solid android:color="#000000" />
+	<size android:height="1dp" />
+</shape>
+```
+
+
+Itt lérehozunk egy egyszerű shape elemet, aminek egyszínű hátteret adunk (fekete) és beállítjuk 1dp magasra.
+
+A második elem a dupla vonal, melyhez a __choice_divider_double.xml__ erőforrást hozzuk létre:
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+	<item android:bottom="3dp">
+		<shape android:shape="line">
+			<stroke android:color="#000000" android:width="1dp" />
+			<size android:height="4dp" />
+		</shape>
+	</item>
+	<item android:top="3dp">
+		<shape android:shape="line">
+			<stroke	android:color="#000000"	android:width="1dp" />
+			<size android:height="4dp" />
+		</shape>
+	</item>
+</layer-list>
+```
+
+Ebben az esetben egy kicsit komplexebb leírást használunk. Itt az úgynevezett layer-list elemben definiálunk több elemet. Ennek a lényege, hogy az egyes elemek majd egymásra rajzolódnak és így definiálható komplexebb grafika XML-ben. Az első item-e a layer-list-nek egy vonal, amely a 4dp magas vásznon 1dp széles vonalat húz alsó, 3dp-s padding-gal. A második elem pedig szintén egy ugyanilyen vonalat húz, de felső, 3dp-s padding-gal. Ennek eredménye egy 4 dp magas kép, aminek a felső és alsó pixele fekete. Ezt széltében nyújtva horizontális vonalat kapunk.
+
+Tehát ezt a két drawable elemet fogjuk felhasználni divider-ként a ChoiceLayout-ban. Következő lépésben a ChoiceLayout osztályt kell kiegészíteni.
+
+Adjuk hozzá az osztályhoz a Divider lehetséges értékeit integer ként (Androidon kerüljük az enumerációk használatát, erről bővebben az előadásokon):
+
 ```java
-private void drawPlayers(Canvas canvas) {
-  for (int i = 0; i < 3; i++) {
-    for (int j = 0; j < 3; j++) {
-      if (TicTacToeModel.getInstance().getFieldContent(i,j) == TicTacToeModel.CIRCLE) {
 
-        // draw a circle at the center of the field
+public static final int DIVIDER_NONE=0;
+public static final int DIVIDER_SIMPLE=1;
+public static final int DIVIDER_DOUBLE=2;
+int dividerType;
+```
 
-        // X coordinate: left side of the square + half width of the square
-        float centerX = i * getWidth() / 3 + getWidth() / 6;
-        float centerY = j * getHeight() / 3 + getHeight() / 6;
-        int radius = getHeight() / 6 - 2;
+Ezután ki kell olvasni az initLayout függvényben az elválasztó típust az attribútumok közül. Ehhez a multiple kiolvasás után adjuk hozzá az alábbi sort:
 
-        canvas.drawCircle(centerX, centerY, radius, paintLine);
+```java
+dividerType = a.getInt(R.styleable.ChoiceLayout_dividerType, 0);
+```
 
-      } else if (TicTacToeModel.getInstance().getFieldContent(i,j) == TicTacToeModel.CROSS) {
-        canvas.drawLine(i * getWidth() / 3, j * getHeight() / 3,
-          (i + 1) * getWidth() / 3,
-          (j + 1) * getHeight() / 3, paintLine);
+Hozzáadunk az osztályhoz egy új függvényt, ami a divider elem hozzáadást végzi:
 
-        canvas.drawLine((i + 1) * getWidth() / 3, j * getHeight() / 3,
-          i * getWidth() / 3, (j + 1) * getHeight() / 3, paintLine);
-      }
-    }
-  }
+```java
+public void addDivider() {
+		if(dividerType != DIVIDER_NONE) {
+			ImageView div = new ImageView(getContext());
+			switch (dividerType) {
+				case DIVIDER_SIMPLE:
+					div.setImageResource(R.drawable.choice_divider_simple);
+					break;
+				case DIVIDER_DOUBLE:
+					div.setImageResource(R.drawable.choice_divider_double);
+					break;
+			}
+			LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+			super.addView(div, lp);
+		}
+	}
+```
+
+A függvény létrehoz egy ImageView-t és a dividerType alapján beállítja az előbbiekben létrehozott két drawable közül a megfelelőt ennek az ImageView-nak. LayoutParams segítségével beállítjuk, hogy a magassága a tartalom alapján dőljön el, míg a szélessége a szülő alapján. Ezután az addView függvény segítségével hozzáadjuk a View-t a saját layout-hoz. Azért az ős függvényét hívjuk, hogy ne fusson le a saját addView logikánk, amit a kijelölhetőség érdekében hoztunk létre.
+
+Ezután mindkét addView függvény elejére beillesztjük az alábbi kódot:
+
+```java
+if(getChildCount() > 0) {
+	addDivider();
 }
 ```
 
-Végül valósítsuk meg az érintés eseményre való reagálást úgy, hogy a megfelelő mezőbe – ha az üres – elhelyezzük az aktuális játékost, melyet a modell *nextPlayer* változója reprezentál.
-> **A modell frissítése után az újrarajzolást a *invalidate()* függvényének hívásával tudjuk elérni.**
-```java
-@Override
-public boolean onTouchEvent(MotionEvent event) {
-    if (event.getAction() == MotionEvent.ACTION_DOWN) {
-        int tX = ((int) event.getX()) / (getWidth() / 3);
-        int tY = ((int) event.getY()) / (getHeight() / 3);
-        if (tX < 3 && tY < 3 && TicTacToeModel.getInstance().getFieldContent(tX, tY) == TicTacToeModel.EMPTY) {
-            TicTacToeModel.getInstance().setFieldContent(tX, tY, TicTacToeModel.getInstance().getNextPlayer());
-            invalidate();
-        }
-    }
-    return super.onTouchEvent(event);
-}
+Ez biztosítja, hogy minden elem hozzáadás előtt bekerül egy divider a layout-ba (kivétel az első elem hozzáadásánál, mert ott nincs szükség rá).
+
+Ezzel végeztünk a ChoiceLayout osztály módosításával. Már csak egyetlen dolog maradt hátra: használjuk az új attribútumot. Ehhez az activity elrendezését módosítsuk úgy, hogy mindkét ChoiceLayout kapjon egy újabb custom attribútumot, dividerType névvel. Az első nézetnél legyen:
+
+```xml
+app:dividerType="simple_divider"
 ```
 
-### Alkalmazás ikon lecserélése
-Az alkalmazás ikonját jelenleg a *res/drawable[-ldpi/mdpi/hdpi/xhdpi/...]* mappákban található *ic_launcher.png* jelképezi. A laborvezető segítségével keressen egy új ikont és cserélje le. Nem muszáj az ikont minden felbontásban elkészíteni, egyszerűen elhelyezhet egy méretet a drawable mappában is (melyet létre kell hozni), ekkor természetesen különböző felbontású eszközökön torzulhat az ikon képe.
+A második nézetnél legyen:
 
-### Játéklogika ellenőrzése - önálló feladat
-Valósítson meg egy függvényt, mely minden lépés után leellenőrzi, hogy nem győzött-e valamelyik játékos, vagy nincs-e döntetlen. Amennyiben vége a játéknak egy *Toast* üzenettel jelezze ezt a felhasználónak és lépjen vissza a főmenübe. A laborvezető segítségével vizsgálja meg, hogy a *View* osztályból hogyan érhető el az őt tartalmazó "host" Activity, aminek így például egy *endGame()* függvénye meghívható, ami megvalósítja a fent leírt játék befejezést.
-
-```java
-GameActivity gameActivity = (GameActivity) view.getContext();
-gameActivity.endGame();
+```xml
+app:dividerType="double_divider"
 ```
 
-#Jó munkát kívánunk!
+
+Érdemes megfigyelni, hogy az enumeráció lehetséges értékeiben segít a kódkiegészítés.
+
+## Önálló feladat
+
+Módosítsa a PasswordEditText osztályt úgy, hogy attribútumként megadható legyen a jelszó mezőben található kép cseréje.
+Segítség:
+
+*   Új attribútum az **attrs.xml**-be. A típusa legyen _reference_.
+*   Ezt a feldolgozó osztályban ResourceId-ként olvashatjuk ki (_getResourceId()_ függvény).
+*   Az így kapott azonosítóhoz tartozó Drawable-t, a _getResources().getDrawable(resourceId)_ függvény segítségével kérhetjük le.
+*   A PasswordEditText osztály _init_ függvényének bővítése, hogy az _attrs_ paraméterből olvassa ki a referenciát
+*   Az attribútum használata az activity elrendezésében
+*   A kinyert Drawable beállítása az eyeImageView objektum képének (_setImageDrawable()_ függvény)
