@@ -343,10 +343,6 @@ public class ChoiceLayout extends LinearLayout {
 
 	int multiple = 1;
 
-	public interface OnSelectionChangedListener {
-		public void onSelectionChanged();
-	}
-
 	public ChoiceLayout(Context context) {
 		super(context);
 		initLayout(context, null);
@@ -403,18 +399,6 @@ public class ChoiceLayout extends LinearLayout {
 		return selectedCnt;
 	}
 
-	public List<View> getSelectedChilds() {
-		List<View> selectedChilds = new ArrayList<View>();
-		int count = getChildCount();
-		for (int i = 0; i < count; i++) {
-			View v = getChildAt(i);
-			if (v.isSelected()) {
-				selectedChilds.add(v);
-			}
-		}
-		return selectedChilds;
-	}
-
 	private OnClickListener choiceOnClickListener = new OnClickListener() {
 		@Override
 		public void onClick(View view) {
@@ -441,7 +425,7 @@ Fontosabb függvények:
 *   addView felüldefiniálás: itt kapjuk el azt a hívást, ahol egy új View belekerül a Layout-ba. Itt meghívjuk az ős implementációját, majd a hozzáadott nézeten műveletet végzünk a refreshAfterAdd függvényben
 *   refreshAfterAdd: a paraméterként kapott View-t kattinthatóvá állítja, majd beállít egy onClickListener-t a View-ra.
 *   getSelectedCount: visszaadja, hogy hány gyerek elem van kiválasztva
-*   getSelectedChilds: visszaadja azokat a View-kat, amik ki vannak választva
+*   getSelectedChildren: visszaadja azokat a View-kat, amik ki vannak választva
 
 Az egyedi attribútumok eléréséhez a context obtainStyledAttributes függvényét használhatjuk. Ez 1\. paraméterként egy AttributeSet-et vár (amit az osztály konstruktorában kapunk meg), 2\. paraméterként pedig egy attribútum referencia tömböt. Ezt a tömböt a fordító automatikusan generálja az _attrs.xml_ fájlban megadott tag name attribútuma alapján. Tehát jelen esetben az R.styleable.ChoiceLayout reprezentálja ezt a tömböt.
 Az obtainStyledAttributes függvény visszatérési értéke egy TypedArray. Ez tartalmazza a lekért attribútumok értékét. A megfelelő get… függvény segítségével lekérhető a megfelelő integer, String vagy bármely egyéb érték, amit XML-ben megadtunk. **FONTOS, hogy a TypedArray használata után mindig kell az aktuális példányon egy recycle() függvényhívás**, amely felszabadítja a használt attribútumokat (erre van a try … finally megoldás a kódban).
