@@ -399,18 +399,6 @@ public class ChoiceLayout extends LinearLayout {
 		return selectedCnt;
 	}
 
-	public List<View> getSelectedChildren() {
-		List<View> selectedChildren = new ArrayList<View>();
-		int count = getChildCount();
-		for (int i = 0; i < count; i++) {
-			View v = getChildAt(i);
-			if (v.isSelected()) {
-				selectedChildren.add(v);
-			}
-		}
-		return selectedChildren;
-	}
-
 	private OnClickListener choiceOnClickListener = new OnClickListener() {
 		@Override
 		public void onClick(View view) {
