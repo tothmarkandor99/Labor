@@ -25,7 +25,7 @@ A mérés az alábbi témákat érinti:
 
 A feladat megvalósításához szerver oldalon egy galéria alkalmazás áll rendelkezésre, mely az alábbi oldalon is elérhető:
 
-[http://atleast.aut.bme.hu/AndroidGallery/](http://atleast.aut.bme.hu/AndroidGallery/) 
+[http://android-gallery.node.autsoft.hu/](http://android-gallery.node.autsoft.hu/) 
 
 ### API leírás
 
@@ -33,43 +33,46 @@ A galéria egy HTTP API-n keresztül lehetőséget biztosít arra, hogy a képek
 
 Az API a követekező címen érhető el:
 
-`http://atleast.aut.bme.hu/AndroidGallery/`
+`http://android-gallery.node.autsoft.hu/api`
 
 
 #### Képek lekérdezése
 
- Az alábbi `GET` hívással:  `api.php?action=getImages` lehetőségünk van a feltöltött fotókat listázni.
+Az alábbi `GET` hívással:  `/images` lehetőségünk van a feltöltött fotókat listázni.
  
- A válasz egy JSON tömb, pl. 
+ A válasz egy JSON tömb, ami a képek adatait tartalmazza, pl. 
  
  ```
- ["http://152.66.189.19/AndroidGallery/images1.jpg",
-  "http://152.66.189.19/AndroidGallery/images2.jpg"]
+[
+  {
+    "_id": "58a5b80aa8e86411008ca8e4",
+    "name": "Név",
+    "description": "Leírás",
+    "timestamp": 1487255562304,
+    "url": "images/image-1487255562041",
+    "size": 121128,
+    "mimetype": "image/jpeg",
+    "encoding": "7bit"
+  }
+]
  ```
+ 
+ A képek url je, az api címe után fűzve érhető el. (Ne feledkezzünk meg a `/`-ről.)
 
 #### Fotó feltöltése
-Az alábbi `POST` hívással:  `api.php?action=uploadImage` lehetőségünk van a feltöltött fotókat listázni. A kérés tartalma a bináris kép file `img` kulccsal.
+Az alábbi `POST` hívással:  `/upload` lehetőségünk van fotót feltölteni. A kérés tartalma a bináris kép file `image` kulccsal.
 
 
 #### Szavazat feltöltése
-Az alábbi `GET` hívással:  `api.php?action=rate` lehetőségünk van a feltöltött fotókat értékelni.
+Az alábbi `POST` hívással:  `/rate/{id}` lehetőségünk van a feltöltött fotókat értékelni. Az `{id}` helyére a kép id-jét kell fűznünk.[]()
 
-Kötelező paraméterek:
+A kérés paraméterek:
 
-*   `image=[KÉP URL]`
-*   `username=[fehlasználónév]`
-*   `vote=[egész szám 1-5 között]`
-
-Opcionális paraméterek: (bármilyen szöveget elfogadnak)
-
-*   `sex=[férfi|nő]`
-*   `professional=[igen|nem]`
-*   `type=[valami]`
-*   `comment=[tetszőleges komment]`
-
-Például: `http://atleast.aut.bme.hu/AndroidGallery/api.php?action=rate&image=http://atleast.aut.bme.hu/AndroidGallery/images/8.jpg&username=Teszter&vote=5&professional=igen`
-
-**A paraméterek beállításakor továbbra se feledkezzünk meg az URL encode-olásról.**
+*   `username=tetszőleges felhasználónév`
+*   `vote=egész szám 1 és 5 között`
+*   `professional=boolean`
+*   `type=tetszőleges string`
+*   `comment=tetszőleges string`
 
 
 ## Felhasználói felület
@@ -114,82 +117,83 @@ A **MainActivity** nézet fogja kilistázni a feltöltött képeket. Ez egy egys
     android:paddingTop="@dimen/activity_vertical_margin">
 
     <android.support.v4.widget.SwipeRefreshLayout
-        android:id="@+id/photosSRL"
+        android:id="@+id/imagesSRL"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/photosRV"
-        android:scrollbars="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/imagesRV"
+            android:scrollbars="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
     </android.support.v4.widget.SwipeRefreshLayout>
 </RelativeLayout>
 ```
 
-A **MainActivity** kódja pedíg a következő. Látható hogy a `loadPhotos()` függvény végzi ez a photok letöltését (egyenlőre csak beégetett értékekkel), ez hívódik a nézetre navigálása után, illetve ha lehúzzással frissítjük a tartalmat.
+A **MainActivity** kódja pedíg a következő. Látható hogy a `loadImages()` függvény végzi ez a photok letöltését (egyenlőre csak beégetett értékekkel), ez hívódik a nézetre navigálása után, illetve ha lehúzzással frissítjük a tartalmat.
 
 ```java
+
 public class MainActivity extends AppCompatActivity {
-    private PhotosAdapter adapter;
-    private RecyclerView photosRV;
-    private SwipeRefreshLayout photosSRL;
-    
+    private ImagesAdapter adapter;
+    private RecyclerView imagesRV;
+    private SwipeRefreshLayout imagesSRL;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        photosRV = (RecyclerView) findViewById(R.id.photosRV);
-        photosSRL = (SwipeRefreshLayout) findViewById(R.id.photosSRL);
-  
-        GridLayoutManager mLayoutManager = new GridLayoutManager(this, 2);
-        photosRV.setLayoutManager(mLayoutManager);
+        imagesRV = (RecyclerView) findViewById(R.id.imagesRV);
+        imagesSRL = (SwipeRefreshLayout) findViewById(R.id.imagesSRL);
 
-        photosSRL.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+        GridLayoutManager mLayoutManager = new GridLayoutManager(this, 2);
+        imagesRV.setLayoutManager(mLayoutManager);
+
+        imagesSRL.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                loadPhotos();
+                loadImages();
             }
         });
     }
- 
+
     @Override
     protected void onResume() {
         super.onResume();
-        loadPhotos();
-    }   
-    
-    private void loadPhotos() {
-         List<String> images = new ArrayList<>();
+        loadImages();
+    }
+
+    private void loadImages() {
+        List<String> images = new ArrayList<>();
         images.add("http://lorempixel.com/400/400/city/");
         images.add("http://lorempixel.com/400/400/technics/");
         images.add("http://lorempixel.com/400/400/nature/");
 
-        adapter = new PhotosAdapter(getApplicationContext(), images);
-        photosRV.setAdapter(adapter);
-        photosSRL.setRefreshing(false);
+        adapter = new ImagesAdapter(getApplicationContext(), images);
+        imagesRV.setAdapter(adapter);
+        imagesSRL.setRefreshing(false);
     }
 }
 ```
 
-A képek listájának feltöltését a **PhotosAdapter** végzik. Hozzuk is létre ezt az osztályt a fő csomagban a következő tartalommal.
+A képek listájának feltöltését a **ImagesAdapter** végzik. Hozzuk is létre ezt az osztályt a fő csomagban a következő tartalommal.
 
 ```java
-public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.ViewHolder> {
+public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.ViewHolder> {
     private final LayoutInflater layoutInflater;
     private final Context context;
-    private List<String> photos;
+    private List<String> images;
 
-    public PhotosAdapter(Context context, List<String> photos) {
-        this.photos = photos;
-        Collections.reverse(this.photos);
+    public ImagesAdapter(Context context, List<String> images) {
+        this.images = images;
+        Collections.reverse(this.images);
         this.layoutInflater = LayoutInflater.from(context);
         this.context=context;
     }
 
     @Override
-    public PhotosAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View v = layoutInflater.inflate(R.layout.li_photo, parent, false);
+    public ImagesAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View v = layoutInflater.inflate(R.layout.li_image, parent, false);
         return new ViewHolder(v);
     }
 
@@ -200,7 +204,7 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.ViewHolder
 
     @Override
     public int getItemCount() {
-        return photos.size();
+        return images.size();
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -208,13 +212,13 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.ViewHolder
 
         public ViewHolder(View v) {
             super(v);
-            imageView = (ImageView) v.findViewById(R.id.photoIV);
+            imageView = (ImageView) v.findViewById(R.id.imageIV);
         }
     }
 }
 ```
 
-Az egyes képekhez tartozó cella elem felületét pedig az **li_photo.xml** layout fileban definiáljuk.
+Az egyes képekhez tartozó cella elem felületét pedig az **li_image.xml** layout fileban definiáljuk.
 
 ```
 <?xml version="1.0" encoding="utf-8"?>
@@ -224,7 +228,7 @@ Az egyes képekhez tartozó cella elem felületét pedig az **li_photo.xml** lay
     android:orientation="vertical">
 
     <ImageView
-        android:id="@+id/photoIV"
+        android:id="@+id/imageIV"
         android:layout_width="match_parent"
         android:layout_height="120dp"
         android:src="@mipmap/ic_launcher"
@@ -248,10 +252,10 @@ Használatához a **build.gradle** be vegyük fel a következő függőséget a 
 compile 'com.github.bumptech.glide:glide:3.7.0'
 ```
 
-Ezután a **PhotosAdapter**  **onBindViewHolder** függvényében töltsük be az adott fotót az **ImageView**-ba.
+Ezután a **ImagesAdapter**  **onBindViewHolder** függvényében töltsük be az adott fotót az **ImageView**-ba.
 
 ```       
- Glide.with(holder.imageView.getContext()).load(photos.get(position)).into(holder.imageView);
+Glide.with(holder.imageView.getContext()).load(images.get(position)).into(holder.imageView);
 ```
 
 Próbáljuk ki az alkalmazást!
@@ -268,6 +272,7 @@ A Retrofit használatához vegyük fel a függőségek közé az alábbi kódot.
 ```
 compile 'com.squareup.retrofit2:retrofit:2.1.0'
 compile 'com.squareup.okhttp3:okhttp:3.4.2'
+compile 'com.google.code.gson:gson:2.7'
 compile 'com.squareup.retrofit2:converter-gson:2.1.0'
 ```
 
@@ -275,19 +280,38 @@ Ezután hozzunk létre egy új csomagot **network** néven, benne egy új interf
 
 ```
 public interface GalleryAPI {
-    String ENDPOINT_URL="http://atleast.aut.bme.hu/AndroidGallery/";
-    
+    String ENDPOINT_URL="http://android-gallery.node.autsoft.hu/api/";
+    String IMAGE_PREFIX_URL="http://android-gallery.node.autsoft.hu/";
+        
     String MULTIPART_FORM_DATA = "multipart/form-data";
-    String PHOTO_MULTIPART_KEY_IMG = "img";
+    String PHOTO_MULTIPART_KEY_IMG = "image";
 
-    @GET("api.php?action=getImages")
-    Call<List<String>> getPhotos();
+    @GET("/images")
+    Call<List<Image>> getImages();
 
     @Multipart
-    @POST("api.php?action=uploadImage")
-    Call<ResponseBody> uploadPhoto(@Part MultipartBody.Part file);
+    @POST("/upload")
+     Call<ResponseBody> uploadImage(@Part MultipartBody.Part file, @Part("name") RequestBody name, @Part("description") RequestBody description);
 }
 ```
+
+A képek adatait tartalmazó **Image** osztályt hozzuk létre a **model** csomagban.
+
+```
+public class Image {
+    @SerializedName("_id")
+    public String id;
+    public String name;
+    public String description;
+    public long timestamp;
+    public String url;
+    public long size;
+    public String mimetype;
+    public String encoding;
+}
+```
+
+Látható, hogy a GSON automatikus megoldja majd az egyes tagváltozók szerializálását, kivéve az id mezőt, mivel azt a szerver `_id`-ként adja vissza. Ezt a `@SerializedName` annotációval írhatjuk felül.
 
 Ezután hozzuk létre azt az osztályt ugyan ebben a csomagban,amely a fenti API-t használni fogja,  mivel ennek az osztálynak az a feladata hogy fenti API hívásokat egységbe fogja, és az előző laboron látott módon külön szálon vegezze el a hálózati hívásokat. **Az eseménybusz megoldást most idő hiányában nem használjuk, de abszolút releváns ebben a helyzetben is.** 
 
@@ -311,7 +335,7 @@ public class GalleryInteractor {
 }
 ```
 
-Látható, hogy a **Retrofit** objektumot felhasználva hozzuk létre a **GalleryAPI** osztály implementációját, melyet azután használhatunk is. Itt álltjuk be hogy a konverziókhoz a **Gson**-t használja, így felteti meg a **Retrofit** a Java objektumokat a JSON formátumnak.
+Látható, hogy a **Retrofit** objektumot felhasználva hozzuk létre a **GalleryAPI** osztály implementációját, melyet azután használhatunk is. Itt álltjuk be hogy a konverziókhoz a **Gson**-t használja, így felteti meg a **Retrofit** a Java objektumokat a JSON formátumnak (illetve szükség esetén visszafelé is).
 
 Azért, hogy a hálózati hívásokat külön szálra ütemezzük, majd a választ egy interfacen keresztül visszaütemezzük a főszálra **generikus függvényeket** fogunk használni. A hálózati hívások válaszát a következő generikus interface fogja biztosítani, ezt a **GalleryInteractorban** definiáljuk.
 
@@ -335,11 +359,11 @@ private static <T> void runCallOnBackgroundThread(final Call<T> call, final Resp
         @Override
         public void run() {
             try {
-                final T photos = call.execute().body();
+                final T response = call.execute().body();
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
-                        listener.onResponse(photos);
+                        listener.onResponse(response);
                     }
                 });
 
@@ -359,44 +383,86 @@ private static <T> void runCallOnBackgroundThread(final Call<T> call, final Resp
 Ezután a fenti segédfüggvényt felhasználva elkészíthetjük a az Interactorban a hívásokat.
 
 ```
-public void getPhotos(ResponseListener<List<String>> responseListener) {
-    Call<List<String>> getPhotosRequest = galleryApi.getPhotos();
-    runCallOnBackgroundThread(getPhotosRequest, responseListener);
-}
-
-public void uploadPhoto(Uri fileUri, ResponseListener<ResponseBody> responseListener) {
+public void uploadImage(Uri fileUri,String name, String description, ResponseListener<ResponseBody> responseListener) {
     File file = new File(fileUri.getPath());
     RequestBody requestFile = RequestBody.create(MediaType.parse(MULTIPART_FORM_DATA), file);
     MultipartBody.Part body = MultipartBody.Part.createFormData(PHOTO_MULTIPART_KEY_IMG, file.getName(), requestFile);
 
-    Call<ResponseBody> uploadPhotoRequest = galleryApi.uploadPhoto(body);
-    runCallOnBackgroundThread(uploadPhotoRequest, responseListener);
+    RequestBody nameParam =RequestBody.create(okhttp3.MultipartBody.FORM, name);
+    RequestBody descriptionParam =RequestBody.create(okhttp3.MultipartBody.FORM, description);
+
+    Call<ResponseBody> uploadImageRequest = galleryApi.uploadImage(body,nameParam,descriptionParam);
+    runCallOnBackgroundThread(uploadImageRequest, responseListener);
 }
 ```
 
 Figyeljük meg, hogy az adott hívás nem egyből a válasz típusával tér vissza, hanem azt a már említett `Call` objektumba csomagolja, így nagyob rugalmasságot adva a fejlesztőknek.
 
-Ezután a **MainActivity**-ben példányosítsuk a **GalleryInteractor**-unkat, majd hívjuk meg a **getPhotos** hívást, melynek eredményét jelentsük meg a **PhotosAdapter** segítségével.
+Ezután a **MainActivity**-ben példányosítsuk a **GalleryInteractor**-unkat, majd hívjuk meg a **getImages** hívást, melynek eredményét jelentsük meg a **ImagesAdapter** segítségével.
 
 ```
-   private void loadPhotos() {
-        GalleryInteractor galleryInteractor = new GalleryInteractor(this);
-        galleryInteractor.getPhotos(new GalleryInteractor.ResponseListener<List<String>>() {
-            @Override
-            public void onResponse(List<String> photos) {
-                adapter = new PhotosAdapter(getApplicationContext(), photos);
-                photosRV.setAdapter(adapter);
-                photosSRL.setRefreshing(false);
-            }
+private void loadImages() {
+    GalleryInteractor galleryInteractor = new GalleryInteractor(this);
+    galleryInteractor.getImages(new GalleryInteractor.ResponseListener<List<Image>>() {
+        @Override
+        public void onResponse(List<Image> images) {
+            adapter = new ImagesAdapter(getApplicationContext(), images);
+            imagesRV.setAdapter(adapter);
+            imagesSRL.setRefreshing(false);
+        }
 
-            @Override
-            public void onError(Exception e) {
-                e.printStackTrace();
-                photosSRL.setRefreshing(false);
-            }
-        });
+        @Override
+        public void onError(Exception e) {
+            e.printStackTrace();
+            imagesSRL.setRefreshing(false);
+        }
+    });
+}
+```
+
+Mivel eddig String listát jelenítettünk meg az **ImagesAdapter** -el, így most át kell alakítani az adaptert, hogy egy **Image** listát kezeljen. Valamint az `IMAGE_PREFIX_URL` után kell fűznünk a kép **url** mezőjének tartalmát.
+
+```
+public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.ViewHolder> {
+    private final LayoutInflater layoutInflater;
+    private final Context context;
+    private List<Image> images;
+
+    public ImagesAdapter(Context context, List<Image> images) {
+        this.images = images;
+        Collections.reverse(this.images);
+        this.layoutInflater = LayoutInflater.from(context);
+        this.context=context;
     }
+
+    @Override
+    public ImagesAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View v = layoutInflater.inflate(R.layout.li_image, parent, false);
+        return new ViewHolder(v);
+    }
+
+    @Override
+    public void onBindViewHolder(ViewHolder holder, int position) {
+        String url= GalleryAPI.IMAGE_PREFIX_URL+images.get(position).url;
+        Glide.with(holder.imageView.getContext()).load(url).into(holder.imageView);
+    }
+
+    @Override
+    public int getItemCount() {
+        return images.size();
+    }
+
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        public ImageView imageView;
+
+        public ViewHolder(View v) {
+            super(v);
+            imageView = (ImageView) v.findViewById(R.id.imageIV);
+        }
+    }
+}
 ```
+
 Próbáljuk ki az alkalmazást.
 
 <img src="./images/screen3.png" width="250" align="middle">
@@ -413,12 +479,24 @@ Hozzunk létre egy új **Empty Activity** -t **UploadActivity** néven. A hozzá
     android:orientation="vertical" >
 
     <ImageView
-        android:id="@+id/photoIV"
-        android:layout_width="300dp"
-        android:layout_height="300dp"
-        android:scaleType="fitCenter"
-        android:src="@drawable/placeholder" />
+        android:id="@+id/imageIV"
+        android:layout_width="280dp"
+        android:layout_height="280dp"
+        android:scaleType="fitCenter"/>
 
+    <EditText
+        android:id="@+id/nameET"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Name"/>
+
+    <EditText
+        android:id="@+id/descriptionET"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Description"/>
+    
+    
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -451,21 +529,26 @@ A beépített Kamera alkalmazás indítása előtt definiálunk egy útvonalat a
 
 ```java
 public class UploadActivity extends AppCompatActivity {
-    private ImageView photoIV;
+    private ImageView imageIV;
     private Button captureBTN;
     private Button uploadBTN;
+    private EditText nameET;
+    private EditText descriptionET;
 
     public static final String TMP_IMAGE_JPG = "/tmp_image.jpg";
     public static final String IMAGE_PATH = Environment.getExternalStorageDirectory().getAbsolutePath() + TMP_IMAGE_JPG;
-       private final int REQUEST_CAMERA_IMAGE = 101;
-   
+    private final int REQUEST_CAMERA_IMAGE = 101;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_upload);
-        photoIV = (ImageView)findViewById(R.id.photoIV);
+        imageIV = (ImageView)findViewById(R.id.imageIV);
         captureBTN = (Button)findViewById(R.id.captureBTN);
         uploadBTN = (Button)findViewById(R.id.uploadBTN);
+        nameET = (EditText)findViewById(R.id.nameET);
+        descriptionET = (EditText)findViewById(R.id.descriptionET);   
+        
 
         captureBTN.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -477,7 +560,6 @@ public class UploadActivity extends AppCompatActivity {
                 startActivityForResult(cameraIntent,REQUEST_CAMERA_IMAGE);
             }
         });
-
     }
 
     @Override
@@ -487,8 +569,8 @@ public class UploadActivity extends AppCompatActivity {
                 try {
                     Glide.with(this).load(Uri.fromFile(new File(IMAGE_PATH)))
                             .diskCacheStrategy(DiskCacheStrategy.NONE)
-                            .skipMemoryCache(true).into(photoIV);
-           
+                            .skipMemoryCache(true).into(imageIV);
+
                 } catch (Throwable t) {
                     t.printStackTrace();
                     Toast.makeText(this,"ERROR: "+t.getMessage(),Toast.LENGTH_LONG).show();
@@ -552,7 +634,11 @@ uploadBTN.setOnClickListener(new View.OnClickListener() {
     @Override
     public void onClick(View view) {
         GalleryInteractor galleryInteractor = new GalleryInteractor(UploadActivity.this);
-        galleryInteractor.uploadPhoto(Uri.fromFile(new File(IMAGE_PATH)), new GalleryInteractor.ResponseListener<ResponseBody>() {
+
+        String name=nameET.getText().toString();
+        String description=descriptionET.getText().toString();
+
+        galleryInteractor.uploadImage(Uri.fromFile(new File(IMAGE_PATH)),name,description, new GalleryInteractor.ResponseListener<ResponseBody>() {
             @Override
             public void onResponse(ResponseBody responseBody) {
                 Toast.makeText(UploadActivity.this, "Successfully uploaded!", Toast.LENGTH_SHORT).show();
@@ -825,19 +911,25 @@ Az előző labor mintájára módosítsd úgy a generikus szálkezelő megoldás
 
 
 ### Feladat 2: Szavazat feltöltése
-Az API-val lehetőség van szavazatokat is feltölteni. Egészítsd ki a fotók listáját egy részletek nézettel, ahol a felhasználó megadhatja az adatait, és a fotó értékelését. Majd töltse fel az értékelést az API-n keresztül. Az értékelés változását a [weboldalon](http://atleast.aut.bme.hu/AndroidGallery/) 
+Az API-val lehetőség van szavazatokat is feltölteni. Egészítsd ki a fotók listáját egy részletek nézettel, ahol a felhasználó megadhatja az adatait, és a fotó értékelését. Majd töltse fel az értékelést az API-n keresztül. Az értékelés változását a [weboldalon](http://android-gallery.node.autsoft.hu/) 
 keresztül követheted.
 
 Segítség: A hozzá tartozó hívás Retrofit leírója a következő:
 
 ```java
-@GET("api.php?action=rate")
-Call<ResponseBody> ratePhoto(@Query("image") String image,
-                             @Query("username") String username,
-                             @Query("vote") int vote,
-                             @Query("sex") String sex,
-                             @Query("professional") Boolean professional,
-                             @Query("type") String type,
-                             @Query("comment") String comment);
+    @POST("/rate/{id}")
+    Call<ResponseBody> rate(@Path("id") String id, @Body Rating rating);
+```
 
+A rating osztály pedíg:
+
+```java
+public class Rating {
+    public String image;
+    public String username;
+    public int vote;
+    public boolean professional;
+    public String type;
+    public String comment;
+}
 ```
