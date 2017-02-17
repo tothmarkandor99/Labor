@@ -25,7 +25,7 @@ A mérés az alábbi témákat érinti:
 
 A feladat megvalósításához szerver oldalon egy galéria alkalmazás áll rendelkezésre, mely az alábbi oldalon is elérhető:
 
-[http://android-labor-gallery.herokuapp.com](http://android-labor-gallery.herokuapp.com) 
+[http://android-gallery.node.autsoft.hu/](http://android-gallery.node.autsoft.hu/) 
 
 ### API leírás
 
@@ -33,12 +33,12 @@ A galéria egy HTTP API-n keresztül lehetőséget biztosít arra, hogy a képek
 
 Az API a követekező címen érhető el:
 
-`http://android-labor-gallery.herokuapp.com`
+`http://android-gallery.node.autsoft.hu/api`
 
 
 #### Képek lekérdezése
 
-Az alábbi `GET` hívással:  `/api/images` lehetőségünk van a feltöltött fotókat listázni.
+Az alábbi `GET` hívással:  `/images` lehetőségünk van a feltöltött fotókat listázni.
  
  A válasz egy JSON tömb, ami a képek adatait tartalmazza, pl. 
  
@@ -60,11 +60,11 @@ Az alábbi `GET` hívással:  `/api/images` lehetőségünk van a feltöltött f
  A képek url je, az api címe után fűzve érhető el. (Ne feledkezzünk meg a `/`-ről.)
 
 #### Fotó feltöltése
-Az alábbi `POST` hívással:  `/api/upload` lehetőségünk van fotót feltölteni. A kérés tartalma a bináris kép file `image` kulccsal.
+Az alábbi `POST` hívással:  `/upload` lehetőségünk van fotót feltölteni. A kérés tartalma a bináris kép file `image` kulccsal.
 
 
 #### Szavazat feltöltése
-Az alábbi `POST` hívással:  `/api/rate/:id` lehetőségünk van a feltöltött fotókat értékelni. Az `:id` helyére a kép id-jét kell fűznünk.
+Az alábbi `POST` hívással:  `/rate/{id}` lehetőségünk van a feltöltött fotókat értékelni. Az `{id}` helyére a kép id-jét kell fűznünk.[]()
 
 A kérés paraméterek:
 
@@ -280,16 +280,17 @@ Ezután hozzunk létre egy új csomagot **network** néven, benne egy új interf
 
 ```
 public interface GalleryAPI {
-    String ENDPOINT_URL="http://android-labor-gallery.herokuapp.com";
-    
+    String ENDPOINT_URL="http://android-gallery.node.autsoft.hu/api/";
+    String IMAGE_PREFIX_URL="http://android-gallery.node.autsoft.hu/";
+        
     String MULTIPART_FORM_DATA = "multipart/form-data";
     String PHOTO_MULTIPART_KEY_IMG = "image";
 
-    @GET("/api/images")
+    @GET("/images")
     Call<List<Image>> getImages();
 
     @Multipart
-    @POST("/api/upload")
+    @POST("/upload")
      Call<ResponseBody> uploadImage(@Part MultipartBody.Part file, @Part("name") RequestBody name, @Part("description") RequestBody description);
 }
 ```
@@ -419,7 +420,7 @@ private void loadImages() {
 }
 ```
 
-Mivel eddig String listát jelenítettünk meg az **ImagesAdapter** -el, így most át kell alakítani az adaptert, hogy egy **Image** listát kezeljen. Valamint az `ENDPOINT_URL` után kell fűznünk egy `/`-t illetve a kép **url** mezőjének tartalmát.
+Mivel eddig String listát jelenítettünk meg az **ImagesAdapter** -el, így most át kell alakítani az adaptert, hogy egy **Image** listát kezeljen. Valamint az `IMAGE_PREFIX_URL` után kell fűznünk a kép **url** mezőjének tartalmát.
 
 ```
 public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.ViewHolder> {
@@ -442,7 +443,7 @@ public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.ViewHolder
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        String url= GalleryAPI.ENDPOINT_URL+'/'+images.get(position).url;
+        String url= GalleryAPI.IMAGE_PREFIX_URL+images.get(position).url;
         Glide.with(holder.imageView.getContext()).load(url).into(holder.imageView);
     }
 
@@ -910,18 +911,25 @@ Az előző labor mintájára módosítsd úgy a generikus szálkezelő megoldás
 
 
 ### Feladat 2: Szavazat feltöltése
-Az API-val lehetőség van szavazatokat is feltölteni. Egészítsd ki a fotók listáját egy részletek nézettel, ahol a felhasználó megadhatja az adatait, és a fotó értékelését. Majd töltse fel az értékelést az API-n keresztül. Az értékelés változását a [weboldalon](http://android-labor-gallery.herokuapp.com) 
+Az API-val lehetőség van szavazatokat is feltölteni. Egészítsd ki a fotók listáját egy részletek nézettel, ahol a felhasználó megadhatja az adatait, és a fotó értékelését. Majd töltse fel az értékelést az API-n keresztül. Az értékelés változását a [weboldalon](http://android-gallery.node.autsoft.hu/) 
 keresztül követheted.
 
 Segítség: A hozzá tartozó hívás Retrofit leírója a következő:
 
 ```java
-@POST("/api/rate/")
-Call<ResponseBody> ratePhoto(@Query("image") String image,
-                             @Query("username") String username,
-                             @Query("vote") int vote,
-                             @Query("professional") Boolean professional,
-                             @Query("type") String type,
-                             @Query("comment") String comment);
+    @POST("/rate/{id}")
+    Call<ResponseBody> rate(@Path("id") String id, @Body Rating rating);
+```
 
+A rating osztály pedíg:
+
+```java
+public class Rating {
+    public String image;
+    public String username;
+    public int vote;
+    public boolean professional;
+    public String type;
+    public String comment;
+}
 ```
