@@ -296,11 +296,9 @@ Ez az adapter hivatkozik egy **row_todo.xml**-re. Hozzuk létre ezt az álloimá
 
 A három kép, mely szükséges a nézetekhez. Használjuk az [Asset Studiot] a képek legenerálásához, majd a kapott mappákat másoljuk a _res/drawable_ mappába:
 
-<img src="./assets/high.png" align="middle">
-
-<img src="./assets/medium.png" align="middle">
-
-<img src="./assets/low.png" align="middle">
+<img src="./assets/high.png" align="middle" width="50">
+<img src="./assets/medium.png" align="middle" width="50">
+<img src="./assets/low.png" align="middle" width="50">
 
 Írjuk felül a TodoListActivity **SetupRecyclerView** metódusát az alábbi kóddal. (Ez a metódus felel az adapter példaadatokkal való feltöltéséért.)
 
