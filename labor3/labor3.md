@@ -1,14 +1,16 @@
-# Labor3 - Todo Alkalmazás
+# 3. Labor - Todo Alkalmazás
 
-A labor célja, hogy bemutassa, hogyan lehet ún. Master/Detail nézetet tartalmazó alkalmazást készíteni Androidra, fragmentek és erőforrásminősítők segítségével.
+A labor célja, hogy bemutassa, hogyan lehet ún. Master/Detail nézetet tartalmazó alkalmazást készíteni, kiemelve a Fragment-eket és az  erőforrásminősítők használatát.
 
-Első lépésben készítsünk egy új alkalmazást, package név legyen:
+Első lépésben készítsünk egy új alkalmazást, neve legyen **Todo**
+
+A package név legyen:
 
 ```xml
-hu.bme.aut.examples
+hu.bme.aut.amorg.examples.todo
 ```
 
-A sablonválasztónál válasszuk a Master/Detail Flow opciót!
+A sablonválasztónál válasszuk a **Master/Detail Flow** opciót!
 
 <img src="./assets/master-detail-choose_new.PNG" width="200" align="middle">
 
@@ -18,7 +20,7 @@ Laborvezetővel elemezzék a generált alkalmazás működését, próbálják k
 
 ## Átalakítás Todo alkalmazássá
 
-Készítsen egy új package-t **data** néven, ebbe pedig hozza létre a **Todo** osztályt! (Getter és Setter Android Studióban automatikusan is generálható: *Alt + Insert -> Getter And Setter -> az összes tagváltozó kijelölése majd OK*)
+Készítsen egy új package-t **model** néven, ebbe pedig hozza létre a **Todo** osztályt! (Getter és Setter Android Studióban automatikusan is generálható: *Alt + Insert -> Getter And Setter -> az összes tagváltozó kijelölése majd OK*)
 
 ```java
 public class Todo {
@@ -29,38 +31,52 @@ public class Todo {
     private String dueDate;
     private String description;
 
-    public Todo(String aTitle, Priority aPriority,
-                String aDueDate, String aDescription)
-    {
-        title = aTitle;
-        priority = aPriority;
-        dueDate = aDueDate;
-        description = aDescription;
+    public Todo(String title, Priority priority, String dueDate, String description) {
+        this.title = title;
+        this.priority = priority;
+        this.dueDate = dueDate;
+        this.description = description;
     }
 
     public String getTitle() {
         return title;
     }
 
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
     public Priority getPriority() {
         return priority;
+    }
+
+    public void setPriority(Priority priority) {
+        this.priority = priority;
     }
 
     public String getDueDate() {
         return dueDate;
     }
 
+    public void setDueDate(String dueDate) {
+        this.dueDate = dueDate;
+    }
+
     public String getDescription() {
         return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }
 ```
 
-Figyelje meg az osztály eleji enumerációt! Ezen enumerációnak megfelelő ikonokat fogunk használni a listában.
+Figyeljük meg az osztály eleji enumerációt! Ezen enumerációnak megfelelő ikonokat fogunk használni a listában.
 
-Törölje ki a dummy nevű package-t!
+Töröljük ki a **dummy** nevű package-t!
 
-Írja felül a TodoDetailFragment osztály tartalmát, mely a Todo leírását fogja megjeleníteni.
+Írjuk felül a TodoDetailFragment osztály tartalmát, mely a Todo leírását fogja megjeleníteni.
 
 A TodoDetailFragment tartalma az alábbi:
 
@@ -147,7 +163,7 @@ public class SimpleItemRecyclerViewAdapter
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.todorow, parent, false);
+                .inflate(R.layout.row_todo, parent, false);
         return new ViewHolder(view);
     }
 
@@ -160,16 +176,16 @@ public class SimpleItemRecyclerViewAdapter
 
         switch (todos.get(position).getPriority()) {
             case LOW:
-                holder.priority.setImageResource(R.drawable.low);
+                holder.priority.setImageResource(R.drawable.ic_low);
                 break;
             case MEDIUM:
-                holder.priority.setImageResource(R.drawable.medium);
+                holder.priority.setImageResource(R.drawable.ic_medium);
                 break;
             case HIGH:
-                holder.priority.setImageResource(R.drawable.high);
+                holder.priority.setImageResource(R.drawable.ic_high);
                 break;
             default:
-                holder.priority.setImageResource(R.drawable.high);
+                holder.priority.setImageResource(R.drawable.ic_high);
                 break;
         }
 
@@ -194,24 +210,6 @@ public class SimpleItemRecyclerViewAdapter
             }
         });
 
-        holder.mView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                PopupMenu popup = new PopupMenu(v.getContext(), v);
-                popup.inflate(R.menu.long_click_menu);
-                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem item) {
-                        if (R.id.delete == item.getItemId()) {
-                            deleteRow(position);
-                        }
-                        return false;
-                    }
-                });
-                popup.show();
-                return false;
-            }
-        });
     }
 
     /**
@@ -251,7 +249,7 @@ public class SimpleItemRecyclerViewAdapter
 ```
 Figyeljük meg a ViewHolder patternt az adapterben. A RecyclerView már kikényszeríti ennek használatát, mivel így jóval gyorsabb szoftvert kapunk.
 
-Ez az adapter hivatkozik egy todorow.xml-re. Hozzuk létre ezt az álloimányt a _res/layout_ mappába (new -> layout resource file -> Filename: todorow.xml -> OK):
+Ez az adapter hivatkozik egy **row_todo.xml**-re. Hozzuk létre ezt az álloimányt a _res/layout_ mappába (new -> layout resource file -> Filename: row_todo.xml -> OK):
 
 
 ```xml
@@ -266,7 +264,7 @@ Ez az adapter hivatkozik egy todorow.xml-re. Hozzuk létre ezt az álloimányt a
         android:id="@+id/imageViewPriority"
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
-        android:src="@drawable/high"
+        android:src="@drawable/ic_high"
         android:padding="5dp"/>
 
     <RelativeLayout
@@ -296,13 +294,11 @@ Ez az adapter hivatkozik egy todorow.xml-re. Hozzuk létre ezt az álloimányt a
 </LinearLayout>
 ```
 
-A három kép, mely szükséges a nézetekhez (ezeket a _res/drawable_ mappába másoljuk be!):
+A három kép, mely szükséges a nézetekhez. Használjuk az [Asset Studiot] a képek legenerálásához, majd a kapott mappákat másoljuk a _res/drawable_ mappába:
 
-<img src="./assets/high.png" align="middle">
-
-<img src="./assets/medium.png" align="middle">
-
-<img src="./assets/low.png" align="middle">
+<img src="./assets/high.png" align="middle" width="50">
+<img src="./assets/medium.png" align="middle" width="50">
+<img src="./assets/low.png" align="middle" width="50">
 
 Írjuk felül a TodoListActivity **SetupRecyclerView** metódusát az alábbi kóddal. (Ez a metódus felel az adapter példaadatokkal való feltöltéséért.)
 
@@ -315,8 +311,14 @@ private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
     recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(todos, mTwoPane, TodoListActivity.this));
 }
 ```
+
+
+A TodoListActivity-ben töröljük ki a belső adapter osztályt, erre nem lesz szűkségünk.
+
+Ha valamelyik osztályban még hibát jelezne az IDE, ellenőrizzük, hogy nem-e maradt felesleges import a **dummy** csomag elemeire.
+
 Próbálja ki az alkalmazást!
-Tipp: A gyorsabb teszteléshez, keresse ki a tablet mérethez tartozó (layout-w900dp) `_todo_list.xml_` felületleírót, majd másolja a layount-land mappába (hozza létre a mappát!). Ezáltal a mobiltelefon álló orientációjában egy-, míg fekvtetve kétpaneles viselkedést kapunk.
+Tipp: A gyorsabb teszteléshez, keresse ki a tablet mérethez tartozó (layout-w900dp) `todo_list.xml` felületleírót, majd másolja a layount-land mappába (hozza létre a mappát!). Ezáltal a mobiltelefon álló orientációjában egy-, míg fekvtetve kétpaneles viselkedést kapunk.
 
 ## Todo törlése
 
@@ -328,7 +330,7 @@ holder.mView.setOnLongClickListener(new View.OnLongClickListener() {
     @Override
     public boolean onLongClick(View v) {
         PopupMenu popup = new PopupMenu(v.getContext(), v);
-        popup.inflate(R.menu.long_click_menu);
+        popup.inflate(R.menu.menu_todo);
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
@@ -344,7 +346,7 @@ holder.mView.setOnLongClickListener(new View.OnLongClickListener() {
 });
 ```
 
-Az onCreateContextMenu hivatkozik egy layout erőforrásra, ami tartalmazza a lehetséges menüpontokat. Hozzuk létre a `long_click_menu.xml` fájlt a menu mappában.
+Az onCreateContextMenu hivatkozik egy layout erőforrásra, ami tartalmazza a lehetséges menüpontokat. Hozzuk létre a `menu_todo.xml` fájlt a menu mappában.
 (Legegyszerűbb módon az R.menu.long_click_listener piros részére helyezve a kurzort, majd ALT+ENTER -> “Create menu resource file…”)
 
 ```xml
@@ -368,7 +370,7 @@ Próbáljuk ki a törlést!
 
 A TodoListActivity-hez adjunk egy saját menüt, melyben egy „Create new Todo” menüpont található, melyet kiválasztva dialógus formában egy új DialogFragment jelenik meg, hasonlóan a korábbi laboron látott megoldáshoz.
 
-Ehhez természetesen szükségünk lesz egy menü erőforrásra. A _menu_ mappában hozzuk létre a **listmenu.xml** állományt!
+Ehhez természetesen szükségünk lesz egy menü erőforrásra. A _menu_ mappában hozzuk létre a **menu_list.xml** állományt!
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -385,7 +387,7 @@ Majd az _TodoListActivity_-n belül kezeljük az ehhez tartozó metódusokat is.
 ```java
 @Override
 public boolean onCreateOptionsMenu(Menu menu) {
-    getMenuInflater().inflate(R.menu.listmenu, menu);
+    getMenuInflater().inflate(R.menu.menu_list, menu);
     return super.onCreateOptionsMenu(menu);
 }
 
@@ -447,7 +449,7 @@ public class TodoCreateFragment extends DialogFragment{
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View root = inflater.inflate(R.layout.createtodo, container, false);
+        View root = inflater.inflate(R.layout.fragment_todo, container, false);
 
         // Dialog cimenek beallitasa
         getDialog().setTitle(R.string.itemCreateTodo);
@@ -516,7 +518,7 @@ public class TodoCreateFragment extends DialogFragment{
     }
 
     // Listener interface
-    public interface ITodoCreateFragment {
+    public interface TodoCreatedListener {
         public void onTodoCreated(Todo newTodo);
     }
 }
@@ -539,11 +541,10 @@ adapter = (SimpleItemRecyclerViewAdapter) ((RecyclerView) recyclerView).getAdapt
 OnTodoCreated interface megvalósítása:
 
 ```java
-public class TodoListActivity extends AppCompatActivity implements TodoCreateFragment.ITodoCreateFragment
+public class TodoListActivity extends AppCompatActivity implements TodoCreateFragment.TodoCreatedListener
 ```
 
 ```java
-// ITodoCreateFragment
     @Override
     public void onTodoCreated(Todo newTodo) {
         adapter.addItem(newTodo);
@@ -551,7 +552,7 @@ public class TodoListActivity extends AppCompatActivity implements TodoCreateFra
     }
 ```
 
-A TodoCreateFragment layout-ja a következő:
+Hozzuk létre a fragment layoutját, ez a **fragment_create.xml** ,tartalma a következő:
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -600,7 +601,7 @@ A TodoCreateFragment layout-ja a következő:
         <EditText
             android:id="@+id/todoDescription"
             android:width="200dp"
-            android:text="@string/dummyDescription"/>
+            android:text=""/>
     </TableRow>
 
     <TableRow>
@@ -629,13 +630,16 @@ Szöveges erőforrásokat vagy hozzuk létre, vagy másoljuk be őket a string.x
 <string name="btnOk">OK</string>
 <string name="btnCancel">Cancel</string>
 <string name="dummyDescription">dummyDescription</string>
+<string name="itemCreateTodo">Create</string>
 ```
 
 Ezek után ellenőrizzük, hogy működik az új Todo felvitele (kivéve a dátumválasztást)!
 
-### Dátumválasztás
+## Önálló feladat
 
-A dátumválasztás módszere immár gyerekjáték. A _TodoCreateFragment_-ünk implementálja a _IDatePickerDialogFragment_ interfészét a _DatePickerDialogFragment_-ünknek, így a Dátumválasztásról értesül az új Todo felvitele DialogFragment-ünk. Először is csináljuk még egy DialogFragment-ből származó osztályt, ezúttal nevezzük **DatePickerDialogFragment**-nek.
+### Dátumválasztó elkészítése
+
+A _TodoCreateFragment_-ünk implementálja a _DateListener_ interfészét a _DatePickerDialogFragment_-ünknek, így a Dátumválasztásról értesül az új Todo felvitele DialogFragment-ünk. Először is csináljuk még egy DialogFragment-ből származó osztályt, ezúttal nevezzük **DatePickerDialogFragment**-nek.
 
 Importálásnál használjuk az _android.support.v4.DialogFragment_-et, _java.util.calendar_-t, _java.util.date_-t
 
@@ -643,13 +647,13 @@ Importálásnál használjuk az _android.support.v4.DialogFragment_-et, _java.ut
 public class DatePickerDialogFragment extends DialogFragment {
 
     // Log tag
-    public static final String TAG = "DatePickerDialogFragment";
+    public static final String TAG = "DatePickerDialog";
 
     // State
     private Calendar calSelectedDate = Calendar.getInstance();
 
     // Listener
-    private IDatePickerDialogFragment listener;
+    private DateListener listener;
 
     @Override
     public void onAttach(Activity activity) {
@@ -657,7 +661,7 @@ public class DatePickerDialogFragment extends DialogFragment {
 
         if (getTargetFragment() != null) {
             try {
-                listener = (IDatePickerDialogFragment) getTargetFragment();
+                listener = (DateListener) getTargetFragment();
             } catch (ClassCastException ce) {
                 Log.e(TAG,
                         "Target Fragment does not implement fragment interface!");
@@ -667,7 +671,7 @@ public class DatePickerDialogFragment extends DialogFragment {
             }
         } else {
             try {
-                listener = (IDatePickerDialogFragment) activity;
+                listener = (DateListener) activity;
             } catch (ClassCastException ce) {
                 Log.e(TAG,
                         "Parent Activity does not implement fragment interface!");
@@ -721,23 +725,23 @@ public class DatePickerDialogFragment extends DialogFragment {
         return dateString.toString();
     }
 
-    public interface IDatePickerDialogFragment {
+    public interface DateListener{
         public void onDateSelected(String date);
     }
 
 }
 ```
 
-Ugorjunk vissza a _TodoCreateFragment_-re és valósítsuk meg az *IDatePickerDialog* interfészt, illetve állítsuk be a txtDueDate onClickListener(…)-jében, hogy mutassunk egy DialogFragment-et.
+Ugorjunk vissza a _TodoCreateFragment_-re és valósítsuk meg az *DateListener* interfészt, illetve állítsuk be a txtDueDate onClickListener(…)-jében, hogy mutassunk egy DialogFragment-et.
 
 ```java
-public class TodoCreateFragment extends DialogFragment implements DatePickerDialogFragment.IDatePickerDialogFragment
+public class TodoCreateFragment extends DialogFragment implements DatePickerDialogFragment.DateListener
 
 ```
 
 
 ```java
-private void showDatePickerDialog() {
+    private void showDatePickerDialog() {
         FragmentManager fm = getFragmentManager();
 
         DatePickerDialogFragment datePicker = new DatePickerDialogFragment();
@@ -745,7 +749,7 @@ private void showDatePickerDialog() {
         datePicker.show(fm, DatePickerDialogFragment.TAG);
     }
 
-    // IDatePickerDialogFragment
+    @Override
     public void onDateSelected(String date) {
         txtDueDate.setText(date);
     }
@@ -753,8 +757,9 @@ private void showDatePickerDialog() {
 ```
 
 Az onCreateView-ben adjuk hozzá a megfelelő metódust a Dátumválasztó textView-hoz
+
 ```java
-txtDueDate.setOnClickListener(new OnClickListener() {
+        txtDueDate.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 showDatePickerDialog();
             }
