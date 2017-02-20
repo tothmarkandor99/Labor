@@ -741,7 +741,7 @@ public class TodoCreateFragment extends DialogFragment implements DatePickerDial
 
 
 ```java
-private void showDatePickerDialog() {
+    private void showDatePickerDialog() {
         FragmentManager fm = getFragmentManager();
 
         DatePickerDialogFragment datePicker = new DatePickerDialogFragment();
@@ -759,7 +759,7 @@ private void showDatePickerDialog() {
 Az onCreateView-ben adjuk hozzá a megfelelő metódust a Dátumválasztó textView-hoz
 
 ```java
-txtDueDate.setOnClickListener(new OnClickListener() {
+        txtDueDate.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 showDatePickerDialog();
             }
