@@ -1,843 +1,484 @@
-# Labor 9 - Galéria
+# Labor 9 - UX alapok
 
 
 ## Bevezetés
 
-A mérés célja, hogy bemutassa az Android multimédia szolgáltatásait, külön kiemelve a kamerakezelés módszereit, valamint az előző labor során megismert hálózatkezelési megoldások egy magasabb szintjét, a HTTP API készítését megoldását **Retrofit** segítségével. 
+Ma már igen sok alkalmazás található a Play áruházban, köszönhető ez többek között a terjesztés egyszerűségének és az alacsony belépési korlátnak. Azonban ezeknek az alkalmazásoknak igen magas hányada végzi alacsony értékeléssel és magas elégedetlenséggel. A legtöbb projekt fejlesztője késznek érzi az alkalmazást, azonban csak magára gondol és nem a felhasználóra. Ezen a laboron bemutatunk néhány egyszerű fogalmat és technikát, ami segít abban, hogy minőségibb alkalmazások szülessenek. Ehhez egy alapvetően prototípus kaliberű alkalmazást fogunk material szemlélettel javítani.
 
-A mérés során egy Galéria alkalmazást készítünk, melyben lehetőség lesz:
-
-* Fényképek listázására
-* Saját fotó készítésére (saját felület illetve beépített alkalmazás) 
-* Fotó feltöltésére
+Tartsuk szem előtt, hogy ez csak néhány egyszerű ötlet, és ahogy a lollipopos megjelenésű elemektől még nem lesz material egy alkalmazás megjelenése, úgy mi sem leszünk mindenható dizájnerek a labor után. Ez a témakör koránt sem olyan egyértelmű, mint a mérnöki tanulmányok jó része, az itt alkalmazott lépések nem feltétlenül univerzálisak.
 
 
-A mérés az alábbi témákat érinti:
+##Material és UX alapok
 
-*   HTTP API-k használata Retrofit segítségével
-*   File feltöltése szerverre
-*   Beépített kamera alkalmazás használata
-*   Saját kamera felület megjelenítése
+Először is, akinek szándékában áll végigolvasni a teljes útmutatót később, az itt megteheti:
+[https://material.google.com/#](https://material.google.com/#)
 
 
+* A material dizájnban lényeges minden elem megjelenése. Például a Floating Action Button vetett árnyéka nem véletlen. Funkciója kiemelkedik, ezért megjelenítéskor is azt próbáljuk hangsúlyozni, hogy feljebb van. Az elemeknek van Z tengely szerinti **magasságuk**, a rendszer ebből számolja az általuk vetett árnyékot.
 
-## Galéria
+* Az **animációknak jelentésük** kell legyen. Csak úgy nem animálunk dolgokat, mert az jól néz ki. Ha egy listaelemre vagy kártyára tapint a felhasználó, akkor azt az elemet átanimálhatjuk az új képernyővé, úgy, hogy a kártya (vagy listaelem) olyan elemei, amik a következő képernyőn is szerepelnek elfoglalják új helyüket a második képernyőn. Az Android platformon már régóta elérhetőek egyszerű áttűnések, lapozások a képernyőátmenetek közt. Erre azért van szükség, mert a felhasználót (meg)zavarja a hirtelen váltás. A való életben sem villanással kerül az égre a madár, hanem lezajlik egy átmenet (a felszállás), ami átvezet a két állapot között. Emlékezzünk vissza: találkoztunk már olyan alkalmazással, ahol a képernyőváltás során oldalirányban úsztak ki-be a képernyők? Előre és visszafelé navigálásnál melyik irányba haladtak a képernyők?
 
-A feladat megvalósításához szerver oldalon egy galéria alkalmazás áll rendelkezésre, mely az alábbi oldalon is elérhető:
+* Bár laboron a beépített komponensek során nem futunk ebbe a problémába, de jegyezzük meg: **minden felhasználói interakcióra legyen visszajelzés!** Gondoljunk bele mit teszünk, ha egy gombot megnyomva nem történik semmi (fel se villan a gomb nyomott állapota), mit feltételezünk? Jusson eszünkbe egyéni nézetek használatakor! A material szemlélet ezt bővíti azzal, hogy a kiváltott változás egy egyre nagyobb sugarú kör íve mentén történik, aminek középpontja az a hely, ahol a felhasználó kiváltotta a változást:
+[material animáció](http://material-design.storage.googleapis.com/publish/material_v_3/material_ext_publish/0B3T7oTWa3HiFdWhpd296VUhLTFk/animation_responsiveinteraction_radialreaction.webm?_=1)
 
-[http://atleast.aut.bme.hu/AndroidGallery/](http://atleast.aut.bme.hu/AndroidGallery/) 
+* **Minimális gépelés**. Nehéz nagyobb fájdalmat okozni a felhsználónak annál, hogy mobilon kelljen gépelnie, nem véletlenül létezik annyi különböző gesztúra. Ha egyszerű bevitelről van szó (számok, intervallumok, dátumok) egyszerűsítsük csúszkával, vizuális naptári választóval.
 
-### API leírás
+* A materialos színekhez jó segítség az alábbi oldal: [http://www.materialpalette.com/](http://www.materialpalette.com/). Innen le is tudjuk tölteni xml formában a kapott színeket. Annyit érdemes tudni, hogy az “accent” színt csak a leghangsúlyosabb elemek kaphatják meg. Tipikusan ilyen a Floating Action Button, ami a képernyő legfontosabb funkcióját kell jelentse, ha van ilyen. Ugyanúgy másodlagos színt kapnak a Switch és a Slider nézetek is.
 
-A galéria egy HTTP API-n keresztül lehetőséget biztosít arra, hogy a képeket listázzuk, új képek tölsünk fel, illetve hogy képet értékeljünk.
+* Ikonokat tervezni külön szakma, de mivel a legtöbb fejlesztő nem foglalkozik ilyesmivel másodállásban, ezért a Google nem csak néhány ikont készített el előre, hanem rengeteget. Innen letölthetőka hivatalos ikonok: [http://www.google.com/design/spec/resources/sticker-sheets-icons.html#sticker-sheets-icons-system-icons](http://www.google.com/design/spec/resources/sticker-sheets-icons.html#sticker-sheets-icons-system-icons). 
 
-Az API a követekező címen érhető el:
+* A fejlesztői közösség az előbbit tovább gondolta, és létrehoztak egy oldalt ezen ikonok egyszerű kezelésére, illetve számos továbbival ki is egészítettek. [https://materialdesignicons.com/](https://materialdesignicons.com/) Valószínűleg megtaláljuk a nekünk kellőt. Alapszabály, hogy ne használjunk olyan ikont (bármennyire is jó lenne), ami már másik ismert funkciót jelöl. Hasonlóan kinéző komponenstől a felhasználó azt várja, hogy hasonlóan fog működni. A Floating Action Button funkciójának alapvetően egy pozitív cselekedetnek kell lennie (jó példa az új elem létrehozása, rossz példa a szín módosítása vagy a kuka törlése), így válasszunk ennek megfelelő ikont. A laborhoz mellékeljük a szükséges ikonokat, de az otthoni használathoz a javasolt mód az alábbi:
 
-`http://atleast.aut.bme.hu/AndroidGallery/`
+ * Az Android 5.0 változatot töltsük le.
+ * Válasszuk ki a nekünk kellő variánst. Szerepel fehérben, feketében, szürkében és mindhárom színhez 4 féle méretben (nekünk az `ic_add_white_24dp.png` kell)
+ * Menjünk egy könyvtárral feljebb másoljuk az összes minősített mappát a célhelyre.
 
+* Tartsunk megfelelő távolságokat az elemek között, különösen ügyelve az interaktív elemekre. Lesz olyan, akinek nálunk nagyobb az ujjbegye, gondoljunk rá is! A tartalom ne kezdődjön a képernyő 0. pixelénél! Az ajánlásokban elég részletesen taglalják a számokat: az új guideline szerint minden elem egy 8dp-s rácsban helyezkedik el. Ez alól kivételek a szövegek (amiknek alapvonala igazodik 4dp-hez) és a toolbar ikonjai (szintén 4 dp). Tehát alapvetően mindennek a mérete vagy a távolsága n x 8dp. A kijelző szélétől tartandó margó például 16dp, az érinthető területek minimum mérete 48 x 48dp, a köztük tartandó távolság pedig minimum 8dp, de inkább több.
+* A képi elemek legyen inkább személyesek. Ne használjunk pár élettelen mosolyú modell arcát mutató sotck fotókat, a képnek legyen köze a tartalomhoz. A személyes (felhasználó készítette) képek még jobbak. A képek töltsék ki a teret, amennyire csak lehet! Ez azt jelenti, hogy szélességben a teljes kijelzőt fedje, magasságban pedig lehetőleg valamilyen jellegzetes arány vonalát kövesse. Van néhány ajánlás, ezekre az arányokra – mármint arra hogy bizonyos képarányú elemek magassága hol helyezkedik el.
 
-#### Képek lekérdezése
+<img src="./images/keylines.png" width="300" " align="middle">
 
- Az alábbi `GET` hívással:  `api.php?action=getImages` lehetőségünk van a feltöltött fotókat listázni.
- 
- A válasz egy JSON tömb, pl. 
- 
- ```
- ["http://152.66.189.19/AndroidGallery/images1.jpg",
-  "http://152.66.189.19/AndroidGallery/images2.jpg"]
- ```
-
-#### Fotó feltöltése
-Az alábbi `POST` hívással:  `api.php?action=uploadImage` lehetőségünk van a feltöltött fotókat listázni. A kérés tartalma a bináris kép file `img` kulccsal.
+* Ne használjuk a kártyanézeteket (tipikusan Google asszisztens) olyan elemekre, amik megjelenése azonos! Ezesetben egy listáról beszélünk, aminek használatát megnehezíti, hogy a kártyák közt van kihagyott terület és árnyékot is vetnek.
 
 
-#### Szavazat feltöltése
-Az alábbi `GET` hívással:  `api.php?action=rate` lehetőségünk van a feltöltött fotókat értékelni.
+## Hasznos fejlesztői eszközök
 
-Kötelező paraméterek:
+Amikor a felhasználói felületet igazítjuk, nem mindig egyértelmű, hogy miért azt látjuk renderelve, amit. A Beállítások/Fejlesztői eszközök menüpontban találjuk az alábbiakat:
 
-*   `image=[KÉP URL]`
-*   `username=[fehlasználónév]`
-*   `vote=[egész szám 1-5 között]`
+* **Show layout bounds**: Megmutatja mettől-meddig tartanak a nézetek, kiderülhet melyik eltartás (margin, padding) melyik nézethez tartozik.
+* **Windows animation scale**, **Transition animation scale** és **Animator duration scale**: Segítségükkel lelassíthatóak, részletesebben megtekinthetőek az egyébként gyors animációk.
+* **Debug GPU overdraw**: Megmutatja melyek azok a területek, amelyeknek tartalma többször is meg lett adva. Minél többször van szín rendelve egy pixelhez, annál sötétebb szín jelzi.
+* **Profile GPU rendering**: Megmutatja mennyi ideig tartott lerenderelni az adott képkockákat. A képernyőn megjelenő vízszintes vonal jelzi a 16ms határát.  Ha egy oszlop e fölé ér, azt jelenti, hogy az a képkocka nem készült el időben a 60 fps-hez, ezért megakadt a felület.
 
-Opcionális paraméterek: (bármilyen szöveget elfogadnak)
-
-*   `sex=[férfi|nő]`
-*   `professional=[igen|nem]`
-*   `type=[valami]`
-*   `comment=[tetszőleges komment]`
-
-Például: `http://atleast.aut.bme.hu/AndroidGallery/api.php?action=rate&image=http://atleast.aut.bme.hu/AndroidGallery/images/8.jpg&username=Teszter&vote=5&professional=igen`
-
-**A paraméterek beállításakor továbbra se feledkezzünk meg az URL encode-olásról.**
+Próbálják ki ezeket a funkciókat!
 
 
-## Felhasználói felület
+## Javítandó alkalmazás
 
-Hozzunk létre egy új Android Studio Projektet **CameraLabor** néven. 
+Most, hogy néhány hasznos dolgot megismertünk, ideje letöltenünk a prototípust:
 
-A Company Domain mező tartalmát töröljük ki és hagyjuk is üresen.
- 
-A packagename legyen **hu.bme.aut.amorg.examples.cameralabor** 
+[PlacesToVisit.zip](./assets/PlacesToVisit.zip)
 
-A támogatott céleszközök a **Telefon és Tablet**, valamint a minimum SDK szint a **API15: Android 4.0.3** 
+Tömörítsük ki a mappát, indítsuk el az Android Studio-t, majd az Open segítségével nyissuk meg az alkalmazást.
 
-A kezdő projekthez adjuk hozzá egy **Empty Activity**-t, melynek neve legyen **MainActivity**. 
+<img src="./images/screen1_framed.png" width="200" align="middle">
 
-Töröljük ki a **test** és **androidTest** mappákat, most nem lesz rájuk szükség.
+Ennek az alkalmazásnak az a feladata, hogy meglátogatandó helyeket gyűjtsünk benne. A prototípus arra koncentrál, hogy minimális funkcionalitást valósítson meg gyorsan. Az adatok perzisztens tárolásához a *Sugar ORM* ([http://satyan.github.io/sugar/](http://satyan.github.io/sugar/)) könyvtárat használja . Laborvezetővel tekintsék át a kódot és a működést! Főbb elemei:
 
-Vegyük fel a Manifest állományba a szükséges engedélyeket: 
+* A Sugar ORM számára a Manifest-ben elhelyezett meta-data tag-ek segítségével adhatjuk meg az adatbázist tartalmazó fájl nevét és verzióját, hogy logolja-e a query-ket, illetve hogy milyen domain-t használunk.
+
 
 ```xml 
-<uses-permission android:name="android.permission.INTERNET"/>
-<uses-permission android:name="android.permission.CAMERA"/>
-<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <meta-data android:name="DATABASE" android:value="sugar_places.db" />
+    <meta-data android:name="VERSION" android:value="2" />
+    <meta-data android:name="QUERY_LOG" android:value="true" />
+    <meta-data android:name="DOMAIN_PACKAGE_NAME" android:value="hu.bme.aut.amorg.examples.placestovisit.data" />
 ```
 
-> Ezen engedélyek közül a kamera kezelés és a külső háttértár elérése veszélyes engedély, amit Android 6.0 felett megfelelően, futásidőben kell elkérni. A félév során lesz ennek a menetéről is szó. Mi ezt most a labor nem szeretnénk támogatni, ezért a `build.gradle`-ben a `targetSdkVersion` értékét vegyük le `23`-ra.
-
-A **build.gradle**-ben vegyük fel a RecyclerView függőséget:
-
- `compile 'com.android.support:recyclerview-v7:25.0.0'`
-
-A **MainActivity** nézet fogja kilistázni a feltöltött képeket. Ez egy egyszerű RecyclerView, mely egy SwipeRefreshLayoutba van ágyazva, ez lehetőséget biztosít arra, hogy a listához egyszerűen implementáljunk pull-to-refresh működést. A hozzá tartozó **activity_main.xml** tartalma a következő:
+* Az applicationnek a SugarApp-ból kell származnia, ezzel biztosítjuk a Sugar ORM megfelelő inicializálását, illetve lezárását. Esetünkben nincs szükség külön application objektumra, használhatjuk a SugarAppot.
 
 ```xml
-<?xml version="1.0" encoding="utf-8"?>
+<application 
+    android:name="com.orm.SugarApp" 
+    android:allowBackup="true" 
+    android:icon="@mipmap/ic_launcher"
+    android:label="@string/app_name" 
+    android:supportsRtl="true" 
+    android:theme="@style/AppTheme">
+```
+
+* A modell osztálynál (Place) ősosztályként a SugarRecordot használtuk, ez biztosítja, hogy az osztály példányait adatbázisba lehessen menteni. Ehhez implementáljuk a Serializable interfészt is.
+
+
+```java
+public class Place extends SugarRecord implements Serializable {...}
+```
+
+
+### Menü
+
+Új elemet az options menü megnyomásával lehet létrehozni, amely menüben más elem nincs is. Ez a menü tipikusan nem ilyen feladatokra szolgál. Az ilyen feladatokat Floating Action Buttonnel szokás megoldani. Ezért először is töröljük a menüt a nyitóképernyőről, majd helyezzünk fel egy Floating Action Buttont. Ehhez töröljük az Activity OnCreateOptionsMenu és OnOptionsItemSelected metódusait, illetve a res/menu mappát, majd hozzunk létre egy Floating Action Buttont!
+
+A PlacesListActivityben az OnCreatebe:
+
+```java
+FloatingActionButton fab =
+        (FloatingActionButton) findViewById(R.id.addButton);
+    fab.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            showNewPlaceDialog();
+        }
+});
+```
+
+
+Az `activity_places_list.xml`ben az include után:
+
+```xml
+<android.support.design.widget.FloatingActionButton
+    android:id="@+id/addButton"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="bottom|end"
+    android:layout_margin="@dimen/fab_margin"
+    android:layout_alignParentBottom="true"
+    android:layout_alignParentRight="true"/>
+```
+
+
+### FAB ikon
+
+A Floating Action Button ikonja fontos szerepet játszik. A felhasználónak  első ránézésre tudnia kell belőle, hogy mire szolgál a gomb. Így tehát olyan ikont kell választanunk, amiből rögtön látszik, hogy a gomb elem hozzáadására szolgál. Töltsük le az alábbi *zip*et:
+
+[Drawable.zip](./assets/drawable.zip)
+
+Tömörítsük ki és tegyük a projektünkbe, majd állítsuk be a FAB ikonját az `activity_places_list.xml`-ben:
+
+```xml
+app:srcCompat="@drawable/ic_add_white_24dp"
+```
+
+
+### A lista fejléce
+
+Jelenleg a Toolbaron megjelenik az Activity neve, ami "PlacesToVisit", alatta egy TextView-ban pedig a szöveg, hogy "Places to visit". Ezek közül az egyik felesleges, és szebb, ha a normál helyesírás szerinti "Places to visit"-et hagyjuk meg. Azonban egy üres Toolbarnak nincs sok értelme, úgyhogy inkább rakjuk fel ezt a szöveget oda.
+
+Ehhez először is az `activity_places_list.xml`-ben a Toolbar tagen belül vegyük fel az app:title attribútumot, és vegyük fel a string erőforrást.
+
+```xml
+app:title="@string/places_to_visit"
+```
+
+Majd töröljük a `content_places_list.xml`-ből a TextViewt, a RecyclerView-t pedig igazítsuk a szülője tetejéhez.
+
+```xml
+android:layout_alignParentTop="true"
+```
+
+Ahhoz, hogy a Toolbar vetett árnyéka érvényesüljön, és úgy tűnjön, hogy a lista görgetésnél tényleg alá csúszik be, töröljük ki a RelativeLayout felső paddingjét.
+
+Próbáljuk ki az alkalmazást!
+
+<img src="./images/screen2_framed.png" width="200" align="middle">
+
+
+### Üres lista
+
+Kevesen készülnek arra a lehetőségre, hogy mi fogadja a felhasználót akkor, ha üres a listanézet. Célszerű ilyenkor az üres lista helyett valamilyen szöveget megjeleníteni. Írjuk tehát át a `content_places_list.xml`-t.
+
+```xml
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/activity_main"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/content_places_list"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin">
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context=".PlacesListActivity"
+    tools:showIn="@layout/activity_places_list">
 
-    <android.support.v4.widget.SwipeRefreshLayout
-        android:id="@+id/photosSRL"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true">
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/photosRV"
-        android:scrollbars="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
-    </android.support.v4.widget.SwipeRefreshLayout>
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/placesListRV"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true" />
+
+        <TextView
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/emptyTV"
+            style="@style/TextViewTitleStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/add_places_to_visit" />
+
+    </FrameLayout>
+
 </RelativeLayout>
 ```
 
-A **MainActivity** kódja pedíg a következő. Látható hogy a `loadPhotos()` függvény végzi ez a photok letöltését (egyenlőre csak beégetett értékekkel), ez hívódik a nézetre navigálása után, illetve ha lehúzzással frissítjük a tartalmat.
-
-```java
-public class MainActivity extends AppCompatActivity {
-    private PhotosAdapter adapter;
-    private RecyclerView photosRV;
-    private SwipeRefreshLayout photosSRL;
-    
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        photosRV = (RecyclerView) findViewById(R.id.photosRV);
-        photosSRL = (SwipeRefreshLayout) findViewById(R.id.photosSRL);
-  
-        GridLayoutManager mLayoutManager = new GridLayoutManager(this, 2);
-        photosRV.setLayoutManager(mLayoutManager);
-
-        photosSRL.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                loadPhotos();
-            }
-        });
-    }
- 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        loadPhotos();
-    }   
-    
-    private void loadPhotos() {
-         List<String> images = new ArrayList<>();
-        images.add("http://lorempixel.com/400/400/city/");
-        images.add("http://lorempixel.com/400/400/technics/");
-        images.add("http://lorempixel.com/400/400/nature/");
-
-        adapter = new PhotosAdapter(getApplicationContext(), images);
-        photosRV.setAdapter(adapter);
-        photosSRL.setRefreshing(false);
-    }
-}
-```
-
-A képek listájának feltöltését a **PhotosAdapter** végzik. Hozzuk is létre ezt az osztályt a fő csomagban a következő tartalommal.
-
-```java
-public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.ViewHolder> {
-    private final LayoutInflater layoutInflater;
-    private final Context context;
-    private List<String> photos;
-
-    public PhotosAdapter(Context context, List<String> photos) {
-        this.photos = photos;
-        Collections.reverse(this.photos);
-        this.layoutInflater = LayoutInflater.from(context);
-        this.context=context;
-    }
-
-    @Override
-    public PhotosAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View v = layoutInflater.inflate(R.layout.li_photo, parent, false);
-        return new ViewHolder(v);
-    }
-
-    @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
-        //TODO: Set ImageView from URL
-    }
-
-    @Override
-    public int getItemCount() {
-        return photos.size();
-    }
-
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-        public ImageView imageView;
-
-        public ViewHolder(View v) {
-            super(v);
-            imageView = (ImageView) v.findViewById(R.id.photoIV);
-        }
-    }
-}
-```
-
-Az egyes képekhez tartozó cella elem felületét pedig az **li_photo.xml** layout fileban definiáljuk.
-
-```
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical">
-
-    <ImageView
-        android:id="@+id/photoIV"
-        android:layout_width="match_parent"
-        android:layout_height="120dp"
-        android:src="@mipmap/ic_launcher"
-        android:padding="8dp" />
-</LinearLayout>
-```
-
-Próbáljuk ki az alkalmazást!
-
-<img src="./images/screen1.png" width="250" align="middle">
-
-
-## Képek megjelenítése - Glide
-Az alkalmazás jelenleg a képek helyén kék cellékat jelenít meg. Ez azért van mert bár a listát feltöltöttük, az `onBindViewHolder(...)` hívásban nem jelentettük meg a képet. A megjelenítendő képekről csak a webes URL áll rendelkezésünkre. Ilyen esetben a file-t le kell töltenünk a hálózaton keresztül, dekódolni a kapott byte-okat, és az így kapott Bitmap-et beállítani az ImageView forrásaként. Ezt a platform által nyújtott eszközökkel elég kényelmetlen implementálni, ezért egy elterjed, általános célű könyvtárat fogunk használni.
-
-A [Glide](https://github.com/bumptech/glide) egy általános célú képkezelő könyvtár, gyakorlatilag a fent említett műveleteket végzi el helyettünk 1 sor kód használatával, továbbá támogatja a cachelést, aszinkron letöltést, valamint több forrásból is képes megjeleníteni (web, háttértár, content provider, resource ...). 
-
-Használatához a **build.gradle** be vegyük fel a következő függőséget a `dependencies` blokkban. 
-
-```
-compile 'com.github.bumptech.glide:glide:3.7.0'
-```
-
-Ezután a **PhotosAdapter**  **onBindViewHolder** függvényében töltsük be az adott fotót az **ImageView**-ba.
-
-```       
- Glide.with(holder.imageView.getContext()).load(photos.get(position)).into(holder.imageView);
-```
-
-Próbáljuk ki az alkalmazást!
-
-<img src="./images/screen2.png" width="250" align="middle">
-
-
-## Retrofit
-
-A [Retrofit](https://square.github.io/retrofit/) egy általános célú HTTP könyvtár Java környezetben. Széles körben használják, számos projektben bizonyított már (kvázi ipari standard). Azért használjuk, hogy ne kelljen alacson színtű hálózati hívásokat implementálni (mint az előző laboron az OkHttp-vel). Segítségével elég egy interfaceben annotációk segítségével leírni az API-t (ez pl. a Swagger eszközzel generálható is), majd e mögé készít a Retorfit egy olyan osztályt, mely a szükséges hálózati hívásokat elvégzi. A Retrofit a háttérben az OkHttp3-at használja, valamint az objektumok JSON formátumba történő sorosítását a GSON eszközzel végzi. Ezért ezeket is be kell hivatkozni.
-
-A Retrofit használatához vegyük fel a függőségek közé az alábbi kódot.
-
-```
-compile 'com.squareup.retrofit2:retrofit:2.1.0'
-compile 'com.squareup.okhttp3:okhttp:3.4.2'
-compile 'com.squareup.retrofit2:converter-gson:2.1.0'
-```
-
-Ezután hozzunk létre egy új csomagot **network** néven, benne egy új interface-t **GalleryAPI** néven. Ez lesz az API leírónk.
-
-```
-public interface GalleryAPI {
-    String ENDPOINT_URL="http://atleast.aut.bme.hu/AndroidGallery/";
-    
-    String MULTIPART_FORM_DATA = "multipart/form-data";
-    String PHOTO_MULTIPART_KEY_IMG = "img";
-
-    @GET("api.php?action=getImages")
-    Call<List<String>> getPhotos();
-
-    @Multipart
-    @POST("api.php?action=uploadImage")
-    Call<ResponseBody> uploadPhoto(@Part MultipartBody.Part file);
-}
-```
-
-Ezután hozzuk létre azt az osztályt ugyan ebben a csomagban,amely a fenti API-t használni fogja,  mivel ennek az osztálynak az a feladata hogy fenti API hívásokat egységbe fogja, és az előző laboron látott módon külön szálon vegezze el a hálózati hívásokat. **Az eseménybusz megoldást most idő hiányában nem használjuk, de abszolút releváns ebben a helyzetben is.** 
-
-Az osztály neve legyen **GalleryInteractor**.
-
-```
-public class GalleryInteractor {
-    private final GalleryAPI galleryApi;
-    private final Context context;
-
-    public GalleryInteractor(Context context) {
-        this.context = context;
-
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(GalleryAPI.ENDPOINT_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        this.galleryApi = retrofit.create(GalleryAPI.class);
-    }
-}
-```
-
-Látható, hogy a **Retrofit** objektumot felhasználva hozzuk létre a **GalleryAPI** osztály implementációját, melyet azután használhatunk is. Itt álltjuk be hogy a konverziókhoz a **Gson**-t használja, így felteti meg a **Retrofit** a Java objektumokat a JSON formátumnak.
-
-Azért, hogy a hálózati hívásokat külön szálra ütemezzük, majd a választ egy interfacen keresztül visszaütemezzük a főszálra **generikus függvényeket** fogunk használni. A hálózati hívások válaszát a következő generikus interface fogja biztosítani, ezt a **GalleryInteractorban** definiáljuk.
-
-```
-public interface ResponseListener<T> {
-    void onResponse(T t);
-    void onError(Exception e);
-}
-```
-
-Itt látható hogy egy `T` generikus paramétert várunk, és egy ilyen típusu választ adunk vissza az `onRespons`e-ban, illetve egy `Exception`-t a hiba esetén.
-
-Az API-ban definiált `Call` objektumok lehetővé teszik, hogy a hálózati hívások ne a definiálás (ne a függvényhívás) idejében történjenek, hanem később testszőlegesen (`.execute()` hívással) bármikor. Ez lehetőséget ad arra hogy az összeállított kéréseket generikusan kezeljük (nem kell minden kérésre külön implementálni a szálkezelést). 
-
-Készítsük is el a generikus statikus hívásunkat, mely egy tetszőleges típusu `Call` objektumot vár, azt egy külső szálon meghívja, majd a választ (`Handler` segítségével) visszaütemezi a főszálra, és ott meghívja az előbb létrehozott listener objektumot. A `Handler`-rel a `runOnUiThread`-hez hasonló működést tudunk elérni, anélkül hogy referenciánk lenne egy `Activity`-re. Enneka kódja a következő (ezt is a **GalleryInteractor**-ban definiáljunk):
-
-```
-private static <T> void runCallOnBackgroundThread(final Call<T> call, final ResponseListener<T> listener) {
-    final Handler handler = new Handler();
-    new Thread(new Runnable() {
-        @Override
-        public void run() {
-            try {
-                final T photos = call.execute().body();
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        listener.onResponse(photos);
-                    }
-                });
-
-            } catch (final Exception e) {
-                e.printStackTrace();
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        listener.onError(e);
-                    }
-                });
-            }
-        }
-    }).start();
-}
-```
-Ezután a fenti segédfüggvényt felhasználva elkészíthetjük a az Interactorban a hívásokat.
-
-```
-public void getPhotos(ResponseListener<List<String>> responseListener) {
-    Call<List<String>> getPhotosRequest = galleryApi.getPhotos();
-    runCallOnBackgroundThread(getPhotosRequest, responseListener);
-}
-
-public void uploadPhoto(Uri fileUri, ResponseListener<ResponseBody> responseListener) {
-    File file = new File(fileUri.getPath());
-    RequestBody requestFile = RequestBody.create(MediaType.parse(MULTIPART_FORM_DATA), file);
-    MultipartBody.Part body = MultipartBody.Part.createFormData(PHOTO_MULTIPART_KEY_IMG, file.getName(), requestFile);
-
-    Call<ResponseBody> uploadPhotoRequest = galleryApi.uploadPhoto(body);
-    runCallOnBackgroundThread(uploadPhotoRequest, responseListener);
-}
-```
-
-Figyeljük meg, hogy az adott hívás nem egyből a válasz típusával tér vissza, hanem azt a már említett `Call` objektumba csomagolja, így nagyob rugalmasságot adva a fejlesztőknek.
-
-Ezután a **MainActivity**-ben példányosítsuk a **GalleryInteractor**-unkat, majd hívjuk meg a **getPhotos** hívást, melynek eredményét jelentsük meg a **PhotosAdapter** segítségével.
-
-```
-   private void loadPhotos() {
-        GalleryInteractor galleryInteractor = new GalleryInteractor(this);
-        galleryInteractor.getPhotos(new GalleryInteractor.ResponseListener<List<String>>() {
-            @Override
-            public void onResponse(List<String> photos) {
-                adapter = new PhotosAdapter(getApplicationContext(), photos);
-                photosRV.setAdapter(adapter);
-                photosSRL.setRefreshing(false);
-            }
-
-            @Override
-            public void onError(Exception e) {
-                e.printStackTrace();
-                photosSRL.setRefreshing(false);
-            }
-        });
-    }
-```
-Próbáljuk ki az alkalmazást.
-
-<img src="./images/screen3.png" width="250" align="middle">
-
-## Fotó feltöltés
-Hozzunk létre egy új **Empty Activity** -t **UploadActivity** néven. A hozzá tartozó *activity_upload.xml* felülete legyen a következő:
-
-```
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:gravity="center"
-    android:orientation="vertical" >
-
-    <ImageView
-        android:id="@+id/photoIV"
-        android:layout_width="300dp"
-        android:layout_height="300dp"
-        android:scaleType="fitCenter"
-        android:src="@drawable/placeholder" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="horizontal" >
-
-        <Button
-            android:id="@+id/captureBTN"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Capture" />
-
-        <Button
-            android:id="@+id/uploadBTN"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Upload" />
-
-    </LinearLayout>
-
-</LinearLayout>
-```
-
-Töltsük le az üres képet jelző [placeholder](./images/placeholder.png) képet, és másoljuk a **drawables** mappába.
-
-Az **UploadActivity**-ben a Capture gomb megnyomásra elindítjuk a beépített kamera alkalmazást, majd a fotózott képet visszakapva megjelenítjük azt (szintén **Glide** segítségével).
-
-A beépített Kamera alkalmazás indítása előtt definiálunk egy útvonalat az External Storage-ban (miért itt?), majd ezt adjuk át paraméterként, erre a helyre fogja a Kamera alkalmazás menteni az elkészített fotót. Az activity kódja a következő:
-
-
-```java
-public class UploadActivity extends AppCompatActivity {
-    private ImageView photoIV;
-    private Button captureBTN;
-    private Button uploadBTN;
-
-    public static final String TMP_IMAGE_JPG = "/tmp_image.jpg";
-    public static final String IMAGE_PATH = Environment.getExternalStorageDirectory().getAbsolutePath() + TMP_IMAGE_JPG;
-       private final int REQUEST_CAMERA_IMAGE = 101;
-   
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_upload);
-        photoIV = (ImageView)findViewById(R.id.photoIV);
-        captureBTN = (Button)findViewById(R.id.captureBTN);
-        uploadBTN = (Button)findViewById(R.id.uploadBTN);
-
-        captureBTN.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                File imageFile = new File(IMAGE_PATH);
-                Uri imageFileUri = Uri.fromFile(imageFile);
-                Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-                cameraIntent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT,imageFileUri);
-                startActivityForResult(cameraIntent,REQUEST_CAMERA_IMAGE);
-            }
-        });
-
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_CAMERA_IMAGE) {
-            if (resultCode == RESULT_OK) {
-                try {
-                    Glide.with(this).load(Uri.fromFile(new File(IMAGE_PATH)))
-                            .diskCacheStrategy(DiskCacheStrategy.NONE)
-                            .skipMemoryCache(true).into(photoIV);
-           
-                } catch (Throwable t) {
-                    t.printStackTrace();
-                    Toast.makeText(this,"ERROR: "+t.getMessage(),Toast.LENGTH_LONG).show();
-                }
-            }
-        }
-    }
-}
-```
-
-Mivel a képeket mindíg ugyanarra a helyre mentjük, így a **Glide** beépített cache mechanizmusát kikapcsoljuk, különben még az előző fotót jelenítené meg számos esetben.
-
-Ezután a **MainActivity**-ben felveszünk egy menü elemet, amivel az **UploadActivity**-re navigálhatunk. Ehhez hozzuk létre a **res/menu/menu_main.xml**-t a következő tartalommal:
-
 ```xml
-<?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
-    <item
-        android:id="@+id/upload"
-        android:title="UPLOAD"
-        app:showAsAction="always|withText" />
-</menu>
+<string name="add_places_to_visit">Add_places to visit</string>
 ```
 
-Ezután a **MainActivity**-ben vegyük fel a hozzá tartozó menü létrehozó, és menü eseménykezelő függvényeket.
+Figyeljük meg a FrameLayoutot! Egyszerre csak egyik gyermeke látható. Most már csak meg kell oldanunk, hogy üres RecyclerView esetén csak a TextView jelenjen meg:
+
+Először is hozzunk létre egy új View-t, ami képes ezt kezelni. Legyen a neve EmptyRecyclerView, és származzon a RecyclerView-ból. Implementáljuk a három kötelező konstruktorát is:
 
 ```java
-@Override
-public boolean onCreateOptionsMenu(Menu menu) {
-    MenuInflater inflater = getMenuInflater();
-    inflater.inflate(R.menu.menu_main, menu);
-    return true;
-}
+public class EmptyRecyclerView extends RecyclerView {
 
-@Override
-public boolean onOptionsItemSelected(MenuItem item) {
-    switch (item.getItemId()) {
-        case R.id.upload:
-            Intent intent = new Intent(this, UploadActivity.class);
-            startActivity(intent);
-            return true;
-        default:
-            return super.onOptionsItemSelected(item);
-   }
-}
-```
-
-Próbáljuk ki az alkalmazást!
-
-<img src="./images/screen4.png" width="250" align="middle">
-<img src="./images/screen5.png" width="250" align="middle">
-
-### A feltöltés megvalósítása
-
-A feltöltéshez szükséges API definíció és Interactor hívás is definiálva van, így a **getPhotos**-hoz hasonlóan hívjuk meg ezt a hívást is a kép **Uri** paraméterével. Ezt az **UploadActivity** **onCreate(..)** metódusában tegyük meg.
-
-
-```
-uploadBTN.setOnClickListener(new View.OnClickListener() {
-    @Override
-    public void onClick(View view) {
-        GalleryInteractor galleryInteractor = new GalleryInteractor(UploadActivity.this);
-        galleryInteractor.uploadPhoto(Uri.fromFile(new File(IMAGE_PATH)), new GalleryInteractor.ResponseListener<ResponseBody>() {
-            @Override
-            public void onResponse(ResponseBody responseBody) {
-                Toast.makeText(UploadActivity.this, "Successfully uploaded!", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onError(Exception e) {
-                Toast.makeText(UploadActivity.this, "Error during uploading photo!", Toast.LENGTH_SHORT).show();
-                e.printStackTrace();
-            }
-        });
-
-    }
-});
-```
-
-Figyeljük meg, hogy nekünk csak a file elérési utvonlát kellett megadnunk, a file beolvasását és feltöltését a **Retrofit** elvégzi helyettünk.
-
-Próbáljuk ki az alkalmazást, és töltsünk fel egy fotót!
-
-<img src="./images/screen6.png" width="250" align="middle">
-
-## Saját kamera nézet készítése
-
-Az előbbiekben a beépített kamera alkalmazást használtuk fel, most egy ilyen kamera funkcionalítást ellátó Activity-t fogunk létrehozni.
-
-Hozzuk létre a saját kamera nézetünket, készítsünk egy új csomagot **view** néven, ebben hozzuk létre a **CameraView** osztályt. Ez egy custom nézet lesz, mely a **SurfaceView**-ból származik, ebben fogjuk a kamera által éppen látott képet megjeleníteni.
-
-```java
-public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
-    public static final String TAG = CameraView.class.getSimpleName();
-    private SurfaceHolder mHolder;
-    private Camera mCamera;
-
-    public CameraView(Context context, AttributeSet attrs, int defStyle) {
-        super(context, attrs, defStyle);
-        init();
-    }
-
-    public CameraView(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        init();
-    }
-
-    public CameraView(Context context) {
+    public EmptyRecyclerView(Context context) {
         super(context);
-        init();
     }
 
-    private void init() {
-        mHolder = getHolder();
-        mHolder.addCallback(this);
+    public EmptyRecyclerView(Context context, @Nullable AttributeSet attrs) {
+        super(context, attrs);
     }
 
-    public void setCamera(Camera camera) {
-        mCamera = camera;
-        try {
-            mCamera.setPreviewDisplay(mHolder);
-            mCamera.startPreview();
-        } catch (Exception e) {
-            e.printStackTrace();
-            Log.d(TAG, "Failed to start camera preview!");
-        }
+    public EmptyRecyclerView(Context context, @Nullable AttributeSet attrs, int defStyle) {
+        super(context, attrs, defStyle);
     }
 
-    @Override
-    public void surfaceCreated(SurfaceHolder holder) {
-        // Not used
-    }
-
-    @Override
-    public void surfaceDestroyed(SurfaceHolder holder) {
-        // Not used
-    }
-
-    @Override
-    public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
-        if (mHolder.getSurface() == null || mCamera == null) {
-            return;
-        }
-
-        try {
-            mCamera.stopPreview();
-        } catch (Exception e) {
-            e.printStackTrace();
-            Log.d(TAG, "Tried to stop a non-existing camera preview!");
-        }
-
-        try {
-            mCamera.setPreviewDisplay(mHolder);
-            mCamera.startPreview();
-        } catch (Exception e) {
-            e.printStackTrace();
-            Log.d(TAG, "Failed to restart camera preview!");
-        }
-    }
 }
 ```
-
-Ez a nézet tartalmaz egy **SurfaceHolder**-t amin keresztül a képernyőre tud rajzolni, és egy **Camera** objektumot (`android.hardware` csomag), amin keresztül a preview képet eléri.
-
-Ezt a nézetet fogjuk használni a saját fotó készítő activitynkben. Hozzunk létre egy új **Empty Activity**-t **CameraActivity** néven a fő csomagban. A hozzá tartozó **activity_camera.xml** felület legyen:
-
-```xml
-<?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:gravity="center"
-    android:orientation="vertical" >
-
-    <hu.bme.aut.amorg.examples.cameralabor.view.CameraView
-        android:id="@+id/camereView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:layout_alignParentBottom="true"
-        android:orientation="horizontal" >
-
-        <Button
-            android:id="@+id/captureBTN"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Capture" />
-
-        <Button
-            android:id="@+id/cancelBTN"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Cancel" />
-
-    </LinearLayout>
-
-</RelativeLayout>
-
-```
-
-A CameraActivity az előbb létrehozott CameraView-t fogja beállítani, illetve gombnyomásra egy fotót készít. Ez a fotó `byte[]` ként érhető el, melyet az activity a háttértárra ment. A háttértárra mentés útvonlát intent paraméterként kapja (a beépített fényképező is így működik). A CameraActivity kódja a következő:
+Vegyünk fel bele egy emptyView-t, amiben azt a View-t fogjuk tárolni, amit üres lista esetén meg szeretnénk jeleníteni:
 
 ```java
-public class CameraActivity extends AppCompatActivity {
-    public static final String EXTRA_OUTPUT = "EXTRA_OUTPUT";
-    private Button captureBTN;
-    private CameraView cameraView;
-    private Camera camera;
-    private Button cancelBTN;
-    private Uri fileUri;
+private View emptyView;
+```
 
+Ezek után vegyünk fel egy observert, aminek a feladata, hogy a listában történt változásokat lekezelje. 
+
+```java
+final private AdapterDataObserver observer = new AdapterDataObserver() {
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_camera);
-
-        fileUri = getIntent().getParcelableExtra(EXTRA_OUTPUT);
-
-        cameraView = (CameraView) findViewById(R.id.camereView);
-        captureBTN = (Button) findViewById(R.id.captureBTN);
-        captureBTN.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                camera.takePicture(null, null, new Camera.PictureCallback() {
-                    @Override
-                    public void onPictureTaken(byte[] bytes, Camera camera) {
-                        saveToFile(bytes);
-                        Intent resultIntent = new Intent();
-                        setResult(MainActivity.RESULT_OK, resultIntent);
-                        finish();
-                    }
-                });
-            }
-        });
-
-
-        cancelBTN = (Button) findViewById(R.id.cancelBTN);
-        cancelBTN.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent resultIntent = new Intent();
-                setResult(MainActivity.RESULT_CANCELED, resultIntent);
-                finish();
-            }
-        });
-
-        camera = Camera.open();
-
-        adjustPreviewSize();
-        cameraView.setCamera(camera);
-    }
-
-    private void saveToFile(byte[] data) {
-        try {
-            File tmpImage = new File(fileUri.getPath());
-            if (tmpImage.exists())
-                tmpImage.delete();
-            tmpImage.createNewFile();
-            FileOutputStream buf = new FileOutputStream(tmpImage);
-            buf.write(data);
-            buf.flush();
-            buf.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void adjustPreviewSize() {
-        List<Camera.Size> supportedPreviewSizes = camera.getParameters()
-                .getSupportedPreviewSizes();
-
-        Camera.Size selectedPreviewSize = Collections.max(
-                supportedPreviewSizes, new Comparator<Camera.Size>() {
-                    @Override
-                    public int compare(Camera.Size lhs, Camera.Size rhs) {
-                        return (lhs.width * lhs.height) < (rhs.width * rhs.height) ? -1
-                                : 1;
-                    }
-                });
-
-        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
-                selectedPreviewSize.width, selectedPreviewSize.height);
-        cameraView.setLayoutParams(lp);
-        cameraView.invalidate();
-
-        camera.getParameters().setPreviewSize(selectedPreviewSize.width, selectedPreviewSize.height);
+    public void onChanged() {
+        checkIfEmpty();
     }
 
     @Override
-    protected void onPause() {
-        if (camera != null) {
-            camera.stopPreview();
-            camera.release();
-        }
-
-        super.onPause();
+    public void onItemRangeInserted(int positionStart, int itemCount) {
+        checkIfEmpty();
     }
+
+    @Override
+    public void onItemRangeRemoved(int positionStart, int itemCount) {
+        checkIfEmpty();
+    }
+};
+```
+
+Bármilyen változás történik az adathalmazban, le kell ellenőriznünk, hogy a melyik felületet kell megjelenítenünk vagyis, hogy üres-e a lista. Erre szolgál a checkIfEmpty() függvény. Implementáljuk ezt is:
+
+```java
+void checkIfEmpty() {
+        if (emptyView != null && getAdapter() != null) {
+            final boolean emptyViewVisible = 
+                                    getAdapter().getItemCount() == 0;
+            emptyView.setVisibility(emptyViewVisible ? VISIBLE : GONE);
+            setVisibility(emptyViewVisible ? GONE : VISIBLE);
+        }
+    }
+```
+
+Látható, hogy a checkIfEmpty függvény az adapterben található elemek számának függvényében állítja az EmptyRecyclerView, és az EmptyView láthatóságát.
+
+Hozzunk létre egy setter fügvényt az emptyView-hoz, amivel kívülről megadhatjuk majd a megfelelő View-t. Hívjunk ebben is egy checkIfEmpty-t:
+
+```java
+public void setEmptyView(View emptyView) {
+    this.emptyView = emptyView;
+    checkIfEmpty();
 }
 ```
 
-A `saveToFile(...)` függvény végzi a byte tömb fileba mentését, az `adjustPreviewSize()` pedig a legnagyobb támogatott preview méretet keresi meg.
+Az EmptyRecyclerView-nk megfelelő működéséhez felül kell még írnunk a setAdapter függvényt. Ebben tudjuk beregisztrálni az imént létrehozott observerünket, ami kezeli az adathalmazban történt változásokat:
 
-Ezután módosítsuk az **UploadActivity** **captureBTN** listenerjét, hogy az általunk elkészített activity-t használja.
+```java
+@Override
+public void setAdapter(Adapter adapter) {
+    final Adapter oldAdapter = getAdapter();
+    if (oldAdapter != null) {
+        oldAdapter.unregisterAdapterDataObserver(observer);
+    }
+    super.setAdapter(adapter);
+    if (adapter != null) {
+        adapter.registerAdapterDataObserver(observer);
+    }
 
+    checkIfEmpty();
+}
 ```
-captureBTN.setOnClickListener(new View.OnClickListener() {
-    @Override
-    public void onClick(View view) {
-        File imageFile = new File(IMAGE_PATH);
-        Uri imageFileUri = Uri.fromFile(imageFile);
 
-        Intent cameraIntent=new Intent(UploadActivity.this,CameraActivity.class);
-        cameraIntent.putExtra(CameraActivity.EXTRA_OUTPUT,imageFileUri);
-        startActivityForResult(cameraIntent, REQUEST_CAMERA_IMAGE);
+Ezzel el is készült az EmptyRecyclerView-nk. Most cseréljük le az eddig használt RecyclerView-t:
+
+`content_places_list.xml`:
+
+```java
+<hu.bme.aut.amorg.examples.placestovisit.view.EmptyRecyclerView
+            android:id="@+id/placesListERV"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true" />
+```
+
+PlacesListActivity.java:
+
+```java
+private EmptyRecyclerView emptyRecyclerView;
+```
+
+```java
+emptyRecyclerView = (EmptyRecyclerView) findViewById(R.id.placesListERV);
+emptyRecyclerView.setLayoutManager(new LinearLayoutManager((this)));
+adapter = new PlacesToVisitAdapter(this, placesToVisit);
+emptyRecyclerView.setAdapter(adapter);
+registerForContextMenu(emptyRecyclerView);
+```
+
+Végül szerezzünk referenciát a `content_places_list.xml`-ben létrehozott TextView-ra, és állítsuk be az EmptyRecyclerView emptyView-jának:
+
+```java
+View emptyView = findViewById(R.id.emptyTV);
+emptyRecyclerView.setEmptyView(emptyView);
+```
+
+Próbáljuk ki az alkalmazást! Láthatjuk, hogy üres lista helyett valóban az "Add places to visit" felirat jelenik meg.
+
+<img src="./images/screen3_framed.png" width="200" align="middle">
+ 
+Segíthetünk a felhasználónak még annyiban, hogy megengedjük, hogy erre a feliratra rákattintva is vehessen fel új helyet. Ehhez írjuk meg az OnClickListenert:
+
+```java
+emptyTV.setOnClickListener(new View.OnClickListener() {
+    @Override
+    public void onClick(View v) {
+        showNewPlaceDialog();
     }
 });
+
 ```
+
+
+### Dialógus és animációja
+
+Az Android Lollipop verziójától lehetőségünk van képernyőátmenetek során elemeket megosztva animálni. Ebben az esetben azt fogjuk elérni, hogy amikor a felhasználó megérinti a FAB-ot, akkor az új helyszínt létrehozó képernyő abból animálódjon ki. A visszafelé portolás ebben az esetben nem tökéletes, 21-es API szint alatt ezt nem fogjuk látni. A megosztott animációhoz át kell írjuk a stílusainkat, azonban az új xml elemek csak API 21-től működnek.
+
+Hozzunk létre egy új erőforrás mappát! A neve legyen **values-v21**! Ebbe másoljuk bele a meglevő `styles.xml` állományt a minősítetlen mappából. A v21-es styles-xml-ben az alaptémát módosítsuk az alábbiaknak megfelelően:
+
+```xml
+<!-- Base application theme. -->
+<style name="AppTheme"
+    parent="Theme.AppCompat.Light.DarkActionBar">
+
+    <item name="colorPrimary">@color/colorPrimary</item>
+    <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+    <item name="colorAccent">@color/colorAccent</item>
+        
+    <!-- Customize your theme here. -->
+    <item name="android:buttonStyle">@style/ButtonStyleRounded</item>
+
+    <!-- enable window content transitions -->
+    <item name="android:windowContentTransitions">true</item>
+
+    <!-- enable overlapping of exiting and entering activities-->
+    <item name="android:windowAllowEnterTransitionOverlap">true</item>
+    <item name="android:windowAllowReturnTransitionOverlap">true</item>
+
+</style>
+
+```
+
+Most meg kell adjuk az xml erőforrásokban, hogy miből-mit kell animálni. Ehhez úgy párosítjuk össze őket, hogy új attribútumot veszünk fel mind a Floating Action Button-hez, mind az `activity_create_place_to_visit.xml` gyökér eleméhez (Ez ugye a LinearLayout).
+
+```xml
+android:transitionName="create"
+```
+
+Ezután a PlaceListActivity showNewPlaceDialog metódusát egészítsük ki az alábbiak szerint (a Floating Action Buttont ki kell szervezni) :
+
+```java
+private void showNewPlaceDialog() {
+    ActivityOptionsCompat options = 
+		ActivityOptionsCompat.makeSceneTransitionAnimation(
+            PlacesListActivity.this,
+            fab,
+            "create");
+    Intent i = new Intent();
+    i.setClass(this, CreatePlaceToVisitActivity.class);
+    startActivityForResult(i, REQUEST_NEW_PLACE_CODE, options.toBundle());
+}
+```
+
+Itt megdjuk, hogy melyik View-ból indul az animáció (fab), és azt is, hogy milyen transitionName-mel kell dolgoznia a rendszernek ("create"). Az animációról szóló információt egy Bundle-be pakolva adjuk át.
 
 Próbáljuk ki az alkalmazást!
 
-<img src="./images/screen7.png" width="250" align="middle">
-<img src="./images/screen8.png" width="250" align="middle">
+<img src="./images/screen4_framed.png" width="200" align="middle">
 
 
-## Önálló feladatok
+### Új hely felvétele
 
-### Feladat 1: EventBus használata
-Az előző labor mintájára módosítsd úgy a generikus szálkezelő megoldást, hogy EventBus használatával a hívások túléljék az Activity elforgatást.
+Nem a legjobb, hiszen az alkalmazás második képernyője eredetileg dialógus stílusú. Hát töröljük a Manifestből és a stílusfájlokból a kapcsolódó stílusbejegyzést!
 
+Az Activity azonban még így sem tökéletes, hiszen ha nagyon hosszú leírást adunk neki, akkor a Save gomb kicsúszik a képernyőről és használhatatlan lesz. Rögzítsük tehát a gombot a képernyő aljára, a fölötte lévő tartalmat pedig tegyük görgethetővé!
 
-### Feladat 2: Szavazat feltöltése
-Az API-val lehetőség van szavazatokat is feltölteni. Egészítsd ki a fotók listáját egy részletek nézettel, ahol a felhasználó megadhatja az adatait, és a fotó értékelését. Majd töltse fel az értékelést az API-n keresztül. Az értékelés változását a [weboldalon](http://atleast.aut.bme.hu/AndroidGallery/) 
-keresztül követheted.
+Az `activity_create_place_to_visit.xml` gyökérelemét változtassuk RelativeLayout-ra, a benne lévő gombot pedig kössük az aljához.
 
-Segítség: A hozzá tartozó hívás Retrofit leírója a következő:
+```xml
+android:layout_alignParentBottom="true"
+```
+
+A többi elemet pedig ágyazzuk be egy vertikális LinearLayoutba, majd egy ScrollView-ba, amit kössünk felülre, és helyezzünk a gomb fölé:
+
+```xml
+<ScrollView
+        android:layout_width="match_parent"
+        android:layout_alignParentTop="true"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/btnSave">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+```
+
+### Snackbar
+
+A Toast üzeneteknél már van egy sokkal szebb megoldás, ami a Material Design-t követi, a SnackBar. Cseréljük le a Toast figyelmeztetést SnackBar-ra!
+
+Ehhez írjunk egy külön showText() függvényt, ami a paraméterül kapott szöveget jeleníti meg, majd használjuk ezt: 
 
 ```java
-@GET("api.php?action=rate")
-Call<ResponseBody> ratePhoto(@Query("image") String image,
-                             @Query("username") String username,
-                             @Query("vote") int vote,
-                             @Query("sex") String sex,
-                             @Query("professional") Boolean professional,
-                             @Query("type") String type,
-                             @Query("comment") String comment);
-
+private void showText(String text) {
+    Snackbar.make(coordinatorLayout,text,Snackbar.LENGTH_LONG).show();
+}
 ```
+
+Hívás:
+
+```java
+showText(getResources().getString(R.string.cancelled));
+```
+
+A Snackbar.make(...) függvény első paramétere egy View. Adjuk meg ide az Activitynk CoordinatorLayout-ját. Ehhez a PlacesListActivityben fel kell venni változóként, majd az onCreate-ben referenciát szerezni rá.
+
+
+```java
+private CoordinatorLayout coordinatorLayout;
+```
+
+```java
+coordinatorLayout = (CoordinatorLayout) 
+        findViewById(R.id.main_coordinator_layout);
+```
+
+Próbáljuk ki a Snakcbart!
+
+<img src="./images/screen5_framed.png" width="200" align="middle">
+
+
+## Önálló feladat
+
+### Feladat 1 - Továbbfejlesztés
+
+A fenti alapok segítségével alakítsa tovább az alkalmazást!
+
+* Csökkentse a listában megjelenített információkat
+* Készítsen új képernyőt, ahol részletesen jeleníti meg az adott helyet
+* Készítse fel a felületet arra, hogy később a felhasználónak lehetősége lesz képet rögzíteni a helyről
+
+### Feladat 2 - Swipe to delete
+
+Valósítsa meg a swipe gesztussal való törlést (és esetleg módosítást). Használhatja például a következő osztálykönyvtárat: [https://github.com/wdullaer/SwipeActionAdapter](https://github.com/wdullaer/SwipeActionAdapter)

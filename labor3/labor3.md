@@ -1,657 +1,762 @@
-# 3\. Labor: Nézetek
+# Labor3 - Todo Alkalmazás
 
-A labor során egy regisztrációs nézetet készítünk el, melyben számos egyedi View található. Ezek az egyedi nézetek az előző laborhoz képest nem a View osztályt bővítik, hanem egy meglévő, komplexebb View elemet bővítenek.
+A labor célja, hogy bemutassa, hogyan lehet ún. Master/Detail nézetet tartalmazó alkalmazást készíteni Androidra, fragmentek és erőforrásminősítők segítségével.
 
-A labor során az alábbi dolgokat nézzük meg:
-
-*   Színek és stílusok definiálása erőforrásokban
-*   Alapértelmezett téma módosítása
-*   Material Paletta színezés generálása
-*   Saját View létrehozása
-*   Egyedi attribútumok definiálása és kezelése
-
-A labor során az alábbi regisztrációs nézetet rakjuk össze az egyedi View-k segítségével.
-
-<img src="./assets/labor_3_ss1.png" width="200" align="middle">
-
-Alkalmazás felülete
-
-## Kezdő nézet
-
-Hozzunk létre egy új Android Studio Projektet **ViewLabor** néven.
-A Company Domain mező tartalmát töröljük ki és hagyjuk is üresen.
-A packagename legyen **hu.bme.aut.amorg.examples.viewlabor**
-A projektet a **D:\Users\Android\LaborX\Neved\ViewLabor** mappába hozzuk létre.
-
-A támogatott céleszközök a **Telefon és Tablet**, valamint a minimum SDK szint a **API15: Android 4.0.3**
-A kezdő projekthez adjuk hozzá egy **Empty Activity**-t, melynek neve legyen **ViewLaborActivity**.
-
-A legenerált projektből töröljük ki a teszteket (ezekre most nem lesz szükség).
-
-A következő lépésben módosítsuk a az activity elrendezését (_activity_view_labor.xml_).
-
-```XML
-<ScrollView
-	xmlns:android="http://schemas.android.com/apk/res/android"
-	xmlns:tools="http://schemas.android.com/tools"
-	android:layout_width="match_parent"
-	android:layout_height="match_parent">
-
-	<LinearLayout
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:paddingLeft="@dimen/activity_horizontal_margin"
-		android:paddingRight="@dimen/activity_horizontal_margin"
-		android:paddingTop="@dimen/activity_vertical_margin"
-		android:paddingBottom="@dimen/activity_vertical_margin"
-		android:orientation="vertical">
-
-		<TextView
-			style="@style/Subtitle"
-			android:text="Registration"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"/>
-
-		<EditText
-			android:hint="Felhasználónév"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"/>
-
-		<!-- Ide jön majd a saját jelszó nézet -->
-
-		<TextView
-			style="@style/Subtitle"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:text="Nem"/>
-
-		<!-- Ide jön single ChoiceLayout -->
-
-		<TextView
-			style="@style/Subtitle"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:text="Válassz max 3-at"/>
-
-		<!-- Ide jön multiple ChoiceLayout -->
-
-	</LinearLayout>
-</ScrollView>
-
-```
-
-## Material Palette
-
-URL: [https://www.materialpalette.com/](https://www.materialpalette.com/)
-
-A honlap segítségével saját Material színsémát generálhatunk az alkalmazásunkhoz, ahol két kiválasztott szín segítségével a Meterial színpalettáról állítja össze a holnap az alkalmazásunk szín világát.
-
-Nyissuk meg a honlapot, majd az alábbi beállításokkal generáljunk témát:
-
-1.  Elsődleges színnek válasszuk ki a **Green**-t
-2.  Másodlagos színnek pedig a **Light-Green**-t
-3.  Majd a **Download**-t kiválasztva …
-4.  … **XML** formátumban töltsük is le.
-5.  A kapott file tartalmát másoljuk az **colors.xml**-be.
-
-Az alkalmazásunkban használt stílusokat pedig a _styles.xml_ állományban definiáljuk.
+Első lépésben készítsünk egy új alkalmazást, package név legyen:
 
 ```xml
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-	<!-- Base application theme. -->
-	<style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-		<!-- Customize your theme here. -->
-		<item name="colorPrimary">@color/primary</item>
-		<item name="colorPrimaryDark">@color/primary_dark</item>
-		<item name="colorAccent">@color/accent</item>
-		<item name="android:textViewStyle">@style/TextView</item>
-	</style>
-
-	<style name="TextView" parent="android:Widget.TextView">
-		<item name="android:textColor">@color/primary</item>
-	</style>
-
-	<style name="Subtitle">
-		<item name="android:textSize">20sp</item>
-		<item name="android:paddingTop">16dp</item>
-		<item name="android:paddingBottom">16dp</item>
-	</style>
-
-</resources>
+hu.bme.aut.examples
 ```
 
-Az AndroidManifest állományt megnézve látható, hogy az alkalmazásunk alapértelmezett témája az AppTheme. Így amit ebben a stílusban definiálunk, az alapértelmezett lesz az alkalmazásunkat tekintve. Az android:textViewStyle definiálja, hogy hogy néz ki az adott alkalmazásban az alapértelmezett TextView egy felüldefiniált stílus segítségével. Ezeknek a felüldefiniált stílusoknak minden esetben a beépített stílusból kell leszármaznia, jelen esetünkben a saját TextView stílusunknak az android:Widget.TextView stílusból. Itt felüldefiniáljuk a textColor attribútumot, aminek hatására minden TextView alapértelmezett betűszíne megváltozik az ott megadottra.
+A sablonválasztónál válasszuk a Master/Detail Flow opciót!
 
-Figyeljük meg hogy az editText is követi a beállított értékeket (Kiválasztott esetben az téma **accent** színét). Adjuk hozzá az AppTheme-hez a következőket, és figyeljük meg hogy megváltozott az EditText szöveg színe.
+<img src="./assets/master-detail-choose_new.PNG" width="200" align="middle">
 
-```xml
-<item name="android:textColor">@color/accent</item>
-<item name="android:textColorPrimary">@color/accent</item>
-<item name="android:textColorSecondary">@color/accent</item>
-```
+A következő ablakban írjuk be rendre, hogy **Todo, Todos, Todos**! Ennek csak a generált sablonban van szerepe, de legalább az activity nevét nem kell később átírjuk.
 
-## Saját View létrehozása
+Laborvezetővel elemezzék a generált alkalmazás működését, próbálják ki emulátoron, készüléken! A Master/Detail nézet célja, hogy egyetlen alkalmazással megoldjunk egy lista és annak egy elemének megjelenítését tableten és mobiltelefonon egyaránt. Működésének a lényege, hogy egy activity-hez tartozó layoutnak kétféle változata van. Egy kétpaneles és egy egypaneles változat. Egy módszer az, ha erőforrás minősítőkkel biztosítjuk, hogy tableten a kétpaneles változat töltődjön be, míg mobilon az egypaneles. Az activityben megpróbálunk referenciát szerezni a második panelre, és ha sikerül, akkor tableten vagyunk, ha nem, akkor mobilon. Az első panel tartalma egy **RecyclerView** a másodiké pedig egy sima Fragment a lista egy elemének megjelenítésére. Ha mobilon vagyunk, akkor a listaelemre kattintva új activitybe töltjük a részletező fragmentet, míg tableten egyszerűen betöltjük a jobb oldali panelbe. (a generált kód másképpen működik, ott a refs.xml állomány-t minősíti)
 
-A következő lépés az egyedi nézetek létrehozása.
+## Átalakítás Todo alkalmazássá
 
-### Egyedi jelszó nézet
-
-Elsőként az egyedi jelszó nézetet valósítjuk meg. Ez a nézet egy beviteli mezőből áll és egy képből, amelyre rákattintva a jelszó mező megmutatja, hogy mit gépeltünk a mezőbe.
-
-Hozzunk létre egy PasswordEditText osztályt, melynek a kódja az alábbi:
+Készítsen egy új package-t **data** néven, ebbe pedig hozza létre a **Todo** osztályt! (Getter és Setter Android Studióban automatikusan is generálható: *Alt + Insert -> Getter And Setter -> az összes tagváltozó kijelölése majd OK*)
 
 ```java
+public class Todo {
+    public enum Priority { LOW, MEDIUM, HIGH }
 
-public class PasswordEditText extends RelativeLayout {
+    private String title;
+    private Priority priority;
+    private String dueDate;
+    private String description;
 
-	protected EditText passwordEditText;
-	protected ImageView eyeImageView;
+    public Todo(String aTitle, Priority aPriority,
+                String aDueDate, String aDescription)
+    {
+        title = aTitle;
+        priority = aPriority;
+        dueDate = aDueDate;
+        description = aDescription;
+    }
 
-	public PasswordEditText(Context context) {
-		super(context);
-		init(context);
-	}
+    public String getTitle() {
+        return title;
+    }
 
-	public PasswordEditText(Context context, AttributeSet attrs) {
-		super(context, attrs);
-		init(context);
-	}
+    public Priority getPriority() {
+        return priority;
+    }
 
-	public PasswordEditText(Context context, AttributeSet attrs, int defStyle) {
-		super(context, attrs, defStyle);
-		init(context);
-	}
+    public String getDueDate() {
+        return dueDate;
+    }
 
-	private void init(Context context) {
-		LayoutInflater.from(context).inflate(R.layout.view_password_edittext, this, true);
+    public String getDescription() {
+        return description;
+    }
+}
+```
 
-		passwordEditText = (EditText) findViewById(R.id.passwordET);
-		eyeImageView = (ImageView) findViewById(R.id.passwordIV);
+Figyelje meg az osztály eleji enumerációt! Ezen enumerációnak megfelelő ikonokat fogunk használni a listában.
 
-		eyeImageView.setOnTouchListener(new OnTouchListener() {
+Törölje ki a dummy nevű package-t!
 
-			@Override
-			public boolean onTouch(View v, MotionEvent event) {
-				if (event.getAction() == MotionEvent.ACTION_DOWN) {
-					setTransformationMethod(null);
-					return true;
-				} else if (event.getAction() == MotionEvent.ACTION_UP || event.getAction() == MotionEvent.ACTION_CANCEL) {
-					setTransformationMethod(PasswordTransformationMethod.getInstance());
-					return true;
-				}
-				return false;
-			}
-		});
+Írja felül a TodoDetailFragment osztály tartalmát, mely a Todo leírását fogja megjeleníteni.
 
-		setTransformationMethod(PasswordTransformationMethod.getInstance());
-	}
+A TodoDetailFragment tartalma az alábbi:
 
-	private void setTransformationMethod(TransformationMethod method) {
-		int ss = passwordEditText.getSelectionStart();
-		int se = passwordEditText.getSelectionEnd();
-		passwordEditText.setTransformationMethod(method);
-		passwordEditText.setSelection(ss, se);
-	}
+```java
+public class TodoDetailFragment extends Fragment {
 
-	public Editable getText() {
-		if(passwordEditText != null)
-			return passwordEditText.getText();
-		else
-			return null;
-	}
+    public static final String TAG = "TodoDetailFragment";
 
-	public void setError(CharSequence str) {
-		passwordEditText.setError(str);
-	}
+    public static final String KEY_TODO_DESCRIPTION = "todoDesc";
 
-	public void setText(CharSequence text) {
-		passwordEditText.setText(text);
-	}
+    private TextView todoDescription;
 
-	public IBinder getWindowToken() {
-                if (passwordEditText != null) {
-		   ();
+    private static Todo selectedTodo;
+
+    public static TodoDetailFragment newInstance(String todoDesc) {
+        TodoDetailFragment result = new TodoDetailFragment();
+
+        Bundle args = new Bundle();
+        args.putString(KEY_TODO_DESCRIPTION, todoDesc);
+        result.setArguments(args);
+
+        return result;
+    }
+
+    public static TodoDetailFragment newInstance(Bundle args) {
+        TodoDetailFragment result = new TodoDetailFragment();
+
+        result.setArguments(args);
+
+        return result;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        if (savedInstanceState == null) {
+            if (getArguments() != null) {
+                selectedTodo = new Todo("cim", Todo.Priority.LOW, "1987.23.12",
+                        getArguments().getString(KEY_TODO_DESCRIPTION));
+            }
+        }
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View root = inflater.inflate(R.layout.todo_detail, container,
+                false);
+
+        todoDescription = (TextView) root.findViewById(R.id.todo_detail);
+        todoDescription.setText(selectedTodo.getDescription());
+
+        return root;
+    }
+}
+```
+
+A megváltozott kulcs miatt át kell alakítani a TodoDetailActivity onCreate metódusát is.
+
+```java
+arguments.putString(TodoDetailFragment.KEY_TODO_DESCRIPTION, getIntent().getStringExtra(TodoDetailFragment.KEY_TODO_DESCRIPTION));
+```
+
+A két Activity és a jobb oldali panel már fel van készítve az új működésre. A Listactivity el tudja dönteni, hogy egy vagy két panel jelenik meg, listenerként pedig majd betölti a DetailActivityt vagy a jobb oldali fragmentet.
+
+Már csak egy dolog van hátra: ahhoz, hogy a Todoink megfelelően jelenjenek meg a listában, módosítanunk kell a sablonban létrejött *SimpleItemRecyclerViewAdapter*-t. Először is töröljük a TodoListActivity-ből az SimpleItemRecyclerViewAdapter belső osztályt és hozzunk létre a **SimpleItemRecyclerViewAdapter** osztályt az **adapter** package-ben. Ennek tartalma legyen a következő:
+
+```java
+public class SimpleItemRecyclerViewAdapter
+        extends RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder> {
+
+    private boolean mTwoPane;
+    private AppCompatActivity activity;
+
+    private final List<Todo> todos;
+
+    public SimpleItemRecyclerViewAdapter(List<Todo> todos, boolean mTwoPane, AppCompatActivity activity) {
+        this.todos = todos;
+        this.mTwoPane = mTwoPane;
+        this.activity = activity;
+    }
+
+    @Override
+    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.todorow, parent, false);
+        return new ViewHolder(view);
+    }
+
+
+    @Override
+    public void onBindViewHolder(final ViewHolder holder, final int position) {
+        holder.mTodo = todos.get(position);
+        holder.title.setText(todos.get(position).getTitle());
+        holder.dueDate.setText(todos.get(position).getDueDate());
+
+        switch (todos.get(position).getPriority()) {
+            case LOW:
+                holder.priority.setImageResource(R.drawable.low);
+                break;
+            case MEDIUM:
+                holder.priority.setImageResource(R.drawable.medium);
+                break;
+            case HIGH:
+                holder.priority.setImageResource(R.drawable.high);
+                break;
+            default:
+                holder.priority.setImageResource(R.drawable.high);
+                break;
+        }
+
+        holder.mView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mTwoPane) {
+                    Bundle arguments = new Bundle();
+                    arguments.putString(TodoDetailFragment.KEY_TODO_DESCRIPTION, todos.get(position).getDescription());
+                    TodoDetailFragment fragment = new TodoDetailFragment();
+                    fragment.setArguments(arguments);
+                    activity.getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.todo_detail_container, fragment)
+                            .commit();
+                } else {
+                    Context context = v.getContext();
+                    Intent intent = new Intent(context, TodoDetailActivity.class);
+                    intent.putExtra(TodoDetailFragment.KEY_TODO_DESCRIPTION, todos.get(position).getDescription());
+
+                    context.startActivity(intent);
                 }
-                return null;
-	}
+            }
+        });
+
+        holder.mView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                PopupMenu popup = new PopupMenu(v.getContext(), v);
+                popup.inflate(R.menu.long_click_menu);
+                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        if (R.id.delete == item.getItemId()) {
+                            deleteRow(position);
+                        }
+                        return false;
+                    }
+                });
+                popup.show();
+                return false;
+            }
+        });
+    }
+
+    /**
+     * Egy elem törlése
+     */
+    public void deleteRow(int position) {
+        todos.remove(position);
+        notifyDataSetChanged();
+    }
+
+
+    public void addItem(Todo aTodo) {
+        todos.add(aTodo);
+    }
+
+    @Override
+    public int getItemCount() {
+        return todos.size();
+    }
+
+    public class ViewHolder extends RecyclerView.ViewHolder {
+        public final View mView;
+        public final TextView dueDate;
+        public final TextView title;
+        public final ImageView priority;
+        public Todo mTodo;
+
+        public ViewHolder(View view) {
+            super(view);
+            mView = view;
+            title = (TextView) view.findViewById(R.id.textViewTitle);
+            dueDate = (TextView) view.findViewById(R.id.textViewDueDate);
+            priority = (ImageView) view.findViewById(R.id.imageViewPriority);
+        }
+    }
+}
+```
+Figyeljük meg a ViewHolder patternt az adapterben. A RecyclerView már kikényszeríti ennek használatát, mivel így jóval gyorsabb szoftvert kapunk.
+
+Ez az adapter hivatkozik egy todorow.xml-re. Hozzuk létre ezt az álloimányt a _res/layout_ mappába (new -> layout resource file -> Filename: todorow.xml -> OK):
+
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content">
+
+    <ImageView
+        android:id="@+id/imageViewPriority"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:src="@drawable/high"
+        android:padding="5dp"/>
+
+    <RelativeLayout
+        android:layout_margin="8dp"
+        android:layout_height="wrap_content"
+        android:layout_width="fill_parent">
+
+        <TextView
+            android:id="@+id/textViewTitle"
+            android:textSize="16dp"
+            android:text="Title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"/>
+
+        <TextView
+            android:id="@+id/textViewDueDate"
+            android:textSize="12dp"
+            android:text="DueDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/textViewTitle"
+            android:layout_alignParentBottom="true"
+            android:gravity="bottom"/>
+    </RelativeLayout>
+
+</LinearLayout>
+```
+
+A három kép, mely szükséges a nézetekhez (ezeket a _res/drawable_ mappába másoljuk be!):
+
+<img src="./assets/high.png" align="middle">
+
+<img src="./assets/medium.png" align="middle">
+
+<img src="./assets/low.png" align="middle">
+
+Írjuk felül a TodoListActivity **SetupRecyclerView** metódusát az alábbi kóddal. (Ez a metódus felel az adapter példaadatokkal való feltöltéséért.)
+
+```java
+private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
+    ArrayList<Todo> todos = new ArrayList<Todo>();
+    todos.add(new Todo("title1", Todo.Priority.LOW, "2011. 09. 26.", "description1"));
+    todos.add(new Todo("title2", Todo.Priority.MEDIUM, "2011. 09. 27.", "description2"));
+    todos.add(new Todo("title3", Todo.Priority.HIGH, "2011. 09. 28.", "description3"));
+    recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(todos, mTwoPane, TodoListActivity.this));
+}
+```
+Próbálja ki az alkalmazást!
+Tipp: A gyorsabb teszteléshez, keresse ki a tablet mérethez tartozó (layout-w900dp) `_todo_list.xml_` felületleírót, majd másolja a layount-land mappába (hozza létre a mappát!). Ezáltal a mobiltelefon álló orientációjában egy-, míg fekvtetve kétpaneles viselkedést kapunk.
+
+## Todo törlése
+
+Az adapterben láttuk a törlésre szolgáló metódust, hát használjuk is! A cél, hogy egy Todora hosszan érintve megjelenjen egy menü, ahol törölhetjük a Todot.
+Az elemek érintés eseménykezelője már el van készítve, a todo törléséhez készítsünk az elemkhez hosszú érintés gesztúra detektálót, majd ekkor dobjunk fel egy popup ablakot, ahol a kívánt művelet kiválasztható lesz. Adjuk hozzá az alábbi sorokat az Adapter _onBindViewHolder_ metódusához:
+
+```java
+holder.mView.setOnLongClickListener(new View.OnLongClickListener() {
+    @Override
+    public boolean onLongClick(View v) {
+        PopupMenu popup = new PopupMenu(v.getContext(), v);
+        popup.inflate(R.menu.long_click_menu);
+        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                if (R.id.delete == item.getItemId()) {
+                    deleteRow(position);
+                }
+                return false;
+            }
+        });
+        popup.show();
+        return false;
+    }
+});
+```
+
+Az onCreateContextMenu hivatkozik egy layout erőforrásra, ami tartalmazza a lehetséges menüpontokat. Hozzuk létre a `long_click_menu.xml` fájlt a menu mappában.
+(Legegyszerűbb módon az R.menu.long_click_listener piros részére helyezve a kurzort, majd ALT+ENTER -> “Create menu resource file…”)
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/delete"
+        android:title="DELETE"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/back"
+        android:title="BACK"
+        app:showAsAction="always" />
+</menu>
+```
+
+Próbáljuk ki a törlést!
+
+## Új Todo létrehozása
+
+A TodoListActivity-hez adjunk egy saját menüt, melyben egy „Create new Todo” menüpont található, melyet kiválasztva dialógus formában egy új DialogFragment jelenik meg, hasonlóan a korábbi laboron látott megoldáshoz.
+
+Ehhez természetesen szükségünk lesz egy menü erőforrásra. A _menu_ mappában hozzuk létre a **listmenu.xml** állományt!
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/itemCreateTodo"
+        android:title="@string/itemCreateTodo"/>
+</menu>
+```
+
+Hozzuk létre a hiányzó szöveges erőforrást is! (Hibára állva Alt+Enter segít)
+
+Majd az _TodoListActivity_-n belül kezeljük az ehhez tartozó metódusokat is. Az OptionsMenu-höz is van onCreate és onOptionsItemSelected metódus:
+
+```java
+@Override
+public boolean onCreateOptionsMenu(Menu menu) {
+    getMenuInflater().inflate(R.menu.listmenu, menu);
+    return super.onCreateOptionsMenu(menu);
+}
+
+@Override
+public boolean onOptionsItemSelected(MenuItem item) {
+    if (item.getItemId() == R.id.itemCreateTodo) {
+        TodoCreateFragment createFragment = new TodoCreateFragment();
+        android.support.v4.app.FragmentManager fm = getSupportFragmentManager();
+        createFragment.show(fm, TodoCreateFragment.TAG);
+    }
+    return super.onOptionsItemSelected(item);
 }
 ```
 
-
-Az osztály a RelativeLayout-ból származik. A RelativeLayout elemei pedig egy EditText és egy ImageView lenne úgy, hogy az ImageView-t jobbra rendezzük és az EditText kitölti bal oldalt a rendelkezésre álló helyet. Ahhoz, hogy egy felüldefiniált ViewGroup-ból származó osztálynak kódból meg tudjuk adni az elrendezését szükségünk van egy úgynevezett merge_layout-ra. Ezt a layout-ot a LayoutInflater.from(context).inflate(R.layout.view_password_edittext, this, true); kóddal tudjuk a RelativeLayout-ba felfújni, aminek hatására a RelativeLayout-nak lesz két gyerek nézete, egy ImageView és egy EditText.
-
-Az elrendezéshez hozzunk létre egy _view_password_edittext.xml_ layout erőforrást és a tartalma legyen az alábbi kód:
-
-
-```xml
-<?xml version="1.0" encoding="utf-8"?>
-<merge xmlns:android="http://schemas.android.com/apk/res/android">
-
-	<ImageView
-		android:id="@+id/passwordIV"
-		android:layout_alignParentRight="true"
-		android:layout_width="50dp"
-		android:layout_height="50dp"
-		android:layout_centerVertical="true"
-		android:src="@android:drawable/ic_menu_view"/>
-
-	<EditText
-		android:id="@+id/passwordET"
-		android:layout_alignParentLeft="true"
-		android:layout_toLeftOf="@+id/passwordIV"
-		android:layout_centerVertical="true"
-		android:layout_width="0dp"
-		android:layout_height="wrap_content"/>
-
-</merge>
-
-```
-
-A laborvezetővel tekintsék át az ImageView és az EditText elhelyezését a RelativeLayout-on belül.
-
-A java osztály fontosabb függvényei:
-
-*   Konstruktorok: ezek szükségesek az ősosztály megfelelő inicializálásához
-*   init: a saját nézetünket inicializálja. Megkeresi az EditText-et és az ImageView-t, valamint beállítja az onClickListener-t az ImageView-hoz.
-*   setTransformationMethod: átállítja az EditText-hez tartozó szöveg transzformációt, valamint elmenti és visszatölti a kijelölést.
-*   getText, setError, setText, getWindowToken: az EditText függvényei, melyet kiajánlunk a saját, RelativeLayout-ból származó osztályunkon kívülre.
-
-A használathoz az alábbi kódot adjuk hozzá az _activity_view_labor.xml_ elrendezés “Ide jön majd a saját jelszó nézet” kommentje után:
-
-```xml
-<hu.bme.aut.amorg.examples.viewlabor.PasswordEditText
-	android:id="@+id/registrationPET"
-	android:layout_width="match_parent"
-	android:layout_height="wrap_content"/>
-```
-
-Ezután az Activity-ből az alábbi kóddal érhetjük el a saját osztályunkat:
+Készítsünk egy új osztályt **TodoCreateFragment** néven ami a _DialogFragment_-ből származik. Az onAttach hívás során ellenőrizzük, hogy van-e listener objektum beregisztrálva a dialógusunk számára. A TodoListActivity fog értesülni az új Todo-ról, úgy ahogyan a TodoCreateFragment-ünk is értesülni fog a dátumválasztásról.
 
 ```java
-PasswordEditText passwordEditText = (PasswordEditText) findViewById(R.id.registrationPET);
-```
+public class TodoCreateFragment extends DialogFragment{
 
-### ChoiceLayout
+    // Log tag
+    public static final String TAG = "TodoCreateFragment";
 
-A második egyedi nézet egy különleges választó. Ez egy olyan nézet, amelyhez XML-ben adhatunk gyermek elemeket, amelyek így kiválaszhatóvá válnak a szülőben. A szülő elemben pedig egyedi attribútumok segítségével módosíthatjuk a működést. A **multiple** attribútummal azt szeretnék beállítani, hogy hány elem legyen kijelölhető a ViewGroup-on belül. A **dividerType** attribútum pedig azt adja meg, hogy mi válassza el a benne lévő elemeket (lehet semmilyen, szimpla vonal, dupla vonal).
+    // UI
+    private EditText editTodoTitle;
+    private Spinner spnrTodoPriority;
+    private TextView txtDueDate;
+    private EditText editTodoDescription;
 
-Ezek alapján az activity elrendezésében kétszer szeretnénk ezt a nézetet felhasználni.
+    // Listener
+    private ITodoCreateFragment listener;
 
-*   Először egy nem választó nézetet szeretnénk. Itt 3 lehetőség legyen, amik közül a felhasználó maximum 1-et választhat. Az elválasztó elem jelen esetben legyen szimpla vonalas.
-*   Másodszor pedig egy 6 opciós választást szeretnénk a felhasználónak nyújtani. Itt a 6 opcióból maximum 3 választható ki. Ebben az esetben az elválasztó elem dupla vonalas.
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
 
-#### Stílusok definiálása
+        if (getTargetFragment() != null) {
+            try {
+                listener = (ITodoCreateFragment) getTargetFragment();
+            } catch (ClassCastException ce) {
+                Log.e(TAG,
+                        "Target Fragment does not implement fragment interface!");
+            } catch (Exception e) {
+                Log.e(TAG, "Unhandled exception!");
+                e.printStackTrace();
+            }
+        } else {
+            try {
+                listener = (ITodoCreateFragment) activity;
+            } catch (ClassCastException ce) {
+                Log.e(TAG,
+                        "Parent Activity does not implement fragment interface!");
+            } catch (Exception e) {
+                Log.e(TAG, "Unhandled exception!");
+                e.printStackTrace();
+            }
+        }
+    }
 
-Első lépésben hozzuk létre a színeket és stílusokat, amiket a nézetünk használni fog.
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View root = inflater.inflate(R.layout.createtodo, container, false);
 
-Színek hozzáadása a _colors.xml_ fájlhoz:
-```xml
-<color name="choiceItemBackground">#DFDFDF</color>
-<color name="choiceItemActiveBackground">#FF45FB95</color>
-<color name="choiceItemPressedBackground">#FF3BC769</color>
-```
+        // Dialog cimenek beallitasa
+        getDialog().setTitle(R.string.itemCreateTodo);
 
-Ezeket a színeket használjuk majd a különböző állapotok hátteréhez.
+        // UI elem referenciak elkerese
+        editTodoTitle = (EditText) root.findViewById(R.id.todoTitle);
 
-A háttér megadására több lehetőség van. Megoldhatjuk, hogy kódból figyeljük az egyes állapotok (lenyomva, kiválasztva, normál) változását és kódból állítgatjuk az elemek háttérszínét. Azonban ez jelentős plusz munka. Android platformon van ennél egyszerűbb megoldás is. Használhatjuk az úgynevezett selector erőforrást. Ez egy olyan kirajzolható erőforrás, amely a View állapotától függ, amelyhez hozzárendeltük.
+        spnrTodoPriority = (Spinner) root.findViewById(R.id.todoPriority);
+        String[] priorities = new String[3];
+        priorities[0] = "Low";
+        priorities[1] = "Medium";
+        priorities[2] = "High";
+        spnrTodoPriority.setAdapter(new ArrayAdapter<String>(getActivity(),
+                android.R.layout.simple_spinner_item, priorities));
 
-Hozzunk létre a drawable mappában egy _selector_choice_item.xml_ fájlt, majd a következő selector kódot másoljuk bele:
-```xml
-<?xml version="1.0" encoding="utf-8"?>
-<selector xmlns:android="http://schemas.android.com/apk/res/android" android:enterFadeDuration="100" android:exitFadeDuration="100">
-	<item android:drawable="@color/choiceItemPressedBackground" android:state_pressed="true"/>
-	<item android:drawable="@color/choiceItemActiveBackground" android:state_selected="true"/>
-	<item android:drawable="@color/choiceItemBackground"/>
-</selector>
-```
-Szükséges stílus hozzáadása a _styles.xml_ fájlhoz:
+        txtDueDate = (TextView) root.findViewById(R.id.todoDueDate);
+        txtDueDate.setText("  -  ");
+        txtDueDate.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                //Itt jon a datumvalaszto
+            }
+        });
 
-```xml
-<style name="ChoiceOptionStyle">
-    <item name="android:gravity">center</item>
-    <item name="android:textSize">16sp</item>
-    <item name="android:paddingTop">10dp</item>
-    <item name="android:paddingBottom">10dp</item>
-    <item name="android:background">@drawable/selector_choice_item</item>
-</style>
-```
+        editTodoDescription = (EditText) root
+                .findViewById(R.id.todoDescription);
 
-Ez a stílus a selector-t használja háttérként, tehát az a View, amely ezt a stílust használja az állapota alapján változtatja majd automatikusan a hátterét.
+        // A gombok esemenykezeloinek beallitasa
+        Button btnOk = (Button) root.findViewById(R.id.btnCreateTodo);
+        btnOk.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Todo.Priority selectedPriority = Todo.Priority.LOW;
 
-#### Osztály létrehozása
+                switch (spnrTodoPriority.getSelectedItemPosition()) {
+                    case 0:
+                        selectedPriority = Todo.Priority.LOW;
+                        break;
+                    case 1:
+                        selectedPriority = Todo.Priority.MEDIUM;
+                        break;
+                    case 2:
+                        selectedPriority = Todo.Priority.HIGH;
+                        break;
+                    default:
+                        break;
+                }
 
-Kezdetben a dividerType attribútumot a Java osztályban kihagyjuk és csak a multiple attribútumot implementáljuk.
+                if (listener != null) {
+                    listener.onTodoCreated(new Todo(editTodoTitle.getText()
+                            .toString(), selectedPriority, txtDueDate.getText()
+                            .toString(), editTodoDescription.getText()
+                            .toString()));
+                }
 
-Attribútumok (hozzuk létre az _attrs.xml_ fájlt):
+                dismiss();
+            }
+        });
 
-```xml
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-	<declare-styleable name="ChoiceLayout">
-		<attr name="multiple" format="integer" />
-	</declare-styleable>
-</resources>
-```
+        Button btnCancel = (Button) root.findViewById(R.id.btnCancelCreateTodo);
+        btnCancel.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                dismiss();
+            }
+        });
 
-Java kód:
+        return root;
+    }
 
-```java
-public class ChoiceLayout extends LinearLayout {
-
-	int multiple = 1;
-
-	public interface OnSelectionChangedListener {
-		public void onSelectionChanged();
-	}
-
-	public ChoiceLayout(Context context) {
-		super(context);
-		initLayout(context, null);
-	}
-
-	public ChoiceLayout(Context context, AttributeSet attrs) {
-		super(context, attrs);
-		initLayout(context, attrs);
-	}
-
-	public ChoiceLayout(Context context, AttributeSet attrs, int defStyle) {
-		super(context, attrs, defStyle);
-		initLayout(context, attrs);
-	}
-
-	protected void initLayout(Context context, AttributeSet attrs) {
-		setOrientation(LinearLayout.VERTICAL);
-		if (attrs != null) {
-			TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.ChoiceLayout);
-			try {
-				multiple = a.getInt(R.styleable.ChoiceLayout_multiple, 1);
-			} finally {
-				a.recycle();
-			}
-		}
-		Log.d("ChoiceLayout", "multiple: " + multiple);
-	}
-
-	@Override
-	public void addView(View child) {
-		super.addView(child);
-		refreshAfterAdd(child);
-	}
-
-	@Override
-	public void addView(View child, android.view.ViewGroup.LayoutParams params) {
-		super.addView(child, params);
-		refreshAfterAdd(child);
-	}
-
-	private void refreshAfterAdd(final View newChild) {
-		newChild.setClickable(true);
-		newChild.setOnClickListener(choiceOnClickListener);
-	}
-
-	private int getSelectedCount() {
-		int selectedCnt = 0;
-		int count = getChildCount();
-		for (int i = 0; i < count; i++) {
-			if (getChildAt(i).isSelected()) {
-				selectedCnt++;
-			}
-		}
-		return selectedCnt;
-	}
-
-	public List<View> getSelectedChilds() {
-		List<View> selectedChilds = new ArrayList<View>();
-		int count = getChildCount();
-		for (int i = 0; i < count; i++) {
-			View v = getChildAt(i);
-			if (v.isSelected()) {
-				selectedChilds.add(v);
-			}
-		}
-		return selectedChilds;
-	}
-
-	private OnClickListener choiceOnClickListener = new OnClickListener() {
-		@Override
-		public void onClick(View view) {
-			if(multiple > 1) {
-				if (view.isSelected() || getSelectedCount() < multiple) {
-					view.setSelected(!view.isSelected());
-				}
-			} else {
-				int count = getChildCount();
-				for (int i = 0; i < count; i++) {
-					View v = getChildAt(i);
-					v.setSelected(v == view);
-				}
-			}
-		}
-	};
+    // Listener interface
+    public interface ITodoCreateFragment {
+        public void onTodoCreated(Todo newTodo);
+    }
 }
 ```
 
-Fontosabb függvények:
+Most ugorjunk vissza a TodoListActivity-re, és valósítsuk meg az ITodoCreateFragment interfészt! Ehhez a RecyclerView adapteréből készítsünk mezőt, majd írjuk meg az interfész által elvárt metódust:
 
-*   Konstruktorok: szintén az ős View miatt szükséges a 3 implementáció
-*   initLayout: a saját inicializáló függvény. Beállítjuk az orientationt, majd kiolvassuk az attribútumokat (ha elérhetőek).
-*   addView felüldefiniálás: itt kapjuk el azt a hívást, ahol egy új View belekerül a Layout-ba. Itt meghívjuk az ős implementációját, majd a hozzáadott nézeten műveletet végzünk a refreshAfterAdd függvényben
-*   refreshAfterAdd: a paraméterként kapott View-t kattinthatóvá állítja, majd beállít egy onClickListener-t a View-ra.
-*   getSelectedCount: visszaadja, hogy hány gyerek elem van kiválasztva
-*   getSelectedChilds: visszaadja azokat a View-kat, amik ki vannak választva
+Új mező az adapterből:
 
-Az egyedi attribútumok eléréséhez a context obtainStyledAttributes függvényét használhatjuk. Ez 1\. paraméterként egy AttributeSet-et vár (amit az osztály konstruktorában kapunk meg), 2\. paraméterként pedig egy attribútum referencia tömböt. Ezt a tömböt a fordító automatikusan generálja az _attrs.xml_ fájlban megadott tag name attribútuma alapján. Tehát jelen esetben az R.styleable.ChoiceLayout reprezentálja ezt a tömböt.
-Az obtainStyledAttributes függvény visszatérési értéke egy TypedArray. Ez tartalmazza a lekért attribútumok értékét. A megfelelő get… függvény segítségével lekérhető a megfelelő integer, String vagy bármely egyéb érték, amit XML-ben megadtunk. **FONTOS, hogy a TypedArray használata után mindig kell az aktuális példányon egy recycle() függvényhívás**, amely felszabadítja a használt attribútumokat (erre van a try … finally megoldás a kódban).
-
-Az osztály végén található OnClickListener felelős az egyes elemek kiválasztásáért. Az implementáció két részre oszlik. Amennyiben a multiple változó értéke nagyobb mint 1, tehát több mint 1 elem választható ki: ha éppen kikattintunk egy elemet, akkor megváltoztatjuk a selected értékét az ellentétjére; ha pedig kiválasztunk egy elemet, akkor megnézzük, hogy elértük-e már a maximumot és ez alapján választjuk ki.
-A másik esetben a multiple értéke 1\. Ilyenkor csak egyetlen elem választható ki; a kiválasztás során az előző kiválasztást kiszedjük és csak az újat hagyjuk bent.
-
-#### Használat XML-ből
-
-```xml
-<hu.bme.aut.amorg.examples.viewlabor.ChoiceLayout
-	android:id="@+id/firstCL"
-	app:multiple="1"
-	android:layout_width="match_parent"
-	android:layout_height="wrap_content">
-
-	<TextView
-		style="@style/ChoiceOptionStyle"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:text="Férfi"/>
-
-	<TextView
-		style="@style/ChoiceOptionStyle"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:text="Nő"/>
-
-	<TextView
-		style="@style/ChoiceOptionStyle"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:text="Egyéb"/>
-</hu.bme.aut.amorg.examples.viewlabor.ChoiceLayout>
+```java
+private SimpleItemRecyclerViewAdapter adapter;
 ```
 
-Második ChoiceLayout hozzáadása az activity_view_labor.xml-hez:
+_OnCreate_-ben, SetupRecyclerView metódus után:
 
-```xml
-<hu.bme.aut.amorg.examples.viewlabor.ChoiceLayout
-	android:id="@+id/secondCL"
-	android:layout_width="match_parent"
-	android:layout_height="wrap_content"
-	app:multiple="3">
-
-	<TextView
-		style="@style/ChoiceOptionStyle"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:text="Akármi1"/>
-
-	<TextView
-		style="@style/ChoiceOptionStyle"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:text="Akármi2"/>
-
-	<TextView
-		style="@style/ChoiceOptionStyle"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:text="Akármi3"/>
-
-	<TextView
-		style="@style/ChoiceOptionStyle"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:text="Akármi4"/>
-
-	<TextView
-		style="@style/ChoiceOptionStyle"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:text="Akármi5"/>
-
-	<TextView
-		style="@style/ChoiceOptionStyle"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:text="Akármi6"/>
-</hu.bme.aut.amorg.examples.viewlabor.ChoiceLayout>
+```java
+adapter = (SimpleItemRecyclerViewAdapter) ((RecyclerView) recyclerView).getAdapter();
 ```
 
-A saját attribútumok saját névtéren keresztül érhetőek el, ez konvekció szerint **app**, az app névtérre állva _Alt+Enter_ segítségével felvehető.
+OnTodoCreated interface megvalósítása:
 
-Látható, hogy a saját View behivatkozás szintén a teljes, package nevet is tartalmazó osztálynév segítségével történik. A multiple attribútum használatára mindkét esetben látunk példát az erőforrásban. A **app** attribútumhoz is működik Android Studio alatt a kódkiegészítés, érdemes kipróbálni.
-
-#### ChoiceLayout kiegészítése a dividerType attribútummal
-
-Azt szeretnénk megoldani, hogy az egyes kiválasztható elemek között egyedi, a nézet által definiált elválasztó elem legyen, ahol több lehetőség közül választhatunk.
-
-Ehhez első lépésben az _attrs.xml_ állományt kell módosítani. Hozzá kell adni a **declare-styleable tag-en belül** az alábbi elemeket:
-
-```xml
-<attr name="dividerType" format="enum">
-			<enum name="none" value="0" />
-			<enum name="simple_divider" value="1" />
-			<enum name="double_divider" value="2" />
-</attr>
+```java
+public class TodoListActivity extends AppCompatActivity implements TodoCreateFragment.ITodoCreateFragment
 ```
 
-Ez most egy másik formátum. A multiple integer formátumú attribútum volt, most viszont 3 érték közül szeretnénk majd választani. Ehhez enum formátumot kell használni. Ezt megadva az adott attr tag gyerek elemei definiálják a lehetséges értékeket. Jelen esetben lehet none: kikapcsolt; simple_divider: egyszerű vonal; double_divider: dupla vonal.
-
-A két divider típushoz első lépésben definiálunk két kirajzolható erőforrást a drawable mappában. Ehhez xml-ben leírt drawable elemeket használunk.
-
-Az első elem a szimpla vonal, melyhez létrehozunk egy _choice_divider_simple.xml_ erőforrást az alábbi tartalommal:
-```xml
-<?xml version="1.0" encoding="utf-8"?>
-<shape xmlns:android="http://schemas.android.com/apk/res/android">
-	<solid android:color="#000000" />
-	<size android:height="1dp" />
-</shape>
+```java
+// ITodoCreateFragment
+    @Override
+    public void onTodoCreated(Todo newTodo) {
+        adapter.addItem(newTodo);
+        adapter.notifyDataSetChanged();
+    }
 ```
 
-
-Itt lérehozunk egy egyszerű shape elemet, aminek egyszínű hátteret adunk (fekete) és beállítjuk 1dp magasra.
-
-A második elem a dupla vonal, melyhez a __choice_divider_double.xml__ erőforrást hozzuk létre:
+A TodoCreateFragment layout-ja a következő:
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
-<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-	<item android:bottom="3dp">
-		<shape android:shape="line">
-			<stroke android:color="#000000" android:width="1dp" />
-			<size android:height="4dp" />
-		</shape>
-	</item>
-	<item android:top="3dp">
-		<shape android:shape="line">
-			<stroke	android:color="#000000"	android:width="1dp" />
-			<size android:height="4dp" />
-		</shape>
-	</item>
-</layer-list>
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:stretchColumns="1">
+    <TableRow>
+        <TextView
+            android:layout_column="1"
+            android:text="@string/lblTodoTitle"
+            android:layout_width="wrap_content"
+            android:gravity="right"/>
+        <EditText
+            android:id="@+id/todoTitle"
+            android:width="200dp"/>
+    </TableRow>
+    <TableRow>
+        <TextView
+            android:layout_column="1"
+            android:text="@string/lblTodoPriority"
+            android:layout_width="wrap_content"
+            android:gravity="right"/>
+        <Spinner
+            android:id="@+id/todoPriority"
+            android:width="200dp"/>
+    </TableRow>
+    <TableRow>
+        <TextView
+            android:layout_column="1"
+            android:text="@string/lblTodoDueDate"
+            android:layout_width="wrap_content"
+            android:gravity="right"/>
+        <TextView
+            android:id="@+id/todoDueDate"
+            android:textSize="20dp"
+            android:width="200dp"
+            android:gravity="center"/>
+    </TableRow>
+    <TableRow>
+        <TextView
+            android:layout_column="1"
+            android:text="@string/lblTodoDescription"
+            android:layout_width="wrap_content"
+            android:gravity="right"/>
+        <EditText
+            android:id="@+id/todoDescription"
+            android:width="200dp"
+            android:text="@string/dummyDescription"/>
+    </TableRow>
+
+    <TableRow>
+        <Button
+            android:id="@+id/btnCreateTodo"
+            android:layout_column="1"
+            android:text="@string/btnOk"
+            android:layout_width="wrap_content"
+            android:gravity="right"/>
+        <Button
+            android:id="@+id/btnCancelCreateTodo"
+            android:text="@string/btnCancel"
+            android:layout_width="wrap_content"
+            android:gravity="left"/>
+    </TableRow>
+</TableLayout>
 ```
 
-Ebben az esetben egy kicsit komplexebb leírást használunk. Itt az úgynevezett layer-list elemben definiálunk több elemet. Ennek a lényege, hogy az egyes elemek majd egymásra rajzolódnak és így definiálható komplexebb grafika XML-ben. Az első item-e a layer-list-nek egy vonal, amely a 4dp magas vásznon 1dp széles vonalat húz alsó, 3dp-s padding-gal. A második elem pedig szintén egy ugyanilyen vonalat húz, de felső, 3dp-s padding-gal. Ennek eredménye egy 4 dp magas kép, aminek a felső és alsó pixele fekete. Ezt széltében nyújtva horizontális vonalat kapunk.
+Szöveges erőforrásokat vagy hozzuk létre, vagy másoljuk be őket a string.xml-be:
 
-Tehát ezt a két drawable elemet fogjuk felhasználni divider-ként a ChoiceLayout-ban. Következő lépésben a ChoiceLayout osztályt kell kiegészíteni.
-
-Adjuk hozzá az osztályhoz a Divider lehetséges értékeit integer ként (Androidon kerüljük az enumerációk használatát, erről bővebben az előadásokon):
-
-```java
-
-public static final int DIVIDER_NONE=0;
-public static final int DIVIDER_SIMPLE=1;
-public static final int DIVIDER_DOUBLE=2;
-int dividerType;
+```xml
+<string name="lblTodoTitle">Todo label</string>
+<string name="lblTodoPriority">Priority</string>
+<string name="lblTodoDueDate">Due date</string>
+<string name="lblTodoDescription">Description</string>
+<string name="btnOk">OK</string>
+<string name="btnCancel">Cancel</string>
+<string name="dummyDescription">dummyDescription</string>
 ```
 
-Ezután ki kell olvasni az initLayout függvényben az elválasztó típust az attribútumok közül. Ehhez a multiple kiolvasás után adjuk hozzá az alábbi sort:
+Ezek után ellenőrizzük, hogy működik az új Todo felvitele (kivéve a dátumválasztást)!
+
+### Dátumválasztás
+
+A dátumválasztás módszere immár gyerekjáték. A _TodoCreateFragment_-ünk implementálja a _IDatePickerDialogFragment_ interfészét a _DatePickerDialogFragment_-ünknek, így a Dátumválasztásról értesül az új Todo felvitele DialogFragment-ünk. Először is csináljuk még egy DialogFragment-ből származó osztályt, ezúttal nevezzük **DatePickerDialogFragment**-nek.
+
+Importálásnál használjuk az _android.support.v4.DialogFragment_-et, _java.util.calendar_-t, _java.util.date_-t
 
 ```java
-dividerType = a.getInt(R.styleable.ChoiceLayout_dividerType, 0);
-```
+public class DatePickerDialogFragment extends DialogFragment {
 
-Hozzáadunk az osztályhoz egy új függvényt, ami a divider elem hozzáadást végzi:
+    // Log tag
+    public static final String TAG = "DatePickerDialogFragment";
 
-```java
-public void addDivider() {
-		if(dividerType != DIVIDER_NONE) {
-			ImageView div = new ImageView(getContext());
-			switch (dividerType) {
-				case DIVIDER_SIMPLE:
-					div.setImageResource(R.drawable.choice_divider_simple);
-					break;
-				case DIVIDER_DOUBLE:
-					div.setImageResource(R.drawable.choice_divider_double);
-					break;
-			}
-			LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-			super.addView(div, lp);
-		}
-	}
-```
+    // State
+    private Calendar calSelectedDate = Calendar.getInstance();
 
-A függvény létrehoz egy ImageView-t és a dividerType alapján beállítja az előbbiekben létrehozott két drawable közül a megfelelőt ennek az ImageView-nak. LayoutParams segítségével beállítjuk, hogy a magassága a tartalom alapján dőljön el, míg a szélessége a szülő alapján. Ezután az addView függvény segítségével hozzáadjuk a View-t a saját layout-hoz. Azért az ős függvényét hívjuk, hogy ne fusson le a saját addView logikánk, amit a kijelölhetőség érdekében hoztunk létre.
+    // Listener
+    private IDatePickerDialogFragment listener;
 
-Ezután mindkét addView függvény elejére beillesztjük az alábbi kódot:
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
 
-```java
-if(getChildCount() > 0) {
-	addDivider();
+        if (getTargetFragment() != null) {
+            try {
+                listener = (IDatePickerDialogFragment) getTargetFragment();
+            } catch (ClassCastException ce) {
+                Log.e(TAG,
+                        "Target Fragment does not implement fragment interface!");
+            } catch (Exception e) {
+                Log.e(TAG, "Unhandled exception!");
+                e.printStackTrace();
+            }
+        } else {
+            try {
+                listener = (IDatePickerDialogFragment) activity;
+            } catch (ClassCastException ce) {
+                Log.e(TAG,
+                        "Parent Activity does not implement fragment interface!");
+            } catch (Exception e) {
+                Log.e(TAG, "Unhandled exception!");
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        calSelectedDate.setTime(new Date(System.currentTimeMillis()));
+    }
+
+    @Override
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+        return new DatePickerDialog(getActivity(), mDateSetListener,
+                calSelectedDate.get(Calendar.YEAR),
+                calSelectedDate.get(Calendar.MONTH),
+                calSelectedDate.get(Calendar.DAY_OF_MONTH));
+    }
+
+    private DatePickerDialog.OnDateSetListener mDateSetListener = new DatePickerDialog.OnDateSetListener() {
+        public void onDateSet(DatePicker view, int year, int monthOfYear,
+                int dayOfMonth) {
+            // uj datum beallitasa
+            calSelectedDate.set(Calendar.YEAR, year);
+            calSelectedDate.set(Calendar.MONTH, monthOfYear);
+            calSelectedDate.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+
+            if (listener != null) {
+                listener.onDateSelected(buildDateText());
+            }
+
+            dismiss();
+        }
+    };
+
+    private String buildDateText() {
+        StringBuilder dateString = new StringBuilder();
+        dateString.append(calSelectedDate.get(Calendar.YEAR));
+        dateString.append(". ");
+        dateString.append(calSelectedDate.get(Calendar.MONTH) + 1);
+        dateString.append(". ");
+        dateString.append(calSelectedDate.get(Calendar.DAY_OF_MONTH));
+        dateString.append(".");
+
+        return dateString.toString();
+    }
+
+    public interface IDatePickerDialogFragment {
+        public void onDateSelected(String date);
+    }
+
 }
 ```
 
-Ez biztosítja, hogy minden elem hozzáadás előtt bekerül egy divider a layout-ba (kivétel az első elem hozzáadásánál, mert ott nincs szükség rá).
+Ugorjunk vissza a _TodoCreateFragment_-re és valósítsuk meg az *IDatePickerDialog* interfészt, illetve állítsuk be a txtDueDate onClickListener(…)-jében, hogy mutassunk egy DialogFragment-et.
 
-Ezzel végeztünk a ChoiceLayout osztály módosításával. Már csak egyetlen dolog maradt hátra: használjuk az új attribútumot. Ehhez az activity elrendezését módosítsuk úgy, hogy mindkét ChoiceLayout kapjon egy újabb custom attribútumot, dividerType névvel. Az első nézetnél legyen:
+```java
+public class TodoCreateFragment extends DialogFragment implements DatePickerDialogFragment.IDatePickerDialogFragment
 
-```xml
-app:dividerType="simple_divider"
-```
-
-A második nézetnél legyen:
-
-```xml
-app:dividerType="double_divider"
 ```
 
 
-Érdemes megfigyelni, hogy az enumeráció lehetséges értékeiben segít a kódkiegészítés.
+```java
+private void showDatePickerDialog() {
+        FragmentManager fm = getFragmentManager();
 
-## Önálló feladat
+        DatePickerDialogFragment datePicker = new DatePickerDialogFragment();
+        datePicker.setTargetFragment(this, 0);
+        datePicker.show(fm, DatePickerDialogFragment.TAG);
+    }
 
-Módosítsa a PasswordEditText osztályt úgy, hogy attribútumként megadható legyen a jelszó mezőben található kép cseréje.
-Segítség:
+    // IDatePickerDialogFragment
+    public void onDateSelected(String date) {
+        txtDueDate.setText(date);
+    }
 
-*   Új attribútum az **attrs.xml**-be. A típusa legyen _reference_.
-*   Ezt a feldolgozó osztályban ResourceId-ként olvashatjuk ki (_getResourceId()_ függvény).
-*   Az így kapott azonosítóhoz tartozó Drawable-t, a _getResources().getDrawable(resourceId)_ függvény segítségével kérhetjük le.
-*   A PasswordEditText osztály _init_ függvényének bővítése, hogy az _attrs_ paraméterből olvassa ki a referenciát
-*   Az attribútum használata az activity elrendezésében
-*   A kinyert Drawable beállítása az eyeImageView objektum képének (_setImageDrawable()_ függvény)
+```
+
+Az onCreateView-ben adjuk hozzá a megfelelő metódust a Dátumválasztó textView-hoz
+```java
+txtDueDate.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+                showDatePickerDialog();
+            }
+        });
+  ```
