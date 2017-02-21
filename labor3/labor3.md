@@ -291,7 +291,7 @@ Ez az adapter hivatkozik egy **row_todo.xml**-re. Hozzuk létre ezt az álloimá
 </LinearLayout>
 ```
 
-A három kép, mely szükséges a nézetekhez. Használjuk az [Asset Studiot] a képek legenerálásához, majd a kapott mappákat másoljuk a _res/drawable_ mappába:
+A három kép, mely szükséges a nézetekhez. Használjuk az [Asset Studiot](https://romannurik.github.io/AndroidAssetStudio/index.html) a képek legenerálásához, majd a kapott mappákat másoljuk a _res/drawable_ mappába:
 
 <img src="./assets/high.png" align="middle" width="50">
 <img src="./assets/medium.png" align="middle" width="50">
@@ -313,6 +313,44 @@ private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
 A TodoListActivity-ben töröljük ki a belső adapter osztályt, erre nem lesz szűkségünk.
 
 Ha valamelyik osztályban még hibát jelezne az IDE, ellenőrizzük, hogy nem-e maradt felesleges import a **dummy** csomag elemeire.
+
+Mivel a generált kód előbb állítja be az adapter, mint hogy eldöntené hogy telefon/tablet az eszköz, így ezt a két hívást meg kell cserélnünk a TodoListActivity onCreate metódusban:
+
+
+```java
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_todo_list);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        toolbar.setTitle(getTitle());
+
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+            }
+        });
+
+        View recyclerView = findViewById(R.id.todo_list);
+        assert recyclerView != null;
+
+        if (findViewById(R.id.todo_detail_container) != null) {
+            // The detail container view will be present only in the
+            // large-screen layouts (res/values-w900dp).
+            // If this view is present, then the
+            // activity should be in two-pane mode.
+            mTwoPane = true;
+        }
+
+        setupRecyclerView((RecyclerView) recyclerView);
+    }
+```
+
 
 Próbálja ki az alkalmazást!
 Tipp: A gyorsabb teszteléshez, keresse ki a tablet mérethez tartozó (layout-w900dp) `todo_list.xml` felületleírót, majd másolja a layount-land mappába (hozza létre a mappát!). Ezáltal a mobiltelefon álló orientációjában egy-, míg fekvtetve kétpaneles viselkedést kapunk.
