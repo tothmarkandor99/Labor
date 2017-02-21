@@ -13,13 +13,13 @@ A labor célja a hálózati kommunikáció, a platformon leginkább használt, H
 
 A következőkben egy olyan Android alkalmazást készítünk, mely tulajdonképpen egy kliensalkalmazás egy multiplayer labirintus játékhoz.
 
-A játék tényleges felülete nem az Android alkalmazás része, azt egy előre elkészített webes alkalmazás jeleníti meg, amely elérhető az alábbi címen
+A játék tényleges felülete nem az Android alkalmazás része, azt egy előre elkészített webes alkalmazás jeleníti meg, amely elérhető az alábbi címen:
 
-[https://android-labyrinth.node.autsoft.hu](https://android-labyrinth.node.autsoft.hu)
+[http://android-labyrinth.node.autsoft.hu](http://android-labyrinth.node.autsoft.hu)
 
 A játék szabályai egyszerűek, a játékosunkat a készülékről négy gomb segítségével (bal, jobb, fel, le) irányíthatjuk, továbbá lehetőség van még üzenetküldésre is. Az első lépésünk során kerül rá az új játékos a játéktérre egy véletlen pozícióra. Ha egy játékos a másikra lép, akkor pontot kap! A feladatok megoldása során a hálózati kommunikációra és az aszinkron hívásokra egyre teljes körűbb, minden helyzetben jól használható megoldást mutatunk.
 
-<img src="./images/game.png" width="400" align="middle">
+<img src="./images/game.png" width="600" align="middle">
 
 ## A felhasználói felület elkészítése
 
@@ -320,7 +320,7 @@ Ezen belül kell majd a megfelelő PHP állományokat meghívni az előre defini
 A játékos mozgatásához a `/api/step/{username}/{direction}`-t kell meghívni (`GET` hívás), amely két paramétert vár:
 
 *   _username_: felhasználónév (ne felejtsük URL encode-olni!)
-*   _direction_: lépés típusa (1: bal, 2: jobb, 3: fel, 4: le)
+*   _direction_: lépés típusa (1: bal, 2: fel, 3: jobb, 4: le)
 
 Például: 
 ``` 
@@ -438,7 +438,7 @@ Ezt fogjuk használni az összes HTTP GET híváshoz. Használjuk is az újonnal
 private static final String TAG = "Network";
 private static final String ENDPOINT_STEP = "/api/step/";
 private static final String PARAM_USERNAME = "username";
-private static final String SEPARATOR = "/;
+private static final String SEPARATOR = "/";
 private static final String ENDPOINT_MESSAGE = "/api/message/";
 private static final String RESPONSE_ERROR = "ERROR";
 
@@ -485,8 +485,8 @@ Ezután vegyük fel az irányok értékeit konstansként a MainActivitybe
 
 ```
 public static final int MOVE_LEFT = 1;
-public static final int MOVE_RIGHT = 2;
-public static final int MOVE_UP = 3;
+public static final int MOVE_UP = 2;
+public static final int MOVE_RIGHT = 3;
 public static final int MOVE_DOWN = 4;
 ```
 
@@ -501,8 +501,8 @@ public class MainActivity extends AppCompatActivity {
     @BindView(R.id.responseTV) TextView responseTV;
 
     public static final int MOVE_LEFT = 1;
-    public static final int MOVE_RIGHT = 2;
-    public static final int MOVE_UP = 3;
+    public static final int MOVE_UP = 2;
+    public static final int MOVE_RIGHT = 3;
     public static final int MOVE_DOWN = 4;
 
     private LabyrinthAPI labyrinthAPI;
