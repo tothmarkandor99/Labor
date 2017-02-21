@@ -212,9 +212,6 @@ public class SimpleItemRecyclerViewAdapter
 
     }
 
-    /**
-     * Egy elem törlése
-     */
     public void deleteRow(int position) {
         todos.remove(position);
         notifyDataSetChanged();
@@ -412,7 +409,6 @@ Készítsünk egy új osztályt **TodoCreateFragment** néven ami a _DialogFragm
 ```java
 public class TodoCreateFragment extends DialogFragment{
 
-    // Log tag
     public static final String TAG = "TodoCreateFragment";
 
     // UI
@@ -704,7 +700,7 @@ public class DatePickerDialogFragment extends DialogFragment {
     private DatePickerDialog.OnDateSetListener mDateSetListener = new DatePickerDialog.OnDateSetListener() {
         public void onDateSet(DatePicker view, int year, int monthOfYear,
                 int dayOfMonth) {
-            // uj datum beallitasa
+
             calSelectedDate.set(Calendar.YEAR, year);
             calSelectedDate.set(Calendar.MONTH, monthOfYear);
             calSelectedDate.set(Calendar.DAY_OF_MONTH, dayOfMonth);
