@@ -347,7 +347,7 @@ holder.mView.setOnLongClickListener(new View.OnLongClickListener() {
 ```
 
 Az onCreateContextMenu hivatkozik egy layout erőforrásra, ami tartalmazza a lehetséges menüpontokat. Hozzuk létre a `menu_todo.xml` fájlt a menu mappában.
-(Legegyszerűbb módon az R.menu.long_click_listener piros részére helyezve a kurzort, majd ALT+ENTER -> “Create menu resource file…”)
+(Legegyszerűbb módon az `R.menu.menu_todo` piros részére helyezve a kurzort, majd ALT+ENTER -> “Create menu resource file…”)
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -380,7 +380,12 @@ Ehhez természetesen szükségünk lesz egy menü erőforrásra. A _menu_ mappá
 </menu>
 ```
 
-Hozzuk létre a hiányzó szöveges erőforrást is! (Hibára állva Alt+Enter segít)
+Hozzuk létre a hiányzó szöveges erőforrást is! (Hibára állva Alt+Enter segít):
+
+
+```xml
+<string name="itemCreateTodo">Create</string>
+```
 
 Majd az _TodoListActivity_-n belül kezeljük az ehhez tartozó metódusokat is. Az OptionsMenu-höz is van onCreate és onOptionsItemSelected metódus:
 
@@ -417,7 +422,7 @@ public class TodoCreateFragment extends DialogFragment{
     private EditText editTodoDescription;
 
     // Listener
-    private ITodoCreateFragment listener;
+    private TodoCreatedListener listener;
 
     @Override
     public void onAttach(Activity activity) {
@@ -425,7 +430,7 @@ public class TodoCreateFragment extends DialogFragment{
 
         if (getTargetFragment() != null) {
             try {
-                listener = (ITodoCreateFragment) getTargetFragment();
+                listener = (TodoCreatedListener) getTargetFragment();
             } catch (ClassCastException ce) {
                 Log.e(TAG,
                         "Target Fragment does not implement fragment interface!");
@@ -435,7 +440,7 @@ public class TodoCreateFragment extends DialogFragment{
             }
         } else {
             try {
-                listener = (ITodoCreateFragment) activity;
+                listener = (TodoCreatedListener) activity;
             } catch (ClassCastException ce) {
                 Log.e(TAG,
                         "Parent Activity does not implement fragment interface!");
@@ -449,7 +454,7 @@ public class TodoCreateFragment extends DialogFragment{
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View root = inflater.inflate(R.layout.fragment_todo, container, false);
+        View root = inflater.inflate(R.layout.fragment_create, container, false);
 
         // Dialog cimenek beallitasa
         getDialog().setTitle(R.string.itemCreateTodo);
@@ -524,7 +529,7 @@ public class TodoCreateFragment extends DialogFragment{
 }
 ```
 
-Most ugorjunk vissza a TodoListActivity-re, és valósítsuk meg az ITodoCreateFragment interfészt! Ehhez a RecyclerView adapteréből készítsünk mezőt, majd írjuk meg az interfész által elvárt metódust:
+Most ugorjunk vissza a TodoListActivity-re, és valósítsuk meg az TodoCreatedListener interfészt! Ehhez a RecyclerView adapteréből készítsünk mezőt, majd írjuk meg az interfész által elvárt metódust:
 
 Új mező az adapterből:
 
@@ -630,7 +635,6 @@ Szöveges erőforrásokat vagy hozzuk létre, vagy másoljuk be őket a string.x
 <string name="btnOk">OK</string>
 <string name="btnCancel">Cancel</string>
 <string name="dummyDescription">dummyDescription</string>
-<string name="itemCreateTodo">Create</string>
 ```
 
 Ezek után ellenőrizzük, hogy működik az új Todo felvitele (kivéve a dátumválasztást)!
