@@ -7,7 +7,7 @@ A bal oldali egy tárcsázó, a jobb oldali pedig az alkalmazásokat listázza k
 ![](images/dialer.png)
 ![](images/apps.png)
 
-! A *ViewPager* használatához szükség van a support v4 csomagra. Importoknál ha lehetséges mindig a supportos változatot használjuk !
+A *ViewPager* használatához szükség van a support v4 csomagra. Importoknál ha lehetséges mindig a supportos változatot használjuk !
 
 Első lépésben készítsünk egy új alkalmazást **Launcher** néven.
 
@@ -564,6 +564,8 @@ Hozzunk létre a Fragmentben egy segédmetódust, ami összeszedi az informáci�
         }
     }
 ```
+
+Az applications objektumon álltva CTRL+ALT+F kombinációval mezővé alakíthatjuk.
 
 Ezt a metódust hívjuk meg a Fragment onCreate életciklusfüggvényében.
 A Fragment onCreate metódusa tipikusan erre való: olyan feladatok elvégzése, ami még nem igényel valódi nézetet.
