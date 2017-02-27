@@ -1,23 +1,28 @@
-# Labor 4 - Intentek, Broadcast receiverek
+# Labor 4 - Launcher
 
-A labor során egy launcher vagy home screen alkalmazást fogunk készíteni, amelyben egy *ViewPager* található, benne 2 *fragment*-tel.
+A labor során egy **Launcher** vagy **Home Screen** alkalmazást fogunk készíteni, amelyben egy *ViewPager* található, benne 2 *fragment*-tel.
+
 A bal oldali egy tárcsázó, a jobb oldali pedig az alkalmazásokat listázza ki.
 
 ![](images/dialer.png)
-![](images/appdrawer.png)
+![](images/apps.png)
 
-! A *ViewPager* használatához szükség van a support v4 csomagra. Importoknál ha lehetséges mindig a supportos változatot használjuk !
+A *ViewPager* használatához szükség van a support v4 csomagra. Importoknál ha lehetséges mindig a supportos változatot használjuk !
 
-Első lépésben készítsünk egy új alkalmazást, package név legyen:
-> hu.bme.aut.amorg.examples.intentlabor
+Első lépésben készítsünk egy új alkalmazást **Launcher** néven.
+
+A package név legyen: **hu.bme.aut.amorg.examples.launcher**
+
 
 Készítsünk egy új Empty Activity-t ,akár projekt létrehozásakor, akár később **LauncherActivity** néven, de gondoskodjunk róla,
 hogy a **FragmentActivity**-ből származik le!
 
 A projektünkben ez az egy Activity lesz. Nem szeretnénk, hogy el lehessen forgatni, illetve szeretnénk, ha home alkalmazásként viselkedhetne.
+
 Mindkét igény miatt a Manifest állományunkat kell módosítani.
 
 Az activity elem az alábbi legyen:
+
 ```xml
 <activity
     android:name=".LauncherActivity"
@@ -34,24 +39,22 @@ Az activity elem az alábbi legyen:
 </activity>
 ```
 Az Activity szempontjából egyetlen View kell az *activity_main* XML-be: egy ViewPager
+
 ```xml
 <android.support.v4.view.ViewPager xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/pager"
     android:layout_width="match_parent"
     android:layout_height="match_parent" />
 ```
-Ebben a ViewPagerben két Fragment jelenik meg. Készítsünk egy fragments nevű java package-t!
-Hozzunk létre benne 2 Fragment osztályt DialerFragment és AppDrawerFragment néven!
+
+Ebben a ViewPagerben két Fragment jelenik meg. Készítsünk egy **fragments** nevű csomagot!
+
+Hozzunk létre benne 2 Fragment osztályt **DialerFragment** és **ApplicationsFragment** néven!
 
 A ViewPager működéséhez szükségünk van egy adapterre, ami szolgáltatja a Fragmenteket. Az Activity-nk kódja az alábbi módon alakul:
+
 ```java
-/* Number of views in the viewpager */
-private static final int NUM_PAGES = 2;
-
-/* The viewpager that is the only view in the xml */
 private ViewPager pager;
-
-/* Pageradapter, that holds the fragments */
 private PagerAdapter pagerAdapter;
 ```
 
@@ -62,17 +65,20 @@ protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_launcher);
 
-    /* Getting reference to the viewpager, creating new adapter, and setting it to the pager */
     pager = (ViewPager) findViewById(R.id.pager);
-    pagerAdapter = new HomeScreenPagerAdapter(getSupportFragmentManager());
+    pagerAdapter = new LauncherPagerAdapter(getSupportFragmentManager());
     pager.setAdapter(pagerAdapter);
 }
 ```
-Majd az adapter, mint belső osztály (csak a példa kedvéért, ajánlott kiszervezni):
-```java
-private class HomeScreenPagerAdapter extends FragmentStatePagerAdapter {
 
-    public HomeScreenPagerAdapter(FragmentManager manager) {
+Ezután hozzuk létre az **adapter** csomagot. Benne a **LauncherPagerAdapter** osztályal.
+
+```java
+public class LauncherPagerAdapter extends FragmentStatePagerAdapter {
+
+    private static final int NUM_PAGES = 2;
+
+    public LauncherPagerAdapter(FragmentManager manager) {
         super(manager);
     }
 
@@ -80,8 +86,8 @@ private class HomeScreenPagerAdapter extends FragmentStatePagerAdapter {
     public Fragment getItem(int position) {
         switch (position){
             case 0: return new DialerFragment();
-            case 1: return new AppDrawerFragment();
-            default: return new AppDrawerFragment();
+            case 1: return new ApplicationsFragment();
+            default: return new ApplicationsFragment();
         }
     }
 
@@ -95,31 +101,39 @@ Próbáljuk ki az alkalmazást!
 
 ### Saját téma és RobotoTextView
 
-Az Android hivatalos betűtípusa a Roboto család (annak ellenére, hogy beépítve nem szerepel):
+Az Android hivatalos betűtípusa a Roboto család (annak ellenére, hogy beépítve nem szerepel minden verzióban):
 
 * Roboto
 * Roboto slab (talpas változat)
 * Roboto condensed (keskeny változat)
 
 Ahhoz, hogy saját betűtípust alkalmazzunk meg kell változtassuk kódból a TextView-n.
-Viszont ezt minden TextView-n és szöveget megjelnítő komponensen el kellene végezni, így ehelyett egy kész megoldást használunk:
+Viszont ezt minden TextView-n és szöveget megjelenítő komponensen el kellene végezni, így ehelyett egy kész megoldást használunk:
 
 [RobotoTextView Github](https://github.com/johnkil/Android-RobotoTextView)
 
-Illesszük be a Gradle függőségek közé, leírása szerint (elvileg már rég szerepel ott a supportv4)!
+Illesszük be a Gradle függőségek közé, leírása szerint (elvileg már rég szerepel ott a support v4)!
 
 A tárcsázó gombjainak (12 darab) stílusát fogjuk össze, illetve egy kicsit szabjuk át a kinézetet!
 
 **colors.xml**
+
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="text_color">#ff051b3e</color>
-    <color name="apptheme_color">#512DA8</color>
+    <color name="primary">#9E9E9E</color>
+    <color name="primary_dark">#9E9E9E</color>
+    <color name="primary_light">#F5F5F5</color>
+    <color name="accent">#607D8B</color>
+    <color name="primary_text">#212121</color>
+    <color name="secondary_text">#757575</color>
+    <color name="icons">#212121</color>
+    <color name="divider">#BDBDBD</color>
 </resources>
 ```
 
 **dimens.xml**
+
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
@@ -132,31 +146,32 @@ A tárcsázó gombjainak (12 darab) stílusát fogjuk össze, illetve egy kicsit
 ```
 
 **styles.xml**
+
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- Base application theme. -->
-
-<style name="AppTheme" parent="android:Theme.Holo.Light.NoActionBar">
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primary_dark</item>
         <item name="android:textViewStyle">@style/DefaultText</item>
     </style>
 
-<style name="DefaultText" parent="android:Widget.TextView">
+    <style name="DefaultText" parent="Widget.AppCompat.TextView.SpinnerItem">
         <!-- Attributes of RobotoTextView -->
         <item name="fontFamily">roboto</item>
         <item name="textWeight">normal</item>
         <item name="textStyle">normal</item>
     </style>
 
-<style name="DialerButton" parent="android:Widget.Button">
+    <style name="DialerButton" parent="Widget.AppCompat.Button">
         <!-- Attributes of RobotoButton -->
         <item name="fontFamily">roboto</item>
         <item name="textWeight">thin</item>
         <item name="textStyle">italic</item>
 
-        <item name="android:textColor">@color/text_color</item>
+        <item name="android:textColor">@color/primary_text</item>
         <item name="android:gravity">center</item>
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
@@ -167,15 +182,15 @@ A tárcsázó gombjainak (12 darab) stílusát fogjuk össze, illetve egy kicsit
 ```
 
 **A DialerFragment layoutjának kódja:**
+
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/apptheme_color"
-    tools:context="hu.bme.aut.amorg.examples.intentlabor.fragments.DialerFragment">
+    android:padding="@dimen/activity_horizontal_margin"
+    android:background="@color/primary_light">
 
     <com.devspark.robototextview.widget.RobotoEditText
         android:id="@+id/callEditText"
@@ -283,10 +298,10 @@ A tárcsázó gombjainak (12 darab) stílusát fogjuk össze, illetve egy kicsit
 </RelativeLayout>
 ```
 
-Ez az elrendezés hivatkozik az ic_action_backspace erőforrásra. Töltsük le az actionbar icon packot az alábbi linkről:
-https://storage.googleapis.com/material-icons/external-assets/v4/icons/zip/ic_backspace_black_24dp.zip
+Ez az elrendezés hivatkozik az **ic_action_backspace** erőforrásra. 
+Ezt töltsük le a [https://materialdesignicons.com/](https://materialdesignicons.com/) oldalról. Keressünk rá a backscape -re , majd válassuk ki a számunkra megfelelőt.
 
-Tömörítsük ki, majd az android mappából másoljuk be az összes erőforrást a res mappánkba illetve készítsük el a *call* string erőforrást.
+Tömörítsük ki, majd az másoljuk be az összes erőforrást a **res** mappánkba illetve készítsük el a *call* string erőforrást.
 
 Laborvezető segítségével vizsgáljuk meg az elrendezést!
 
@@ -299,20 +314,14 @@ Hogyan is működik ez a megoldás (emulátoron nem feltétlenül jön elő a bi
 public class DialerFragment extends Fragment {
 
     public DialerFragment() {
-        // Required empty public constructor
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View layout = inflater.inflate(R.layout.fragment_dialer, container, false);
         RobotoEditText editText = (RobotoEditText) layout.findViewById(R.id.callEditText);
+    
         //Disabling soft keyboard
         editText.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -328,168 +337,125 @@ public class DialerFragment extends Fragment {
 
 ### Alkalmazások listája
 
-Az alkalmazásokat listázó Fragment tartalma egy GridView. Laborvezetővel tekintsük át az xml-jét!
+Az alkalmazásokat listázó Fragment tartalma egy RecyclerView. Laborvezetővel tekintsük át az xml-jét!
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
-<GridView xmlns:android="http://schemas.android.com/apk/res/android"
-     xmlns:tools="http://schemas.android.com/tools"
-     android:layout_width="match_parent"
-     android:layout_height="match_parent"
-     tools:context="hu.bute.daai.amorg.intentlabor.fragments.AppDrawerFragment"
-     android:id="@+id/all_apps"
-     android:persistentDrawingCache="animation|scrolling"
-     android:alwaysDrawnWithCache="true"
-     android:scrollbars="none"
-     android:drawSelectorOnTop="false"
-     android:numColumns="auto_fit"
-     android:columnWidth="78dp"
-     android:stretchMode="spacingWidth"
-     android:layout_weight="1.0"
-     android:stackFromBottom="true"
-     android:visibility="visible">
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
-</GridView>
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/applicationRV"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+</RelativeLayout>
 ```
-A GridView feltöltéséhez szükségünk lesz egy adapterre, annak pedig egy adatszerkezetre. Vegyük fel az alábbiakat az AppDrawerFragment osztály elejére:
+
+A RecyclerView support könyvtárként érhető el, ezt hivatkozzuk be a **build.gradle**-ben.
+
+```groovy
+compile 'com.android.support:recyclerview-v7:25.0.0'
+```
+
+
+Az **adapter** csomagba hozzuk létre az **ApplicationsAdapter** osztályt. Tartalma a következő:
 
 ```java
-private ArrayList<ApplicationInfo> mApplications;
-private GridView mGrid;
-```
-Az adapterünk kódja a következő kódrészlet, vegyük fel a Fragmentbe belső osztályként!
 
-```java
-/**
- * Custom grid adapter for ApplicationInfo array
- */
-private class ApplicationsAdapter extends ArrayAdapter<ApplicationInfo> {
-    private Rect mOldBounds = new Rect();
+public class ApplicationsAdapter extends RecyclerView.Adapter<ApplicationsAdapter.ViewHolder> {
 
-    public ApplicationsAdapter(Context context, ArrayList<ApplicationInfo> apps) {
-        super(context, 0, apps);
+    private Activity activity;
+    private final List<ApplicationInfo> applications;
+    private LayoutInflater mInflater;
+
+    public ApplicationsAdapter(Activity activity, List<ApplicationInfo> applications) {
+        this.mInflater = LayoutInflater.from(activity);
+        this.activity = activity;
+        this.applications = applications;
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        final ApplicationInfo info = mApplications.get(position);
+    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View view = mInflater.inflate(R.layout.li_application, parent, false);
+        return new ViewHolder(view);
+    }
 
-        // This is the already discussed method: using convertview for smoothness!
-        if (convertView == null) {
-            final LayoutInflater inflater = getActivity().getLayoutInflater();
-            convertView = inflater.inflate(R.layout.application, parent, false);
-        }
+    @Override
+    public void onBindViewHolder(ViewHolder holder, int position) {
+        final ApplicationInfo app = applications.get(position);
+        holder.nameTV.setText(app.getTitle());
+        holder.iconIV.setImageDrawable(app.getIcon());
 
-        Drawable icon = info.getIcon();
-
-        if (!info.isFiltered()) {
-            final Resources resources = getContext().getResources();
-            int width = (int) resources.getDimension(android.R.dimen.app_icon_size);
-            int height = (int) resources.getDimension(android.R.dimen.app_icon_size);
-
-            final int iconWidth = icon.getIntrinsicWidth();
-            final int iconHeight = icon.getIntrinsicHeight();
-
-            if (icon instanceof PaintDrawable) {
-                PaintDrawable painter = (PaintDrawable) icon;
-                painter.setIntrinsicWidth(width);
-                painter.setIntrinsicHeight(height);
+        holder.applicationsLL.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                activity.startActivity(app.getIntent());
             }
+        });
+        
+    }
 
-            if (width > 0 && height > 0 && (width < iconWidth || height < iconHeight)) {
-                 final float ratio = (float) iconWidth / iconHeight;
-                 if (iconWidth > iconHeight) {
-                    height = (int) (width / ratio);
-                } else if (iconHeight > iconWidth) {
-                    width = (int) (height * ratio);
-                }
+    @Override
+    public int getItemCount() {
+        return applications.size();
+    }
 
-                final Bitmap.Config c =
-                        icon.getOpacity() != PixelFormat.OPAQUE ?
-                                Bitmap.Config.ARGB_8888 : Bitmap.Config.RGB_565;
-                final Bitmap thumb = Bitmap.createBitmap(width, height, c);
-                final Canvas canvas = new Canvas(thumb);
-                canvas.setDrawFilter(new PaintFlagsDrawFilter(Paint.DITHER_FLAG, 0));
-                // Copy the old bounds to restore them later
-                // If we were to do oldBounds = icon.getBounds(),
-                // the call to setBounds() that follows would
-                // change the same instance and we would lose the
-                // old bounds
-                mOldBounds.set(icon.getBounds());
-                icon.setBounds(0, 0, width, height);
-                icon.draw(canvas);
-                icon.setBounds(mOldBounds);
-                icon = new BitmapDrawable(thumb);
-                info.setIcon(icon);
-                info.setFiltered(true);
-            }
+
+    public class ViewHolder extends RecyclerView.ViewHolder {
+        public LinearLayout applicationsLL;
+        public TextView nameTV;
+        public ImageView iconIV;
+
+        public ViewHolder(View view) {
+            super(view);
+            applicationsLL = (LinearLayout) view.findViewById(R.id.applicationLL);
+            nameTV = (TextView) view.findViewById(R.id.nameTV);
+            iconIV = (ImageView) view.findViewById(R.id.iconIV);
+           
         }
-
-        final TextView textView = (TextView) convertView.findViewById(R.id.label);
-        textView.setText(info.getTitle());
-        final ImageView imageView = (ImageView) convertView.findViewById(R.id.icon);
-        imageView.setImageDrawable(info.getIcon());
-
-        return convertView;
     }
 }
 ```
-A getView metódus hivatkozik egy erőforrásra, alább egyetlen grid elem xml layoutja.
+
+A getView metódus hivatkozik egy erőforrásra, alább egyetlen cella layoutja (li_application.xml).
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-     xmlns:app="http://schemas.android.com/apk/res-auto"
-     android:layout_width="match_parent"
-     android:layout_height="match_parent"
-     android:orientation="vertical">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/applicationLL"
+    android:orientation="vertical">
 
     <ImageView
-         android:id="@+id/icon"
-         android:layout_width="wrap_content"
-         android:layout_height="wrap_content" />
+        android:id="@+id/iconIV"
+        android:layout_width="50dp"
+        android:layout_height="50dp" />
 
-    <com.devspark.robototextview.widget.RobotoTextView
-         android:id="@+id/label"
-         android:layout_width="wrap_content"
-         android:layout_height="wrap_content"
-         android:textSize="@dimen/drawer_text_size"
-         app:fontFamily="roboto_condensed"
-         app:textWeight="light" />
+    <TextView
+        android:id="@+id/nameTV"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/drawer_text_size"
+       />
 
 </LinearLayout>
 ```
 
-Össze kell gyűjtenünk az adatokat, amiből majd az adapter dolgozhat. Ehhez hozzunk létre egy data nevű java package-t,
+Össze kell gyűjtenünk az adatokat, amiből majd az adapter dolgozhat. Ehhez hozzunk létre egy **model** nevű csomagot,
 majd abban egy osztályt, amiben tárolhatjuk az alkalmazásinforációkat:
+
 ```java
 public class ApplicationInfo {
-    /**
-     * The application name.
-     */
-    CharSequence title;
+    private CharSequence title;
+    private Intent intent;
+    private Drawable icon;
+    private boolean filtered;
 
-    /**
-     * The intent used to start the application.
-     */
-    Intent intent;
-
-    /**
-     * The application icon.
-     */
-    Drawable icon;
-
-    /**
-     * When set to true, indicates that the icon has been resized.
-     */
-    boolean filtered;
-
-    /**
-     * Creates the application intent based on a component name and various launch flags.
-     *
-     * @param className the class name of the component representing the intent
-     * @param launchFlags the launch flags
-     */
     public final void setActivity(ComponentName className, int launchFlags) {
         intent = new Intent(Intent.ACTION_MAIN);
         intent.addCategory(Intent.CATEGORY_LAUNCHER);
@@ -559,162 +525,101 @@ metódusát hívjuk segítségül. Ez a kapott Intentnek megfelelő összes Acti
 éppen erre van szükségünk (Intent feloldást végez a háttérben). Az így visszakapott Activity-k adatait olvassuk be egy
 ApplicationInfo objektumokból álló kollekcióba, melyet a Fragmentünkben definiáltunk.
 Hozzunk létre a Fragmentben egy segédmetódust, ami összeszedi az információkat, majd listát készít az alkalmazásokból:
+
 ```java
-private void loadApplications() {
-    // Reference to the PackageManager
-    PackageManager manager = getActivity().getPackageManager();
+   private void loadApplications() {
+        PackageManager manager = getActivity().getPackageManager();
 
-    // creating a list of every application we want to display
-    Intent mainIntent = new Intent(Intent.ACTION_MAIN, null);
-    mainIntent.addCategory(Intent.CATEGORY_LAUNCHER);
-    final List<ResolveInfo> apps = manager.queryIntentActivities(mainIntent, 0);
-    // sorting by name
-    Collections.sort(apps, new ResolveInfo.DisplayNameComparator(manager));
+        // creating a list of every application we want to display
+        Intent mainIntent = new Intent(Intent.ACTION_MAIN, null);
+        mainIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+        final List<ResolveInfo> apps = manager.queryIntentActivities(mainIntent, 0);
+        // sorting by name
+        Collections.sort(apps, new ResolveInfo.DisplayNameComparator(manager));
 
-    // filling the ApplicationInfo array for every app (we want to display)
-    if (apps != null) {
-        final int count = apps.size();
+        // filling the ApplicationInfo array for every app (we want to display)
+        if (apps != null) {
+            final int count = apps.size();
 
-        if (mApplications == null) {
-            mApplications = new ArrayList<ApplicationInfo>(count);
-        }
-        mApplications.clear();
+            if (applications == null) {
+                applications = new ArrayList<ApplicationInfo>(count);
+            }
+            applications.clear();
 
-        for (int i = 0; i < count; i++) {
-            ApplicationInfo application = new ApplicationInfo();
-            ResolveInfo info = apps.get(i);
+            for (int i = 0; i < count; i++) {
+                ApplicationInfo application = new ApplicationInfo();
+                ResolveInfo info = apps.get(i);
 
-            // app's name
-            application.setTitle(info.loadLabel(manager));
-            // we need an Intent to start the app when touched the icon
-            application.setActivity(
-                    new ComponentName(info.activityInfo.applicationInfo.packageName, info.activityInfo.name),
-                    Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
-            // icon
-            application.setIcon(info.activityInfo.loadIcon(manager));
+                // app's name
+                application.setTitle(info.loadLabel(manager));
+                // we need an Intent to start the app when touched the icon
+                application.setActivity(
+                        new ComponentName(info.activityInfo.applicationInfo.packageName, info.activityInfo.name),
+                        Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+                // icon
+                application.setIcon(info.activityInfo.loadIcon(manager));
 
-            mApplications.add(application);
+                applications.add(application);
+            }
         }
     }
-}
 ```
+
+Az applications objektumon álltva CTRL+ALT+F kombinációval mezővé alakíthatjuk.
+
 Ezt a metódust hívjuk meg a Fragment onCreate életciklusfüggvényében.
 A Fragment onCreate metódusa tipikusan erre való: olyan feladatok elvégzése, ami még nem igényel valódi nézetet.
 
-Ezek után össze kell kössük az összeszedett információkat a GridView-val. Másoljuk be az alábbi metódust,
+Ezek után össze kell kössük az összeszedett információkat a Recycler-val. Másoljuk be az alábbi metódust,
 majd hívjuk meg a Fragment onCreateView életciklus függvényében!
 
 ```java
-/**
- * Creating and filling ApplicationsAdapter
- * Setting the onTouchListener
- */
 private void bindApplications(View root) {
-    if (mGrid == null) {
-        mGrid = (GridView) root.findViewById(R.id.all_apps);
-    }
-    mGrid.setAdapter(new ApplicationsAdapter(getActivity(), mApplications));
-    mGrid.setSelection(0);
-    mGrid.setOnItemClickListener(new ApplicationLauncher());
+    RecyclerView appsRV = (RecyclerView) root.findViewById(R.id.applicationRV);
+    appsRV.setLayoutManager(new GridLayoutManager(getContext(), 4));
+    appsRV.setAdapter(new ApplicationsAdapter(getActivity(), applications));
 }
-```
-Az előbbi függvénynek szüksége van egy onItemClickListenerre. Rögtön alá el is készíthetünk egy egyszerű implementációt:
+```    
+
+
 ```java
-/**
- * Helper class that starts the new application
- */
-private class ApplicationLauncher implements AdapterView.OnItemClickListener {
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        ApplicationInfo app = (ApplicationInfo) parent.getItemAtPosition(position);
-        startActivity(app.getIntent());
-    }
+@Override
+public void onCreate(@Nullable Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    loadApplications();
+}
+
+@Override
+public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
+    View view = inflater.inflate(R.layout.fragment_applications, container, false);
+    bindApplications(view);
+    return view;
 }
 ```
+
+
 #### Próbáljuk ki az alkalmazást!
 
-## Önálló feladatok
+![](images/dialer.png)
+![](images/apps.png)
 
-* Írja meg a tárcsázó működését!
-* Finomítsa az alkalmazások listáját, törekedjen esztétikus megjelenésre!
+
+
+## Önálló feladat
+
+### Írja meg a tárcsázó működését!
 
 Tárcsázó segítség:
 A gombokat lássuk el id-kkal!
 A gombok eseménykezelője legyen közös, a kattintott View objektum id-ja alapján állítsa
 be a felhívandó telefonszámot az EditTextben (ha kell töröljön is), majd indítsa a hívást ha a hívás gombot nyomtuk meg!
+
 ```java
-//Hívás indítása Intenttel
-//Ez csak egy példa string
-String phoneNumber = "tel:+36205815693";
+String phoneNumber = "tel:+36201234567";
 Intent i = new Intent(
     Intent.ACTION_CALL,
     Uri.parse(phoneNumber)
     );
 startActivity(i);
 ```
-### Otthoni plusz feladat
-Készítsen egy egyszerű alkalmazást, aminek egyetlen Activity-je van és Toastot dob fel, amikor sms
-érkezik a készülékre! (emulátoron célszerű tesztelni)
-
-Segítség:
-A következő fejezet bemutatja hogyan lehet Broadcast Intent-eket kezelni, ezzel felkészítve az
-alkalmazásunkat rendszerszintű eseményekre. Célunk, hogy értesüljünk a bejövő SMS üzenekről, illetve Toast-ban jelenítsük meg a feladót és az SMS szövegét.
-
-Hozzunk létre egy új alkalmazást, és vegyünk fel egy új osztályt, ami a BroadcastReceiver-ből származik.
-Ez a származtatás kötelezően előírja az onReceive() metódus elüldefiniálását, aminek vázát megkapjuk az „Add unimplemented methods”
-kiválasztásával. Ahogy a függvény fejlécéből látszik, megkapjuk az Intent objektumot, amire feliratkoztunk
-a megfelelő Intent Filter beállításával.
-
-Vegyünk fel egy Intent filtert a Manifestünkbe (application node-on belülre):
-
-```xml
-<receiver android:name="[BR osztály neve]" >
-    <intent-filter>
-        <action android:name="android.provider.Telephony.SMS_RECEIVED"/>
-    </intent-filter>
-</receiver>
-```
-Mivel személyes adathoz szeretnénk hozzáférni, permission-t kell kérni a felhasználótól.
-A manifestben kérjük el az SMS fogadásához szükséges RECEIVE_SMS, olvasásához pedig a READ_SMS engedélyeket:
-
-```xml
-<uses-permission android:name="android.permission.RECEIVE_SMS"/>
-<uses-permission android:name="android.permission.READ_SMS"/>
-```
-
-#### Broadcastreceiver kód
-Az onReceive() metódusban kezeljük le a Broadcast üzenetet. SMS olvasásnál ez a következő módon történik (csak SMS kiolvasás esetén ilyen bonyolult az adat kinyerése):
-
-```java
-if(intent.getAction().equalsIgnoreCase("android.provider.Telephony.SMS_RECEIVED")){
-    // 'pdus' nevu extraban egy Object tombot kapunk, amibol kinyerheto az sms
-    Object[] pdus = (Object[]) intent.getExtras().get("pdus");
-    if(pdus == null){
-        Log.e("RECEIVER", "pdus are null");
-    } else {
-        Log.v("RECEIVER", "received " + pdus.length + " messages");
-        SmsMessage msg = null;
-        // Object tombot kaptunk, vegigmegyunk rajta
-        for (Object pdu : pdus) {
-            // a konkret SMS kinyerese
-            msg = SmsMessage.createFromPdu((byte[])pdu);
-            if(msg != null){
-                showToast(context, "Message from " +msg.getOriginatingAddress()+ ": " +msg.getDisplayMessageBody());
-            } else {
-                Log.e("RECEIVER", "Sms is null");
-            }
-        }
-    }
-}
-```
-A showToast(String) egy segédfüggvény, ami a Toast.makeText() metódust hívja megfelelően paraméterezve.
-Írja meg a showToast() függvényt, majd tesztelje az alkalmazást! (Az emulátorra a DDMS felületről tud SMS-t küldeni)
-
-Bővítse ki az alkalmazást további két eseményre való figyeléssel! Néhány példa:
-
-* Headset figyelése
-* Telefon elindulásának figyelése
-* Töltöttségi állpaot változása
-* Hálózati állapot változása
-* Kijelző ki-be
-
