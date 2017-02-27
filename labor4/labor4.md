@@ -1,762 +1,720 @@
-# 4. Labor: Todo Alkalmazás
+# Labor 4 - Intentek, Broadcast receiverek
 
-A labor célja, hogy bemutassa, hogyan lehet ún. Master/Detail nézetet tartalmazó alkalmazást készíteni Androidra, fragmentek és erőforrásminősítők segítségével.
+A labor során egy launcher vagy home screen alkalmazást fogunk készíteni, amelyben egy *ViewPager* található, benne 2 *fragment*-tel.
+A bal oldali egy tárcsázó, a jobb oldali pedig az alkalmazásokat listázza ki.
+
+![](images/dialer.png)
+![](images/appdrawer.png)
+
+! A *ViewPager* használatához szükség van a support v4 csomagra. Importoknál ha lehetséges mindig a supportos változatot használjuk !
 
 Első lépésben készítsünk egy új alkalmazást, package név legyen:
+> hu.bme.aut.amorg.examples.intentlabor
 
+Készítsünk egy új Empty Activity-t ,akár projekt létrehozásakor, akár később **LauncherActivity** néven, de gondoskodjunk róla,
+hogy a **FragmentActivity**-ből származik le!
+
+A projektünkben ez az egy Activity lesz. Nem szeretnénk, hogy el lehessen forgatni, illetve szeretnénk, ha home alkalmazásként viselkedhetne.
+Mindkét igény miatt a Manifest állományunkat kell módosítani.
+
+Az activity elem az alábbi legyen:
 ```xml
-hu.bme.aut.examples
+<activity
+    android:name=".LauncherActivity"
+    android:label="@string/app_name"
+    android:launchMode="singleTask"
+    android:screenOrientation="portrait">
+    <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+
+        <category android:name="android.intent.category.LAUNCHER" />
+        <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.HOME" />
+    </intent-filter>
+</activity>
+```
+Az Activity szempontjából egyetlen View kell az *activity_main* XML-be: egy ViewPager
+```xml
+<android.support.v4.view.ViewPager xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/pager"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" />
+```
+Ebben a ViewPagerben két Fragment jelenik meg. Készítsünk egy fragments nevű java package-t!
+Hozzunk létre benne 2 Fragment osztályt DialerFragment és AppDrawerFragment néven!
+
+A ViewPager működéséhez szükségünk van egy adapterre, ami szolgáltatja a Fragmenteket. Az Activity-nk kódja az alábbi módon alakul:
+```java
+/* Number of views in the viewpager */
+private static final int NUM_PAGES = 2;
+
+/* The viewpager that is the only view in the xml */
+private ViewPager pager;
+
+/* Pageradapter, that holds the fragments */
+private PagerAdapter pagerAdapter;
 ```
 
-A sablonválasztónál válasszuk a Master/Detail Flow opciót!
-
-<img src="./assets/master-detail-choose_new.PNG" width="200" align="middle">
-
-A következő ablakban írjuk be rendre, hogy **Todo, Todos, Todos**! Ennek csak a generált sablonban van szerepe, de legalább az activity nevét nem kell később átírjuk.
-
-Laborvezetővel elemezzék a generált alkalmazás működését, próbálják ki emulátoron, készüléken! A Master/Detail nézet célja, hogy egyetlen alkalmazással megoldjunk egy lista és annak egy elemének megjelenítését tableten és mobiltelefonon egyaránt. Működésének a lényege, hogy egy activity-hez tartozó layoutnak kétféle változata van. Egy kétpaneles és egy egypaneles változat. Egy módszer az, ha erőforrás minősítőkkel biztosítjuk, hogy tableten a kétpaneles változat töltődjön be, míg mobilon az egypaneles. Az activityben megpróbálunk referenciát szerezni a második panelre, és ha sikerül, akkor tableten vagyunk, ha nem, akkor mobilon. Az első panel tartalma egy **RecyclerView** a másodiké pedig egy sima Fragment a lista egy elemének megjelenítésére. Ha mobilon vagyunk, akkor a listaelemre kattintva új activitybe töltjük a részletező fragmentet, míg tableten egyszerűen betöltjük a jobb oldali panelbe. (a generált kód másképpen működik, ott a refs.xml állomány-t minősíti)
-
-## Átalakítás Todo alkalmazássá
-
-Készítsen egy új package-t **data** néven, ebbe pedig hozza létre a **Todo** osztályt! (Getter és Setter Android Studióban automatikusan is generálható: *Alt + Insert -> Getter And Setter -> az összes tagváltozó kijelölése majd OK*)
-
+OnCreate metódusunk:
 ```java
-public class Todo {
-    public enum Priority { LOW, MEDIUM, HIGH }
+@Override
+protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_launcher);
 
-    private String title;
-    private Priority priority;
-    private String dueDate;
-    private String description;
+    /* Getting reference to the viewpager, creating new adapter, and setting it to the pager */
+    pager = (ViewPager) findViewById(R.id.pager);
+    pagerAdapter = new HomeScreenPagerAdapter(getSupportFragmentManager());
+    pager.setAdapter(pagerAdapter);
+}
+```
+Majd az adapter, mint belső osztály (csak a példa kedvéért, ajánlott kiszervezni):
+```java
+private class HomeScreenPagerAdapter extends FragmentStatePagerAdapter {
 
-    public Todo(String aTitle, Priority aPriority,
-                String aDueDate, String aDescription)
-    {
-        title = aTitle;
-        priority = aPriority;
-        dueDate = aDueDate;
-        description = aDescription;
+    public HomeScreenPagerAdapter(FragmentManager manager) {
+        super(manager);
     }
 
-    public String getTitle() {
-        return title;
+    @Override
+    public Fragment getItem(int position) {
+        switch (position){
+            case 0: return new DialerFragment();
+            case 1: return new AppDrawerFragment();
+            default: return new AppDrawerFragment();
+        }
     }
 
-    public Priority getPriority() {
-        return priority;
-    }
-
-    public String getDueDate() {
-        return dueDate;
-    }
-
-    public String getDescription() {
-        return description;
+    @Override
+    public int getCount() {
+        return NUM_PAGES;
     }
 }
 ```
+Próbáljuk ki az alkalmazást!
 
-Figyelje meg az osztály eleji enumerációt! Ezen enumerációnak megfelelő ikonokat fogunk használni a listában.
+### Saját téma és RobotoTextView
 
-Törölje ki a dummy nevű package-t!
+Az Android hivatalos betűtípusa a Roboto család (annak ellenére, hogy beépítve nem szerepel):
 
-Írja felül a TodoDetailFragment osztály tartalmát, mely a Todo leírását fogja megjeleníteni.
+* Roboto
+* Roboto slab (talpas változat)
+* Roboto condensed (keskeny változat)
 
-A TodoDetailFragment tartalma az alábbi:
+Ahhoz, hogy saját betűtípust alkalmazzunk meg kell változtassuk kódból a TextView-n.
+Viszont ezt minden TextView-n és szöveget megjelnítő komponensen el kellene végezni, így ehelyett egy kész megoldást használunk:
+
+[RobotoTextView Github](https://github.com/johnkil/Android-RobotoTextView)
+
+Illesszük be a Gradle függőségek közé, leírása szerint (elvileg már rég szerepel ott a supportv4)!
+
+A tárcsázó gombjainak (12 darab) stílusát fogjuk össze, illetve egy kicsit szabjuk át a kinézetet!
+
+**colors.xml**
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="text_color">#ff051b3e</color>
+    <color name="apptheme_color">#512DA8</color>
+</resources>
+```
+
+**dimens.xml**
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="dialer_text_size">40sp</dimen>
+    <dimen name="drawer_text_size">15dp</dimen>
+</resources>
+```
+
+**styles.xml**
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Base application theme. -->
+
+<style name="AppTheme" parent="android:Theme.Holo.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="android:textViewStyle">@style/DefaultText</item>
+    </style>
+
+<style name="DefaultText" parent="android:Widget.TextView">
+        <!-- Attributes of RobotoTextView -->
+        <item name="fontFamily">roboto</item>
+        <item name="textWeight">normal</item>
+        <item name="textStyle">normal</item>
+    </style>
+
+<style name="DialerButton" parent="android:Widget.Button">
+        <!-- Attributes of RobotoButton -->
+        <item name="fontFamily">roboto</item>
+        <item name="textWeight">thin</item>
+        <item name="textStyle">italic</item>
+
+        <item name="android:textColor">@color/text_color</item>
+        <item name="android:gravity">center</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">@dimen/dialer_text_size</item>
+    </style>
+
+</resources>
+```
+
+**A DialerFragment layoutjának kódja:**
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/apptheme_color"
+    tools:context="hu.bme.aut.amorg.examples.intentlabor.fragments.DialerFragment">
+
+    <com.devspark.robototextview.widget.RobotoEditText
+        android:id="@+id/callEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/tableLayout"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_toLeftOf="@+id/callBackSpaceButton"
+        android:layout_toStartOf="@+id/callBackSpaceButton"
+        android:textSize="@dimen/dialer_text_size" />
+
+    <ImageButton
+        android:id="@+id/callBackSpaceButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/tableLayout"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignTop="@+id/callEditText"
+        android:src="@drawable/ic_backspace_black_24dp" />
+
+    <com.devspark.robototextview.widget.RobotoButton
+        android:id="@+id/call_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:gravity="center"
+        android:padding="15dp"
+        android:text="@string/call"
+        android:textSize="30sp"
+        app:fontFamily="roboto"
+        app:textStyle="normal"
+        app:textWeight="normal" />
+
+    <TableLayout
+        android:id="@+id/tableLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/call_button"
+        android:stretchColumns="*">
+
+        <TableRow>
+
+            <com.devspark.robototextview.widget.RobotoButton
+                style="@style/DialerButton"
+                android:text="1" />
+
+            <com.devspark.robototextview.widget.RobotoButton
+                style="@style/DialerButton"
+                android:text="2" />
+
+            <com.devspark.robototextview.widget.RobotoButton
+                style="@style/DialerButton"
+                android:text="3" />
+        </TableRow>
+
+        <TableRow>
+
+            <com.devspark.robototextview.widget.RobotoButton
+                style="@style/DialerButton"
+                android:text="4" />
+
+            <com.devspark.robototextview.widget.RobotoButton
+                style="@style/DialerButton"
+                android:text="5" />
+
+            <com.devspark.robototextview.widget.RobotoButton
+                style="@style/DialerButton"
+                android:text="6" />
+        </TableRow>
+
+        <TableRow>
+
+            <com.devspark.robototextview.widget.RobotoButton
+                style="@style/DialerButton"
+                android:text="7" />
+
+            <com.devspark.robototextview.widget.RobotoButton
+                style="@style/DialerButton"
+                android:text="8" />
+
+            <com.devspark.robototextview.widget.RobotoButton
+                style="@style/DialerButton"
+                android:text="9" />
+        </TableRow>
+
+        <TableRow>
+
+            <com.devspark.robototextview.widget.RobotoButton
+                style="@style/DialerButton"
+                android:text="*" />
+
+            <com.devspark.robototextview.widget.RobotoButton
+                style="@style/DialerButton"
+                android:text="0" />
+
+            <com.devspark.robototextview.widget.RobotoButton
+                style="@style/DialerButton"
+                android:text="#" />
+        </TableRow>
+
+    </TableLayout>
+
+</RelativeLayout>
+```
+
+Ez az elrendezés hivatkozik az ic_action_backspace erőforrásra. Töltsük le az actionbar icon packot az alábbi linkről:
+https://storage.googleapis.com/material-icons/external-assets/v4/icons/zip/ic_backspace_black_24dp.zip
+
+Tömörítsük ki, majd az android mappából másoljuk be az összes erőforrást a res mappánkba illetve készítsük el a *call* string erőforrást.
+
+Laborvezető segítségével vizsgáljuk meg az elrendezést!
+
+Próbáljuk ki az alkalmazást! Mit tapasztalunk?
+
+Alakítsuk át a Fragment kódját, hogy ne jöjjön fel a billentyűzet, amikor fókuszt kap az EditText!
+Hogyan is működik ez a megoldás (emulátoron nem feltétlenül jön elő a billenytűzet de készüléken tesztelve mindenképp)?
 
 ```java
-public class TodoDetailFragment extends Fragment {
+public class DialerFragment extends Fragment {
 
-    public static final String TAG = "TodoDetailFragment";
-
-    public static final String KEY_TODO_DESCRIPTION = "todoDesc";
-
-    private TextView todoDescription;
-
-    private static Todo selectedTodo;
-
-    public static TodoDetailFragment newInstance(String todoDesc) {
-        TodoDetailFragment result = new TodoDetailFragment();
-
-        Bundle args = new Bundle();
-        args.putString(KEY_TODO_DESCRIPTION, todoDesc);
-        result.setArguments(args);
-
-        return result;
-    }
-
-    public static TodoDetailFragment newInstance(Bundle args) {
-        TodoDetailFragment result = new TodoDetailFragment();
-
-        result.setArguments(args);
-
-        return result;
+    public DialerFragment() {
+        // Required empty public constructor
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        if (savedInstanceState == null) {
-            if (getArguments() != null) {
-                selectedTodo = new Todo("cim", Todo.Priority.LOW, "1987.23.12",
-                        getArguments().getString(KEY_TODO_DESCRIPTION));
-            }
-        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View root = inflater.inflate(R.layout.todo_detail, container,
-                false);
-
-        todoDescription = (TextView) root.findViewById(R.id.todo_detail);
-        todoDescription.setText(selectedTodo.getDescription());
-
-        return root;
+        // Inflate the layout for this fragment
+        View layout = inflater.inflate(R.layout.fragment_dialer, container, false);
+        RobotoEditText editText = (RobotoEditText) layout.findViewById(R.id.callEditText);
+        //Disabling soft keyboard
+        editText.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                return true;
+            }
+        });
+        return layout;
     }
+
 }
 ```
 
-A megváltozott kulcs miatt át kell alakítani a TodoDetailActivity onCreate metódusát is.
+### Alkalmazások listája
 
-```java
-arguments.putString(TodoDetailFragment.KEY_TODO_DESCRIPTION, getIntent().getStringExtra(TodoDetailFragment.KEY_TODO_DESCRIPTION));
-```
-
-A két Activity és a jobb oldali panel már fel van készítve az új működésre. A Listactivity el tudja dönteni, hogy egy vagy két panel jelenik meg, listenerként pedig majd betölti a DetailActivityt vagy a jobb oldali fragmentet.
-
-Már csak egy dolog van hátra: ahhoz, hogy a Todoink megfelelően jelenjenek meg a listában, módosítanunk kell a sablonban létrejött *SimpleItemRecyclerViewAdapter*-t. Először is töröljük a TodoListActivity-ből az SimpleItemRecyclerViewAdapter belső osztályt és hozzunk létre a **SimpleItemRecyclerViewAdapter** osztályt az **adapter** package-ben. Ennek tartalma legyen a következő:
-
-```java
-public class SimpleItemRecyclerViewAdapter
-        extends RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder> {
-
-    private boolean mTwoPane;
-    private AppCompatActivity activity;
-
-    private final List<Todo> todos;
-
-    public SimpleItemRecyclerViewAdapter(List<Todo> todos, boolean mTwoPane, AppCompatActivity activity) {
-        this.todos = todos;
-        this.mTwoPane = mTwoPane;
-        this.activity = activity;
-    }
-
-    @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.todorow, parent, false);
-        return new ViewHolder(view);
-    }
-
-
-    @Override
-    public void onBindViewHolder(final ViewHolder holder, final int position) {
-        holder.mTodo = todos.get(position);
-        holder.title.setText(todos.get(position).getTitle());
-        holder.dueDate.setText(todos.get(position).getDueDate());
-
-        switch (todos.get(position).getPriority()) {
-            case LOW:
-                holder.priority.setImageResource(R.drawable.low);
-                break;
-            case MEDIUM:
-                holder.priority.setImageResource(R.drawable.medium);
-                break;
-            case HIGH:
-                holder.priority.setImageResource(R.drawable.high);
-                break;
-            default:
-                holder.priority.setImageResource(R.drawable.high);
-                break;
-        }
-
-        holder.mView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mTwoPane) {
-                    Bundle arguments = new Bundle();
-                    arguments.putString(TodoDetailFragment.KEY_TODO_DESCRIPTION, todos.get(position).getDescription());
-                    TodoDetailFragment fragment = new TodoDetailFragment();
-                    fragment.setArguments(arguments);
-                    activity.getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.todo_detail_container, fragment)
-                            .commit();
-                } else {
-                    Context context = v.getContext();
-                    Intent intent = new Intent(context, TodoDetailActivity.class);
-                    intent.putExtra(TodoDetailFragment.KEY_TODO_DESCRIPTION, todos.get(position).getDescription());
-
-                    context.startActivity(intent);
-                }
-            }
-        });
-
-        holder.mView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                PopupMenu popup = new PopupMenu(v.getContext(), v);
-                popup.inflate(R.menu.long_click_menu);
-                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem item) {
-                        if (R.id.delete == item.getItemId()) {
-                            deleteRow(position);
-                        }
-                        return false;
-                    }
-                });
-                popup.show();
-                return false;
-            }
-        });
-    }
-
-    /**
-     * Egy elem törlése
-     */
-    public void deleteRow(int position) {
-        todos.remove(position);
-        notifyDataSetChanged();
-    }
-
-
-    public void addItem(Todo aTodo) {
-        todos.add(aTodo);
-    }
-
-    @Override
-    public int getItemCount() {
-        return todos.size();
-    }
-
-    public class ViewHolder extends RecyclerView.ViewHolder {
-        public final View mView;
-        public final TextView dueDate;
-        public final TextView title;
-        public final ImageView priority;
-        public Todo mTodo;
-
-        public ViewHolder(View view) {
-            super(view);
-            mView = view;
-            title = (TextView) view.findViewById(R.id.textViewTitle);
-            dueDate = (TextView) view.findViewById(R.id.textViewDueDate);
-            priority = (ImageView) view.findViewById(R.id.imageViewPriority);
-        }
-    }
-}
-```
-Figyeljük meg a ViewHolder patternt az adapterben. A RecyclerView már kikényszeríti ennek használatát, mivel így jóval gyorsabb szoftvert kapunk.
-
-Ez az adapter hivatkozik egy todorow.xml-re. Hozzuk létre ezt az álloimányt a _res/layout_ mappába (new -> layout resource file -> Filename: todorow.xml -> OK):
-
+Az alkalmazásokat listázó Fragment tartalma egy GridView. Laborvezetővel tekintsük át az xml-jét!
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content">
+<GridView xmlns:android="http://schemas.android.com/apk/res/android"
+     xmlns:tools="http://schemas.android.com/tools"
+     android:layout_width="match_parent"
+     android:layout_height="match_parent"
+     tools:context="hu.bute.daai.amorg.intentlabor.fragments.AppDrawerFragment"
+     android:id="@+id/all_apps"
+     android:persistentDrawingCache="animation|scrolling"
+     android:alwaysDrawnWithCache="true"
+     android:scrollbars="none"
+     android:drawSelectorOnTop="false"
+     android:numColumns="auto_fit"
+     android:columnWidth="78dp"
+     android:stretchMode="spacingWidth"
+     android:layout_weight="1.0"
+     android:stackFromBottom="true"
+     android:visibility="visible">
+
+</GridView>
+```
+A GridView feltöltéséhez szükségünk lesz egy adapterre, annak pedig egy adatszerkezetre. Vegyük fel az alábbiakat az AppDrawerFragment osztály elejére:
+
+```java
+private ArrayList<ApplicationInfo> mApplications;
+private GridView mGrid;
+```
+Az adapterünk kódja a következő kódrészlet, vegyük fel a Fragmentbe belső osztályként!
+
+```java
+/**
+ * Custom grid adapter for ApplicationInfo array
+ */
+private class ApplicationsAdapter extends ArrayAdapter<ApplicationInfo> {
+    private Rect mOldBounds = new Rect();
+
+    public ApplicationsAdapter(Context context, ArrayList<ApplicationInfo> apps) {
+        super(context, 0, apps);
+    }
+
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+        final ApplicationInfo info = mApplications.get(position);
+
+        // This is the already discussed method: using convertview for smoothness!
+        if (convertView == null) {
+            final LayoutInflater inflater = getActivity().getLayoutInflater();
+            convertView = inflater.inflate(R.layout.application, parent, false);
+        }
+
+        Drawable icon = info.getIcon();
+
+        if (!info.isFiltered()) {
+            final Resources resources = getContext().getResources();
+            int width = (int) resources.getDimension(android.R.dimen.app_icon_size);
+            int height = (int) resources.getDimension(android.R.dimen.app_icon_size);
+
+            final int iconWidth = icon.getIntrinsicWidth();
+            final int iconHeight = icon.getIntrinsicHeight();
+
+            if (icon instanceof PaintDrawable) {
+                PaintDrawable painter = (PaintDrawable) icon;
+                painter.setIntrinsicWidth(width);
+                painter.setIntrinsicHeight(height);
+            }
+
+            if (width > 0 && height > 0 && (width < iconWidth || height < iconHeight)) {
+                 final float ratio = (float) iconWidth / iconHeight;
+                 if (iconWidth > iconHeight) {
+                    height = (int) (width / ratio);
+                } else if (iconHeight > iconWidth) {
+                    width = (int) (height * ratio);
+                }
+
+                final Bitmap.Config c =
+                        icon.getOpacity() != PixelFormat.OPAQUE ?
+                                Bitmap.Config.ARGB_8888 : Bitmap.Config.RGB_565;
+                final Bitmap thumb = Bitmap.createBitmap(width, height, c);
+                final Canvas canvas = new Canvas(thumb);
+                canvas.setDrawFilter(new PaintFlagsDrawFilter(Paint.DITHER_FLAG, 0));
+                // Copy the old bounds to restore them later
+                // If we were to do oldBounds = icon.getBounds(),
+                // the call to setBounds() that follows would
+                // change the same instance and we would lose the
+                // old bounds
+                mOldBounds.set(icon.getBounds());
+                icon.setBounds(0, 0, width, height);
+                icon.draw(canvas);
+                icon.setBounds(mOldBounds);
+                icon = new BitmapDrawable(thumb);
+                info.setIcon(icon);
+                info.setFiltered(true);
+            }
+        }
+
+        final TextView textView = (TextView) convertView.findViewById(R.id.label);
+        textView.setText(info.getTitle());
+        final ImageView imageView = (ImageView) convertView.findViewById(R.id.icon);
+        imageView.setImageDrawable(info.getIcon());
+
+        return convertView;
+    }
+}
+```
+A getView metódus hivatkozik egy erőforrásra, alább egyetlen grid elem xml layoutja.
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+     xmlns:app="http://schemas.android.com/apk/res-auto"
+     android:layout_width="match_parent"
+     android:layout_height="match_parent"
+     android:orientation="vertical">
 
     <ImageView
-        android:id="@+id/imageViewPriority"
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:src="@drawable/high"
-        android:padding="5dp"/>
+         android:id="@+id/icon"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content" />
 
-    <RelativeLayout
-        android:layout_margin="8dp"
-        android:layout_height="wrap_content"
-        android:layout_width="fill_parent">
-
-        <TextView
-            android:id="@+id/textViewTitle"
-            android:textSize="16dp"
-            android:text="Title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"/>
-
-        <TextView
-            android:id="@+id/textViewDueDate"
-            android:textSize="12dp"
-            android:text="DueDate"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/textViewTitle"
-            android:layout_alignParentBottom="true"
-            android:gravity="bottom"/>
-    </RelativeLayout>
+    <com.devspark.robototextview.widget.RobotoTextView
+         android:id="@+id/label"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:textSize="@dimen/drawer_text_size"
+         app:fontFamily="roboto_condensed"
+         app:textWeight="light" />
 
 </LinearLayout>
 ```
 
-A három kép, mely szükséges a nézetekhez (ezeket a _res/drawable_ mappába másoljuk be!):
-
-<img src="./assets/high.png" align="middle">
-
-<img src="./assets/medium.png" align="middle">
-
-<img src="./assets/low.png" align="middle">
-
-Írjuk felül a TodoListActivity **SetupRecyclerView** metódusát az alábbi kóddal. (Ez a metódus felel az adapter példaadatokkal való feltöltéséért.)
-
+Össze kell gyűjtenünk az adatokat, amiből majd az adapter dolgozhat. Ehhez hozzunk létre egy data nevű java package-t,
+majd abban egy osztályt, amiben tárolhatjuk az alkalmazásinforációkat:
 ```java
-private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
-    ArrayList<Todo> todos = new ArrayList<Todo>();
-    todos.add(new Todo("title1", Todo.Priority.LOW, "2011. 09. 26.", "description1"));
-    todos.add(new Todo("title2", Todo.Priority.MEDIUM, "2011. 09. 27.", "description2"));
-    todos.add(new Todo("title3", Todo.Priority.HIGH, "2011. 09. 28.", "description3"));
-    recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(todos, mTwoPane, TodoListActivity.this));
-}
-```
-Próbálja ki az alkalmazást!
-Tipp: A gyorsabb teszteléshez, keresse ki a tablet mérethez tartozó (layout-w900dp) `_todo_list.xml_` felületleírót, majd másolja a layount-land mappába (hozza létre a mappát!). Ezáltal a mobiltelefon álló orientációjában egy-, míg fekvtetve kétpaneles viselkedést kapunk.
+public class ApplicationInfo {
+    /**
+     * The application name.
+     */
+    CharSequence title;
 
-## Todo törlése
+    /**
+     * The intent used to start the application.
+     */
+    Intent intent;
 
-Az adapterben láttuk a törlésre szolgáló metódust, hát használjuk is! A cél, hogy egy Todora hosszan érintve megjelenjen egy menü, ahol törölhetjük a Todot.
-Az elemek érintés eseménykezelője már el van készítve, a todo törléséhez készítsünk az elemkhez hosszú érintés gesztúra detektálót, majd ekkor dobjunk fel egy popup ablakot, ahol a kívánt művelet kiválasztható lesz. Adjuk hozzá az alábbi sorokat az Adapter _onBindViewHolder_ metódusához:
+    /**
+     * The application icon.
+     */
+    Drawable icon;
 
-```java
-holder.mView.setOnLongClickListener(new View.OnLongClickListener() {
-    @Override
-    public boolean onLongClick(View v) {
-        PopupMenu popup = new PopupMenu(v.getContext(), v);
-        popup.inflate(R.menu.long_click_menu);
-        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                if (R.id.delete == item.getItemId()) {
-                    deleteRow(position);
-                }
-                return false;
-            }
-        });
-        popup.show();
-        return false;
+    /**
+     * When set to true, indicates that the icon has been resized.
+     */
+    boolean filtered;
+
+    /**
+     * Creates the application intent based on a component name and various launch flags.
+     *
+     * @param className the class name of the component representing the intent
+     * @param launchFlags the launch flags
+     */
+    public final void setActivity(ComponentName className, int launchFlags) {
+        intent = new Intent(Intent.ACTION_MAIN);
+        intent.addCategory(Intent.CATEGORY_LAUNCHER);
+        intent.setComponent(className);
+        intent.setFlags(launchFlags);
     }
-});
-```
-
-Az onCreateContextMenu hivatkozik egy layout erőforrásra, ami tartalmazza a lehetséges menüpontokat. Hozzuk létre a `long_click_menu.xml` fájlt a menu mappában.
-(Legegyszerűbb módon az R.menu.long_click_listener piros részére helyezve a kurzort, majd ALT+ENTER -> “Create menu resource file…”)
-
-```xml
-<?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
-    <item
-        android:id="@+id/delete"
-        android:title="DELETE"
-        app:showAsAction="always" />
-    <item
-        android:id="@+id/back"
-        android:title="BACK"
-        app:showAsAction="always" />
-</menu>
-```
-
-Próbáljuk ki a törlést!
-
-## Új Todo létrehozása
-
-A TodoListActivity-hez adjunk egy saját menüt, melyben egy „Create new Todo” menüpont található, melyet kiválasztva dialógus formában egy új DialogFragment jelenik meg, hasonlóan a korábbi laboron látott megoldáshoz.
-
-Ehhez természetesen szükségünk lesz egy menü erőforrásra. A _menu_ mappában hozzuk létre a **listmenu.xml** állományt!
-
-```xml
-<?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/itemCreateTodo"
-        android:title="@string/itemCreateTodo"/>
-</menu>
-```
-
-Hozzuk létre a hiányzó szöveges erőforrást is! (Hibára állva Alt+Enter segít)
-
-Majd az _TodoListActivity_-n belül kezeljük az ehhez tartozó metódusokat is. Az OptionsMenu-höz is van onCreate és onOptionsItemSelected metódus:
-
-```java
-@Override
-public boolean onCreateOptionsMenu(Menu menu) {
-    getMenuInflater().inflate(R.menu.listmenu, menu);
-    return super.onCreateOptionsMenu(menu);
-}
-
-@Override
-public boolean onOptionsItemSelected(MenuItem item) {
-    if (item.getItemId() == R.id.itemCreateTodo) {
-        TodoCreateFragment createFragment = new TodoCreateFragment();
-        android.support.v4.app.FragmentManager fm = getSupportFragmentManager();
-        createFragment.show(fm, TodoCreateFragment.TAG);
-    }
-    return super.onOptionsItemSelected(item);
-}
-```
-
-Készítsünk egy új osztályt **TodoCreateFragment** néven ami a _DialogFragment_-ből származik. Az onAttach hívás során ellenőrizzük, hogy van-e listener objektum beregisztrálva a dialógusunk számára. A TodoListActivity fog értesülni az új Todo-ról, úgy ahogyan a TodoCreateFragment-ünk is értesülni fog a dátumválasztásról.
-
-```java
-public class TodoCreateFragment extends DialogFragment{
-
-    // Log tag
-    public static final String TAG = "TodoCreateFragment";
-
-    // UI
-    private EditText editTodoTitle;
-    private Spinner spnrTodoPriority;
-    private TextView txtDueDate;
-    private EditText editTodoDescription;
-
-    // Listener
-    private ITodoCreateFragment listener;
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof ApplicationInfo)) {
+            return false;
+        }
 
-        if (getTargetFragment() != null) {
-            try {
-                listener = (ITodoCreateFragment) getTargetFragment();
-            } catch (ClassCastException ce) {
-                Log.e(TAG,
-                        "Target Fragment does not implement fragment interface!");
-            } catch (Exception e) {
-                Log.e(TAG, "Unhandled exception!");
-                e.printStackTrace();
-            }
-        } else {
-            try {
-                listener = (ITodoCreateFragment) activity;
-            } catch (ClassCastException ce) {
-                Log.e(TAG,
-                        "Parent Activity does not implement fragment interface!");
-            } catch (Exception e) {
-                Log.e(TAG, "Unhandled exception!");
-                e.printStackTrace();
+        ApplicationInfo that = (ApplicationInfo) o;
+        return title.equals(that.title) &&
+                intent.getComponent().getClassName().equals(
+                        that.intent.getComponent().getClassName());
+    }
+
+    @Override
+    public int hashCode() {
+        int result;
+        result = (title != null ? title.hashCode() : 0);
+        final String name = intent.getComponent().getClassName();
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        return result;
+    }
+
+    public CharSequence getTitle() {
+        return title;
+    }
+
+    public void setTitle(CharSequence title) {
+        this.title = title;
+    }
+
+    public Intent getIntent() {
+        return intent;
+    }
+
+    public void setIntent(Intent intent) {
+        this.intent = intent;
+    }
+
+    public Drawable getIcon() {
+        return icon;
+    }
+
+    public void setIcon(Drawable icon) {
+        this.icon = icon;
+    }
+
+    public boolean isFiltered() {
+        return filtered;
+    }
+
+    public void setFiltered(boolean filtered) {
+        this.filtered = filtered;
+    }
+}
+```
+Ahhoz hogy a főképernyőn megjeleníthessünk minden szükséges alkalmazást, a PackageManager osztály queryIntentActivities()
+metódusát hívjuk segítségül. Ez a kapott Intentnek megfelelő összes Activity-t képes visszaadni egy listában, nekünk pedig
+éppen erre van szükségünk (Intent feloldást végez a háttérben). Az így visszakapott Activity-k adatait olvassuk be egy
+ApplicationInfo objektumokból álló kollekcióba, melyet a Fragmentünkben definiáltunk.
+Hozzunk létre a Fragmentben egy segédmetódust, ami összeszedi az információkat, majd listát készít az alkalmazásokból:
+```java
+private void loadApplications() {
+    // Reference to the PackageManager
+    PackageManager manager = getActivity().getPackageManager();
+
+    // creating a list of every application we want to display
+    Intent mainIntent = new Intent(Intent.ACTION_MAIN, null);
+    mainIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+    final List<ResolveInfo> apps = manager.queryIntentActivities(mainIntent, 0);
+    // sorting by name
+    Collections.sort(apps, new ResolveInfo.DisplayNameComparator(manager));
+
+    // filling the ApplicationInfo array for every app (we want to display)
+    if (apps != null) {
+        final int count = apps.size();
+
+        if (mApplications == null) {
+            mApplications = new ArrayList<ApplicationInfo>(count);
+        }
+        mApplications.clear();
+
+        for (int i = 0; i < count; i++) {
+            ApplicationInfo application = new ApplicationInfo();
+            ResolveInfo info = apps.get(i);
+
+            // app's name
+            application.setTitle(info.loadLabel(manager));
+            // we need an Intent to start the app when touched the icon
+            application.setActivity(
+                    new ComponentName(info.activityInfo.applicationInfo.packageName, info.activityInfo.name),
+                    Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+            // icon
+            application.setIcon(info.activityInfo.loadIcon(manager));
+
+            mApplications.add(application);
+        }
+    }
+}
+```
+Ezt a metódust hívjuk meg a Fragment onCreate életciklusfüggvényében.
+A Fragment onCreate metódusa tipikusan erre való: olyan feladatok elvégzése, ami még nem igényel valódi nézetet.
+
+Ezek után össze kell kössük az összeszedett információkat a GridView-val. Másoljuk be az alábbi metódust,
+majd hívjuk meg a Fragment onCreateView életciklus függvényében!
+
+```java
+/**
+ * Creating and filling ApplicationsAdapter
+ * Setting the onTouchListener
+ */
+private void bindApplications(View root) {
+    if (mGrid == null) {
+        mGrid = (GridView) root.findViewById(R.id.all_apps);
+    }
+    mGrid.setAdapter(new ApplicationsAdapter(getActivity(), mApplications));
+    mGrid.setSelection(0);
+    mGrid.setOnItemClickListener(new ApplicationLauncher());
+}
+```
+Az előbbi függvénynek szüksége van egy onItemClickListenerre. Rögtön alá el is készíthetünk egy egyszerű implementációt:
+```java
+/**
+ * Helper class that starts the new application
+ */
+private class ApplicationLauncher implements AdapterView.OnItemClickListener {
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        ApplicationInfo app = (ApplicationInfo) parent.getItemAtPosition(position);
+        startActivity(app.getIntent());
+    }
+}
+```
+#### Próbáljuk ki az alkalmazást!
+
+## Önálló feladatok
+
+* Írja meg a tárcsázó működését!
+* Finomítsa az alkalmazások listáját, törekedjen esztétikus megjelenésre!
+
+Tárcsázó segítség:
+A gombokat lássuk el id-kkal!
+A gombok eseménykezelője legyen közös, a kattintott View objektum id-ja alapján állítsa
+be a felhívandó telefonszámot az EditTextben (ha kell töröljön is), majd indítsa a hívást ha a hívás gombot nyomtuk meg!
+```java
+//Hívás indítása Intenttel
+//Ez csak egy példa string
+String phoneNumber = "tel:+36205815693";
+Intent i = new Intent(
+    Intent.ACTION_CALL,
+    Uri.parse(phoneNumber)
+    );
+startActivity(i);
+```
+### Otthoni plusz feladat
+Készítsen egy egyszerű alkalmazást, aminek egyetlen Activity-je van és Toastot dob fel, amikor sms
+érkezik a készülékre! (emulátoron célszerű tesztelni)
+
+Segítség:
+A következő fejezet bemutatja hogyan lehet Broadcast Intent-eket kezelni, ezzel felkészítve az
+alkalmazásunkat rendszerszintű eseményekre. Célunk, hogy értesüljünk a bejövő SMS üzenekről, illetve Toast-ban jelenítsük meg a feladót és az SMS szövegét.
+
+Hozzunk létre egy új alkalmazást, és vegyünk fel egy új osztályt, ami a BroadcastReceiver-ből származik.
+Ez a származtatás kötelezően előírja az onReceive() metódus elüldefiniálását, aminek vázát megkapjuk az „Add unimplemented methods”
+kiválasztásával. Ahogy a függvény fejlécéből látszik, megkapjuk az Intent objektumot, amire feliratkoztunk
+a megfelelő Intent Filter beállításával.
+
+Vegyünk fel egy Intent filtert a Manifestünkbe (application node-on belülre):
+
+```xml
+<receiver android:name="[BR osztály neve]" >
+    <intent-filter>
+        <action android:name="android.provider.Telephony.SMS_RECEIVED"/>
+    </intent-filter>
+</receiver>
+```
+Mivel személyes adathoz szeretnénk hozzáférni, permission-t kell kérni a felhasználótól.
+A manifestben kérjük el az SMS fogadásához szükséges RECEIVE_SMS, olvasásához pedig a READ_SMS engedélyeket:
+
+```xml
+<uses-permission android:name="android.permission.RECEIVE_SMS"/>
+<uses-permission android:name="android.permission.READ_SMS"/>
+```
+
+#### Broadcastreceiver kód
+Az onReceive() metódusban kezeljük le a Broadcast üzenetet. SMS olvasásnál ez a következő módon történik (csak SMS kiolvasás esetén ilyen bonyolult az adat kinyerése):
+
+```java
+if(intent.getAction().equalsIgnoreCase("android.provider.Telephony.SMS_RECEIVED")){
+    // 'pdus' nevu extraban egy Object tombot kapunk, amibol kinyerheto az sms
+    Object[] pdus = (Object[]) intent.getExtras().get("pdus");
+    if(pdus == null){
+        Log.e("RECEIVER", "pdus are null");
+    } else {
+        Log.v("RECEIVER", "received " + pdus.length + " messages");
+        SmsMessage msg = null;
+        // Object tombot kaptunk, vegigmegyunk rajta
+        for (Object pdu : pdus) {
+            // a konkret SMS kinyerese
+            msg = SmsMessage.createFromPdu((byte[])pdu);
+            if(msg != null){
+                showToast(context, "Message from " +msg.getOriginatingAddress()+ ": " +msg.getDisplayMessageBody());
+            } else {
+                Log.e("RECEIVER", "Sms is null");
             }
         }
     }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View root = inflater.inflate(R.layout.createtodo, container, false);
-
-        // Dialog cimenek beallitasa
-        getDialog().setTitle(R.string.itemCreateTodo);
-
-        // UI elem referenciak elkerese
-        editTodoTitle = (EditText) root.findViewById(R.id.todoTitle);
-
-        spnrTodoPriority = (Spinner) root.findViewById(R.id.todoPriority);
-        String[] priorities = new String[3];
-        priorities[0] = "Low";
-        priorities[1] = "Medium";
-        priorities[2] = "High";
-        spnrTodoPriority.setAdapter(new ArrayAdapter<String>(getActivity(),
-                android.R.layout.simple_spinner_item, priorities));
-
-        txtDueDate = (TextView) root.findViewById(R.id.todoDueDate);
-        txtDueDate.setText("  -  ");
-        txtDueDate.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                //Itt jon a datumvalaszto
-            }
-        });
-
-        editTodoDescription = (EditText) root
-                .findViewById(R.id.todoDescription);
-
-        // A gombok esemenykezeloinek beallitasa
-        Button btnOk = (Button) root.findViewById(R.id.btnCreateTodo);
-        btnOk.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                Todo.Priority selectedPriority = Todo.Priority.LOW;
-
-                switch (spnrTodoPriority.getSelectedItemPosition()) {
-                    case 0:
-                        selectedPriority = Todo.Priority.LOW;
-                        break;
-                    case 1:
-                        selectedPriority = Todo.Priority.MEDIUM;
-                        break;
-                    case 2:
-                        selectedPriority = Todo.Priority.HIGH;
-                        break;
-                    default:
-                        break;
-                }
-
-                if (listener != null) {
-                    listener.onTodoCreated(new Todo(editTodoTitle.getText()
-                            .toString(), selectedPriority, txtDueDate.getText()
-                            .toString(), editTodoDescription.getText()
-                            .toString()));
-                }
-
-                dismiss();
-            }
-        });
-
-        Button btnCancel = (Button) root.findViewById(R.id.btnCancelCreateTodo);
-        btnCancel.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                dismiss();
-            }
-        });
-
-        return root;
-    }
-
-    // Listener interface
-    public interface ITodoCreateFragment {
-        public void onTodoCreated(Todo newTodo);
-    }
 }
 ```
+A showToast(String) egy segédfüggvény, ami a Toast.makeText() metódust hívja megfelelően paraméterezve.
+Írja meg a showToast() függvényt, majd tesztelje az alkalmazást! (Az emulátorra a DDMS felületről tud SMS-t küldeni)
 
-Most ugorjunk vissza a TodoListActivity-re, és valósítsuk meg az ITodoCreateFragment interfészt! Ehhez a RecyclerView adapteréből készítsünk mezőt, majd írjuk meg az interfész által elvárt metódust:
+Bővítse ki az alkalmazást további két eseményre való figyeléssel! Néhány példa:
 
-Új mező az adapterből:
+* Headset figyelése
+* Telefon elindulásának figyelése
+* Töltöttségi állpaot változása
+* Hálózati állapot változása
+* Kijelző ki-be
 
-```java
-private SimpleItemRecyclerViewAdapter adapter;
-```
-
-_OnCreate_-ben, SetupRecyclerView metódus után:
-
-```java
-adapter = (SimpleItemRecyclerViewAdapter) ((RecyclerView) recyclerView).getAdapter();
-```
-
-OnTodoCreated interface megvalósítása:
-
-```java
-public class TodoListActivity extends AppCompatActivity implements TodoCreateFragment.ITodoCreateFragment
-```
-
-```java
-// ITodoCreateFragment
-    @Override
-    public void onTodoCreated(Todo newTodo) {
-        adapter.addItem(newTodo);
-        adapter.notifyDataSetChanged();
-    }
-```
-
-A TodoCreateFragment layout-ja a következő:
-
-```xml
-<?xml version="1.0" encoding="utf-8"?>
-<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:stretchColumns="1">
-    <TableRow>
-        <TextView
-            android:layout_column="1"
-            android:text="@string/lblTodoTitle"
-            android:layout_width="wrap_content"
-            android:gravity="right"/>
-        <EditText
-            android:id="@+id/todoTitle"
-            android:width="200dp"/>
-    </TableRow>
-    <TableRow>
-        <TextView
-            android:layout_column="1"
-            android:text="@string/lblTodoPriority"
-            android:layout_width="wrap_content"
-            android:gravity="right"/>
-        <Spinner
-            android:id="@+id/todoPriority"
-            android:width="200dp"/>
-    </TableRow>
-    <TableRow>
-        <TextView
-            android:layout_column="1"
-            android:text="@string/lblTodoDueDate"
-            android:layout_width="wrap_content"
-            android:gravity="right"/>
-        <TextView
-            android:id="@+id/todoDueDate"
-            android:textSize="20dp"
-            android:width="200dp"
-            android:gravity="center"/>
-    </TableRow>
-    <TableRow>
-        <TextView
-            android:layout_column="1"
-            android:text="@string/lblTodoDescription"
-            android:layout_width="wrap_content"
-            android:gravity="right"/>
-        <EditText
-            android:id="@+id/todoDescription"
-            android:width="200dp"
-            android:text="@string/dummyDescription"/>
-    </TableRow>
-
-    <TableRow>
-        <Button
-            android:id="@+id/btnCreateTodo"
-            android:layout_column="1"
-            android:text="@string/btnOk"
-            android:layout_width="wrap_content"
-            android:gravity="right"/>
-        <Button
-            android:id="@+id/btnCancelCreateTodo"
-            android:text="@string/btnCancel"
-            android:layout_width="wrap_content"
-            android:gravity="left"/>
-    </TableRow>
-</TableLayout>
-```
-
-Szöveges erőforrásokat vagy hozzuk létre, vagy másoljuk be őket a string.xml-be:
-
-```xml
-<string name="lblTodoTitle">Todo label</string>
-<string name="lblTodoPriority">Priority</string>
-<string name="lblTodoDueDate">Due date</string>
-<string name="lblTodoDescription">Description</string>
-<string name="btnOk">OK</string>
-<string name="btnCancel">Cancel</string>
-<string name="dummyDescription">dummyDescription</string>
-```
-
-Ezek után ellenőrizzük, hogy működik az új Todo felvitele (kivéve a dátumválasztást)!
-
-### Dátumválasztás
-
-A dátumválasztás módszere immár gyerekjáték. A _TodoCreateFragment_-ünk implementálja a _IDatePickerDialogFragment_ interfészét a _DatePickerDialogFragment_-ünknek, így a Dátumválasztásról értesül az új Todo felvitele DialogFragment-ünk. Először is csináljuk még egy DialogFragment-ből származó osztályt, ezúttal nevezzük **DatePickerDialogFragment**-nek.
-
-Importálásnál használjuk az _android.support.v4.DialogFragment_-et, _java.util.calendar_-t, _java.util.date_-t
-
-```java
-public class DatePickerDialogFragment extends DialogFragment {
-
-    // Log tag
-    public static final String TAG = "DatePickerDialogFragment";
-
-    // State
-    private Calendar calSelectedDate = Calendar.getInstance();
-
-    // Listener
-    private IDatePickerDialogFragment listener;
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-
-        if (getTargetFragment() != null) {
-            try {
-                listener = (IDatePickerDialogFragment) getTargetFragment();
-            } catch (ClassCastException ce) {
-                Log.e(TAG,
-                        "Target Fragment does not implement fragment interface!");
-            } catch (Exception e) {
-                Log.e(TAG, "Unhandled exception!");
-                e.printStackTrace();
-            }
-        } else {
-            try {
-                listener = (IDatePickerDialogFragment) activity;
-            } catch (ClassCastException ce) {
-                Log.e(TAG,
-                        "Parent Activity does not implement fragment interface!");
-            } catch (Exception e) {
-                Log.e(TAG, "Unhandled exception!");
-                e.printStackTrace();
-            }
-        }
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        calSelectedDate.setTime(new Date(System.currentTimeMillis()));
-    }
-
-    @Override
-    public Dialog onCreateDialog(Bundle savedInstanceState) {
-        return new DatePickerDialog(getActivity(), mDateSetListener,
-                calSelectedDate.get(Calendar.YEAR),
-                calSelectedDate.get(Calendar.MONTH),
-                calSelectedDate.get(Calendar.DAY_OF_MONTH));
-    }
-
-    private DatePickerDialog.OnDateSetListener mDateSetListener = new DatePickerDialog.OnDateSetListener() {
-        public void onDateSet(DatePicker view, int year, int monthOfYear,
-                int dayOfMonth) {
-            // uj datum beallitasa
-            calSelectedDate.set(Calendar.YEAR, year);
-            calSelectedDate.set(Calendar.MONTH, monthOfYear);
-            calSelectedDate.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-
-            if (listener != null) {
-                listener.onDateSelected(buildDateText());
-            }
-
-            dismiss();
-        }
-    };
-
-    private String buildDateText() {
-        StringBuilder dateString = new StringBuilder();
-        dateString.append(calSelectedDate.get(Calendar.YEAR));
-        dateString.append(". ");
-        dateString.append(calSelectedDate.get(Calendar.MONTH) + 1);
-        dateString.append(". ");
-        dateString.append(calSelectedDate.get(Calendar.DAY_OF_MONTH));
-        dateString.append(".");
-
-        return dateString.toString();
-    }
-
-    public interface IDatePickerDialogFragment {
-        public void onDateSelected(String date);
-    }
-
-}
-```
-
-Ugorjunk vissza a _TodoCreateFragment_-re és valósítsuk meg az *IDatePickerDialog* interfészt, illetve állítsuk be a txtDueDate onClickListener(…)-jében, hogy mutassunk egy DialogFragment-et.
-
-```java
-public class TodoCreateFragment extends DialogFragment implements DatePickerDialogFragment.IDatePickerDialogFragment
-
-```
-
-
-```java
-private void showDatePickerDialog() {
-        FragmentManager fm = getFragmentManager();
-
-        DatePickerDialogFragment datePicker = new DatePickerDialogFragment();
-        datePicker.setTargetFragment(this, 0);
-        datePicker.show(fm, DatePickerDialogFragment.TAG);
-    }
-
-    // IDatePickerDialogFragment
-    public void onDateSelected(String date) {
-        txtDueDate.setText(date);
-    }
-
-```
-
-Az onCreateView-ben adjuk hozzá a megfelelő metódust a Dátumválasztó textView-hoz
-```java
-txtDueDate.setOnClickListener(new OnClickListener() {
-            public void onClick(View v) {
-                showDatePickerDialog();
-            }
-        });
-  ```
