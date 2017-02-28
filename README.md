@@ -12,7 +12,7 @@
 
 [3. labor - TODO Alkalmazás](./labor3/labor3.md)
 
-[4. labor - Intentek, Broadcast receiverek](./labor4/labor4.md)
+[4. labor - Launcher](./labor4/labor4.md)
 
 [5. labor - Perzisztencia](./labor5/labor5.md)
 
