@@ -307,32 +307,21 @@ Laborvezető segítségével vizsgáljuk meg az elrendezést!
 
 Próbáljuk ki az alkalmazást! Mit tapasztalunk?
 
-Alakítsuk át a Fragment kódját, hogy ne jöjjön fel a billentyűzet, amikor fókuszt kap az EditText!
-Hogyan is működik ez a megoldás (emulátoron nem feltétlenül jön elő a billenytűzet de készüléken tesztelve mindenképp)?
+Alakítsuk át a Fragment kódját, hogy ne jöjjön fel a billentyűzet, amikor fókuszt kap az EditText! A** fragment_dialer.xml **-ben a RobotoEditText `clickable` és `focusable` értékét állítsuk false-ra.
 
-```java
-public class DialerFragment extends Fragment {
-
-    public DialerFragment() {
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View layout = inflater.inflate(R.layout.fragment_dialer, container, false);
-        RobotoEditText editText = (RobotoEditText) layout.findViewById(R.id.callEditText);
-    
-        //Disabling soft keyboard
-        editText.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                return true;
-            }
-        });
-        return layout;
-    }
-
-}
+```xml
+    <com.devspark.robototextview.widget.RobotoEditText
+        android:id="@+id/callEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/tableLayout"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:clickable="false"
+        android:focusable="false"
+        android:layout_toLeftOf="@+id/callBackSpaceButton"
+        android:layout_toStartOf="@+id/callBackSpaceButton"
+        android:textSize="@dimen/dialer_text_size" />
 ```
 
 ### Alkalmazások listája
