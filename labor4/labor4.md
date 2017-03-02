@@ -612,3 +612,11 @@ Intent i = new Intent(
     );
 startActivity(i);
 ```
+
+A telefonhíváshoz engedély szükséges, ezt a manifestben az `application` tag-en kívül kell megadnunk. 
+
+```xml
+<uses-permission android:name="android.permission.CALL_PHONE" />
+```
+
+Ez az engedély egy veszélyesnek minősített engedély, ezért Android 6.0 (API level 23) felett ezt futásidőben kellene elkérni. Jelen esetben ezt kerüljük ki, az app modul `build.gradle` -ben a `targetSDKVersion`-t állítsuk `22`-re (Android 5.1).
