@@ -280,7 +280,7 @@ Ezután hozzunk létre egy új csomagot **network** néven, benne egy új interf
 
 ```
 public interface GalleryAPI {
-    String ENDPOINT_URL="http://android-gallery.node.autsoft.hu/api/";
+    String ENDPOINT_URL="http://android-gallery.node.autsoft.hu/api";
     String IMAGE_PREFIX_URL="http://android-gallery.node.autsoft.hu/";
         
     String MULTIPART_FORM_DATA = "multipart/form-data";
@@ -383,6 +383,11 @@ private static <T> void runCallOnBackgroundThread(final Call<T> call, final Resp
 Ezután a fenti segédfüggvényt felhasználva elkészíthetjük a az Interactorban a hívásokat.
 
 ```
+public void getImages(ResponseListener<List<Image>> responseListener) {
+    Call<List<Image>> getImagesRequest = galleryApi.getImages();
+    runCallOnBackgroundThread(getImagesRequest, responseListener);
+}
+
 public void uploadImage(Uri fileUri,String name, String description, ResponseListener<ResponseBody> responseListener) {
     File file = new File(fileUri.getPath());
     RequestBody requestFile = RequestBody.create(MediaType.parse(MULTIPART_FORM_DATA), file);
