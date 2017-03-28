@@ -11,12 +11,15 @@ A labor célja a hálózati kommunikáció, a platformon leginkább használt, H
 
 ## A feladat
 
-A következőkben egy olyan Android alkalmazást készítünk, mely tulajdonképpen egy kliensalkalmazás egy multiplayer labirintus játékhoz. A játék tényleges felülete nem az Android alkalmazás része, azt egy előre elkészített JavaFX alkalmazás jeleníti meg, amelyet a projektorról láthatunk kivetítve a labor alatt, vagy szükség esetén letölthető [innen](./app/LabyrinthWar.jar).
+A következőkben egy olyan Android alkalmazást készítünk, mely tulajdonképpen egy kliensalkalmazás egy multiplayer labirintus játékhoz.
 
+A játék tényleges felülete nem az Android alkalmazás része, azt egy előre elkészített webes alkalmazás jeleníti meg, amely elérhető az alábbi címen:
+
+[http://android-labyrinth.node.autsoft.hu](http://android-labyrinth.node.autsoft.hu)
 
 A játék szabályai egyszerűek, a játékosunkat a készülékről négy gomb segítségével (bal, jobb, fel, le) irányíthatjuk, továbbá lehetőség van még üzenetküldésre is. Az első lépésünk során kerül rá az új játékos a játéktérre egy véletlen pozícióra. Ha egy játékos a másikra lép, akkor pontot kap! A feladatok megoldása során a hálózati kommunikációra és az aszinkron hívásokra egyre teljes körűbb, minden helyzetben jól használható megoldást mutatunk.
 
-<img src="./images/game.png" width="400" align="middle">
+<img src="./images/game.png" width="600" align="middle">
 
 ## A felhasználói felület elkészítése
 
@@ -308,32 +311,32 @@ Próbáljuk ki az alkalmazást, nézzük meg a felületét.
 ## Az API bemutatása
 
 A szerver egy PHP alapú oldal, amely HTTP GET kérésekben várja a lépéseket és az üzeneteket. Ezeket eltárolja egy adatbázisban, amelyet egy PHP oldalon tesz elérhetővé a megjelenítésért felelős JavaFX alkalmazás számára. A Java FX alkalmazás ezt a PHP oldalt pollozza relatív kis időközönként és kapott válaszok alapján frissíti a felhasználói felületét. A szerver alap címe az alábbi oldalon érhető el: 
-``` http://babcomaut.aut.bme.hu/labyrinthwar/ ``` 
+``` http://android-labyrinth.node.autsoft.hu ``` 
 
 Ezen belül kell majd a megfelelő PHP állományokat meghívni az előre definiált GET paraméterekkel. A PHP-ktől hiba esetén mindig „ERROR”-al kezdődő üzenetet kapunk.
 
 ### Játékos mozgatása
 
-A játékos mozgatásához a `moveuser.php`-t kell meghívni, amely két paramétert vár:
+A játékos mozgatásához a `/api/step/{username}/{direction}`-t kell meghívni (`GET` hívás), amely két paramétert vár:
 
 *   _username_: felhasználónév (ne felejtsük URL encode-olni!)
-*   _step_: lépés típusa (1: bal, 2: jobb, 3: fel, 4: le)
+*   _direction_: lépés típusa (1: bal, 2: fel, 3: jobb, 4: le)
 
 Például: 
 ``` 
-moveuser.php?username=user1&step=1 
+/api/step/hallgato/3
 ```
 
 ### Üzenet feltöltése
 
-Üzenet feltöltéséhez a `writemessage.php`-t kell hívni,amely szintén két paramétert vár:
+Üzenet feltöltéséhez a `/api/message/{username}/{message}`-t kell hívni (`GET` hívás),amely szintén két paramétert vár:
 
 *   _username_: felhasználónév (ne felejtsük URL encode-olni!)
 *   _message_: üzenet (ne felejtsük URL encode-olni!)
 
 Például: 
 
-``` writemessage.php?username=user1&message=uzenet ```
+``` /api/message/hallgato/hello```
 
 
 ## Aszinkron hívások Android platformon
@@ -381,7 +384,7 @@ A **network** csomagban hozzunk létre a **LabyrinthAPI** osztályt.
 ```java
 public class LabyrinthAPI {
 
-    private static final String BASE_URL = "http://babcomaut.aut.bme.hu/labyrinthwar/";
+    private static final String BASE_URL = "http://android-labyrinth.node.autsoft.hu";
     private static final String UTF_8 = "UTF-8";
 
   
@@ -433,14 +436,10 @@ Ezt fogjuk használni az összes HTTP GET híváshoz. Használjuk is az újonnal
 
 ```java
 private static final String TAG = "Network";
-private static final String ENDPOINT_MOVE_USER = "moveuser.php";
+private static final String ENDPOINT_STEP = "/api/step/";
 private static final String PARAM_USERNAME = "username";
-private static final String SEPARATOR_QUESTION = "?";
-private static final String SEPARATOR_EQUALS = "=";
-private static final String PARAM_STEP = "step";
-private static final String SEPARATOR_AMPERSAND = "&";
-private static final String PARAM_MESSAGE = "message";
-private static final String ENDPOINT_WRITE_MESSAGE = "writemessage.php";
+private static final String SEPARATOR = "/";
+private static final String ENDPOINT_MESSAGE = "/api/message/";
 private static final String RESPONSE_ERROR = "ERROR";
 
 
@@ -448,7 +447,7 @@ public String moveUser(String userName, int direction) {
     try {
         String usernameURLEncoded = URLEncoder.encode(userName, UTF_8);
 
-        String moveUserUrl = ENDPOINT_MOVE_USER + SEPARATOR_QUESTION + PARAM_USERNAME + SEPARATOR_EQUALS + usernameURLEncoded + SEPARATOR_AMPERSAND + PARAM_STEP + SEPARATOR_EQUALS + direction;
+        String moveUserUrl = ENDPOINT_STEP + usernameURLEncoded + SEPARATOR + direction;
 
         Log.d(TAG,"Call to:"+moveUserUrl);
         String response = httpGet(BASE_URL + moveUserUrl);
@@ -465,7 +464,7 @@ public String writeMessage(String userName, String message) {
         String usernameURLEncoded = URLEncoder.encode(userName, UTF_8);
         String messageURLEncoded = URLEncoder.encode(message, UTF_8);
 
-        String writeMessageUrl = ENDPOINT_WRITE_MESSAGE + SEPARATOR_QUESTION + PARAM_USERNAME + SEPARATOR_EQUALS + usernameURLEncoded + SEPARATOR_AMPERSAND + PARAM_MESSAGE + SEPARATOR_EQUALS + messageURLEncoded;
+        String writeMessageUrl = ENDPOINT_MESSAGE + usernameURLEncoded + SEPARATOR + messageURLEncoded;
 
         Log.d(TAG,"Call to:"+writeMessageUrl);
         String response = httpGet(BASE_URL + writeMessageUrl);
@@ -486,8 +485,8 @@ Ezután vegyük fel az irányok értékeit konstansként a MainActivitybe
 
 ```
 public static final int MOVE_LEFT = 1;
-public static final int MOVE_RIGHT = 2;
-public static final int MOVE_UP = 3;
+public static final int MOVE_UP = 2;
+public static final int MOVE_RIGHT = 3;
 public static final int MOVE_DOWN = 4;
 ```
 
@@ -502,8 +501,8 @@ public class MainActivity extends AppCompatActivity {
     @BindView(R.id.responseTV) TextView responseTV;
 
     public static final int MOVE_LEFT = 1;
-    public static final int MOVE_RIGHT = 2;
-    public static final int MOVE_UP = 3;
+    public static final int MOVE_UP = 2;
+    public static final int MOVE_RIGHT = 3;
     public static final int MOVE_DOWN = 4;
 
     private LabyrinthAPI labyrinthAPI;
@@ -637,7 +636,7 @@ Számos 3rd party eseménybusz megoldás van, mi az Greenrobot EventBus megoldá
 
 `compile 'org.greenrobot:eventbus:3.0.0'`
 
-Majd definiáljunk esemény osztályokat. Hozzunk létre 1-1 esemény osztályt, a **MoveUser** és a **WriteMessage** eseményeknek, az **events** csomagban, **MoveUserResponseEvent** és **WriteUserResponseEvent** néven. Mivel az eseménybuszok az osztály alapján dolgoznak ezért az egyes eseményekhez külön osztályok szükségesek. Mindenkét osztály standard Java osztály, mely 1-1 String-ben tárolja a választ.
+Majd definiáljunk esemény osztályokat. Hozzunk létre 1-1 esemény osztályt, a **MoveUser** és a **WriteMessage** eseményeknek, az **events** csomagban, **MoveUserResponseEvent** és **WriteMessageResponseEvent** néven. Mivel az eseménybuszok az osztály alapján dolgoznak ezért az egyes eseményekhez külön osztályok szükségesek. Mindenkét osztály standard Java osztály, mely 1-1 String-ben tárolja a választ.
 
 ```java
 public class MoveUserResponseEvent {
