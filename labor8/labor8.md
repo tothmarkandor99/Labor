@@ -280,17 +280,17 @@ Ezután hozzunk létre egy új csomagot **network** néven, benne egy új interf
 
 ```
 public interface GalleryAPI {
-    String ENDPOINT_URL="http://android-gallery.node.autsoft.hu/api";
+    String ENDPOINT_URL="http://android-gallery.node.autsoft.hu/api/";
     String IMAGE_PREFIX_URL="http://android-gallery.node.autsoft.hu/";
         
     String MULTIPART_FORM_DATA = "multipart/form-data";
     String PHOTO_MULTIPART_KEY_IMG = "image";
 
-    @GET("/images")
+    @GET("images")
     Call<List<Image>> getImages();
 
     @Multipart
-    @POST("/upload")
+    @POST("upload")
      Call<ResponseBody> uploadImage(@Part MultipartBody.Part file, @Part("name") RequestBody name, @Part("description") RequestBody description);
 }
 ```
