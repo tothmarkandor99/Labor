@@ -38,8 +38,6 @@ Először is, akinek szándékában áll végigolvasni a teljes útmutatót kés
 
 * Ne használjuk a kártyanézeteket (tipikusan Google asszisztens) olyan elemekre, amik megjelenése azonos! Ezesetben egy listáról beszélünk, aminek használatát megnehezíti, hogy a kártyák közt van kihagyott terület és árnyékot is vetnek.
 
-<img src="./images/keylines.png" width="300" " align="middle">
-
 
 ## Hasznos fejlesztői eszközök
 
