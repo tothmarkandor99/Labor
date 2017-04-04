@@ -8,7 +8,7 @@ Ma már igen sok alkalmazás található a Play áruházban, köszönhető ez t�
 Tartsuk szem előtt, hogy ez csak néhány egyszerű ötlet, és ahogy a lollipopos megjelenésű elemektől még nem lesz material egy alkalmazás megjelenése, úgy mi sem leszünk mindenható dizájnerek a labor után. Ez a témakör koránt sem olyan egyértelmű, mint a mérnöki tanulmányok jó része, az itt alkalmazott lépések nem feltétlenül univerzálisak.
 
 
-##Material és UX alapok
+## Material és UX alapok
 
 Először is, akinek szándékában áll végigolvasni a teljes útmutatót később, az itt megteheti:
 [https://material.google.com/#](https://material.google.com/#)
@@ -36,9 +36,9 @@ Először is, akinek szándékában áll végigolvasni a teljes útmutatót kés
 * Tartsunk megfelelő távolságokat az elemek között, különösen ügyelve az interaktív elemekre. Lesz olyan, akinek nálunk nagyobb az ujjbegye, gondoljunk rá is! A tartalom ne kezdődjön a képernyő 0. pixelénél! Az ajánlásokban elég részletesen taglalják a számokat: az új guideline szerint minden elem egy 8dp-s rácsban helyezkedik el. Ez alól kivételek a szövegek (amiknek alapvonala igazodik 4dp-hez) és a toolbar ikonjai (szintén 4 dp). Tehát alapvetően mindennek a mérete vagy a távolsága n x 8dp. A kijelző szélétől tartandó margó például 16dp, az érinthető területek minimum mérete 48 x 48dp, a köztük tartandó távolság pedig minimum 8dp, de inkább több.
 * A képi elemek legyen inkább személyesek. Ne használjunk pár élettelen mosolyú modell arcát mutató sotck fotókat, a képnek legyen köze a tartalomhoz. A személyes (felhasználó készítette) képek még jobbak. A képek töltsék ki a teret, amennyire csak lehet! Ez azt jelenti, hogy szélességben a teljes kijelzőt fedje, magasságban pedig lehetőleg valamilyen jellegzetes arány vonalát kövesse. Van néhány ajánlás, ezekre az arányokra – mármint arra hogy bizonyos képarányú elemek magassága hol helyezkedik el.
 
-<img src="./images/keylines.png" width="300" " align="middle">
-
 * Ne használjuk a kártyanézeteket (tipikusan Google asszisztens) olyan elemekre, amik megjelenése azonos! Ezesetben egy listáról beszélünk, aminek használatát megnehezíti, hogy a kártyák közt van kihagyott terület és árnyékot is vetnek.
+
+<img src="./images/keylines.png" width="300" " align="middle">
 
 
 ## Hasznos fejlesztői eszközök
@@ -330,8 +330,8 @@ registerForContextMenu(emptyRecyclerView);
 Végül szerezzünk referenciát a `content_places_list.xml`-ben létrehozott TextView-ra, és állítsuk be az EmptyRecyclerView emptyView-jának:
 
 ```java
-View emptyView = findViewById(R.id.emptyTV);
-emptyRecyclerView.setEmptyView(emptyView);
+View emptyTV= findViewById(R.id.emptyTV);
+emptyRecyclerView.setEmptyView(emptyTV);
 ```
 
 Próbáljuk ki az alkalmazást! Láthatjuk, hogy üres lista helyett valóban az "Add places to visit" felirat jelenik meg.
