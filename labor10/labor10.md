@@ -216,7 +216,9 @@ public void setElevation(float elevation){
 
 **Próbáljuk ki az alkalmazást**
 
+
 <img src="./images/screen1.png" width="600" " align="middle">
+
 
 ## Irányítás
 
@@ -314,7 +316,9 @@ public class GameActivity extends AppCompatActivity {
 
 **Próbáljuk ki az alkalmazást.**
 
+
 <img src="./images/screen2.png" width="600" " align="middle">
+
 
 ### Animáció
 
@@ -391,7 +395,9 @@ A renderelés kezdete és vége előtt eltelt időt nézzük és ha ez kisebb mi
 
 **Próbáljuk ki az alkalmazást!** 
 
+
 <img src="./images/animate.gif" width="500" " align="middle">
+
 
 ## Önálló feladatok
 
