@@ -40,9 +40,33 @@ Sikeres projekt létrehozás után fussák át a laborvezetővel közösen a Fir
 - Authentication, Database és Storage,
 - Database>Rules.
 
-
-
 Hozzunk létre egy új projektet Android Studio-ban, válasszuk az *Empty Activity* sablont és a kezdő Activity-nk neve legyen **LoginActivity**, mivel elsőként a regisztrációs és bejelentkező nézetet fogjuk megvalósítani. Az egyszerűség kedvéért ugyanazt a felületet fogjuk használni regisztráció és bejelentkezés céljából.
+
+A projekt létrehozása után válasszuk Android Studioba a Tools->Firebase menüpontot, melynek hatására jobb oldalt megnyílik a *Firebase Assistant* funkció.
+
+Amennyiben nincs ilyen menüpont nem található a Studioban, telepíteni kell a plugint a File->Settings->Plugins alatt (Firebase Services).
+
+A Firebase Assistant akkor fogja megtalálni a Firebase console-ba létrehozott projektet, ha Android Studio-ba is ugyanazzal az accounttal vagyunk bejelentkezve mint amivel a console-ban létrehoztuk a projektet. Ellenőrizzük ezt mindkét helyen.
+Amennyiben a Firebase Assistant-ot nem sikerül beüzemelni, manuálisan is összeköthető a projekt. A leírásban ismertetni fogjuk a lépéseket, amit az Assistant generál.
+
+Válasszuk az Assistant-ban az *Authentication* szakaszt és azon belül az "Email and password authentication"-t, majd a *Connect to Firebase* gombot.
+Ezt követően egy dialógus nyílik meg, ahol a második szakaszt választva kiválaszthatjuk a projektet amit a Firebase console-ban létrehoztunk, ha megfelelőek az accountok. Itt egyébként lehetőség van új projektet is létrehozni.
+
+A háttérben valójában annyi történik, hogy az alkalmazásunk package neve és az aláíró kulcs *SHA-1*-e alapján létrejön egy Android projekt a Firebase console-ba és az ahhoz tartozó konfigurációs *google-services.json* file letöltődik a projektünk könyvtárába az alapértelmezett (app) modul alá.
+Ezt a lépéssorozatot manuálisan is végrehajthatjuk a Firebase console-ban az "Add another app"-ot választva. A debug kulcs SHA-1 lenyomata a gradle->[projektnév]->Tasks->android->signingRepot taskot futtatva kinyerhető alul az execution/text módot választva.
+
+[KÉP]
+
+Következő lépésben szintén az Assistant-ban az "Email and password authentication" alatt válasszuk az "Add Firebase Authentication to your app" elemet, itt látható is, hogy milyen módosítások történnek a projekt és modul szintű build.gradle fileokban.
+
+**Figyelem**, emulátoron való tesztelés esetében korábbi (9.6.0) Firebase service-t kell használni, mert a legújabbat az emulátor még nem támogatja:
+
+*compile 'com.google.firebase:firebase-auth:9.6.0'*
+
+Ahhoz, hogy 
+
+
+
 
 ## Regisztráció, bejelentkezés
 
@@ -134,4 +158,5 @@ Első lépésként valósítsuk meg a bejelentkező képernyő felületét. Mive
 
 
 ## Képek csatolása a postokhoz
+
 
