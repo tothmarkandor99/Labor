@@ -114,7 +114,7 @@ public class Contact {
 
 ## Adapter
 
-Készítsük el a listát feltöltő adaptert **ContactsAdapter **néven, **adapter** nevű csomagba.
+Készítsük el a listát feltöltő adaptert **ContactsAdapter** néven, **adapter** nevű csomagba.
 
 ```java
 public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ContactViewHolder> {
@@ -185,7 +185,7 @@ Az adapter az **onCreateViewHolder()** metódusában hivatkozik a listaelem fel�
             android:layout_height="55dp"
             android:layout_marginLeft="10dp"
             android:layout_marginStart="10dp"
-            android:src="@drawable/ic_contact_phone_black_48dp"/>
+            android:src="@drawable/ic_contact_mail_black_48dp"/>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -226,8 +226,7 @@ strings.xml-be:
 <string name="phone">Phone</string>
 ```
 
-drawables mappába:
-[`ic_contact_phone_black_48dp`](./assets/ic_contact_phone_black_48dp.png)
+A hiányzó ikont töltsük le a [https://materialdesignicons.com/](https://materialdesignicons.com/) -ról, keressük a **contact-mail** icon-t.
 
 A névjegyek megjelenítéséhez az utolsó lépés az adapter pélányosítása, és beállítása a recyclerview komponenshez. Szükség van az eszközön tárolt névjegyek megszerzésére, ehhez adjuk hozzá a **ContactsActivity**-be az alábbi metódust:
 
@@ -396,7 +395,8 @@ private static final int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 100;
 A **handleReadContactsPermission()** metódus megvizsgálja a **checkSelfPermission()** segítségével, hogy az alkalmazás rendelkezik-e már a `READ_CONTACTS` engedéllyel. Ha igen, akkor meghívja a **loadContacts()** metódust, és a névjegyek betöltődnek. Ellenkező esetben nézzük meg, hogy a felhasználót kell-e tájékoztatni az engedélykérés létjogosultságáról (*shouldShowRequestPermissionRationale()*). Ez a metódus akkor tér vissza true értékkel, ha korábban a felhasználó megtagadta az engedélyt az alkalmazástól. (Például mert nem gondolta, hogy az adott funkcióhoz feltétlenül szükséges az engedély.) Ilyenkor érdemes egy magyarázatot adni, melyben leírjuk, hogy miért van feltétlen szükség az engedélyre. (Legyünk tömörek, a hosszú magyarázatokat nem fogja a felhasználó elolvasni, inkább letörli az alkalmazást...) A magyarázat jelen esetben egy dialógus, mely rövid leírást ad az engedély szükségességéről.
 Amennyiben nincs szükség magyarázatra, vagy a magyarázat dialógusablakában a Tovább gombra nyomott a felhasználó, akkor kérjük el az engedélyt (*requestPermissions()*).
 
-Cseréljük ki az activity **onCreate()**-ben található **loadContacts() **metódust az újonnan létrehozottra (**handleReadContactsPermission();**)!
+Cseréljük ki az activity **onCreate()**-ben található **loadContacts()**
+metódust az újonnan létrehozottra (**handleReadContactsPermission();**)!
 
 Kezeljük le az engedélykérés válaszát (**onRequestPermissionsResult()**) is az alábbi kóddal:
 
@@ -441,7 +441,10 @@ Bővítsük a funkcionalitást olyan módon, hogy egy adott névjegy elemre katt
 Másoljuk az alábbi két metódust az adapterünkbe!
 
 ```java
+private String lastPhoneNumber;
+
 private void handleCallPhonePermission(View view, String phoneNumber) {
+    this.lastPhoneNumber=phoneNumber;
     if (ActivityCompat.checkSelfPermission(view.getContext(), Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
         // Should we show an explanation?
         if (ActivityCompat.shouldShowRequestPermissionRationale((Activity) mContext,
@@ -485,6 +488,10 @@ private void callPhoneNumber(String phoneNumber) {
     callIntent.setData(Uri.parse("tel:" + phoneNumber));
     mContext.startActivity(callIntent);
 }
+
+public void callLastPhoneNumber() {
+    callPhoneNumber(lastPhoneNumber);
+}
 ```
 
 strings.xml-be:
@@ -506,7 +513,7 @@ Az engedélykérés válaszát ebben az esetben is a ContactsActivity fogja keze
 case ContactsAdapter.MY_PERMISSIONS_REQUEST_PHONE_CALL: {
     if (grantResults.length > 0
             && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-        Toast.makeText(this, R.string.phoneCallPermissionResultSuccess, Toast.LENGTH_SHORT).show();
+        ((ContactsAdapter)contactsRV.getAdapter()).callLastPhoneNumber();
     }
     return;
 }
