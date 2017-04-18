@@ -1,404 +1,546 @@
-# Labor 11 - Játékfejlesztés
+# Labor 11 - Futásidejű engedélyek
 
 ## Bevezető
 
-A labor során ízelítőt szeretnénk adni az Android platformon történő játékfejlesztési lehetőségekből. Egy 2D-s játékot fogunk elkészíteni, amiben a felhasználó az eszköz _gyroscope_ szenzorát felhasználva tudja az őt reprezentáló űrhajót irányítani, hogy elkerülje az ellenséges űrhajókat.
- 
-Tekintve a platform adottságait, az egyébként elérhető és sikeres megoldásokat, valamint a labor időkorlátait, a labor során nem térünk ki a 3D játékfejlesztésre. Természetesen a platformon egyébként erre is van lehetőség.
+Android 6.0 (API level 23) verziótól kezdve a felhasználó futásidőben adhatja meg az alkalmazás engedélyeit, és nem az alkalmazás telepítésekor vagy frissítésekor. Dönthet úgy, hogy bizonyos engedélyeket nem ad meg egy alkalmazásnak, így nagyobb fokú irányítás kerül a kezébe. Az alkalmazásengedélyeket később bármikor módosíthatja az alkalmazásbeállítások képernyőn.
 
-## Érintett témakörök
+Az engedélyek két kategóriába vannak sorolva: normal/dangerous.
+A **normal** kategóriába tartozó engedélyek nem jelentenek közvetlen kockázatot a felhasználó érzékeny adataira, ezeket az engedélyeket a rendszer automatikusan megadja.
 
-*   Rajzolás SurfaceView-ra
-*   Sensorok kezelése
-*   Sprite-ok és animáció.
-*   FPS szabályozás
+A **veszélyes** kategóriába tartozó engedélyek lehetőséget adhatnak az alkalmazásnak, hogy a felhasználó érzékeny adataihoz hozzáférjen. Ebben az esetben a felhasználónak kell megadni az engedélyt az alkalmazás számára.
 
-## Kiinduló projekt
+https://developer.android.com/guide/topics/security/permissions.html#normal-dangerous
 
-Elsőnek töltsük le a labor során használt kiinduló projektet, majd nyissuk meg Android Studio-val. 
+Minden esetben meg kell adni a normal és a dangerous engedélyeket a manifest fájlban, de ennek hatása eltér a rendszer verziójától és a target sdk szinttől függően:
 
-[Kiinduló projekt](./assets/SpaceShipGame_skeleton.zip) 
+Ha az eszköz Android 5.1 vagy alacsonyabb verziót futtat, **VAGY** az alkalmazás target SDK szintje 22 vagy kisebb, akkor a rendszer telepítéskor kéri el az összes engedélyt, és ha a felhasználó nem fogadja el, akkor a telepítés leáll.
 
-A Laborvezető segítségével vizsgáljuk meg a projekt felépítését.
+Ha az eszköz Android 6.0 verzióval rendelkezik **ÉS** az alkalmazás target SDK szintje 23 vagy nagyobb, akkor az alkalmazás a futása során fogja elkérni a dangerous kategóriába tartozó engedélyeket, a normal engedélyeket pedig a rendszer automatikusan megadja. A felhasználó bármely engedélyt megadhat, vagy letilthat, emiatt az alkalmazás limitált funkcionalitással futhat tovább, melyet megfelelően kell kezelni.
 
-### Általános
+## Jogosultság ellenőrzése
+Amennyiben az alkalmazás funkciójának egy veszélyes engedélyre van szüksége, akkor minden esetben ellenőrízni kell még a funkció indítása előtt, hogy rendelkezik-e az engedéllyel, hiszen az engedélyeket a felhasználó bármikor módosíthatja.
+**ContextCompat.checkSelfPermission()**
 
-A projektben található egyetlen, indító _activity_ a **GameActivity**. Ez egy elfordított (_landscape_) nézet, _ActionBar_ nélkül (lásd styles.xml), valamint a **GameView** nézetet tartalmazza (lásd **activity_game.xml** ). A **GameView** a kirajzolt játéktér megjelenítésért felelős nézet, de magát a kirajzolást nem ő fogja végezni, csak megjeleníteni a már kirajzolt képet.
+## Jogosultság elkérése
+Az Android rendszer számos metódust biztosít egy jogosultság elkérésére. Ezeket meghívva egy nem testreszabható dialógust dob fel a rendszer.
+**ActivityCompat.requestPermissions()**
 
-### Model
+## Jogosultság magyarázata
+Egyes esetekben szükséges lehet a felhasználót tájékoztatni, hogy miért kér az alkalmazás veszélyes engedélyeket.
+**ActivityCompat.shouldShowRequestPermissionRationale()**
 
-A _model_ csomagban található az előre elkészített játékmodell. Minden a játékban megjeleníthető entitás a **Renderable** interface megvalósítója. A kirajzolást végző szál majd mindent, mint **Renderable**-t fog kezelni (ezt később készítjük majd el). Minden entitásnak lehetőség van megadni, hogy mekkora a rajzfelület **size(x,y)**, hogy ebből a saját méreteit kiszámolhassa. Lehetőség van minden egyes kirajzolás után az objektum állapotát léptetni (**step()**), valamint minden objektumnak ki kell tudnia rajzolni magát egy _Canvas_ objektumra (**render(Canvas canvas)**).
+## Kezdő lépések
 
-### Háttér
+A labor során egy egyszerű telefonkönyv alkalmazást kell elkészíteni. Az alkalmazás listázni tudja a telefonon tárolt névjegyeket, majd egy adott elemre kattintva hívást lehet kezdeményezni.
 
-A legegyszerűbb játékelem a háttér (**Background**). A háttérnek állapota nincs és egy teljes képernyőt kitöltő méretű képet rajzol ki. Ha a képi erőforrás kisebb mint a kirajzolt kép, akkor azt mind vízszintesen, mind függőlegesen tükrözi. A képek kirajzolása a _BitmapDrawable_ segítségével történik, amit a _BitmapFactory.decodeResource_-al hozunk létre.
+Hozzunk létre egy új Android Studio Projektet **PermissionsLabor** néven. A Company Domain mező tartalmát töröljük ki és hagyjuk is üresen.
 
-### Űrhajó
+A packagename legyen **hu.bme.aut.amorg.examples.permissionslabor** A támogatott céleszközök a **Telefon és Tablet**, valamint a minimum SDK szint az **API15: Android 4.0.3**
 
-A játékban kétfelé űrhajó is található, a játékos (**Player**) és az ellenség (**Enemy**). Mindkét entitás az abstract **Ship**-ből származik. Minden **Shiphez** tartozik egy kép, amit kirajzol magáról, valamint egy számlálóban lépteti, hogy hányadik kirajzolásról van szó, valamint a képernyőn lévő x,y pozícióját (**posX,posY**) is tárolja. Ezen túl még van egy **elevation** értéke, amivel mozgatni fogjuk az űrhajót. A **Player** és az **Enemy** osztályok a megfelelő bitmapet töltik be, valamint tartalmazzák, hogy az adott képen, amit betöltenek, hol helyezkedik el az űrhajó alapállapota. A **Player** objektum az **elevation** értékétől függően függőlegesen mozog, az **Enemy** objektum pedig egy véletlen szerű magasságon mozog egy adott sebességgel jobbról balra.
+A kezdő projekthez adjuk hozzá egy **Empty Activity**-t, melynek neve legyen **ContactsActivity**.
 
-## A Renderer elkészítése
-
-Készítsük el az objektumok kirajzolását végző **Renderer** osztályt a _rendering_ csomagban. Ez az osztály tárolja a kirajzolni kívánt objektumokat, és azokat megfelelő sorrendben a képernyőre is rajzolja, illetve lépteti a megfelelő objektumokat. A léptetés hatására véletlenszerűen egy új **Enemy** objektumot ad hozzá a játéktérhez. A _setElevation_ hatására pedig a **Player** magasságát állítja be. 
+Vegyük fel a RecyclerView komponens függőségét, illetve állítsuk a targetSDK-t 23 vagy nagyobbra a **build.graddle(module:app)** fájlban, majd nyomjuk meg a **Sync Now** gombot. Amennyiben nincs 23, vagy magasabb SDK telepítve a gépre, akkor frissítsük az SDK Manager segítségével a szükséges komponenseket.
 
 
 ```java
-public class Renderer {
-    private Context context;
+dependencies {
+...
+compile 'com.android.support:recyclerview-v7:25.0.0'
+...
+}
+```
 
-    private int width;
-    private int height;
+## Felhasználói felület
 
-    private Random random;
+Első lépésként készítsük el az alkalmazás felhasználói felületét XML erőforrásból. A felület egyetlen RecyclerView komponensből fog állni, mely az eszközön tárolt névjegyeket fogja megjeleníteni.
 
-    private List<Renderable> entitiesToDraw;
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_contacts"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="hu.bme.aut.amorg.examples.permissionslabor.ContactsActivity">
 
-    private Background background;
-    private Player player;
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/contactsRV"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+</RelativeLayout>
+```
 
-    public Renderer(Context context) {
-        this.context = context;
-        init(0, 0);
+A ContactsActivity-ben szerezzünk referenciát a RecyclerView-ra, és emeljük ki mezőbe.
+
+```java
+private RecyclerView contactsRV;
+```
+
+onCreate() metódusba:
+```java
+contactsRV = (RecyclerView) findViewById(R.id.contactsRV);
+```
+
+## Model
+
+Készítsük el a Contact osztályt, mely az eszközön található névjegyeket fogja reprezentálni. Az egyszerűség kedvéért most csak a név és telefonszám adatokat tároljuk el benne.
+
+```java
+public class Contact {
+    private String contactName;
+    private String contactNumber;
+
+    public String getContactName() {
+        return contactName;
     }
 
-    public void init(int width, int height) {
-        this.width = width;
-        this.height = height;
-        entitiesToDraw = new ArrayList<>();
-        background = new Background(context);
-        background.size(width, height);
-        player = new Player(context);
-        player.size(width, height);
-
-        Enemy enemy = new Enemy(context);
-        enemy.size(width, height);
-        entitiesToDraw.add(enemy);
-        entitiesToDraw.add(player);
-        random = new Random();
+    public void setContactName(String contactName) {
+        this.contactName = contactName;
     }
 
-    public void step() {
-        if (random.nextFloat() > (0.993)) {
-            Enemy enemy = new Enemy(context);
-            enemy.size(width, height);
-            entitiesToDraw.add(enemy);
-        }
-
-        for (Renderable object : entitiesToDraw) {
-            object.step();
-        }
+    public String getContactNumber() {
+        return contactNumber;
     }
 
-    public void draw(Canvas canvas) {
-        background.render(canvas);
-        for (Renderable object : entitiesToDraw) {
-            object.render(canvas);
-        }
-    }
-
-    public void setElevation(float elevation) {
-        player.setElevation(elevation);
+    public void setContactNumber(String contactNumber) {
+        this.contactNumber = contactNumber;
     }
 }
 ```
 
-### A kirajzoló szál
+## Adapter
 
-Készítsük el a kirajzolás ütemezéséért felelős szálat, a *rendering* csomagban **RenderLoop** néven.. Ezen a szálon fognak kirajzolásra kerülni a **Renderer** objektumai. Ez tartalmaz egy referenciát a **GameView**-ra, hogy abban megjelenítse a kirajzolt képet, valamint az előbb létrehozott **Renderer**-t használja fel. Maga is egy szálból származik, és a _run()_ függvényében egy végtelen ciklusban rajzolja ki újra és újra a játékelemeket. A rajzolás kezdetén először lépteti a játéktér állapotát, majd a **SurfaceView** **SurfaceHolder** objektuma segítségével kirajzolja magát. Fontos, hogy a kirajzolás előtt és után le kell zárni a **SurfaceHolder**-hez tartozó **Canvas**-t. 
-
-
+Készítsük el a listát feltöltő adaptert **ContactsAdapter **néven, **adapter** nevű csomagba.
 
 ```java
-public class RenderLoop extends Thread {
-  private GameView view;
-  private final Renderer renderer;
-
-  private boolean running = false;
-
-  public RenderLoop(Context context,GameView view) {
-    this.view = view;
-    this.renderer=new Renderer(context);
-  }
-
-  public void init(int width,int height){
-    renderer.init(width,height);
-  }
-
-  public void setRunning(boolean run) {
-    running = run;
-  }
-
-  @Override
-  public void run() {
-    while (running) {
-      draw();
-    }
-  }
-
-  private void draw() {
-    renderer.step();
-    Canvas c = null;
-    try {
-      c = view.getHolder().lockCanvas();
-      synchronized (view.getHolder()) {
-        renderer.draw(c);
-      }
-   } finally {
-      if (c != null) {
-        view.getHolder().unlockCanvasAndPost(c);
-      }
-    }
- }
-
-  public void setElevation(float elevation) {
-    renderer.setElevation(elevation);
-  }
-}
-```
-
-
-Egészítsük ki a **GameView**-t úgy hogy a renderelő szálat használja. Andjunk hozzá egy tagváltozót.
-
-`private RenderLoop renderLoop;`
-
-Majd az init függvényben ezt hozzuk létre: 
-
-`renderLoop = new RenderLoop(context,this);`
-
-Módosítsuk a **GameView** _init()_ függvényét, hogy a kontextust paraméterül átadhassuk, majd a 3 konstruktorban adjuk is át a kontextusokat.
-
-`init(context);` 
- 
-Ezután a **SurfaceHolder** callback eseményeit valósítjuk meg. 
-  
-```java
-private void init(final Context context) {
-	SurfaceHolder holder = getHolder();
-	holder.addCallback(new SurfaceHolder.Callback() {
-		@Override
-		public void surfaceCreated(SurfaceHolder holder) {
-			renderLoop = new RenderLoop(context,GameView.this);
-			renderLoop.setRunning(true);
-			renderLoop.start();
-		}
-
-		@Override
-		public void surfaceDestroyed(SurfaceHolder holder) {
-			boolean retry = true;
-			renderLoop.setRunning(false);
-			while (retry) {
-				try {
-					renderLoop.join();
-
-					retry = false;
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-
-		@Override
-		public void surfaceChanged(SurfaceHolder holder, int format,int width, int height) {
-			renderLoop.init(width,height);
-		}
-	});
-}
-```
-  
-  
-Majd a játékos űrhajójának helyzetét állító hívást vezessük ki a **GameView**-ra. 
-
-```java
-public void setElevation(float elevation){
-  if(renderLoop!=null) renderLoop.setElevation(elevation);
-}
-```
-
-**Próbáljuk ki az alkalmazást**
-
-<img src="./images/screen1.png" width="600" " align="middle">
-
-## Irányítás
-
-Mozgassuk a felhasználó űrhajóját a gyorsulásmérő és magnetométer segítségével. Az alábbi osztályt készítsük el a _sensor_ csomagba. Majd a **GameActivity** _onResume()_ és _onPause()_ függvényében indítjuk el, majd állítjuk le. 
-
-```java
-public class GyroscopeHelper implements SensorEventListener {
-	private final SensorManager sensorManager;
-	private GameView gameView;
-	private Sensor accelerometer;
-	private Sensor magnetometer;
-
-	private float[] lastAccelerometerValue = new float[3];
-	private float[] lastMagnetometerValue = new float[3];
-
-	private boolean lastAccelerometerSet = false;
-	private boolean lastMagnetometerSet = false;
-
-	private float[] rotation = new float[9];
-	private float[] orientation = new float[3];
-
-	public GyroscopeHelper(Context context, GameView gameView) {
-		this.gameView = gameView;
-		sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
-		accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-		magnetometer = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
-	}
-
-	public void start() {
-		sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_FASTEST);
-		sensorManager.registerListener(this, magnetometer, SensorManager.SENSOR_DELAY_FASTEST);
-	}
-
-	public void stop() {
-		sensorManager.unregisterListener(this);
-	}
-
-	@Override
-	public void onSensorChanged(SensorEvent event) {
-		if (event.sensor.equals(accelerometer)) {
-			System.arraycopy(event.values, 0, lastAccelerometerValue, 0, event.values.length);
-			lastAccelerometerSet = true;
-		} else if (event.sensor.equals(magnetometer)) {
-			System.arraycopy(event.values, 0, lastMagnetometerValue, 0, event.values.length);
-			lastMagnetometerSet = true;
-		}
-		if (lastAccelerometerSet && lastMagnetometerSet) {
-			SensorManager.getRotationMatrix(rotation, null, lastAccelerometerValue, lastMagnetometerValue);
-			SensorManager.getOrientation(rotation, orientation);
-
-			float roll = orientation[2] * 1.0f;
-
-			float position = roll - (-1.0f);
-			if (gameView != null) {
-				gameView.setElevation(position);
-			}
-		}
-	}
-
-	@Override
-	public void onAccuracyChanged(Sensor sensor, int accuracy) {
-	}
-}
-```
-
-
-Majd ezt használjuk a **GameActivity**-ben. 
-
-```java
-public class GameActivity extends AppCompatActivity {
-  private GyroscopeHelper gyroscopeHelper;
-  private GameView gameView;
-
-  @Override
-  protected void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    setContentView(R.layout.activity_game);
-    gameView = (GameView) findViewById(R.id.gameView);
-    gyroscopeHelper = new GyroscopeHelper(this,gameView);
-  }
-
-  @Override
-  protected void onResume() {
-    super.onResume();
-    gyroscopeHelper.start();
-  }
-
-  @Override
-  protected void onPause() {
-    gyroscopeHelper.stop();
-    super.onPause();
-  }
-}
-```
-
-**Próbáljuk ki az alkalmazást.**
-
-<img src="./images/screen2.png" width="600" " align="middle">
-
-### Animáció
-
-A **Ship** osztály valamint a **Player** és **Enemy** már fel vannak készítve arra hogy különböző állapotok között animáljanak. A megfelelő képi erőforrások is biztosítottak, már csak a képeket kell elcsúsztatni a megfelelő állapotba, a Ship osztály render függvényében: 
-
-```java
-@Override
-public void render(Canvas canvas) {
-  setSpriteSizes();
-
-  int statePos = state/5;
-  //4 states, 64*29 each image
-
-  int x = 0;
-  int y = spriteHeight * statePos;
-
-  Rect src = new Rect(x, y, x + spriteWidth, y + spriteHeight);
-  Rect dst = new Rect(posX, posY, posX + spriteWidth * 4, posY + spriteHeight * 4);
-
-  if(canvas!=null) {
-      canvas.drawBitmap(image, src, dst, null);
-  }
-}
-```
-
-**Próbáljuk ki az alkalmazást!** 
-
-<img src="./images/animate.gif" width="500" " align="middle">
-
-
-## FPS korlát elhelyezése
-
-Azért hogy a kirajzolás sebességét egy fix értékre állítsuk két kirajzolás között aludnia kell a kirajzoló szálnak, amennyiben a kirajzolás nem tartott annyi ideig mint a kívánt FPS érték időköze. 
-
-A **RenderLoop** osztályt egészítsük ki a következőkkel:
-
-```java
-public static final long FPS = 30;
-private static final long timeBetweenFrames = 1000 / FPS;
-
-private void sleepThread(long time) {
-  try {
-    sleep(time);
-  } catch (InterruptedException e) {
-  }
-}
-
-private long getTime() {
-  return System.currentTimeMillis();
-}
-```
-
-Valamint a run fügyvényt egészítsük ki:
-
-```java
-@Override
-public void run() {
-  while (running) {
-    long renderStart = getTime();
-    draw();
+public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ContactViewHolder> {
     
-    long renderEnd = getTime();
-    long sleepTime = timeBetweenFrames - (renderEnd - renderStart);
-    if (sleepTime > 0) {
-      sleepThread(sleepTime);
-    } else {
-      sleepThread(5);
+    private List<Contact> contactList;
+    private Context mContext;
+
+    public ContactsAdapter(List<Contact> contactList, Context mContext) {
+        this.contactList = contactList;
+        this.mContext = mContext;
     }
-  }
+
+    @Override
+    public ContactViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(mContext).inflate(R.layout.contact_item, null);
+        ContactViewHolder contactViewHolder = new ContactViewHolder(view);
+        return contactViewHolder;
+    }
+
+    @Override
+    public void onBindViewHolder(final ContactViewHolder holder, int position) {
+        Contact contact = contactList.get(position);
+        holder.tvContactName.setText(contact.getContactName());
+        holder.tvPhoneNumber.setText(contact.getContactNumber());
+    }
+
+
+    @Override
+    public int getItemCount() {
+        return contactList.size();
+    }
+
+    public static class ContactViewHolder extends RecyclerView.ViewHolder {
+        View container;
+        ImageView ivContactImage;
+        TextView tvContactName;
+        TextView tvPhoneNumber;
+
+        public ContactViewHolder(View itemView) {
+            super(itemView);
+            container = itemView.findViewById(R.id.container);
+            ivContactImage = (ImageView) itemView.findViewById(R.id.ivContactImage);
+            tvContactName = (TextView) itemView.findViewById(R.id.tvContactName);
+            tvPhoneNumber = (TextView) itemView.findViewById(R.id.tvPhoneNumber);
+        }
+    }
 }
 ```
- 
-A renderelés kezdete és vége előtt eltelt időt nézzük és ha ez kisebb mint amennyi az adott FPS számhoz szükséges, úgy a megfelelő ideig altatjuk a szálat. Amennyiben tovább tartott a renderelés, akkor is adunk valamennyi alvás időt a CPU-nak.
 
-**Próbáljuk ki az alkalmazást!** 
+Az adapter az **onCreateViewHolder()** metódusában hivatkozik a listaelem felületleírójára, hozzuk létre a hiányzó **contact_item** xml erőforrást:
 
-<img src="./images/animate.gif" width="500" " align="middle">
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/container"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:background="#dddddd">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/ivContactImage"
+            android:layout_width="55dp"
+            android:layout_height="55dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
+            android:src="@drawable/ic_contact_phone_black_48dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/tvContactName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginStart="10dp"
+                android:textSize="16sp"
+                android:textColor="@android:color/primary_text_light"
+                android:text="@string/name"/>
+
+            <TextView
+                android:id="@+id/tvPhoneNumber"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginStart="10dp"
+                android:textSize="14sp"
+                android:textColor="@android:color/primary_text_light"
+                android:text="@string/phone"/>
+        </LinearLayout>
+    </LinearLayout>
+</RelativeLayout>
+```
+
+Adjuk hozzá a két hiányzó szöveges erőforrást, és másoljuk be a drawables mappába a hiányzó képet!
+
+strings.xml-be:
+
+```xml
+<string name="name">Name</string>
+<string name="phone">Phone</string>
+```
+
+drawables mappába:
+[`ic_contact_phone_black_48dp`](./assets/ic_contact_phone_black_48dp.png)
+
+A névjegyek megjelenítéséhez az utolsó lépés az adapter pélányosítása, és beállítása a recyclerview komponenshez. Szükség van az eszközön tárolt névjegyek megszerzésére, ehhez adjuk hozzá a **ContactsActivity**-be az alábbi metódust:
+
+```java
+private List<Contact> getAllContacts() {
+    List<Contact> contactList = new ArrayList();
+    ContentResolver contentResolver = getContentResolver();
+    Cursor cursor = contentResolver.query(ContactsContract.Contacts.CONTENT_URI, null, null, null, ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME + " ASC");
+    if (cursor.getCount() > 0) {
+        while (cursor.moveToNext()) {
+            int hasPhoneNumber = Integer.parseInt(cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER)));
+            if (hasPhoneNumber > 0) {
+                String id = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
+                String name = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
+
+                Contact contact = new Contact();
+                contact.setContactName(name);
+
+                Cursor phoneCursor = contentResolver.query(
+                        ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                        null,
+                        ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?",
+                        new String[]{id},
+                        null);
+                if (phoneCursor.moveToNext()) {
+                    String phoneNumber = phoneCursor.getString(phoneCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                    contact.setContactNumber(phoneNumber);
+                }
+                phoneCursor.close();
+                contactList.add(contact);
+            }
+        }
+    }
+    return contactList;
+}
+```
+
+Ez után a kapott névjegylistával példányosítsuk az adaptert, és állítsuk be a RecyclerView komponenshez.
+**ContactsActivity** **onCreate()** metódusába:
+
+```java
+ContactsAdapter contactsAdapter = new ContactsAdapter(getAllContacts(), this);
+contactsRV.setLayoutManager(new LinearLayoutManager(this));
+contactsRV.setAdapter(contactsAdapter);
+```
+
+Névjegyek olvasásához szükséges engedély a manifest-be:
+
+```xml
+<uses-permission android:name="android.permission.READ_CONTACTS" />
+```
+
+## Teszt
+
+Egyelőre semmilyen jogosulságkezelést nem valósítottunk meg a kódban, ezért az alkalmazás pillanatnyi állapotának kipróbálásához Android 6.0 előtti verzióra van szükség, különben hibát kapunk az indulás során.
+
+Próbáljuk ki az alkalmazást 6.0/API 23 előtti verzióval rendelkező eszközön!
+Amennyiben az eszközön nincsenek névjegyek, adjunk hozzá legalább egyet telefonszámmal ellátva.
+
+<img src="./assets/app.png" width="400" align="middle">
+
+Android 6.0 vagy magasabb verzión futtatva az alkalmazást hibát kapunk, hiszen a névjegyek beolvasásához szükséges engedély a veszélyes kategóriába tartozik, ezért ezt külön kell kezelni a kódban. (6.0 felett ÉS target SDK 23+ esetén)
+
+A hiba:
+
+```java
+java.lang.SecurityException: Permission Denial: 
+opening provider com.android.providers.contacts.ContactsProvider2
+from ProcessRecord{b077ff821678:
+hu.bme.aut.amorg.examples.permissionslabor/u0a264} 
+(pid=21678, uid=10264) requires android.permission.READ_CONTACTS or
+android.permission.WRITE_CONTACTS
+```
+
+## Jogosultságkezelés
+
+Módosítsuk az alkalmazást úgy, hogy futási időben kérje el a felhasználótól a manifestben deklarált veszélyes engedélyt! Ehhez a bevezetőben ismertetett metódusok lesznek segítségünkre.
+
+Emeljük ki a ContactsActivity onCreate() metódusában található alábbi 3 sor kódot egy metódusba, melynek a neve legyen loadContacts()!
+Ezt legegyszerűbben a kiemelni kívánt kód kijelölésével, majd CTRL+ALT+M billentyűkombinációval tudjuk megtenni Android Studioban.
+
+```java
+private void loadContacts() {
+    ContactsAdapter contactsAdapter = new ContactsAdapter(getAllContacts(), this);
+    contactsRV.setLayoutManager(new LinearLayoutManager(this));
+    contactsRV.setAdapter(contactsAdapter);
+}
+```
+
+onCreate():
+
+```java
+@Override
+protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_contacts);
+    contactsRV = (RecyclerView) findViewById(R.id.contactsRV);
+
+    loadContacts();
+}
+```
+
+Ahelyett hogy az **onCreate()**-ben azonnal meghívnánk a **loadContacts()** függvényt, kérjünk a felhasználótól engedélyt a névjegyek olvasására!
+
+Adjuk hozzá az alábbi metódust a ContactsActivityhez!
+
+```java
+private void handleReadContactsPermission() {
+    if (ContextCompat.checkSelfPermission(this,
+            Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
+        // Should we show an explanation?
+        if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_CONTACTS)) {
+
+            // Show an explanation to the user *asynchronously* -- don't block
+            // this thread waiting for the user's response! After the user
+            // sees the explanation, try again to request the permission.
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+            alertDialogBuilder.setTitle(R.string.dialogTitle);
+            alertDialogBuilder
+                    .setMessage(R.string.explanation)
+                    .setCancelable(false)
+                    .setNegativeButton(R.string.exit, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            ContactsActivity.this.finish();
+                        }
+                    })
+                    .setPositiveButton(R.string.forward, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dialog.cancel();
+                            ActivityCompat.requestPermissions(ContactsActivity.this,
+                                    new String[]{Manifest.permission.READ_CONTACTS},
+                                    MY_PERMISSIONS_REQUEST_READ_CONTACTS);
+                        }
+                    });
+            AlertDialog alertDialog = alertDialogBuilder.create();
+            alertDialog.show();
+        } else {
+            // No explanation needed, we can request the permission.
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.READ_CONTACTS},
+                    MY_PERMISSIONS_REQUEST_READ_CONTACTS);
+        }
+    } else {
+        loadContacts();
+    }
+}
+```
+
+A `MY_PERMISSIONS_REQUEST_READ_CONTACTS` egy általunk definiálandó requestCode. Amikor engedélyt kérünk, meg kell adni mellé egy requestCode-ot is, és amikor az operációs rendszer visszatér a **onRequestPermissionsResult()** metódusban, akkor ez alapján tudjuk kezelni, hogy éppen melyik engedélykérésre érkezett válasz.
+
+Bármilyen érték adható neki, jelen esetben legyen 100.
+
+```java
+private static final int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 100;
+```
+
+**strings.xml**-be:
+
+```xml
+<string name="dialogTitle">Figyelem!</string>
+<string name="explanation">Az alkalmazásnak szüksége van az engedélyre a névjegyek beolvasásához!</string>
+<string name="exit">Kilépés</string>
+<string name="forward">Tovább</string>
+```
+
+A **handleReadContactsPermission()** metódus megvizsgálja a **checkSelfPermission()** segítségével, hogy az alkalmazás rendelkezik-e már a `READ_CONTACTS` engedéllyel. Ha igen, akkor meghívja a **loadContacts()** metódust, és a névjegyek betöltődnek. Ellenkező esetben nézzük meg, hogy a felhasználót kell-e tájékoztatni az engedélykérés létjogosultságáról (*shouldShowRequestPermissionRationale()*). Ez a metódus akkor tér vissza true értékkel, ha korábban a felhasználó megtagadta az engedélyt az alkalmazástól. (Például mert nem gondolta, hogy az adott funkcióhoz feltétlenül szükséges az engedély.) Ilyenkor érdemes egy magyarázatot adni, melyben leírjuk, hogy miért van feltétlen szükség az engedélyre. (Legyünk tömörek, a hosszú magyarázatokat nem fogja a felhasználó elolvasni, inkább letörli az alkalmazást...) A magyarázat jelen esetben egy dialógus, mely rövid leírást ad az engedély szükségességéről.
+Amennyiben nincs szükség magyarázatra, vagy a magyarázat dialógusablakában a Tovább gombra nyomott a felhasználó, akkor kérjük el az engedélyt (*requestPermissions()*).
+
+Cseréljük ki az activity **onCreate()**-ben található **loadContacts() **metódust az újonnan létrehozottra (**handleReadContactsPermission();**)!
+
+Kezeljük le az engedélykérés válaszát (**onRequestPermissionsResult()**) is az alábbi kóddal:
+
+```java
+@Override
+public void onRequestPermissionsResult(int requestCode,
+                                       String permissions[], int[] grantResults) {
+    switch (requestCode) {
+        case MY_PERMISSIONS_REQUEST_READ_CONTACTS: {
+            // If request is cancelled, the result arrays are empty.
+            if (grantResults.length > 0
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // permission was granted, yay! Do the
+                // contacts-related task you need to do.
+                loadContacts();
+            } else {
+                // permission denied! Disable the
+                // functionality that depends on this permission.
+            }
+            return;
+        }
+    }
+}
+```
+
+Amennyiben az engedélyt az alkalmazás megkapta, a névjegyek a loadContacts() segítségével betöltésre kerülnek.
+
+Próbáljuk ki az alkalmazást 6.0+/API level 23+ eszközön!
+Figyeljük meg a magyarázódialógust abban az esetben, ha megtagadjuk az engedélyt, majd újraindítjuk az alkalmazást!
+
+## Telefonszám hívása
+
+Ahhoz, hogy alkalmazásunk hívásokat indíthasson, fel kell venni a következő engedélyt a manifest fájlba:
+
+```xml
+<uses-permission android:name="android.permission.CALL_PHONE" />
+```
+
+Magától értetődő, hogy ez az engedély is a veszélyes kategóriába tartozik, ezért ezt is megfelelően kell kezelnünk.
+Bővítsük a funkcionalitást olyan módon, hogy egy adott névjegy elemre kattintva hívást indítson az eszköz a névjegyen szereplő telefonszámra!
+
+Másoljuk az alábbi két metódust az adapterünkbe!
+
+```java
+private void handleCallPhonePermission(View view, String phoneNumber) {
+    if (ActivityCompat.checkSelfPermission(view.getContext(), Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+        // Should we show an explanation?
+        if (ActivityCompat.shouldShowRequestPermissionRationale((Activity) mContext,
+                Manifest.permission.CALL_PHONE)) {
+            // Show an explanation to the user *asynchronously* -- don't block
+            // this thread waiting for the user's response! After the user
+            // sees the explanation, try again to request the permission.
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(mContext);
+            alertDialogBuilder.setTitle(R.string.dialogTitle);
+            alertDialogBuilder
+                    .setMessage(R.string.explanation2)
+                    .setCancelable(false)
+                    .setNegativeButton(R.string.exit, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            ((ContactsActivity) mContext).finish();
+                        }
+                    })
+                    .setPositiveButton(R.string.forward, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dialog.cancel();
+                            ActivityCompat.requestPermissions((Activity) mContext,
+                                    new String[]{Manifest.permission.CALL_PHONE},
+                                    MY_PERMISSIONS_REQUEST_PHONE_CALL);
+                        }
+                    });
+            AlertDialog alertDialog = alertDialogBuilder.create();
+            alertDialog.show();
+        } else {
+            // No explanation needed, we can request the permission.
+            ActivityCompat.requestPermissions((Activity) mContext,
+                    new String[]{Manifest.permission.CALL_PHONE},
+                    MY_PERMISSIONS_REQUEST_PHONE_CALL);
+        }
+    } else {
+        callPhoneNumber(phoneNumber);
+    }
+}
+
+private void callPhoneNumber(String phoneNumber) {
+    Intent callIntent = new Intent(Intent.ACTION_CALL);
+    callIntent.setData(Uri.parse("tel:" + phoneNumber));
+    mContext.startActivity(callIntent);
+}
+```
+
+strings.xml-be:
+
+```xml
+<string name="explanation2">A hívás indításához engedélyre van szükség!</string>
+```
+
+A callPhoneNumber() fogja a hívást indítani, a handleCallPhonePermission() pedig az engedélykérést kezeli a korábbival megegyező módon.
+Itt is szükség van egy requestCode-ra, hozzuk létre public láthatósággal a korábban létrehozott requestCode-tól eltérő értékkel.
+
+```java
+public static final int MY_PERMISSIONS_REQUEST_PHONE_CALL = 101;
+```
+
+Az engedélykérés válaszát ebben az esetben is a ContactsActivity fogja kezelni, ezért helyezzük el az alábbi ágat az onRequestPermissionsResult() metódusba!
+
+```java
+case ContactsAdapter.MY_PERMISSIONS_REQUEST_PHONE_CALL: {
+    if (grantResults.length > 0
+            && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+        Toast.makeText(this, R.string.phoneCallPermissionResultSuccess, Toast.LENGTH_SHORT).show();
+    }
+    return;
+}
+```
+
+strings.xml-be:
+
+```xml
+<string name="phoneCallPermissionResultSuccess">Engedély elfogadva, kérem érintse meg újra a névjegyet a híváshoz!</string>
+```
+
+A hívás kezeléséhez szükséges kód hozzáadásra került, nincs más hátra mint használni. Ehhez adjunk eseménykezelőt a névjegyekhez, mellyel elindítjuk az imént létrehozott hívás engedély kezelést!
+
+ContactsAdapter onBindViewHolder() végére:
+
+```java
+holder.container.setOnClickListener(new View.OnClickListener() {
+    @Override
+    public void onClick(View view) {
+        handleCallPhonePermission(view, holder.tvPhoneNumber.getText().toString());
+    }
+});
+```
+
+Teszteljük a hívás funkcionalitást 6.0+/API level 23+ eszközön!
 
 ## Önálló feladatok
 
-### Feladat 1 - Ütközés detektálás
+### Feladat:  Valósítsa meg az SMS küldés funkcionalitást!
 
-Detektálja, ha a felhasználó űrhajója ütközik egy ellenséges űrhajóval, ekkor jelenítsen meg egy **Toast** üzenetet, majd állítsa le a játékot!
+Például hosszú érintés eseménykezelő segítségével. 
+A szükséges engedély:
 
-### Feladat 2 - Képernyőn maradás
+```xml
+<uses-permission android:name="android.permission.SEND_SMS"/>
+```
 
-Biztosítsa, hogy a játékos űrhajóját ne lehessen kimozgatni a játéktérből!	

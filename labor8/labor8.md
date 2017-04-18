@@ -1,775 +1,940 @@
-# Labor 8 - Hálózatkezelés
+# Labor 8 - Galéria
+
 
 ## Bevezetés
 
-A labor célja a hálózati kommunikáció, a platformon leginkább használt, HTTP kommunikáció alapjainak bemutatása, valamint az ehhez kapcsolódó aszinkron hívások ismertetése. A labor során egy multiplayer labirintus játékhoz fogunk mobil klienst fejleszteni. A kliens segítségével irányíthatjuk a labirintusban egy bábut, továbbá lehetőség lesz üzenetek küldésére is. A labor az alábbi témákat érinti:
+A mérés célja, hogy bemutassa az Android multimédia szolgáltatásait, külön kiemelve a kamerakezelés módszereit, valamint az előző labor során megismert hálózatkezelési megoldások egy magasabb szintjét, a HTTP API készítését megoldását **Retrofit** segítségével. 
 
-*   Felületek használata ButterKnife segítségével
-*   HTTP hálózati hívások
-*   Aszinkron hívások szálakkal
-*   Események kezelése EventBus-al
+A mérés során egy Galéria alkalmazást készítünk, melyben lehetőség lesz:
 
-## A feladat
-
-A következőkben egy olyan Android alkalmazást készítünk, mely tulajdonképpen egy kliensalkalmazás egy multiplayer labirintus játékhoz. A játék tényleges felülete nem az Android alkalmazás része, azt egy előre elkészített JavaFX alkalmazás jeleníti meg, amelyet a projektorról láthatunk kivetítve a labor alatt, vagy szükség esetén letölthető [innen](./app/LabyrinthWar.jar).
+* Fényképek listázására
+* Saját fotó készítésére (saját felület illetve beépített alkalmazás) 
+* Fotó feltöltésére
 
 
-A játék szabályai egyszerűek, a játékosunkat a készülékről négy gomb segítségével (bal, jobb, fel, le) irányíthatjuk, továbbá lehetőség van még üzenetküldésre is. Az első lépésünk során kerül rá az új játékos a játéktérre egy véletlen pozícióra. Ha egy játékos a másikra lép, akkor pontot kap! A feladatok megoldása során a hálózati kommunikációra és az aszinkron hívásokra egyre teljes körűbb, minden helyzetben jól használható megoldást mutatunk.
+A mérés az alábbi témákat érinti:
 
-<img src="./images/game.png" width="400" align="middle">
+*   HTTP API-k használata Retrofit segítségével
+*   File feltöltése szerverre
+*   Beépített kamera alkalmazás használata
+*   Saját kamera felület megjelenítése
 
-## A felhasználói felület elkészítése
 
-Hozzunk létre egy új Android Studio Projektet **NetworkLabor** néven. A Company Domain mező tartalmát töröljük ki és hagyjuk is üresen. 
 
-A packagename legyen **hu.bme.aut.amorg.examples.networklabor** 
-A támogatott céleszközök a **Telefon és Tablet**, valamint a minimum SDK szint az **API15: Android 4.0.3** 
+## Galéria
+
+A feladat megvalósításához szerver oldalon egy galéria alkalmazás áll rendelkezésre, mely az alábbi oldalon is elérhető:
+
+[http://android-gallery.node.autsoft.hu/](http://android-gallery.node.autsoft.hu/) 
+
+### API leírás
+
+A galéria egy HTTP API-n keresztül lehetőséget biztosít arra, hogy a képeket listázzuk, új képek tölsünk fel, illetve hogy képet értékeljünk.
+
+Az API a követekező címen érhető el:
+
+`http://android-gallery.node.autsoft.hu/api`
+
+
+#### Képek lekérdezése
+
+Az alábbi `GET` hívással:  `/images` lehetőségünk van a feltöltött fotókat listázni.
+ 
+ A válasz egy JSON tömb, ami a képek adatait tartalmazza, pl. 
+ 
+ ```
+[
+  {
+    "_id": "58a5b80aa8e86411008ca8e4",
+    "name": "Név",
+    "description": "Leírás",
+    "timestamp": 1487255562304,
+    "url": "images/image-1487255562041",
+    "size": 121128,
+    "mimetype": "image/jpeg",
+    "encoding": "7bit"
+  }
+]
+ ```
+ 
+ A képek url je, az api címe után fűzve érhető el. (Ne feledkezzünk meg a `/`-ről.)
+
+#### Fotó feltöltése
+Az alábbi `POST` hívással:  `/upload` lehetőségünk van fotót feltölteni. A kérés tartalma a bináris kép file `image` kulccsal.
+
+
+#### Szavazat feltöltése
+Az alábbi `POST` hívással:  `/rate/{id}` lehetőségünk van a feltöltött fotókat értékelni. Az `{id}` helyére a kép id-jét kell fűznünk.[]()
+
+A kérés paraméterek:
+
+*   `username=tetszőleges felhasználónév`
+*   `vote=egész szám 1 és 5 között`
+*   `professional=boolean`
+*   `type=tetszőleges string`
+*   `comment=tetszőleges string`
+
+
+## Felhasználói felület
+
+Hozzunk létre egy új Android Studio Projektet **CameraLabor** néven. 
+
+A Company Domain mező tartalmát töröljük ki és hagyjuk is üresen.
+ 
+A packagename legyen **hu.bme.aut.amorg.examples.cameralabor** 
+
+A támogatott céleszközök a **Telefon és Tablet**, valamint a minimum SDK szint a **API15: Android 4.0.3** 
 
 A kezdő projekthez adjuk hozzá egy **Empty Activity**-t, melynek neve legyen **MainActivity**. 
 
-Első lépésként készítsük el az alkalmazás felhasználói felületét XML erőforrásból. A felületen helyezzünk el két _EditText_-et, egyet a felhasználónév bekéréséhez, egyet pedig üzenetküldéshez. Emellett legyen összesen 5 gomb, négy gomb az irányításhoz, egy pedig az üzenetküldéshez, valamint 3 TextView az üzenetek megjelenítéséhez. 
+Töröljük ki a **test** és **androidTest** mappákat, most nem lesz rájuk szükség.
 
+Vegyük fel a Manifest állományba a szükséges engedélyeket: 
 
-<img src="./images/ui.png" width="250" align="middle">
+```xml 
+<uses-permission android:name="android.permission.INTERNET"/>
+<uses-permission android:name="android.permission.CAMERA"/>
+<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+```
 
-Az ehhez megfelelő XML állomány a következő: 
+> Ezen engedélyek közül a kamera kezelés és a külső háttértár elérése veszélyes engedély, amit Android 6.0 felett megfelelően, futásidőben kell elkérni. A félév során lesz ennek a menetéről is szó. Mi ezt most a labor nem szeretnénk támogatni, ezért a `build.gradle`-ben a `targetSdkVersion` értékét vegyük le `23`-ra.
 
-```xml  
+A **build.gradle**-ben vegyük fel a RecyclerView függőséget:
+
+ `compile 'com.android.support:recyclerview-v7:25.0.0'`
+
+A **MainActivity** nézet fogja kilistázni a feltöltött képeket. Ez egy egyszerű RecyclerView, mely egy SwipeRefreshLayoutba van ágyazva, ez lehetőséget biztosít arra, hogy a listához egyszerűen implementáljunk pull-to-refresh működést. A hozzá tartozó **activity_main.xml** tartalma a következő:
+
+```xml
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/bgLayout"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="@dimen/default_padding">
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin">
 
-    <TextView
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/imagesSRL"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/title_username"
-        style="@style/DefaultViewMarginStyle" />
+        android:layout_height="match_parent">
 
-    <EditText
-        android:id="@+id/usernameET"
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/imagesRV"
+            android:scrollbars="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+    </android.support.v4.widget.SwipeRefreshLayout>
+</RelativeLayout>
+```
+
+A **MainActivity** kódja pedíg a következő. Látható hogy a `loadImages()` függvény végzi ez a photok letöltését (egyenlőre csak beégetett értékekkel), ez hívódik a nézetre navigálása után, illetve ha lehúzzással frissítjük a tartalmat.
+
+```java
+
+public class MainActivity extends AppCompatActivity {
+    private ImagesAdapter adapter;
+    private RecyclerView imagesRV;
+    private SwipeRefreshLayout imagesSRL;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        imagesRV = (RecyclerView) findViewById(R.id.imagesRV);
+        imagesSRL = (SwipeRefreshLayout) findViewById(R.id.imagesSRL);
+
+        GridLayoutManager mLayoutManager = new GridLayoutManager(this, 2);
+        imagesRV.setLayoutManager(mLayoutManager);
+
+        imagesSRL.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                loadImages();
+            }
+        });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        loadImages();
+    }
+
+    private void loadImages() {
+        List<String> images = new ArrayList<>();
+        images.add("http://lorempixel.com/400/400/city/");
+        images.add("http://lorempixel.com/400/400/technics/");
+        images.add("http://lorempixel.com/400/400/nature/");
+
+        adapter = new ImagesAdapter(getApplicationContext(), images);
+        imagesRV.setAdapter(adapter);
+        imagesSRL.setRefreshing(false);
+    }
+}
+```
+
+A képek listájának feltöltését a **ImagesAdapter** végzik. Hozzuk is létre ezt az osztályt a fő csomagban a következő tartalommal.
+
+```java
+public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.ViewHolder> {
+    private final LayoutInflater layoutInflater;
+    private final Context context;
+    private List<String> images;
+
+    public ImagesAdapter(Context context, List<String> images) {
+        this.images = images;
+        Collections.reverse(this.images);
+        this.layoutInflater = LayoutInflater.from(context);
+        this.context=context;
+    }
+
+    @Override
+    public ImagesAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View v = layoutInflater.inflate(R.layout.li_image, parent, false);
+        return new ViewHolder(v);
+    }
+
+    @Override
+    public void onBindViewHolder(ViewHolder holder, int position) {
+        //TODO: Set ImageView from URL
+    }
+
+    @Override
+    public int getItemCount() {
+        return images.size();
+    }
+
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        public ImageView imageView;
+
+        public ViewHolder(View v) {
+            super(v);
+            imageView = (ImageView) v.findViewById(R.id.imageIV);
+        }
+    }
+}
+```
+
+Az egyes képekhez tartozó cella elem felületét pedig az **li_image.xml** layout fileban definiáljuk.
+
+```
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <ImageView
+        android:id="@+id/imageIV"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        style="@style/DefaultViewMarginStyle" />
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="vertical">
-
-        <Button
-            android:id="@+id/upBTN"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true"
-            style="@style/DefaultViewMarginStyle"
-            android:text="@string/up" />
-
-        <Button
-            android:id="@+id/downBTN"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/upBTN"
-            android:layout_centerHorizontal="true"
-            style="@style/DefaultViewMarginStyle"
-            android:text="@string/down" />
-
-        <Button
-            android:id="@+id/leftBTN"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/upBTN"
-            style="@style/DefaultViewMarginStyle"
-            android:layout_toLeftOf="@id/downBTN"
-            android:text="@string/left" />
-
-        <Button
-            android:id="@+id/rightBTN"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/upBTN"
-            style="@style/DefaultViewMarginStyle"
-            android:layout_toRightOf="@id/downBTN"
-            android:text="@string/right" />
-
-
-    </RelativeLayout>
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        style="@style/DefaultViewMarginStyle"
-        android:text="@string/title_message" />
-
-    <EditText
-        android:id="@+id/messageET"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        style="@style/DefaultViewMarginStyle"  />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="horizontal">
-
-        <Button
-            android:id="@+id/sendBTN"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            style="@style/DefaultViewMarginStyle"
-            android:text="@string/send" />
-    </LinearLayout>
-
-    <TextView
-        android:id="@+id/responseTV"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        style="@style/DefaultViewMarginStyle"/>
-
+        android:layout_height="120dp"
+        android:src="@mipmap/ic_launcher"
+        android:padding="8dp" />
 </LinearLayout>
-
-``` 
-
-A felület tartalmaz több szöveges konstanst is, ezért töltsük fel a _res/values_ könyvtárban lévő _strings.xml_ állományunkat a következő értékekkel: 
-
-
-```xml
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="app_name">Labirintus</string>
-    <string name="title_username">Felhasználónév</string>
-    <string name="title_message">Üzenet</string>
-    <string name="left">Bal</string>
-    <string name="right">Jobb</string>
-    <string name="up">Fel</string>
-    <string name="down">Le</string>
-    <string name="send">Küldés</string>
-    <string name="empty_user">Üres felhasználónév!</string>
-    <string name="empty_user_or_message"> Üres felhasználónév vagy jelszó!</string>
-</resources>
-``` 
-
-A felület tartalmaz stílusokat is, ezért töltsük fel a _res/values_ könyvtárban lévő _styles.xml_ állományunkat a következő értékekkel: 
-
-```xml
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <item name="colorPrimary">@color/primary</item>
-        <item name="colorPrimaryDark">@color/primary_dark</item>
-        <item name="colorAccent">@color/accent</item>
-    </style>
-
-    <style name="DefaultViewMarginStyle">
-        <item name="android:layout_margin">@dimen/default_padding</item>
-    </style>
-
-</resources>
-
-``` 
-
-Szabjuk testre az alkalmazás színeit _res/values_ könyvtárban lévő _color.xml_ állományban.
-
-```xml
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-  <color name="primary">#009688</color>
-  <color name="primary_dark">#00796B</color>
-  <color name="primary_light">#B2DFDB</color>
-  <color name="accent">#00BCD4</color>
-  <color name="primary_text">#212121</color>
-  <color name="secondary_text">#757575</color>
-  <color name="icons">#FFFFFF</color>
-  <color name="divider">#BDBDBD</color>
-</resources>
-
-
-``` 
-
-Szabjuk testre a _dimens.xml_ file tartalmát.
-
-```xml
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <dimen name="activity_horizontal_margin">16dp</dimen>
-    <dimen name="activity_vertical_margin">16dp</dimen>
-    <dimen name="default_padding">8dp</dimen>
-</resources>
 ```
 
-A tabletekre optimalizált dimens file-t törölhetjük is (figyeljük oda, hogy ne mind a kettőt töröljük, mert azt ajánlaná fel a Studió).Töröljük az **androidTest** és **test** könyvtárakat is, nem lesz most rá szükségünk. 
+Próbáljuk ki az alkalmazást!
 
-Mivel az alkalmazásunk interneten keresztül fog kommunikálni, vegyül fel a manifestbe az ehhez kapcsolódó permissiont.
+<img src="./images/screen1.png" width="250" align="middle">
 
-```xml
- <uses-permission android:name="android.permission.INTERNET"/>
+
+## Képek megjelenítése - Glide
+Az alkalmazás jelenleg a képek helyén kék cellékat jelenít meg. Ez azért van mert bár a listát feltöltöttük, az `onBindViewHolder(...)` hívásban nem jelentettük meg a képet. A megjelenítendő képekről csak a webes URL áll rendelkezésünkre. Ilyen esetben a file-t le kell töltenünk a hálózaton keresztül, dekódolni a kapott byte-okat, és az így kapott Bitmap-et beállítani az ImageView forrásaként. Ezt a platform által nyújtott eszközökkel elég kényelmetlen implementálni, ezért egy elterjed, általános célű könyvtárat fogunk használni.
+
+A [Glide](https://github.com/bumptech/glide) egy általános célú képkezelő könyvtár, gyakorlatilag a fent említett műveleteket végzi el helyettünk 1 sor kód használatával, továbbá támogatja a cachelést, aszinkron letöltést, valamint több forrásból is képes megjeleníteni (web, háttértár, content provider, resource ...). 
+
+Használatához a **build.gradle** be vegyük fel a következő függőséget a `dependencies` blokkban. 
+
+```
+compile 'com.github.bumptech.glide:glide:3.7.0'
 ```
 
+Ezután a **ImagesAdapter**  **onBindViewHolder** függvényében töltsük be az adott fotót az **ImageView**-ba.
 
-## A felületi elemek egyszerű feloldása
-Az előző laborok során többször is használtuk a **findViewByID** hívást a nézetek feloldására. Ez a felületi elemekkel arányos mennyiségű kódolást kiván, mely egyébként nagyon repetativ. Azért hogy ezt ne _kézzel_ kelljen megcsinálnunk újra használjuk a [Butterknife](http://jakewharton.github.io/butterknife/) könyvtárat.
-
-Ehhez a module build.gradle ben kell a dependencies részbe felvenni a könyvátrat. Egyszer fel kell venni mint compile függőség, hogy az osztályait elérjük. Másrészt fel kell venni mint annotationProcessor-t, hogy az annotáció feldolgozás lefuthasson. (Régebben erre az **android-apt** gradle plugin kellett, de az Android Gradle Plugin 2.2 óta beépítve elérhető, ha mégsem a legújabb gradle plugint használtnánk, azt a projekt _build.gradle_ -ben tudjuk frissíteni.).
-
-```java
-compile 'com.jakewharton:butterknife:8.4.0'
-annotationProcessor 'com.jakewharton:butterknife-compiler:8.4.0'
+```       
+Glide.with(holder.imageView.getContext()).load(images.get(position)).into(holder.imageView);
 ```
 
-A könyvtár fordítás időben generálja le a findViewByID hívásokat, és el is fedi előlünk, az összerendelést annotációkkal tudjuk megadni.
+Próbáljuk ki az alkalmazást!
+
+<img src="./images/screen2.png" width="250" align="middle">
 
 
-```java
-public class MainActivity extends AppCompatActivity
-{
-	@BindView(R.id.usernameET) EditText usernameET;
-	 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-		ButterKnife.bind(this);
+## Retrofit
+
+A [Retrofit](https://square.github.io/retrofit/) egy általános célú HTTP könyvtár Java környezetben. Széles körben használják, számos projektben bizonyított már (kvázi ipari standard). Azért használjuk, hogy ne kelljen alacson színtű hálózati hívásokat implementálni (mint az előző laboron az OkHttp-vel). Segítségével elég egy interfaceben annotációk segítségével leírni az API-t (ez pl. a Swagger eszközzel generálható is), majd e mögé készít a Retorfit egy olyan osztályt, mely a szükséges hálózati hívásokat elvégzi. A Retrofit a háttérben az OkHttp3-at használja, valamint az objektumok JSON formátumba történő sorosítását a GSON eszközzel végzi. Ezért ezeket is be kell hivatkozni.
+
+A Retrofit használatához vegyük fel a függőségek közé az alábbi kódot.
+
+```
+compile 'com.squareup.retrofit2:retrofit:2.1.0'
+compile 'com.squareup.okhttp3:okhttp:3.4.2'
+compile 'com.google.code.gson:gson:2.7'
+compile 'com.squareup.retrofit2:converter-gson:2.1.0'
+```
+
+Ezután hozzunk létre egy új csomagot **network** néven, benne egy új interface-t **GalleryAPI** néven. Ez lesz az API leírónk.
+
+```
+public interface GalleryAPI {
+    String ENDPOINT_URL="http://android-gallery.node.autsoft.hu/api/";
+    String IMAGE_PREFIX_URL="http://android-gallery.node.autsoft.hu/";
+        
+    String MULTIPART_FORM_DATA = "multipart/form-data";
+    String PHOTO_MULTIPART_KEY_IMG = "image";
+
+    @GET("images")
+    Call<List<Image>> getImages();
+
+    @Multipart
+    @POST("upload")
+     Call<ResponseBody> uploadImage(@Part MultipartBody.Part file, @Part("name") RequestBody name, @Part("description") RequestBody description);
+}
+```
+
+A képek adatait tartalmazó **Image** osztályt hozzuk létre a **model** csomagban.
+
+```
+public class Image {
+    @SerializedName("_id")
+    public String id;
+    public String name;
+    public String description;
+    public long timestamp;
+    public String url;
+    public long size;
+    public String mimetype;
+    public String encoding;
+}
+```
+
+Látható, hogy a GSON automatikus megoldja majd az egyes tagváltozók szerializálását, kivéve az id mezőt, mivel azt a szerver `_id`-ként adja vissza. Ezt a `@SerializedName` annotációval írhatjuk felül.
+
+Ezután hozzuk létre azt az osztályt ugyan ebben a csomagban,amely a fenti API-t használni fogja,  mivel ennek az osztálynak az a feladata hogy fenti API hívásokat egységbe fogja, és az előző laboron látott módon külön szálon vegezze el a hálózati hívásokat. **Az eseménybusz megoldást most idő hiányában nem használjuk, de abszolút releváns ebben a helyzetben is.** 
+
+Az osztály neve legyen **GalleryInteractor**.
+
+```
+public class GalleryInteractor {
+    private final GalleryAPI galleryApi;
+    private final Context context;
+
+    public GalleryInteractor(Context context) {
+        this.context = context;
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(GalleryAPI.ENDPOINT_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        this.galleryApi = retrofit.create(GalleryAPI.class);
     }
 }
 ```
 
-Viszont jól látható, hogy így is van feladatunk, meg kell adnunk a felületi elemeket és a hozzájuk tartozó tagváltozókat létrehozni. Szerencsére ez a feladat is automatizálható, a Butterknife Zelezny Android Studio Pluginnal.
+Látható, hogy a **Retrofit** objektumot felhasználva hozzuk létre a **GalleryAPI** osztály implementációját, melyet azután használhatunk is. Itt álltjuk be hogy a konverziókhoz a **Gson**-t használja, így felteti meg a **Retrofit** a Java objektumokat a JSON formátumnak (illetve szükség esetén visszafelé is).
 
-Ennek a telepítéséhez `Preferences` - `Plugings` - `Browser Repositories` - `keresés: Android ButterKnife Zelezny` , majd `Install` és Android Studio újraindítás.
+Azért, hogy a hálózati hívásokat külön szálra ütemezzük, majd a választ egy interfacen keresztül visszaütemezzük a főszálra **generikus függvényeket** fogunk használni. A hálózati hívások válaszát a következő generikus interface fogja biztosítani, ezt a **GalleryInteractorban** definiáljuk.
 
-Ha plugin már telepítve van, akkor  a setContentView(**R.layout.activity_main**); elemére állva, **Alt+Insert** _(CMD+N)_ majd **Generate Butterknife Injections**, majd válasszuk ki a generálni kívánt elemeket (gombok, usernév, üzenet).
-
-Jelen esetben csak az EditText és TextView mezőket fogjuk használni ilyen formában. A 4 gomb kezelésére használjuk a ButterKnife beépített `@OnClick(R.id.button)` annotációt.
-
-```java
-@OnClick(R.id.downBTN)
-public void onDownButtonClick() {
-	//...
-}
 ```
-Az összekötést (a tényleges findViewByID és setOnClickListener hívásokat) a ButterKnife.bind(this) hívás csinálja meg, azutána hívás után használhatóak a nézeteink és a listenerek.
-
-```java
-public class MainActivity extends AppCompatActivity {
-
-    @BindView(R.id.usernameET)
-    EditText usernameET;
-    @BindView(R.id.messageET)
-    EditText messageET;
-    @BindView(R.id.responseTV)
-    TextView responseTV;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        ButterKnife.bind(this);
-    }
-
-    @OnClick(R.id.downBTN)
-    public void onDownButtonClick() {
-        Toast.makeText(this,"Down",Toast.LENGTH_SHORT).show();
-    }
-
-    @OnClick(R.id.upBTN)
-    public void onUpButtonClick() {
-        Toast.makeText(this,"Up",Toast.LENGTH_SHORT).show();
-    }
-
-    @OnClick(R.id.leftBTN)
-    public void onLeftButtonClick() {
-        Toast.makeText(this,"Left",Toast.LENGTH_SHORT).show();
-    }
-
-    @OnClick(R.id.rightBTN)
-    public void onRightButtonClick() {
-        Toast.makeText(this,"Right",Toast.LENGTH_SHORT).show();
-    }
- 
-    @OnClick(R.id.sendBTN)
-    public void onSendButtonClick() {
-        Toast.makeText(this,"Send",Toast.LENGTH_SHORT).show();
-    }
-    
+public interface ResponseListener<T> {
+    void onResponse(T t);
+    void onError(Exception e);
 }
 ```
 
-Próbáljuk ki az alkalmazást, nézzük meg a felületét.
+Itt látható hogy egy `T` generikus paramétert várunk, és egy ilyen típusu választ adunk vissza az `onRespons`e-ban, illetve egy `Exception`-t a hiba esetén.
 
-<img src="./images/ui.png" width="250" align="middle">
+Az API-ban definiált `Call` objektumok lehetővé teszik, hogy a hálózati hívások ne a definiálás (ne a függvényhívás) idejében történjenek, hanem később testszőlegesen (`.execute()` hívással) bármikor. Ez lehetőséget ad arra hogy az összeállított kéréseket generikusan kezeljük (nem kell minden kérésre külön implementálni a szálkezelést). 
 
-## Az API bemutatása
-
-A szerver egy PHP alapú oldal, amely HTTP GET kérésekben várja a lépéseket és az üzeneteket. Ezeket eltárolja egy adatbázisban, amelyet egy PHP oldalon tesz elérhetővé a megjelenítésért felelős JavaFX alkalmazás számára. A Java FX alkalmazás ezt a PHP oldalt pollozza relatív kis időközönként és kapott válaszok alapján frissíti a felhasználói felületét. A szerver alap címe az alábbi oldalon érhető el: 
-``` http://babcomaut.aut.bme.hu/labyrinthwar/ ``` 
-
-Ezen belül kell majd a megfelelő PHP állományokat meghívni az előre definiált GET paraméterekkel. A PHP-ktől hiba esetén mindig „ERROR”-al kezdődő üzenetet kapunk.
-
-### Játékos mozgatása
-
-A játékos mozgatásához a `moveuser.php`-t kell meghívni, amely két paramétert vár:
-
-*   _username_: felhasználónév (ne felejtsük URL encode-olni!)
-*   _step_: lépés típusa (1: bal, 2: jobb, 3: fel, 4: le)
-
-Például: 
-``` 
-moveuser.php?username=user1&step=1 
-```
-
-### Üzenet feltöltése
-
-Üzenet feltöltéséhez a `writemessage.php`-t kell hívni,amely szintén két paramétert vár:
-
-*   _username_: felhasználónév (ne felejtsük URL encode-olni!)
-*   _message_: üzenet (ne felejtsük URL encode-olni!)
-
-Például: 
-
-``` writemessage.php?username=user1&message=uzenet ```
-
-
-## Aszinkron hívások Android platformon
-
-### Mellék szálak kezelése
-Alapértelmezetten Androidon a hívások a fő szálon (UI Thread, Main thread) futnak. Ha itt hosszan tartó műveleteket végzünk akkor a fő szálat blokkoljuk.  Ez a felhasználó számára zavaró.
-
-Android platformon a hálózati kommunikáció emiatt új szálon kell történjen, hogy a felhasználói felületet ne blokkoljuk.  Erre mind a Java mind az Android SDK ad lehetőségeket
-
-*	Java Thread (Plain Old Java Thread, rugalmas, de testre kell szabni)
-*	Android [AsyncTask](http://developer.android.com/reference/android/os/AsyncTask.html) (Szálakra épül, sok beépített feature, de nem elég rugalmas)
-*	RxJava (sokkal bonyolultabb az előzőeknél, szálakra épül ez is)
-
-
-### Visszatérés a fő szálra
-A hálózatról érkező választ azonban általában a felhasználói felületen jelenítjük meg valamilyen módon, de a platform nem engedi, hogy más szálból a UI-t módosítsuk, csak a fő szálról. 
-
-Arra, hogy egy mellék szálról hogyan térjünk vissza a fő szálra a platform több eszközt is biztosít:
-
-#### Erőssen csatolt megoldások
-Amennyiben van már refernciánk az activityre/view-ra.
-
-*   Activity.runOnUiThread(Runnable)
-*   View.post(Runnable)
-*   View.postDelayed(Runnable, long)
-*   Handler
-*   Android [AsyncTask](http://developer.android.com/reference/android/os/AsyncTask.html) (Ez is egy feature-je)
-
-Probléma lehet hogyha pl. elfordul az activity ezért a refercia a régire mutat (memory leak), és az új nem kapja meg a hívás. Ha ez a veszély fenn áll célszerű kombinálni lazán csatolt megoldással.
-
-#### Lazán csatolt megoldások
-A fő szálú objektum feliratkozik, majd leiratkozik az a válaszról, lazán csatolt módon. Hiába fordul el a nézet a hálózati hívás során, az új nézet fogja elkapni a régi által indított üzenete válaszát, és a régire nem marad referencia.
-
-*   Broadcast receiver  (lazán csatolt, nem kell referencia, sorosítani kell a választ, lasabb)
-*   Eseménybuszok  (lazán csatolt, nem kell referencia, de picit bonyolultabb, 3rd party megoldás).
-
-A mostani laboron, a **Java Thread** és az **Eseménybusz** kombinációját fogjuk használni.
-
-## Kommunikáció a szerver oldallal
-
-Következő feladatunk a szerver oldali kommunikációt biztosító osztály megvalósítása, mely végrehajtja a HTTP GET hívásokat és és a választ visszadja String formátumban.
-
-A **network** csomagban hozzunk létre a **LabyrinthAPI** osztályt.
-
-```java
-public class LabyrinthAPI {
-
-    private static final String BASE_URL = "http://babcomaut.aut.bme.hu/labyrinthwar/";
-    private static final String UTF_8 = "UTF-8";
-
-  
-    public String moveUser(String userName, int direction) {
-		//TODO
-		return "";
-     }
-
-    public String writeMessage(String userName, String message) {
-		//TODO
-       return "";
-    }
-
-}
-```
-
-Ez az osztály fogja végezni a különböző api hívásokat, és egységbe zárni a http kérés és válasz feldolgozást.
-
-### HTTP hívások Androidon
-Az Android platform több megoldást is ad beépítve HTTP hívásokra. Egyrészt elérhető az Apache HTTP Client, valamint az Java HttpUrlConnection. Ezeket beépítve tartalmaza a platform. Az Apache HTTP Client mára elavult, az Android 6.0 feletti eszközök már csak kiegészítéésel támogatják, NE HASZNÁLJUK. A HttpUrlConnection elérhető mindenhol, viszont nagyon körülményes a használata, ezért a beépített megoldások helyett, egy széleskörben elterjed, harmadik féltől (3rd party) fejlesztőcsapattól ([Square](http://square.github.io)) származó, nyilt könyvtárat, az [OkHttp](http://square.github.io/okhttp/)-t fogjuk használni.
-
-Ennek használatához fel kell vennük a következő sort az alklamzás build.gradle dependencies részéhez.
-
-```java
-compile 'com.squareup.okhttp3:okhttp:3.4.1'
-```
-
-Ezután a könyvtár nagyon egyszerűen használható. Készítsünk is egy általános HTTP GET hívást lebonyolító függvényt a LabyrinthAPI osztályba.
-
-```java
-private static String httpGet(String URL) throws IOException {
-     OkHttpClient client = new OkHttpClient.Builder()
-            .connectTimeout(10, TimeUnit.SECONDS)
-            .readTimeout(10, TimeUnit.SECONDS)
-            .build();
-            
-    Request request = new Request.Builder()
-            .url(URL)
-            .build();
-
-    //The execute call blocks the thread
-    Response response = client.newCall(request).execute();
-    return response.body().string();
-}
-```
-
-Ezt fogjuk használni az összes HTTP GET híváshoz. Használjuk is az újonnal elkészített függvényünket, és implementáljuk a moveUser és writeMessage hívásokat. 
-> Megjegyzés: Jelen esetben a stringeket nyugodtan összefűzhetjük a + operátorral, a háttérben ezt a fordító kioptimalizálja, összetettebb összefüzésekre (pl. file sorainak összefűzése), használjuk a [StringBuilder](https://developer.android.com/reference/java/lang/StringBuilder.html) -t.
-
-```java
-private static final String TAG = "Network";
-private static final String ENDPOINT_MOVE_USER = "moveuser.php";
-private static final String PARAM_USERNAME = "username";
-private static final String SEPARATOR_QUESTION = "?";
-private static final String SEPARATOR_EQUALS = "=";
-private static final String PARAM_STEP = "step";
-private static final String SEPARATOR_AMPERSAND = "&";
-private static final String PARAM_MESSAGE = "message";
-private static final String ENDPOINT_WRITE_MESSAGE = "writemessage.php";
-private static final String RESPONSE_ERROR = "ERROR";
-
-
-public String moveUser(String userName, int direction) {
-    try {
-        String usernameURLEncoded = URLEncoder.encode(userName, UTF_8);
-
-        String moveUserUrl = ENDPOINT_MOVE_USER + SEPARATOR_QUESTION + PARAM_USERNAME + SEPARATOR_EQUALS + usernameURLEncoded + SEPARATOR_AMPERSAND + PARAM_STEP + SEPARATOR_EQUALS + direction;
-
-        Log.d(TAG,"Call to:"+moveUserUrl);
-        String response = httpGet(BASE_URL + moveUserUrl);
-        return response;
-
-    } catch (Exception e) {
-        e.printStackTrace();
-        return RESPONSE_ERROR;
-    }
-}
-
-public String writeMessage(String userName, String message) {
-    try {
-        String usernameURLEncoded = URLEncoder.encode(userName, UTF_8);
-        String messageURLEncoded = URLEncoder.encode(message, UTF_8);
-
-        String writeMessageUrl = ENDPOINT_WRITE_MESSAGE + SEPARATOR_QUESTION + PARAM_USERNAME + SEPARATOR_EQUALS + usernameURLEncoded + SEPARATOR_AMPERSAND + PARAM_MESSAGE + SEPARATOR_EQUALS + messageURLEncoded;
-
-        Log.d(TAG,"Call to:"+writeMessageUrl);
-        String response = httpGet(BASE_URL + writeMessageUrl);
-        return response;
-
-    } catch (Exception e) {
-        e.printStackTrace();
-        return RESPONSE_ERROR;
-    }
-
-}
-```
-
-Figyeljük meg, hogy az esetleges kivételeket try-catch blockban kezeltük, valamint a HTTP karaktereket megfelelően URL encodeoltuk az `URLEncoder.encode(...)`  függvényével, mely beépítve rendelkezésünkre áll.
-
-
-Ezután vegyük fel az irányok értékeit konstansként a MainActivitybe
+Készítsük is el a generikus statikus hívásunkat, mely egy tetszőleges típusu `Call` objektumot vár, azt egy külső szálon meghívja, majd a választ (`Handler` segítségével) visszaütemezi a főszálra, és ott meghívja az előbb létrehozott listener objektumot. A `Handler`-rel a `runOnUiThread`-hez hasonló működést tudunk elérni, anélkül hogy referenciánk lenne egy `Activity`-re. Enneka kódja a következő (ezt is a **GalleryInteractor**-ban definiáljunk):
 
 ```
-public static final int MOVE_LEFT = 1;
-public static final int MOVE_RIGHT = 2;
-public static final int MOVE_UP = 3;
-public static final int MOVE_DOWN = 4;
-```
-
-Majd private field ként adjunk hozzá az előbb létrehozott LabyrithAPI osztályt, és használjuk a megfelelő események bekövetkeztekor.
-
-
-```java
-public class MainActivity extends AppCompatActivity {
-
-    @BindView(R.id.usernameET) EditText usernameET;
-    @BindView(R.id.messageET) EditText messageET;
-    @BindView(R.id.responseTV) TextView responseTV;
-
-    public static final int MOVE_LEFT = 1;
-    public static final int MOVE_RIGHT = 2;
-    public static final int MOVE_UP = 3;
-    public static final int MOVE_DOWN = 4;
-
-    private LabyrinthAPI labyrinthAPI;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        ButterKnife.bind(this);
-
-        labyrinthAPI = new LabyrinthAPI();
-    }
-
-
-    @OnClick(R.id.downBTN)
-    public void onDownButtonClick() {
-        String response=labyrinthAPI.moveUser(usernameET.getText().toString(),MOVE_DOWN);
-        showResponse(response);
-    }
-
-    @OnClick(R.id.leftBTN)
-    public void onLeftButtonClick() {
-        String response=labyrinthAPI.moveUser(usernameET.getText().toString(),MOVE_LEFT);
-        showResponse(response);
-    }
-
-    @OnClick(R.id.rightBTN)
-    public void onRightButtonClick() {
-        String response=labyrinthAPI.moveUser(usernameET.getText().toString(),MOVE_RIGHT);
-        showResponse(response);
-    }
-
-    @OnClick(R.id.upBTN)
-    public void onUpButtonClick() {
-        String response=labyrinthAPI.moveUser(usernameET.getText().toString(),MOVE_UP);
-        showResponse(response);
-    }
-
-    @OnClick(R.id.sendBTN)
-    public void onSendButtonClick() {
-        String message = messageET.getText().toString();
-        String response=labyrinthAPI.writeMessage(usernameET.getText().toString(),message);
-        showResponse(response);
-
-    }
-
-    private void showResponse(String response) {
-        responseTV.setText(response);
-    }
-
-}  
-```
-
-Próbáljuk, ki az alkalmazást. Mit tapasztalunk?
-
-Azt tapasztaljuk, hogy minden kérésre ERROR-t kapunk, és ha megnézzük a LogCat kimentet, látjuk is hogy `android.os.NetworkOnMainThreadException` kivételt kapunk. Ezt a rendszer dobja, mert érzékeli, hogy a fő szálon szeretnénk hosszan tartó hálózati műveletet végezni. A látszik hogy a fő szálon, az onClic metódusban hívuk meg a moveUser-t ami a httpGet metóduson keresztül a blokkoló execute metódust. Ahhoz hogy ezt a problémát meg tudjuk oldani szálkezelésre lesz szűkségünk.
-
-
-### Szálkezelés elkészítése
-A szálkezeléshez használjuk az egyszerű, és könnyen testre szabható JavaThread-eket. Készítsünk el a MainActivityben 1-1 segéd függvényt a moveUser és writeMessage híváshoz. Elsőnek egy új szálat készítünk,melyben elindítjuk az API hívást, és amint az válaszolt, visszaadjuk a választ a fő szálra (runOnUIThread) ahol pedíg már a főszálon megjelenítjük a választ.
-
-```java
-private void asyncMoveUser(final String username, final int direction) {
+private static <T> void runCallOnBackgroundThread(final Call<T> call, final ResponseListener<T> listener) {
+    final Handler handler = new Handler();
     new Thread(new Runnable() {
         @Override
         public void run() {
-            final String response = labyrinthAPI.moveUser(username, direction);
+            try {
+                final T response = call.execute().body();
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        listener.onResponse(response);
+                    }
+                });
 
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    showResponse(response);
-                }
-            });
-
-        }
-    }).start();
-}
-
-private void asyncWriteMessage(final String username, final String message) {
-    new Thread(new Runnable() {
-        @Override
-        public void run() {
-            final String response = labyrinthAPI.writeMessage(username, message);
-
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    showResponse(response);
-                }
-            });
-
+            } catch (final Exception e) {
+                e.printStackTrace();
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        listener.onError(e);
+                    }
+                });
+            }
         }
     }).start();
 }
 ```
-Hívjuk meg ezeket az onClick metódusokból, a direkt hívások helyett, és nézzük meg mit tapasztalunk.
+Ezután a fenti segédfüggvényt felhasználva elkészíthetjük a az Interactorban a hívásokat.
 
-```java
-@OnClick(R.id.downBTN)
-public void onDownButtonClick() {
-  asyncMoveUser(usernameET.getText().toString(),MOVE_DOWN);
+```
+public void getImages(ResponseListener<List<Image>> responseListener) {
+    Call<List<Image>> getImagesRequest = galleryApi.getImages();
+    runCallOnBackgroundThread(getImagesRequest, responseListener);
 }
 
-// ...
+public void uploadImage(Uri fileUri,String name, String description, ResponseListener<ResponseBody> responseListener) {
+    File file = new File(fileUri.getPath());
+    RequestBody requestFile = RequestBody.create(MediaType.parse(MULTIPART_FORM_DATA), file);
+    MultipartBody.Part body = MultipartBody.Part.createFormData(PHOTO_MULTIPART_KEY_IMG, file.getName(), requestFile);
 
-@OnClick(R.id.sendBTN)
-public void onSendButtonClick() {
-    asyncWriteMessage(usernameET.getText().toString(),messageET.getText().toString());
+    RequestBody nameParam =RequestBody.create(okhttp3.MultipartBody.FORM, name);
+    RequestBody descriptionParam =RequestBody.create(okhttp3.MultipartBody.FORM, description);
+
+    Call<ResponseBody> uploadImageRequest = galleryApi.uploadImage(body,nameParam,descriptionParam);
+    runCallOnBackgroundThread(uploadImageRequest, responseListener);
+}
+```
+
+Figyeljük meg, hogy az adott hívás nem egyből a válasz típusával tér vissza, hanem azt a már említett `Call` objektumba csomagolja, így nagyob rugalmasságot adva a fejlesztőknek.
+
+Ezután a **MainActivity**-ben példányosítsuk a **GalleryInteractor**-unkat, majd hívjuk meg a **getImages** hívást, melynek eredményét jelentsük meg a **ImagesAdapter** segítségével.
+
+```
+private void loadImages() {
+    GalleryInteractor galleryInteractor = new GalleryInteractor(this);
+    galleryInteractor.getImages(new GalleryInteractor.ResponseListener<List<Image>>() {
+        @Override
+        public void onResponse(List<Image> images) {
+            adapter = new ImagesAdapter(getApplicationContext(), images);
+            imagesRV.setAdapter(adapter);
+            imagesSRL.setRefreshing(false);
+        }
+
+        @Override
+        public void onError(Exception e) {
+            e.printStackTrace();
+            imagesSRL.setRefreshing(false);
+        }
+    });
+}
+```
+
+Mivel eddig String listát jelenítettünk meg az **ImagesAdapter** -el, így most át kell alakítani az adaptert, hogy egy **Image** listát kezeljen. Valamint az `IMAGE_PREFIX_URL` után kell fűznünk a kép **url** mezőjének tartalmát.
+
+```
+public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.ViewHolder> {
+    private final LayoutInflater layoutInflater;
+    private final Context context;
+    private List<Image> images;
+
+    public ImagesAdapter(Context context, List<Image> images) {
+        this.images = images;
+        Collections.reverse(this.images);
+        this.layoutInflater = LayoutInflater.from(context);
+        this.context=context;
+    }
+
+    @Override
+    public ImagesAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View v = layoutInflater.inflate(R.layout.li_image, parent, false);
+        return new ViewHolder(v);
+    }
+
+    @Override
+    public void onBindViewHolder(ViewHolder holder, int position) {
+        String url= GalleryAPI.IMAGE_PREFIX_URL+images.get(position).url;
+        Glide.with(holder.imageView.getContext()).load(url).into(holder.imageView);
+    }
+
+    @Override
+    public int getItemCount() {
+        return images.size();
+    }
+
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        public ImageView imageView;
+
+        public ViewHolder(View v) {
+            super(v);
+            imageView = (ImageView) v.findViewById(R.id.imageIV);
+        }
+    }
 }
 ```
 
 Próbáljuk ki az alkalmazást.
 
+<img src="./images/screen3.png" width="250" align="middle">
 
+## Fotó feltöltés
+Hozzunk létre egy új **Empty Activity** -t **UploadActivity** néven. A hozzá tartozó *activity_upload.xml* felülete legyen a következő:
 
+```
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical" >
 
-## Megfelelő válasz kezelés
-Próbáljuk, ki mi történik, ha megnyumunk egy gombot, majd elfordítjuk a készüléket/emulátort.
-Azt tapasztaljuk, hogy az alkalmzás hibába ütközik. 
+    <ImageView
+        android:id="@+id/imageIV"
+        android:layout_width="280dp"
+        android:layout_height="280dp"
+        android:scaleType="fitCenter"/>
 
-Ennek az az oka, hogy a szálak tovább képesek élni, mint az Activity, és ha egy hálózati hívás keresztül ível egy actvity váltáson/újralétrehozáson, akkor a szál még az előző activityre rendelkezik referenciával, így NullpointerException-t kapunk. 
+    <EditText
+        android:id="@+id/nameET"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Name"/>
 
-Ezt úgy lehet kiküszöbölni, hogy az erőss, referencia alapú csatolás helyett laza csatolást alkalmazunk. Ilyen esetben az activity amikor előtérbe kerül (onResume) feliratkozik, majd ha háttérbe kerül leiratkozik (onPause) egy eseményre. A hálózati hívás során, pedíg a választ nem direkt függvényhívásban állítjuk be, hanem csak egy eseményt váltunk ki.
+    <EditText
+        android:id="@+id/descriptionET"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Description"/>
+    
+    
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal" >
 
-Az Android platform beépítve támogatja az események kezelését Broadcast Receiverek formájában. Viszont egy alkalmazáson belül használva a broadcast receviereket, az üzenet sorosítása miatt overhead jelentkezik, valamint kényelmetlen is a használata. 
+        <Button
+            android:id="@+id/captureBTN"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Capture" />
 
-Ennek kiküszöbölése érdekében használjunk esemény buszokat, melyek gyorsabbak, és egyszerűbben is használhatóak a broadcast receiverektől (ellenben csak egy alkalmazáson/processen belül működnek, és referencia szükséges az eseménybuszra).
+        <Button
+            android:id="@+id/uploadBTN"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Upload" />
 
-Számos 3rd party eseménybusz megoldás van, mi az Greenrobot EventBus megoldását fogjuk használni. Ehhez vegyük fel a könyvtárat a függőségek közé:
+    </LinearLayout>
 
-`compile 'org.greenrobot:eventbus:3.0.0'`
+</LinearLayout>
+```
 
-Majd definiáljunk esemény osztályokat. Hozzunk létre 1-1 esemény osztályt, a **MoveUser** és a **WriteMessage** eseményeknek, az **events** csomagban, **MoveUserResponseEvent** és **WriteUserResponseEvent** néven. Mivel az eseménybuszok az osztály alapján dolgoznak ezért az egyes eseményekhez külön osztályok szükségesek. Mindenkét osztály standard Java osztály, mely 1-1 String-ben tárolja a választ.
+Töltsük le az üres képet jelző [placeholder](./images/placeholder.png) képet, és másoljuk a **drawables** mappába.
+
+Az **UploadActivity**-ben a Capture gomb megnyomásra elindítjuk a beépített kamera alkalmazást, majd a fotózott képet visszakapva megjelenítjük azt (szintén **Glide** segítségével).
+
+A beépített Kamera alkalmazás indítása előtt definiálunk egy útvonalat az External Storage-ban (miért itt?), majd ezt adjuk át paraméterként, erre a helyre fogja a Kamera alkalmazás menteni az elkészített fotót. Az activity kódja a következő:
+
 
 ```java
-public class MoveUserResponseEvent {
-    private String response;
+public class UploadActivity extends AppCompatActivity {
+    private ImageView imageIV;
+    private Button captureBTN;
+    private Button uploadBTN;
+    private EditText nameET;
+    private EditText descriptionET;
 
-    public String getResponse() {
-        return response;
+    public static final String TMP_IMAGE_JPG = "/tmp_image.jpg";
+    public static final String IMAGE_PATH = Environment.getExternalStorageDirectory().getAbsolutePath() + TMP_IMAGE_JPG;
+    private final int REQUEST_CAMERA_IMAGE = 101;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_upload);
+        imageIV = (ImageView)findViewById(R.id.imageIV);
+        captureBTN = (Button)findViewById(R.id.captureBTN);
+        uploadBTN = (Button)findViewById(R.id.uploadBTN);
+        nameET = (EditText)findViewById(R.id.nameET);
+        descriptionET = (EditText)findViewById(R.id.descriptionET);   
+        
+
+        captureBTN.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                File imageFile = new File(IMAGE_PATH);
+                Uri imageFileUri = Uri.fromFile(imageFile);
+                Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+                cameraIntent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT,imageFileUri);
+                startActivityForResult(cameraIntent,REQUEST_CAMERA_IMAGE);
+            }
+        });
     }
 
-    public void setResponse(String response) {
-        this.response = response;
-    }
-}
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_CAMERA_IMAGE) {
+            if (resultCode == RESULT_OK) {
+                try {
+                    Glide.with(this).load(Uri.fromFile(new File(IMAGE_PATH)))
+                            .diskCacheStrategy(DiskCacheStrategy.NONE)
+                            .skipMemoryCache(true).into(imageIV);
 
-//...
-
-public class WriteMessageResponseEvent {
-    private String response;
-
-    public String getResponse() {
-        return response;
-    }
-
-    public void setResponse(String response) {
-        this.response = response;
+                } catch (Throwable t) {
+                    t.printStackTrace();
+                    Toast.makeText(this,"ERROR: "+t.getMessage(),Toast.LENGTH_LONG).show();
+                }
+            }
+        }
     }
 }
 ```
 
+Mivel a képeket mindíg ugyanarra a helyre mentjük, így a **Glide** beépített cache mechanizmusát kikapcsoljuk, különben még az előző fotót jelenítené meg számos esetben.
 
-A MainActivityben definiáljuk az eseménybusz elkapó esemnyeit.
+Ezután a **MainActivity**-ben felveszünk egy menü elemet, amivel az **UploadActivity**-re navigálhatunk. Ehhez hozzuk létre a **res/menu/menu_main.xml**-t a következő tartalommal:
 
-```java
-@Subscribe(threadMode = ThreadMode.MAIN)
-public void onMoveUserResponse(MoveUserResponseEvent event) {
-    responseTV.setText("Move User Response:" + event.getResponse());
-}
-
-@Subscribe(threadMode = ThreadMode.MAIN)
-public void onWriteMessageResponse(WriteMessageResponseEvent  event) {
-    responseTV.setText("Write Message Response:" + event.getResponse());
-}
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/upload"
+        android:title="UPLOAD"
+        app:showAsAction="always|withText" />
+</menu>
 ```
-Itt fontos hogy a @Subscribe annotáció használva legyen, ez mondja meg hogy ez egy elkapó metódus, valamint a thread mode main legyen, mert így az események a főszálon kerülnek továbbításra. Fontos hogy az elküldött objektumokat az osztály típusa szerint tudja a rendszer a megfelelő elkapó metódusnak elküldeni. Egyébként 1 eseményhez több elkapó metódus is lehet egyszerre beregisztrálva.
 
-Ezután regisztráljuk be az elkapó metódusokat, pontosabban azt az osztályt amely ezeket tartalmazza (jelen esetben ez a MainActivity aktuális példánya (this)).
-
-Azt szeretnénk hogy akkor legyenek ezek az esemény elkapó metódusok aktívak, amikor az activity előtérben van, így az onResume-ban iratkorunk fel, és az onPause-ban le.
+Ezután a **MainActivity**-ben vegyük fel a hozzá tartozó menü létrehozó, és menü eseménykezelő függvényeket.
 
 ```java
 @Override
-protected void onResume() {
-    super.onResume();
-    EventBus.getDefault().register(this);
+public boolean onCreateOptionsMenu(Menu menu) {
+    MenuInflater inflater = getMenuInflater();
+    inflater.inflate(R.menu.menu_main, menu);
+    return true;
 }
 
 @Override
-protected void onPause() {
-    EventBus.getDefault().unregister(this);
-    super.onPause();
+public boolean onOptionsItemSelected(MenuItem item) {
+    switch (item.getItemId()) {
+        case R.id.upload:
+            Intent intent = new Intent(this, UploadActivity.class);
+            startActivity(intent);
+            return true;
+        default:
+            return super.onOptionsItemSelected(item);
+   }
 }
 ```
 
-Mostmár elkapjuk az eseményeket, nincs más hátra mint kiváltani őket. A különszálakban az `EventBus.getDefault().post(...)` segítségével küldjük ki az eseményeket.
+Próbáljuk ki az alkalmazást!
+
+<img src="./images/screen4.png" width="250" align="middle">
+<img src="./images/screen5.png" width="250" align="middle">
+
+### A feltöltés megvalósítása
+
+A feltöltéshez szükséges API definíció és Interactor hívás is definiálva van, így a **getPhotos**-hoz hasonlóan hívjuk meg ezt a hívást is a kép **Uri** paraméterével. Ezt az **UploadActivity** **onCreate(..)** metódusában tegyük meg.
+
+
+```
+uploadBTN.setOnClickListener(new View.OnClickListener() {
+    @Override
+    public void onClick(View view) {
+        GalleryInteractor galleryInteractor = new GalleryInteractor(UploadActivity.this);
+
+        String name=nameET.getText().toString();
+        String description=descriptionET.getText().toString();
+
+        galleryInteractor.uploadImage(Uri.fromFile(new File(IMAGE_PATH)),name,description, new GalleryInteractor.ResponseListener<ResponseBody>() {
+            @Override
+            public void onResponse(ResponseBody responseBody) {
+                Toast.makeText(UploadActivity.this, "Successfully uploaded!", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onError(Exception e) {
+                Toast.makeText(UploadActivity.this, "Error during uploading photo!", Toast.LENGTH_SHORT).show();
+                e.printStackTrace();
+            }
+        });
+
+    }
+});
+```
+
+Figyeljük meg, hogy nekünk csak a file elérési utvonlát kellett megadnunk, a file beolvasását és feltöltését a **Retrofit** elvégzi helyettünk.
+
+Próbáljuk ki az alkalmazást, és töltsünk fel egy fotót!
+
+<img src="./images/screen6.png" width="250" align="middle">
+
+## Saját kamera nézet készítése
+
+Az előbbiekben a beépített kamera alkalmazást használtuk fel, most egy ilyen kamera funkcionalítást ellátó Activity-t fogunk létrehozni.
+
+Hozzuk létre a saját kamera nézetünket, készítsünk egy új csomagot **view** néven, ebben hozzuk létre a **CameraView** osztályt. Ez egy custom nézet lesz, mely a **SurfaceView**-ból származik, ebben fogjuk a kamera által éppen látott képet megjeleníteni.
 
 ```java
-private void asyncMoveUser(final String username, final int direction) {
-    new Thread(new Runnable() {
-        @Override
-        public void run() {
-            final String response = labyrinthAPI.moveUser(username, direction);
+public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
+    public static final String TAG = CameraView.class.getSimpleName();
+    private SurfaceHolder mHolder;
+    private Camera mCamera;
 
-            MoveUserResponseEvent moveUserResponseEvent = new MoveUserResponseEvent();
-            moveUserResponseEvent.setResponse(response);
-            EventBus.getDefault().post(moveUserResponseEvent);
+    public CameraView(Context context, AttributeSet attrs, int defStyle) {
+        super(context, attrs, defStyle);
+        init();
+    }
 
+    public CameraView(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        init();
+    }
+
+    public CameraView(Context context) {
+        super(context);
+        init();
+    }
+
+    private void init() {
+        mHolder = getHolder();
+        mHolder.addCallback(this);
+    }
+
+    public void setCamera(Camera camera) {
+        mCamera = camera;
+        try {
+            mCamera.setPreviewDisplay(mHolder);
+            mCamera.startPreview();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.d(TAG, "Failed to start camera preview!");
         }
-    }).start();
-}
+    }
 
-private void asyncWriteMessage(final String username, final String message) {
-    new Thread(new Runnable() {
-        @Override
-        public void run() {
-            final String response = labyrinthAPI.writeMessage(username, message);
+    @Override
+    public void surfaceCreated(SurfaceHolder holder) {
+        // Not used
+    }
 
-            WriteMessageResponseEvent writeMessageResponseEvent = new WriteMessageResponseEvent();
-            writeMessageResponseEvent.setResponse(response);
-            EventBus.getDefault().post(writeMessageResponseEvent);
+    @Override
+    public void surfaceDestroyed(SurfaceHolder holder) {
+        // Not used
+    }
 
+    @Override
+    public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
+        if (mHolder.getSurface() == null || mCamera == null) {
+            return;
         }
-    }).start();
+
+        try {
+            mCamera.stopPreview();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.d(TAG, "Tried to stop a non-existing camera preview!");
+        }
+
+        try {
+            mCamera.setPreviewDisplay(mHolder);
+            mCamera.startPreview();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.d(TAG, "Failed to restart camera preview!");
+        }
+    }
 }
 ```
 
-Próbáljuk ki az alkalmazást. Láthatjuk, hogy mostmár a hálózati hívások _túlélik_ az activity elforgatást is.
-  
-Végül próbáljuk ki az alkalmazást működés közben: 
+Ez a nézet tartalmaz egy **SurfaceHolder**-t amin keresztül a képernyőre tud rajzolni, és egy **Camera** objektumot (`android.hardware` csomag), amin keresztül a preview képet eléri.
 
-<img src="./images/game.png" width="400" align="middle">
+Ezt a nézetet fogjuk használni a saját fotó készítő activitynkben. Hozzunk létre egy új **Empty Activity**-t **CameraActivity** néven a fő csomagban. A hozzá tartozó **activity_camera.xml** felület legyen:
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical" >
+
+    <hu.bme.aut.amorg.examples.cameralabor.view.CameraView
+        android:id="@+id/camereView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal" >
+
+        <Button
+            android:id="@+id/captureBTN"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Capture" />
+
+        <Button
+            android:id="@+id/cancelBTN"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Cancel" />
+
+    </LinearLayout>
+
+</RelativeLayout>
+
+```
+
+A CameraActivity az előbb létrehozott CameraView-t fogja beállítani, illetve gombnyomásra egy fotót készít. Ez a fotó `byte[]` ként érhető el, melyet az activity a háttértárra ment. A háttértárra mentés útvonlát intent paraméterként kapja (a beépített fényképező is így működik). A CameraActivity kódja a következő:
+
+```java
+public class CameraActivity extends AppCompatActivity {
+    public static final String EXTRA_OUTPUT = "EXTRA_OUTPUT";
+    private Button captureBTN;
+    private CameraView cameraView;
+    private Camera camera;
+    private Button cancelBTN;
+    private Uri fileUri;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_camera);
+
+        fileUri = getIntent().getParcelableExtra(EXTRA_OUTPUT);
+
+        cameraView = (CameraView) findViewById(R.id.camereView);
+        captureBTN = (Button) findViewById(R.id.captureBTN);
+        captureBTN.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                camera.takePicture(null, null, new Camera.PictureCallback() {
+                    @Override
+                    public void onPictureTaken(byte[] bytes, Camera camera) {
+                        saveToFile(bytes);
+                        Intent resultIntent = new Intent();
+                        setResult(MainActivity.RESULT_OK, resultIntent);
+                        finish();
+                    }
+                });
+            }
+        });
 
 
-<img src="./images/ui_fin.png" width="250" align="middle">
+        cancelBTN = (Button) findViewById(R.id.cancelBTN);
+        cancelBTN.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent resultIntent = new Intent();
+                setResult(MainActivity.RESULT_CANCELED, resultIntent);
+                finish();
+            }
+        });
 
-## Bonus feladat 1 - Válaszidő kijelzése
+        camera = Camera.open();
 
-Egészítsük ki az alkalmazást úgy, hogy a felhasználói felületen megjelenítsük a szerverrel való kommunikáció során tapasztalt átlagos válaszidőt (üzenet küldése és válasz megérkezése közti idő).
+        adjustPreviewSize();
+        cameraView.setCamera(camera);
+    }
 
-Tipp: Az aktuális időt legegyszerűbben a következő hívással érhetjük el:
-`long currentTime=System.currentTimeMillis();` 
+    private void saveToFile(byte[] data) {
+        try {
+            File tmpImage = new File(fileUri.getPath());
+            if (tmpImage.exists())
+                tmpImage.delete();
+            tmpImage.createNewFile();
+            FileOutputStream buf = new FileOutputStream(tmpImage);
+            buf.write(data);
+            buf.flush();
+            buf.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
-## Bonus feladat 2 - Hálozat elérhető-e
+    private void adjustPreviewSize() {
+        List<Camera.Size> supportedPreviewSizes = camera.getParameters()
+                .getSupportedPreviewSizes();
 
-Egészítsük ki az alkalmazást úgy, hogy a hálózati hívások előtt ellenőrizzük, hogy elérhető-e a hálózat, ha nem, jelenítsünk meg hibaüzenetet pl. Toast-ban. Segítség: 
+        Camera.Size selectedPreviewSize = Collections.max(
+                supportedPreviewSizes, new Comparator<Camera.Size>() {
+                    @Override
+                    public int compare(Camera.Size lhs, Camera.Size rhs) {
+                        return (lhs.width * lhs.height) < (rhs.width * rhs.height) ? -1
+                                : 1;
+                    }
+                });
 
-``` java
-ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-boolean networkAvailable = activeNetworkInfo != null && activeNetworkInfo.isConnected();
-``` 
+        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
+                selectedPreviewSize.width, selectedPreviewSize.height);
+        cameraView.setLayoutParams(lp);
+        cameraView.invalidate();
 
-A szükséges manifest engedély: `<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>`
+        camera.getParameters().setPreviewSize(selectedPreviewSize.width, selectedPreviewSize.height);
+    }
 
-## Bonus feladat 3 - WiFi állapot kijelzése
+    @Override
+    protected void onPause() {
+        if (camera != null) {
+            camera.stopPreview();
+            camera.release();
+        }
 
-Egészítsük ki az alkalmazást úgy, hogy a _WiFi_ állapotát és a hálózat nevét megjelenítsük a felhasználói felületen.  Segítség: 
+        super.onPause();
+    }
+}
+```
 
-``` java
-WifiManager wifiManager = (WifiManager) getSystemService(WIFI_SERVICE);
-WifiInfo wifiInfo = wifiManager.getConnectionInfo();
-Log.d("wifiInfo", wifiInfo.toString());
-Log.d("SSID",wifiInfo.getSSID());
-``` 
+A `saveToFile(...)` függvény végzi a byte tömb fileba mentését, az `adjustPreviewSize()` pedig a legnagyobb támogatott preview méretet keresi meg.
 
-A szükséges manifest engedély: `<uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>`
+Ezután módosítsuk az **UploadActivity** **captureBTN** listenerjét, hogy az általunk elkészített activity-t használja.
+
+```
+captureBTN.setOnClickListener(new View.OnClickListener() {
+    @Override
+    public void onClick(View view) {
+        File imageFile = new File(IMAGE_PATH);
+        Uri imageFileUri = Uri.fromFile(imageFile);
+
+        Intent cameraIntent=new Intent(UploadActivity.this,CameraActivity.class);
+        cameraIntent.putExtra(CameraActivity.EXTRA_OUTPUT,imageFileUri);
+        startActivityForResult(cameraIntent, REQUEST_CAMERA_IMAGE);
+    }
+});
+```
+
+Próbáljuk ki az alkalmazást!
+
+<img src="./images/screen7.png" width="250" align="middle">
+<img src="./images/screen8.png" width="250" align="middle">
+
+
+## Önálló feladatok
+
+### Feladat 1: EventBus használata
+Az előző labor mintájára módosítsd úgy a generikus szálkezelő megoldást, hogy EventBus használatával a hívások túléljék az Activity elforgatást.
+
+
+### Feladat 2: Szavazat feltöltése
+Az API-val lehetőség van szavazatokat is feltölteni. Egészítsd ki a fotók listáját egy részletek nézettel, ahol a felhasználó megadhatja az adatait, és a fotó értékelését. Majd töltse fel az értékelést az API-n keresztül. Az értékelés változását a [weboldalon](http://android-gallery.node.autsoft.hu/) 
+keresztül követheted.
+
+Segítség: A hozzá tartozó hívás Retrofit leírója a következő:
+
+```java
+    @POST("/rate/{id}")
+    Call<ResponseBody> rate(@Path("id") String id, @Body Rating rating);
+```
+
+A rating osztály pedíg:
+
+```java
+public class Rating {
+    public String image;
+    public String username;
+    public int vote;
+    public boolean professional;
+    public String type;
+    public String comment;
+}
+```
