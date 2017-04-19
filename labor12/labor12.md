@@ -83,12 +83,11 @@ compile 'com.jakewharton:butterknife:8.5.1'
 annotationProcessor 'com.jakewharton:butterknife-compiler:8.5.1'
 compile 'com.flaviofaria:kenburnsview:1.0.7'
 compile 'com.github.bumptech.glide:glide:3.7.0'
-compile 'com.firebaseui:firebase-ui-database:1.2.0'
 ```
 
 ## Regisztráció, bejelentkezés
 
-Első lépésként valósítsuk meg a bejelentkező képernyő felületét. Mivel ehhez hasonló felületeket már készítettünk korábban egyszerűség kedvéért megadjuk a felület kódját, melyet helyezzen az *activity_login.xml*-be:
+Első lépésként valósítsuk meg a regisztráció/bejelentkező képernyő felületét. Mivel ehhez hasonló felületeket már készítettünk korábban egyszerűség kedvéért megadjuk a felület kódját, melyet helyezzen az *activity_login.xml*-be:
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -162,7 +161,7 @@ Első lépésként valósítsuk meg a bejelentkező képernyő felületét. Mive
 
 Tekintsük át a felhasználói felület kódját. Figyeljük meg, hogy, hogy a jelszó mezőhöz tartozó TextInputLayout *app:passwordToggleEnabled="true"* beállítás hatására a mező mellett egy kis ikon segítségével láthatóvá tehetjük az alkalmazásban a jelszót.
 
-<img src="./assets/bmeforum_login.png.png" width="512" align="middle">
+<img src="./assets/bmeforum_login.png" width="512" align="middle">
 
 Az alkalmazás során több Activity-nk lesz, melyek közös funkcióit, mint például progress dialog megjelenítést és felhasználói adatok lekérdezését szervezzük ki egy *BaseActivity* osztályba (ez csak egy külön osztály, nem kell a Manifestbe regisztrálni):
 
@@ -248,7 +247,7 @@ private String userNameFromEmail(String email) {
 }
 ```
 
-Ezt kővetően valósítsuk meg a regisztráció gomb eseménykezelőjét. Figyeljük meg, hogyan történik a form validációja, a progress dialógus megjelenítése, valamint aszinkron módon a válasz és az esetleges hiba kezelése (éles projektben hibajelzésre a Toast-ot nem javasoljuk (mivel nem feltűnő), helyette egy speciális dialógus vagy egyéb hibakezelés javasolt).
+Ezt kővetően valósítsuk meg a regisztráció gomb eseménykezelőjét. Figyeljük meg, hogyan történik a form validációja, a progress dialógus megjelenítése, valamint aszinkron módon a válasz és az esetleges hiba kezelése (éles projektben hibajelzésre a *Toast*-ot nem javasoljuk (mivel nem feltűnő), helyette egy speciális dialógus vagy egyéb hibakezelés javasolt).
 
 ```java
 @OnClick(R.id.btnRegister)
@@ -334,12 +333,12 @@ A *Navigation Drawer Activity* sablont használva készítsük el az új *PostsA
 
 Próbáljuk ki az alkalmazás jelenlegi működését. Vizsgáljuk meg, hogy, Firebase console-ban látszik-e a regisztrált felhasználó.
 
-<img src="./assets/bmeforum_emptylist.png" width="512" align="middle">
+<img src="./assets/firebase_user.png" width="1024" align="middle">
 
 ## Postok listázása
 
 Első lépésként tekintse át a laborvezetővel a PostsActivity kódját és a hozzá tartozó felhasználói felületet.
-A PostsActivity feladata lesz a fórum üzenetek megjelenítése egy RecyclerView-ban. Az egyes üzenetek egy CardViewn kerülnek megjelenítésre. A lista valós időben fog frissülni, ha egy új üzenet került fel a Firebase-be.
+A PostsActivity feladata lesz a fórum üzenetek megjelenítése egy RecyclerView-ban. Az egyes üzenetek egy *CardView*-n kerülnek megjelenítésre. A lista valós időben fog frissülni, ha egy új üzenet került fel a Firebase-be.
 
 Adjuk hozzá a projekthez a *Firebase Realtime Database* támogatást az Assistant-on keresztül. Figyeljünk rá, hogy a behozott függőség verzióját is írjuk át, ha emulátoron tesztelünk:
 ```gradle
@@ -683,6 +682,8 @@ private void initPostsListener() {
 (Alternatív megoldásként a *Firebase-UI* osztálykönyvtár ad egy *FirebaseRecyclerAdapter* implementációt, melynek megoldása teljesen hasonló, de nehezebben testreszabható - https://github.com/firebase/FirebaseUI-Android - Jelen laborfoglalkozásban ezt nem használjuk, mert az emulátor által támogatott Firebase verzióval tapasztalhatók anomáliák).
 
 Próbáljuk ki az alkalmazás működését. A lista jelenleg még üres lesz, hacsak nem veszünk fel a Firebase console-on elemeket, de fontos, hogy már hiba nélkül kell futnia az alkalmazásnak.
+
+<img src="./assets/bmeforum_emptylist.png" width="512" align="middle">
 
 ## Postok készítése
 
