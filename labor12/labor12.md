@@ -67,8 +67,9 @@ Következő lépésben szintén az Assistant-ban az "Email and password authenti
 <img src="./assets/firebase_auth_connect.png" width="1024" align="middle">
 
 **Figyelem**, emulátoron való tesztelés esetében korábbi (9.6.1) Firebase service-t kell használni, mert a legújabbat az emulátor még nem támogatja:
-
-*compile 'com.google.firebase:firebase-auth:9.6.1'*
+```gradle
+compile 'com.google.firebase:firebase-auth:9.6.1'
+```
 
 Ahhoz, hogy az e-mail alapú regisztráció és authentikáció megfelelően működjön, a Firebase console-ban, az Authentication->Sign-in method alapértelmezett az *Email/Password* provider-t engedélyezni kell.
 
@@ -341,7 +342,9 @@ Első lépésként tekintse át a laborvezetővel a PostsActivity kódját és a
 A PostsActivity feladata lesz a fórum üzenetek megjelenítése egy RecyclerView-ban. Az egyes üzenetek egy CardViewn kerülnek megjelenítésre. A lista valós időben fog frissülni, ha egy új üzenet került fel a Firebase-be.
 
 Adjuk hozzá a projekthez a *Firebase Realtime Database* támogatást az Assistant-on keresztül. Figyeljünk rá, hogy a behozott függőség verzióját is írjuk át, ha emulátoron tesztelünk:
+```gradle
 compile 'com.google.firebase:firebase-database:9.6.1'
+```
 
 Változtassuk meg a Navigation Drawer menüjét, hogy csak egy Logout menüelem szerepeljen rajta; a res/menu/activity_posts_drawer.xml:
 ```xml
@@ -685,8 +688,9 @@ Próbáljuk ki az alkalmazás működését. A lista jelenleg még üres lesz, h
 
 A következő lépés az üzenetek írása, melynek hatására már tartalom kerühet a listába.
 Elsőként kapcsoljuk be Android Studio Assistant-ban a Firebase Assistant-ban a Storage funkciót. Ne felejtsük a *build.gradle*-ben a verziót az emulátorhoz igazítani:
-
+```gradle
 compile 'com.google.firebase:firebase-storage:9.6.1'
+```
 
 Következő lépés a *CreatePostActivity* létrehozása Empty Activity sablont használva, melynek felülete legyen az alábbi és az osztály a BaseActivity-ből származzon le:
 
@@ -875,14 +879,70 @@ Vizsgálja meg az elkészült alkalmazást, üzenetek létrehozását és az ada
 
 <img src="./assets/firebase_data.png" width="1024" align="middle">
 
-## Push értesítése
+## Push értesítések
+Android Stuidoban a Firebase Assistant segítségével adjuk hozzá a Notifications-t az alkalmazáshoz.
+Ügyeljünk ismét az emulátor kompbatibilis verzóra:
+```gradle
+compile 'com.google.firebase:firebase-messaging:9.6.1'
+```
 
+Csupán ennyi elegendő a push alap működéséhez, innentől fogva, ha újfa fordítjuk az alkalmazást, a Firebase felületéről, vagy API-jával küldött push üzeneteket automatikusan megkapják a mobil kliensek és egy notification-ben megjelenítik.
+
+<img src="./assets/firebase_push.png" width="1024" align="middle">
+
+Próbáljuk ki a push küldést a Firebase console-ból és vizsgáljuk meg hogyan érkezik meg telefonra, ha nem fut az alkalmazás.
+
+<img src="./assets/bmeforum_push.png" width="512" align="middle">
+
+Természetesen lehetőség van saját push üzenet feldolgozó szolgáltatás készítésére is egy FirebaseMessagingService létrehozásával, melyről további részletek itt olvashatók:
+https://firebase.google.com/docs/cloud-messaging/android/receive 
 
 ## Crash reporting
 
+Android Stuidoban a Firebase Assistant segítségével adjuk hozzá a Crash reporting-ot az alkalmazáshoz.
+Ügyeljünk ismét az emulátor kompbatibilis verzóra:
+```gradle
+compile 'com.google.firebase:firebase-crash:9.6.1'
+```
+
+Valósítsunk meg egy hibás működést, például nullával osztást egy gombnyomásra és vizsgáljuk meg a hibajelentést a Firebase console-ban.
+
+<img src="./assets/firebase_crash.png" width="1024" align="middle">
+
+Próbáljuk ki saját hibajelzések készítését:
+
+```java
+FirebaseCrash.log("Register failed");
+```
 
 ## Analitika
 
+Az alaklamás jelenleg is naplóz alapvető analitikákat, használati statisztikákat, melyek a Firebase consol Analytics menüpontja alatt érhetők el.
+
+Emellett természetesen lehetőség van az analitika kibővítésére és testreszabására is. Android Studioban, a Firebase Assistant segítségével kapcsoljuk be az Analytics támogatást, ügyelve az emulátor kompatibilis gradle verzió importálásra:
+```gradle
+compile 'com.google.firebase:firebase-core:9.6.1'
+```
+
+Készítsünk saját analitika üzeneteket, például:
+
+```java
+//mentsük el akár osztály tagváltozóként
+firebaseAnalytics = FirebaseAnalytics.getInstance(this);
+
+// analitika küldése
+Bundle bundle = new Bundle();
+bundle.putString("demo_key", "idabc");
+bundle.putString("data_key", "mydata");
+firebaseAnalytics.logEvent(FirebaseAnalytics.Event.LOGIN, bundle);
+```
+
+Lehet saját eseményeket is definiálni, melyeket a Firebase console-ban egyedi Audience-ként definiálva lehet elérni.
+
+Fontos kiemelni, hogy nem garantált, hogy az analitika valós időben látszik a Firebase console-ban.
+
+<img src="./assets/firebase_analytics.png" width="1024" align="middle">
+
 ## Bonus feladatok
-1. Valósítsa meg, hogy a Navigation Drawer header része a felhasználó nevét és e-mail címét mutassa.
+1. Valósítsa meg, hogy a *Navigation Drawer* fejléce a felhasználó nevét és e-mail címét mutassa.
 2. Valósítsa meg, hogy a *PostsActivity*-n a vissza gomb hatására egy megerősítő kérdés után logout történjen.
