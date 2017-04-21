@@ -2,29 +2,29 @@
 
 ## Bevezető
 
-A labor során egy fórum alkalmazás kerül megvalósításra a Firebase Backend as a Service (BaaS) felhasználásával. A feladat célja, hogy szemléltese, hogyan lehet közös backendet használó alkalmazást fejleszteni saját backend kód fejlesztése nélkül.
+A labor során egy fórum alkalmazás kerül megvalósításra a Firebase Backend as a Service (BaaS) felhasználásával. A feladat célja, hogy szemléltesse, hogyan lehet közös backendet használó alkalmazást fejleszteni saját backend kód fejlesztése nélkül.
 
-A Firebase manapság az egyik legnépszerűbb Backend as a Service megoldás Android, iOS és web kliensek támogatáásval, mely számos szolgáltatást biztosít, mint például:
-- real-time adatbáziskezelés,
-- storage,
-- authentikáció,
-- push értesítések,
-- analytics,
-- crash reporting.
+A Firebase manapság az egyik legnépszerűbb Backend as a Service megoldás Android, iOS és web kliensek támogatásával, mely számos szolgáltatást biztosít, mint például:
+- real-time adatbáziskezelés
+- storage
+- authentikáció
+- push értesítések
+- analytics
+- crash reporting
 
 További általános információk a Firebase-ről: https://firebase.google.com/.
 
-A laborfogalkozás célja, hogy bemutassa a Firebase legfontosabb szolgáltatásait egy komplett alklamazás megvalósítása keretében. A megvalósítandó alkalmazás egy fórum megoldás lesz, melyen keresztül a felhasználük szöveges üzeneteket tudnak megosztani egymással valós időben, melyekhez opcionálisan képek is csatolhatók.
-Az alkalmazás az alőbbi fő funkciókat támogatja:
-- regisztráció, bejelentkezés,
-- üzenetek listázása,
-- üzenet írás,
-- képek csatolása üzenetekhez,
-- üzenetek megjelenítése valós időben,
-- crash reporting,
-- analitika.
+A laborfogalkozás célja, hogy bemutassa a Firebase legfontosabb szolgáltatásait egy komplett alkalmazás megvalósítása keretében. A megvalósítandó alkalmazás egy fórum megoldás lesz, melyen keresztül a felhasználók szöveges üzeneteket tudnak megosztani egymással valós időben, melyekhez opcionálisan képek is csatolhatók.
+Az alkalmazás az alábbi fő funkciókat támogatja:
+- regisztráció, bejelentkezés
+- üzenetek listázása
+- üzenet írás
+- képek csatolása üzenetekhez
+- üzenetek megjelenítése valós időben
+- crash reporting
+- analitika
 
-A labor soárn nagyobb kódrészek kerülnek megírásra, ami miatt elnézést kérünk, de ez szükséges ahhoz, hogy egy hello-word jellegű alkalmazásnál többet tudjunk átadni a tárgy keretében. **Az anyag részletes megértéséhez javasoljuk, hogy figyelje a laborvezető utasításait és labor után is 10-20 percet szánjon a kódrészek megérétésére.**
+A labor során nagyobb kódrészek kerülnek megírásra, ami miatt elnézést kérünk, de ez szükséges ahhoz, hogy egy hello-word jellegű alkalmazásnál többet tudjunk átadni a tárgy keretében. **Az anyag részletes megértéséhez javasoljuk, hogy figyelje a laborvezető utasításait és labor után is 10-20 percet szánjon a kódrészek megértésére.**
 
 *Az útmutatóban levő példa kódok esetében a szöveges elemeket nem tettük strings.xml-be a könnyebb olvashatóság érdekében, de éles projektekben ezeket természetesen mindig ki kell szervezni erőforrásba.*
 
@@ -49,7 +49,7 @@ Adjuk hozzá a Manifest file-hoz az Internet használati engedélyt:
 
 A projekt létrehozása után válasszuk Android Studioba a **Tools->Firebase** menüpontot, melynek hatására jobb oldalt megnyílik a *Firebase Assistant* funkció.
 
-Amennyiben nincs ilyen menüpont nem található a Studioban, telepíteni kell a plugint a *File->Settings->Plugins* alatt (Firebase Services).
+Amennyiben ilyen menüpont nem található a Studioban, telepíteni kell a plugint a *File->Settings->Plugins* alatt (Firebase Services).
 
 A Firebase Assistant akkor fogja megtalálni a Firebase console-ba létrehozott projektet, ha Android Studio-ba is ugyanazzal az accounttal vagyunk bejelentkezve mint amivel a console-ban létrehoztuk a projektet. Ellenőrizzük ezt mindkét helyen.
 Amennyiben a Firebase Assistant-ot nem sikerül beüzemelni, manuálisan is összeköthető a projekt. A leírásban ismertetni fogjuk a lépéseket, amit az Assistant generál.
@@ -58,7 +58,7 @@ Válasszuk az Assistant-ban az *Authentication* szakaszt és azon belül az "Ema
 Ezt követően egy dialógus nyílik meg, ahol a második szakaszt választva kiválaszthatjuk a projektet amit a Firebase console-ban létrehoztunk, ha megfelelőek az accountok. Itt egyébként lehetőség van új projektet is létrehozni.
 
 A háttérben valójában annyi történik, hogy az alkalmazásunk package neve és az aláíró kulcs *SHA-1*-e alapján létrejön egy Android projekt a Firebase console-ba és az ahhoz tartozó konfigurációs *google-services.json* file letöltődik a projektünk könyvtárába az alapértelmezett (app) modul alá.
-Ezt a lépéssorozatot manuálisan is végrehajthatjuk a Firebase console-ban az "Add another app"-ot választva. A debug kulcs SHA-1 lenyomata a gradle->[projektnév]->Tasks->android->signingRepot taskot futtatva kinyerhető alul az execution/text módot választva.
+Ezt a lépéssorozatot manuálisan is végrehajthatjuk a Firebase console-ban az "Add another app"-ot választva. A debug kulcs SHA-1 lenyomata a gradle->[projektnév]->Tasks->android->signingReport taskot futtatva kinyerhető alul az execution/text módot választva.
 
 <img src="./assets/android_studio_signingreport.png" width="1024" align="middle">
 
@@ -71,14 +71,14 @@ Következő lépésben szintén az Assistant-ban az "Email and password authenti
 compile 'com.google.firebase:firebase-auth:9.6.1'
 ```
 
-Ahhoz, hogy az e-mail alapú regisztráció és authentikáció megfelelően működjön, a Firebase console-ban, az Authentication->Sign-in method alapértelmezett az *Email/Password* provider-t engedélyezni kell.
+Ahhoz, hogy az e-mail alapú regisztráció és authentikáció megfelelően működjön, a Firebase console-ban, az Authentication->Sign-in method-ban az *Email/Password* provider-t engedélyezni kell.
 
 <img src="./assets/firebase_console_auth_method.png" width="1024" align="middle">
 
-Végezetül a Studioban vegyük fel a modulhoz tartozó build.gradel-be az alábbi függőségeket még; tekintsük át a laborvezetővel ezeket:
+Végezetül a Studioban vegyük fel a modulhoz tartozó build.gradle-be az alábbi függőségeket még; tekintsük át a laborvezetővel ezeket:
 ```gradle
-compile 'com.android.support:design:25.2.0'
-compile 'com.android.support:cardview-v7:25.2.0'
+compile 'com.android.support:design:25.1.1'
+compile 'com.android.support:cardview-v7:25.1.1'
 compile 'com.jakewharton:butterknife:8.5.1'
 annotationProcessor 'com.jakewharton:butterknife-compiler:8.5.1'
 compile 'com.flaviofaria:kenburnsview:1.0.7'
@@ -358,7 +358,7 @@ Változtassuk meg a Navigation Drawer menüjét, hogy csak egy Logout menüelem 
 </menu>
 ```
 
-A *PostsActivity* *onCreateOptionsMenu(...)* és *onOptionsItemSelected(...)* függvényei törölhetők.
+A *PostsActivity* *onCreateOptionsMenu(...)* és *onOptionsItemSelected(...)* függvényei és a *menu/posts.xml* törölhetők.
 
 A *NavigationDrawer* menü kezelő függvényében pedig csak a logout menüt kell kezelni:
 ```java
@@ -644,7 +644,7 @@ recyclerViewPosts.setAdapter(postsAdapter);
 ```
 
 Ahhoz, hogy  az üzenet lista (*RecyclerView*) frissüljön, ha egy új üzenet érkezett, illetve, hogy kezdetben fel legyen töltve az eddigi adatokkal, a Firebase adatbázis "posts" ágára kell készítenünk egy *ChildEventListener*-t, melynek *onChildAdded(...)* függvénye első híváskor minden eddig bent levő elemre meghívódik, majd minden új elemre is. Látható, hogy ez az eseményekezlő aktiválódik további esetekben is (változás, törlés, stb.).
-Valósítsumeg az alábbi *initPostsListener()* függvényt és hívjuk meg a *PostsActivity* *onCreate(...)* függvényének végén:
+Valósítsuk meg az alábbi *initPostsListener()* függvényt és hívjuk meg a *PostsActivity* *onCreate(...)* függvényének végén:
 
 ```java
 private void initPostsListener() {
@@ -687,7 +687,7 @@ Próbáljuk ki az alkalmazás működését. A lista jelenleg még üres lesz, h
 
 ## Postok készítése
 
-A következő lépés az üzenetek írása, melynek hatására már tartalom kerühet a listába.
+A következő lépés az üzenetek írása, melynek hatására már tartalom kerülhet a listába.
 Elsőként kapcsoljuk be Android Studio Assistant-ban a Firebase Assistant-ban a Storage funkciót. Ne felejtsük a *build.gradle*-ben a verziót az emulátorhoz igazítani:
 ```gradle
 compile 'com.google.firebase:firebase-storage:9.6.1'
@@ -750,7 +750,7 @@ Következő lépés a *CreatePostActivity* létrehozása Empty Activity sablont 
 
 A *CreatePostActivity* felületén lehetőség van új üzenet írására a cím, szöveg és opcionálisan kép megadással. A kép megadáskor a beépített kamera alkalmazással van lehetőségünk képet készíteni, melynek módját korábbi laboron már áttekintettük (*implicit Intent* + *onActivityResult(...)*);
 
-A következőkben megadjuk a *CreatePostActivity* kódját, de bemásolás után a laborvezetővel közösen nézze át a kódot, vizsgálja meg, hogy törétnik a Storage API-val a kép feltöltés, majd a Firebase-en eltárolt kép URL-jének elmentése az új *Post*-hoz.
+A következőkben megadjuk a *CreatePostActivity* kódját, de bemásolás után a laborvezetővel közösen nézze át a kódot, vizsgálja meg, hogy történik a Storage API-val a kép feltöltés, majd a Firebase-en eltárolt kép URL-jének elmentése az új *Post*-hoz.
 
 ```java
 public class CreatePostActivity extends BaseActivity {
@@ -874,6 +874,15 @@ public class CreatePostActivity extends BaseActivity {
 }
 ```
 
+Ezt követően kössük be a *CreatePostActivity*-t a Floating Action Button megnyomására.
+
+A *PostsActivity* *onCreate(...)* metódusában írjuk felül a Floating Action Button onClickListenerjének tartalmát:
+
+```java
+Intent createPostIntent = new Intent(PostsActivity.this, CreatePostActivity.class);
+startActivity(createPostIntent);
+```
+
 Vizsgálja meg az elkészült alkalmazást, üzenetek létrehozását és az adatbázis épülését a Firebase console-ban.
 
 <img src="./assets/bmeforum_postlist.png" width="512" align="middle">
@@ -882,7 +891,7 @@ Vizsgálja meg az elkészült alkalmazást, üzenetek létrehozását és az ada
 
 ## Push értesítések
 Android Stuidoban a Firebase Assistant segítségével adjuk hozzá a Notifications-t az alkalmazáshoz.
-Ügyeljünk ismét az emulátor kompbatibilis verzóra:
+Ügyeljünk ismét az emulátor kompatibilis verzóra:
 ```gradle
 compile 'com.google.firebase:firebase-messaging:9.6.1'
 ```
@@ -901,7 +910,7 @@ https://firebase.google.com/docs/cloud-messaging/android/receive
 ## Crash reporting
 
 Android Stuidoban a Firebase Assistant segítségével adjuk hozzá a Crash reporting-ot az alkalmazáshoz.
-Ügyeljünk ismét az emulátor kompbatibilis verzóra:
+Ügyeljünk ismét az emulátor kompatibilis verzóra:
 ```gradle
 compile 'com.google.firebase:firebase-crash:9.6.1'
 ```
@@ -918,7 +927,7 @@ FirebaseCrash.log("Register failed");
 
 ## Analitika
 
-Az alaklamás jelenleg is naplóz alapvető analitikákat, használati statisztikákat, melyek a Firebase consol Analytics menüpontja alatt érhetők el.
+Az alkalmazás jelenleg is naplóz alapvető analitikákat, használati statisztikákat, melyek a Firebase console Analytics menüpontja alatt érhetők el.
 
 Emellett természetesen lehetőség van az analitika kibővítésére és testreszabására is. Android Studioban, a Firebase Assistant segítségével kapcsoljuk be az Analytics támogatást, ügyelve az emulátor kompatibilis gradle verzió importálásra:
 ```gradle
