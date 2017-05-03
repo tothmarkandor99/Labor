@@ -34,17 +34,23 @@ Első lépésként létre kell hozni egy Firebase projektet a Firebase admin fel
 - Navigáljunk a Firebase console felületére: https://console.firebase.google.com/.
 - Jelentkezzünk be jobb felül.
 - Hozzunk létre egy új projektet az *Add project* elemet választva középen.
-- A projekt neve legyen *BMEForum*, a Country pedig *Hungary*.
+- A projekt neve legyen *BMEForumNEPTUN_KOD*, ahol a `NEPTUN_KOD` helyére a hallgato neptun kódját helyettesítsük. 
+- A Country pedig *Hungary*.
+
+>A neptun kódra azért van szükség, mert ugyanazon laborgép kulcsával ugyanolyan nevü projektet nem hozhatunk létre többször, és több labor csoport lévén ebből probléma adódhatna. Ugyan erre lesz majd szükség a package név esetén is.
 
 Sikeres projekt létrehozás után fussák át a laborvezetővel közösen a Firebase console felületét az alábbi elemekre kitérve:
 - Authentication, Database és Storage,
 - Database>Rules.
 
-Hozzunk létre egy új projektet Android Studio-ban, válasszuk az *Empty Activity* sablont és a kezdő Activity-nk neve legyen *LoginActivity*, mivel elsőként a regisztrációs és bejelentkező nézetet fogjuk megvalósítani. Az egyszerűség kedvéért ugyanazt a felületet fogjuk használni regisztráció és bejelentkezés céljából.
+Hozzunk létre egy új projektet Android Studio-ban,a package name legyen **hu.bme.aut.amorg.examples.firebaseNEPTUN_KOD**. Fontos hogy a neptun kód előtt ne legyen pont, mert ez gondot okozhat.
+
+Válasszuk az *Empty Activity* sablont és a kezdő Activity-nk neve legyen *LoginActivity*, mivel elsőként a regisztrációs és bejelentkező nézetet fogjuk megvalósítani. Az egyszerűség kedvéért ugyanazt a felületet fogjuk használni regisztráció és bejelentkezés céljából.
 
 Adjuk hozzá a Manifest file-hoz az Internet használati engedélyt:
 ```xml
 <uses-permission android:name="android.permission.INTERNET" />
+
 ```
 
 A projekt létrehozása után válasszuk Android Studioba a **Tools->Firebase** menüpontot, melynek hatására jobb oldalt megnyílik a *Firebase Assistant* funkció.
@@ -908,6 +914,13 @@ Természetesen lehetőség van saját push üzenet feldolgozó szolgáltatás k�
 https://firebase.google.com/docs/cloud-messaging/android/receive 
 
 ## Crash reporting
+
+A Crash reporting és az analitika használatához az alábbi engedélyekre is szükségünk lesz:
+
+```xml
+<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+<uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+```
 
 Android Stuidoban a Firebase Assistant segítségével adjuk hozzá a Crash reporting-ot az alkalmazáshoz.
 Ügyeljünk ismét az emulátor kompatibilis verzóra:
