@@ -37,7 +37,7 @@ Első lépésként létre kell hozni egy Firebase projektet a Firebase admin fel
 - A projekt neve legyen *BMEForumNEPTUN_KOD*, ahol a `NEPTUN_KOD` helyére a hallgato neptun kódját helyettesítsük. 
 - A Country pedig *Hungary*.
 
->A neptun kódra azért van szükség, mert ugyanazon laborgép kulcsával ugyanolyan nevü projektet nem hozhatunk létre többször, és több labor csoport lévén ebből probléma adódhatna. Ugyan erre lesz majd szükség a package név esetén is.
+>A neptun kódra azért van szükség, mert ugyanazon laborgép kulcsával ugyanolyan nevü projektet nem hozhatunk létre többször, és több labor csoport lévén ebből probléma adódhatna. Ugyanerre lesz majd szükség a package név esetén is.
 
 Sikeres projekt létrehozás után fussák át a laborvezetővel közösen a Firebase console felületét az alábbi elemekre kitérve:
 - Authentication, Database és Storage,
