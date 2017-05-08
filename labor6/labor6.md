@@ -618,7 +618,7 @@ egészítsük ki az *IntentFilter*-rel):
 <activity android:name=".SettingsActivity">
     <intent-filter>
         <action android:name=".Preferences" />
-        <category android:name="android.intent.cetagory.PREFERENCE" />
+        <category android:name="android.intent.category.PREFERENCE" />
     </intent-filter>
 </activity>
 
