@@ -128,7 +128,7 @@ Első lépésként valósítsuk meg a regisztráció/bejelentkező képernyő fe
                 android:layout_height="wrap_content"
                 android:inputType="textEmailAddress"
                 android:text=""
-                android:hint="email" />
+                android:hint="Email" />
         </android.support.design.widget.TextInputLayout>
 
         <android.support.design.widget.TextInputLayout
@@ -694,7 +694,7 @@ Próbáljuk ki az alkalmazás működését. A lista jelenleg még üres lesz, h
 ## Postok készítése
 
 A következő lépés az üzenetek írása, melynek hatására már tartalom kerülhet a listába.
-Elsőként kapcsoljuk be Android Studio Assistant-ban a Firebase Assistant-ban a Storage funkciót. Ne felejtsük a *build.gradle*-ben a verziót az emulátorhoz igazítani:
+Elsőként kapcsoljuk be a Firebase Assistant-ban a Storage funkciót. Ne felejtsük a *build.gradle*-ben a verziót az emulátorhoz igazítani:
 ```gradle
 compile 'com.google.firebase:firebase-storage:9.6.1'
 ```
