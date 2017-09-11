@@ -66,8 +66,9 @@ Az Activity létrehozást azonban megkönnyíti az Andriod Studio és a fenti l�
 
 1. Az Android Studioban a forrásra állva válasszuk a “jobbegér->New->Activity->Basic Activity” menüt és hozzuk létre a két Activity-t (*AboutActivity, GameActivity*). Activity létrehozásakor megadható, hogy melyik legyen a “szülő” Activity, amihez a vissza gomb visszanavigálja a felhasználót. Mindkét esetben legyen ez a *MainMenuActivity*.
 2. Létrehozás után az *res/values/strings.xml*-ben állítsuk be a két új Activity címét amelyet a létrehozáskor a Studio automatikusan kigenerált nekünk mint erőforrás (Például: *Az alkalmazásról* illetve *Játék* ).
-3. Nyissuk meg a két új Activity kódját, vizsgáljuk meg azokat és a fölösleges *FloatingActionButton*-t illetve annak *listener*-ét távolítsik el. Ha ez kész akkor az *Activity*-hez rendelt layout-ból is töröljük a widgetet (Tipp: az adott *Activity* *onCreate()* metódusában a *setContentView()*-ban az adott layout-ra CTRL + kattintással könnyen megnyithatjuk az XML leírót).
-4. Állítsuk be a manifest-ben, hogy az *AboutActivity* dialógus formában jelenjen meg:
+3. Nyissuk meg a két új Activity kódját, vizsgáljuk meg azokat és a fölösleges *FloatingActionButton*-t illetve annak *listener*-ét távolítsuk el. Ha ez kész, akkor az *Activity*-hez rendelt layout-ból is töröljük a widgetet (Tipp: az adott *Activity* *onCreate()* metódusában a *setContentView()*-ban az adott layout-ra CTRL + kattintással könnyen megnyithatjuk az XML leírót).
+4. Az *AboutActivity*-ből távolítsuk el a *Toolbar* kezeléséért felelős sorokat, mivel erre később nem lesz szükségünk.
+5. Állítsuk be a manifest-ben, hogy az *AboutActivity* dialógus formában jelenjen meg:
 
 ```xml
 <activity
@@ -120,10 +121,9 @@ A *MainMenuActivity* a fenti ábra alapján három menüpontot tartalmaz közép
         android:layout_height="wrap_content"
         android:text="@string/btn_about" />
 </LinearLayout>
-
 ```
 
-A Studio egyből jelezni fogja nekünk, hogy a három string erőforrás amit használni szeretnénk, nem létezik, hozzuk létre őket a *strings.xml*-ben (Tipp: ha az erőforrás nevén áll a kurzor az XML-ben és ALT + ENTER -t nyomunk akkor a Studio felajánjla a string resource automatikus elkészítését az értékének megadásával)
+A Studio egyből jelezni fogja nekünk, hogy a két *dimens* erőforrás amit használni szeretnénk, nem létezik, hozzuk létre őket a *strings.xml*-ben, értékük legyen 16dp. (Tipp: ha az erőforrás nevén áll a kurzor az XML-ben és ALT + ENTER -t nyomunk akkor a Studio felajánjla a resource automatikus elkészítését az értékének megadásával.)
 
 ### Highscore gomb eseménykezelő
 
@@ -138,8 +138,6 @@ btnHighscore.setOnClickListener(new View.OnClickListener() {
   }
 });
 ```
-
-(Tipp: az ALT + ENTER itt is működik a hiányzó string-re állítva a kurzort)
 
 ### AboutActivity felület
 
