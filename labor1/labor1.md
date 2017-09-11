@@ -47,7 +47,7 @@ Navigáljunk a `res/values/strings.xml`-re, ahol a projekt szöveges erőforrás
 <resources>
     <string name="app_name">TicTacToe</string>
     <string name="btn_start">Új játék</string>
-    <string name="btn_highscore">Eredméyek</string>
+    <string name="btn_highscore">Eredmények</string>
     <string name="btn_about">Infó</string>
     <string name="toast_highscore">Eredmények</string>
     <string name="txt_about">Made by Hallgató</string>
@@ -124,6 +124,7 @@ A *MainMenuActivity* a fenti ábra alapján három menüpontot tartalmaz közép
 ```
 
 A Studio egyből jelezni fogja nekünk, hogy a három string erőforrás amit használni szeretnénk, nem létezik, hozzuk létre őket a *strings.xml*-ben (Tipp: ha az erőforrás nevén áll a kurzor az XML-ben és ALT + ENTER -t nyomunk akkor a Studio felajánjla a string resource automatikus elkészítését az értékének megadásával)
+
 ### Highscore gomb eseménykezelő
 
 A Highscore menüpontra kattintva ahogy említettük egy *Toast* üzenet jelenjen meg. Ehhez meg kell keresni a Highscore menüpont gombját és be kell állítani az alábbi eseménykezelőt neki a *MainMenuActivity onCreate()* függvényén belül:
@@ -139,14 +140,13 @@ btnHighscore.setOnClickListener(new View.OnClickListener() {
 ```
 
 (Tipp: az ALT + ENTER itt is működik a hiányzó string-re állítva a kurzort)
+
 ### AboutActivity felület
 
 Ahogy korábban említettük az About menü elindítja az új *AboutActivity*-t, ezért elsőként készítsük el az *AboutActivity* felületét, melyet az *activity_about.xml* ír le:
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/content_about"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -226,10 +226,10 @@ public class TicTacToeModel {
 ```
 
 
-> ###__A laborvezetővel vegyék át az osztály működését.__
+> ### __A laborvezetővel vegyék át az osztály működését.__
 
 ### Navigáció megvalósítása Activity-k közt
-A következő lépésként valósítsuk meg a navigációt (váltást) az *Activity*-k között. Gyakorlatilag csak a Start game menüpont hatására kell átváltanunk a *GameActivity*-re, illetve az *About* menüpont hatására az *AboutActivity*-re. Acitivty-k közti váltást *Intent* segítségével tudunk megtenni, beszéljék meg a laborvezetővel az *Intent*-ek alapjait. Ezt a témát előadáson később mélyebben fogjuk még érinteni.
+A következő lépésként valósítsuk meg a navigációt (váltást) az *Activity*-k között. Gyakorlatilag csak a Start game menüpont hatására kell átváltanunk a *GameActivity*-re, illetve az *About* menüpont hatására az *AboutActivity*-re. Activity-k közti váltást *Intent* segítségével tudunk megtenni, beszéljék meg a laborvezetővel az *Intent*-ek alapjait. Ezt a témát előadáson később mélyebben fogjuk még érinteni.
 
 Valósítsuk meg ezen két gomb eseménykezelőjét szintén a *MainMenuActivity onCreate()* függvényében:
 
@@ -239,7 +239,7 @@ btnStart.setOnClickListener(new View.OnClickListener() {
   @Override
   public void onClick(View view) {
     TicTacToeModel.getInstance().resetModel(); // modell törlése új játék indításakor
-    Intent i = new Intent(MainMenuActivity.this,GameActivity.class);
+    Intent i = new Intent(MainMenuActivity.this, GameActivity.class);
     startActivity(i);
   }
 });
@@ -248,7 +248,7 @@ Button btnAbout = (Button) findViewById(R.id.btnAbout);
 btnAbout.setOnClickListener(new View.OnClickListener() {
   @Override
   public void onClick(View view) {
-    Intent i = new Intent(MainMenuActivity.this,AboutActivity.class);
+    Intent i = new Intent(MainMenuActivity.this, AboutActivity.class);
     startActivity(i);
   }
 });
@@ -316,7 +316,7 @@ public class TicTacToeView extends View {
   }
 }
 ```
-> ###__Vizsgálja meg a kódrészt a laborvezető segítségével.__
+> ### __Vizsgálja meg a kódrészt a laborvezető segítségével.__
 Látható, hogy az osztály gyakorlatilag egy nézet kirajzolásáért felelős. A konstruktorban létrehozunk két *Paint* objektumot, melyek a háttér és a pályaelemek kirajzolásárért felelős. Fontos, hogy ezeket a konstruktorba hozzuk létre és ne például az *onDraw()*-ba, hiszen az *onDraw()* gyakran meghívódik és sokszor hozná létre feleslegesen az objektumokat, lassítva ezzel a működést és megnehezítve a *garbage collector* dolgát.
 
 Az osztály egyik leglényegesebb függvénye, az *onDraw(Canvas canvas)*, mely a kapott *canvas* objektumra rajzolja ki gyakorlatilag a nézet tartalmát. A jelenlegi implementáció feketére festi a területet és meghívja a játéktér kirajzolásért (négyzetrács) és a játékosok (X és O) kirajzolásáért felelős – egyenlőre még üres – függvényeket.
@@ -329,8 +329,6 @@ Ahhoz, hogy a *GameActivity* ezt a játékteret megjelenítse, módosítsuk a ho
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/content_game"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -423,4 +421,4 @@ GameActivity gameActivity = (GameActivity) view.getContext();
 gameActivity.endGame();
 ```
 
-#Jó munkát kívánunk!
+# Jó munkát kívánunk!
