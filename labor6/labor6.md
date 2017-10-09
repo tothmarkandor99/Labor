@@ -206,7 +206,8 @@ Vegyük ki az activity layout-jából a Hello World-re hivatkozó TextView-t!
 
 Figyeljük meg a messenger, valamint a handler objektumok működését. Szintén figyeljük meg, hogy kerül
 átadásra a messenger az *IntentService* számára!
-Fontos: Látható, hogy az IntentService milyen módon paraméterezhető, amennyiben összetettebb
+
+**Fontos:** Látható, hogy az IntentService milyen módon paraméterezhető, amennyiben összetettebb
 feladatokat hajtunk végre a Service-ben (pl. hálózati kommunikáció, letöltés, stb.), hasonlóan adhatók át a kérések paraméterei, például az URL.
 
 **Fontos**: az APP modul gradle beállításai között a *targetSdkVersion*-t állítsuk vissza 22-re, mivel a
@@ -375,6 +376,9 @@ az *activity_main.xml*-be:
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".MainActivity" />
 ```
+
+Ha az ebben szereplő *dimen* erőforrások hiányoznak, rajtuk **Alt+Enter**-t nyomva hozzuk létre őket, értékük legyen 16dp.
+
 Hozzuk létre a LocationDashboardFragment Fragment-et az alábbi kóddal:
 ```java
 public class LocationDashboardFragment extends Fragment {
@@ -448,9 +452,10 @@ public class LocationDashboardFragment extends Fragment {
 
     @Override
     public void onPause() {
-        super.onPause();
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(
                 mMessageReceiver);
+
+        super.onPause();
     }
 
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
@@ -540,9 +545,10 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
 
     @Override
     protected void onStop() {
-        super.onStop();
         PreferenceManager.getDefaultSharedPreferences(
                 this).unregisterOnSharedPreferenceChangeListener(this);
+
+        super.onStop();
     }
 
     @Override
@@ -552,7 +558,7 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-       if (KEY_START_SERVICE.equals(key)) {
+        if (KEY_START_SERVICE.equals(key)) {
             boolean startService = sharedPreferences.getBoolean(KEY_START_SERVICE, false);
             // TODO: Service indítása/leállítása
         }
@@ -574,7 +580,7 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
 }
 ```
 **Fontos** kiemelni, hogy a PreferenceActivity/PreferenceFramework megoldás már automatikusan megoldja
-az beállítások tárolását **SharedPrefernces**-ben, ezt nem kell külön lekódolni!
+az beállítások tárolását **SharedPreferences**-ben, ezt nem kell külön lekódolni!
 
 Figyeljük meg, hogy iratkozunk fel *Preference* változásra az *onStart(…)*-ban, mely majd az állapottól
 függően indítani/leállítani fogja a Service-t!
@@ -602,9 +608,9 @@ Hogy elérhessük a Settings nézetet, egészítsük ki a *MainActivity* menü k
 (*onOptionsItemSelected(…)*), hogy a *Settings* menüpontot választva indítsa el a *SettingsActivity*-t:
 ```java
 case R.id.action_settings:
-    Intent intentSettings = new Intent(MainActivity.this,
-            SettingsActivity.class);
-    intentSettings.putExtra(SettingsActivity.EXTRA_SHOW_FRAGMENT, SettingsActivity.FragmentSettingsBasic.class.getName());
+    Intent intentSettings = new Intent(MainActivity.this, SettingsActivity.class);
+    intentSettings.putExtra(SettingsActivity.EXTRA_SHOW_FRAGMENT,
+            SettingsActivity.FragmentSettingsBasic.class.getName());
     intentSettings.putExtra(SettingsActivity.EXTRA_NO_HEADERS, true);
     startActivity(intentSettings);
     break;
@@ -698,10 +704,11 @@ public class ServiceLocation extends Service implements LocationListener {
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
         if (ldLocationManager != null) {
             ldLocationManager.stopLocationMonitoring();
         }
+
+        super.onDestroy();
     }
 
     @Override
@@ -771,7 +778,7 @@ private Notification getMyNotification(String text) {
             notificationIntent,
             PendingIntent.FLAG_CANCEL_CURRENT);
 
-    Notification notification = new Notification.Builder(this)
+    Notification notification = new NotificationCompat.Builder(this)
             .setContentTitle("Service Location Demo")
             .setContentText(text)
             .setSmallIcon(R.mipmap.ic_launcher)
@@ -1070,12 +1077,13 @@ public void onResume() {
 
 @Override
 public void onPause() {
-    super.onPause();
     if (binderServiceLocation != null) {
         getActivity().unbindService(servConn);
     }
     LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(
             mMessageReceiver);
+
+    super.onPause();
 }
 ```
 Utolsó lépésként egészítsük ki a LocationDashboardFragment onViewCreated(…) függvényét,
