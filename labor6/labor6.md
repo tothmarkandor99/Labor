@@ -151,13 +151,13 @@ Az Activity-hez tartozó menü XML így nézzen ki (hagyjuk meg a beállítások
     <item android:id="@+id/action_free_space"
          android:title="@string/action_free_space"
          android:orderInCategory="100"
-         app:showAsAction="always" />
+         app:showAsAction="ifRoom" />
     <item android:id="@+id/action_settings"
          android:title="@string/action_settings"
          android:orderInCategory="100"
-         app:showAsAction="always" />
+         app:showAsAction="ifRoom" />
 </menu>
-```
+``` 
 Az Activity kódja a következő:
 ```java
 public class MainActivity extends AppCompatActivity {
@@ -580,7 +580,7 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
 }
 ```
 **Fontos** kiemelni, hogy a PreferenceActivity/PreferenceFramework megoldás már automatikusan megoldja
-az beállítások tárolását **SharedPreferences**-ben, ezt nem kell külön lekódolni!
+a beállítások tárolását **SharedPreferences**-ben, ezt nem kell külön lekódolni!
 
 Figyeljük meg, hogy iratkozunk fel *Preference* változásra az *onStart(…)*-ban, mely majd az állapottól
 függően indítani/leállítani fogja a Service-t!
@@ -799,7 +799,7 @@ A Service-t indító *onStartCommand(…)* függvény elején állítsuk be a *F
 ```java
 startForeground(NOTIF_FOREGROUND_ID, getMyNotification("starting..."));
 ```
-Az onLocationChanged(…) függvényben új pozíció érkezésekor frissítsük a Notificatin-t:
+Az onLocationChanged(…) függvényben új pozíció érkezésekor frissítsük a Notification-t:
 ```java
 updateNotification("Lat: "+location.getLatitude()+"n"+
         "Lng: "+location.getLongitude());
@@ -821,7 +821,7 @@ public void onProviderDisabled(String provider) {
     updateNotification("Provider disabled: "+provider);
 }
 ```
-**Próbáljuk ki** az alkalmazást működés közben és vizsgáljuk meg a Notification működését?
+**Próbáljuk ki** az alkalmazást működés közben és vizsgáljuk meg a Notification működését!
 
 **Próbáljuk ki** mi történik, ha rákattintunk az értesítésre!
 
@@ -957,7 +957,7 @@ Egészítsük ki a SettingsActivity kódját az elején egy konstanssal:
 ```java
 public static final String KEY_WITH_FLOATING = "with_floating";
 ```
-Valamint a SettingsActivity onShardPrefernceChanged(…) függvényt valósítsuk meg úgy, hogy ellenőrizzük
+Valamint a SettingsActivity onSharedPreferenceChanged(…) függvényt valósítsuk meg úgy, hogy ellenőrizzük
 a CheckBox állapotát és a Service-t indító Intent paramétereként adjuk meg, hogy megjelenjen-e
 a lebegő ablak vagy sem:
 ```java
@@ -981,11 +981,11 @@ public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, Strin
 Végül a ServiceLocation onStartCommand(…) függvényét egészítsük ki úgy, hogy olvassa ki a kapott
 paramétert és annak függvényében jelenítse meg a lebegő ablakot:
 ```java
-if (intent.getBooleanExtra(SettingsActivity.KEY_WITH_FLOATING,false)) {
+if (intent.getBooleanExtra(SettingsActivity.KEY_WITH_FLOATING, false)) {
     showFloatingWindow();
 }
 ```
-és az ServiceLocation onDestroy() függvényében pedig hívjuk meg a hideFloatingWindow(), hogy
+A ServiceLocation onDestroy() függvényében pedig hívjuk meg a hideFloatingWindow() függvényt, hogy
 ha megszűnik a service, törölje a lebegő ablakot is.
 ```java
 hideFloatingWindow();
