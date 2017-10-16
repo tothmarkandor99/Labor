@@ -286,11 +286,11 @@ public interface GalleryAPI {
     String MULTIPART_FORM_DATA = "multipart/form-data";
     String PHOTO_MULTIPART_KEY_IMG = "image";
 
-    @GET("/images")
+    @GET("images")
     Call<List<Image>> getImages();
 
     @Multipart
-    @POST("/upload")
+    @POST("upload")
      Call<ResponseBody> uploadImage(@Part MultipartBody.Part file, @Part("name") RequestBody name, @Part("description") RequestBody description);
 }
 ```
@@ -383,6 +383,11 @@ private static <T> void runCallOnBackgroundThread(final Call<T> call, final Resp
 Ezután a fenti segédfüggvényt felhasználva elkészíthetjük a az Interactorban a hívásokat.
 
 ```
+public void getImages(ResponseListener<List<Image>> responseListener) {
+    Call<List<Image>> getImagesRequest = galleryApi.getImages();
+    runCallOnBackgroundThread(getImagesRequest, responseListener);
+}
+
 public void uploadImage(Uri fileUri,String name, String description, ResponseListener<ResponseBody> responseListener) {
     File file = new File(fileUri.getPath());
     RequestBody requestFile = RequestBody.create(MediaType.parse(MULTIPART_FORM_DATA), file);

@@ -14,7 +14,7 @@ A sablonválasztónál válasszuk a **Master/Detail Flow** opciót!
 
 <img src="./assets/master-detail-choose_new.PNG" width="200" align="middle">
 
-A következő ablakban írjuk be rendre, hogy **Todo, Todos, Todos**! Ennek csak a generált sablonban van szerepe, de legalább az activity nevét nem kell később átírjuk.
+A következő ablakban írjuk be rendre, hogy **Todo, Todos, Todos**! Ennek csak a generált sablonban van szerepe, de legalább az Activity nevét nem kell később átírnunk.
 
 Laborvezetővel elemezzék a generált alkalmazás működését, próbálják ki emulátoron, készüléken! A Master/Detail nézet célja, hogy egyetlen alkalmazással megoldjunk egy lista és annak egy elemének megjelenítését tableten és mobiltelefonon egyaránt. Működésének a lényege, hogy egy activity-hez tartozó layoutnak kétféle változata van. Egy kétpaneles és egy egypaneles változat. Egy módszer az, ha erőforrás minősítőkkel biztosítjuk, hogy tableten a kétpaneles változat töltődjön be, míg mobilon az egypaneles. Az activityben megpróbálunk referenciát szerezni a második panelre, és ha sikerül, akkor tableten vagyunk, ha nem, akkor mobilon. Az első panel tartalma egy **RecyclerView** a másodiké pedig egy sima Fragment a lista egy elemének megjelenítésére. Ha mobilon vagyunk, akkor a listaelemre kattintva új activitybe töltjük a részletező fragmentet, míg tableten egyszerűen betöltjük a jobb oldali panelbe. (a generált kód másképpen működik, ott a refs.xml állomány-t minősíti)
 
@@ -291,13 +291,13 @@ Ez az adapter hivatkozik egy **row_todo.xml**-re. Hozzuk létre ezt az álloimá
 </LinearLayout>
 ```
 
-A három kép, mely szükséges a nézetekhez. Használjuk az [Asset Studiot] a képek legenerálásához, majd a kapott mappákat másoljuk a _res/drawable_ mappába:
+Szükségünk van még a nézetekhez az alábbi három képre. Ezek különböző méreteinek legenerálásához használjuk az [Asset Studio](https://romannurik.github.io/AndroidAssetStudio/index.html)-t (azon belül a Generic icon generator-t), majd a kapott mappákat másoljuk a _res_ mappába.
 
 <img src="./assets/high.png" align="middle" width="50">
 <img src="./assets/medium.png" align="middle" width="50">
 <img src="./assets/low.png" align="middle" width="50">
 
-Írjuk felül a TodoListActivity **SetupRecyclerView** metódusát az alábbi kóddal. (Ez a metódus felel az adapter példaadatokkal való feltöltéséért.)
+Írjuk felül a TodoListActivity **setupRecyclerView** metódusát az alábbi kóddal. (Ez a metódus felel az adapter példaadatokkal való feltöltéséért.)
 
 ```java
 private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
@@ -310,9 +310,45 @@ private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
 ```
 
 
-A TodoListActivity-ben töröljük ki a belső adapter osztályt, erre nem lesz szűkségünk.
-
 Ha valamelyik osztályban még hibát jelezne az IDE, ellenőrizzük, hogy nem-e maradt felesleges import a **dummy** csomag elemeire.
+
+Mivel a generált kód előbb állítja be az adapter, mint hogy eldöntené hogy telefon/tablet az eszköz, így ezt a két hívást meg kell cserélnünk a TodoListActivity onCreate metódusban:
+
+
+```java
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_todo_list);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        toolbar.setTitle(getTitle());
+
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+            }
+        });
+
+        View recyclerView = findViewById(R.id.todo_list);
+        assert recyclerView != null;
+
+        if (findViewById(R.id.todo_detail_container) != null) {
+            // The detail container view will be present only in the
+            // large-screen layouts (res/values-w900dp).
+            // If this view is present, then the
+            // activity should be in two-pane mode.
+            mTwoPane = true;
+        }
+
+        setupRecyclerView((RecyclerView) recyclerView);
+    }
+```
+
 
 Próbálja ki az alkalmazást!
 Tipp: A gyorsabb teszteléshez, keresse ki a tablet mérethez tartozó (layout-w900dp) `todo_list.xml` felületleírót, majd másolja a layount-land mappába (hozza létre a mappát!). Ezáltal a mobiltelefon álló orientációjában egy-, míg fekvtetve kétpaneles viselkedést kapunk.
@@ -320,7 +356,7 @@ Tipp: A gyorsabb teszteléshez, keresse ki a tablet mérethez tartozó (layout-w
 ## Todo törlése
 
 Az adapterben láttuk a törlésre szolgáló metódust, hát használjuk is! A cél, hogy egy Todora hosszan érintve megjelenjen egy menü, ahol törölhetjük a Todot.
-Az elemek érintés eseménykezelője már el van készítve, a todo törléséhez készítsünk az elemkhez hosszú érintés gesztúra detektálót, majd ekkor dobjunk fel egy popup ablakot, ahol a kívánt művelet kiválasztható lesz. Adjuk hozzá az alábbi sorokat az Adapter _onBindViewHolder_ metódusához:
+Az elemek érintés eseménykezelője már el van készítve, a todo törléséhez készítsünk az elemekhez hosszú érintés gesztus detektálót, majd ekkor dobjunk fel egy popup ablakot, ahol a kívánt művelet kiválasztható lesz. Adjuk hozzá az alábbi sorokat az Adapter _onBindViewHolder_ metódusához:
 
 ```java
 holder.mView.setOnLongClickListener(new View.OnLongClickListener() {
@@ -732,7 +768,7 @@ public class DatePickerDialogFragment extends DialogFragment {
 }
 ```
 
-Ugorjunk vissza a _TodoCreateFragment_-re és valósítsuk meg az *DateListener* interfészt, illetve állítsuk be a txtDueDate onClickListener(…)-jében, hogy mutassunk egy DialogFragment-et.
+Ugorjunk vissza a _TodoCreateFragment_-re és valósítsuk meg a *DateListener* interfészt, illetve állítsuk be a txtDueDate onClickListener(…)-jében, hogy mutassunk egy DialogFragment-et.
 
 ```java
 public class TodoCreateFragment extends DialogFragment implements DatePickerDialogFragment.DateListener
@@ -741,27 +777,26 @@ public class TodoCreateFragment extends DialogFragment implements DatePickerDial
 
 
 ```java
-    private void showDatePickerDialog() {
-        FragmentManager fm = getFragmentManager();
+private void showDatePickerDialog() {
+    FragmentManager fm = getFragmentManager();
 
-        DatePickerDialogFragment datePicker = new DatePickerDialogFragment();
-        datePicker.setTargetFragment(this, 0);
-        datePicker.show(fm, DatePickerDialogFragment.TAG);
-    }
+    DatePickerDialogFragment datePicker = new DatePickerDialogFragment();
+    datePicker.setTargetFragment(this, 0);
+    datePicker.show(fm, DatePickerDialogFragment.TAG);
+}
 
-    @Override
-    public void onDateSelected(String date) {
-        txtDueDate.setText(date);
-    }
-
+@Override
+public void onDateSelected(String date) {
+    txtDueDate.setText(date);
+}
 ```
 
 Az onCreateView-ben adjuk hozzá a megfelelő metódust a Dátumválasztó textView-hoz
 
 ```java
-        txtDueDate.setOnClickListener(new OnClickListener() {
-            public void onClick(View v) {
-                showDatePickerDialog();
-            }
-        });
-  ```
+txtDueDate.setOnClickListener(new View.OnClickListener() {
+    public void onClick(View v) {
+        showDatePickerDialog();
+    }
+});
+```
