@@ -222,8 +222,8 @@ Az előző laborok során többször is használtuk a **findViewByID** hívást 
 Ehhez a module build.gradle ben kell a dependencies részbe felvenni a könyvátrat. Egyszer fel kell venni mint compile függőség, hogy az osztályait elérjük. Másrészt fel kell venni mint annotationProcessor-t, hogy az annotáció feldolgozás lefuthasson. (Régebben erre az **android-apt** gradle plugin kellett, de az Android Gradle Plugin 2.2 óta beépítve elérhető, ha mégsem a legújabb gradle plugint használtnánk, azt a projekt _build.gradle_ -ben tudjuk frissíteni.).
 
 ```java
-compile 'com.jakewharton:butterknife:8.4.0'
-annotationProcessor 'com.jakewharton:butterknife-compiler:8.4.0'
+compile 'com.jakewharton:butterknife:8.8.1'
+annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
 ```
 
 A könyvtár fordítás időben generálja le a findViewByID hívásokat, és el is fedi előlünk, az összerendelést annotációkkal tudjuk megadni.

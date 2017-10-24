@@ -216,7 +216,8 @@ public void setElevation(float elevation){
 
 **Próbáljuk ki az alkalmazást**
 
-<img src="./images/screen1.png" width="600" " align="middle">
+![](./images/screen1.png)
+
 
 ## Irányítás
 
@@ -314,7 +315,8 @@ public class GameActivity extends AppCompatActivity {
 
 **Próbáljuk ki az alkalmazást.**
 
-<img src="./images/screen2.png" width="600" " align="middle">
+![](./images/screen2.png)
+
 
 ### Animáció
 
@@ -342,7 +344,7 @@ public void render(Canvas canvas) {
 
 **Próbáljuk ki az alkalmazást!** 
 
-<img src="./images/animate.gif" width="500" " align="middle">
+![](./images/animate.gif)
 
 
 ## FPS korlát elhelyezése
@@ -391,7 +393,8 @@ A renderelés kezdete és vége előtt eltelt időt nézzük és ha ez kisebb mi
 
 **Próbáljuk ki az alkalmazást!** 
 
-<img src="./images/animate.gif" width="500" " align="middle">
+![](./images/animate.gif)
+
 
 ## Önálló feladatok
 

@@ -26,6 +26,10 @@
 
 [10. labor - Játékfejlesztés](./labor10/labor10.md)
 
-[11. labor - Launcher++](./labor11/labor11.md)
+[11. labor - Futásidejű engedélyek](./labor11/labor11.md)
 
-[12. labor - Futásidejű engedélyek](./labor12/labor12.md)
+[12. labor - Firebase](./labor12/labor12.md)
+
+[13. labor - Launcher++](./labor13/labor13.md)
+
+[14. labor - Órarend](./labor14/labor14.md)
