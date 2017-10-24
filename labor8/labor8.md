@@ -97,11 +97,22 @@ Vegyük fel a Manifest állományba a szükséges engedélyeket:
 <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 ```
 
-> Ezen engedélyek közül a kamera kezelés és a külső háttértár elérése veszélyes engedély, amit Android 6.0 felett megfelelően, futásidőben kell elkérni. A félév során lesz ennek a menetéről is szó. Mi ezt most a labor nem szeretnénk támogatni, ezért a `build.gradle`-ben a `targetSdkVersion` értékét vegyük le `23`-ra.
+> Ezen engedélyek közül a kamera kezelés és a külső háttértár elérése veszélyes engedély, amit Android 6.0 felett megfelelően, futásidőben kell elkérni. A félév során lesz ennek a menetéről is szó. Mi ezt most a labor nem szeretnénk támogatni, ezért a `build.gradle`-ben a `targetSdkVersion` értékét vegyük le `22`-ra.
 
 A **build.gradle**-ben vegyük fel a RecyclerView függőséget:
 
- `compile 'com.android.support:recyclerview-v7:25.0.0'`
+ `compile 'com.android.support:recyclerview-v7:26+'`
+ 
+Mivel az újabb Google könyvtárak csak a Google Maven tárolójából érhetőek el, ezért ezt vegyük fel a project `build.gradle`-be.
+
+```
+allprojects {
+    repositories {
+        jcenter()
+        maven {url 'https://maven.google.com'}
+    }
+}
+```
 
 A **MainActivity** nézet fogja kilistázni a feltöltött képeket. Ez egy egyszerű RecyclerView, mely egy SwipeRefreshLayoutba van ágyazva, ez lehetőséget biztosít arra, hogy a listához egyszerűen implementáljunk pull-to-refresh működést. A hozzá tartozó **activity_main.xml** tartalma a következő:
 
@@ -129,6 +140,8 @@ A **MainActivity** nézet fogja kilistázni a feltöltött képeket. Ez egy egys
     </android.support.v4.widget.SwipeRefreshLayout>
 </RelativeLayout>
 ```
+
+A hiányzó dimenzió értékeket vegyük fel alt+enter segítségével. Értékük legyen `16dp`.
 
 A **MainActivity** kódja pedíg a következő. Látható hogy a `loadImages()` függvény végzi ez a photok letöltését (egyenlőre csak beégetett értékekkel), ez hívódik a nézetre navigálása után, illetve ha lehúzzással frissítjük a tartalmat.
 
@@ -249,7 +262,7 @@ A [Glide](https://github.com/bumptech/glide) egy általános célú képkezelő 
 Használatához a **build.gradle** be vegyük fel a következő függőséget a `dependencies` blokkban. 
 
 ```
-compile 'com.github.bumptech.glide:glide:3.7.0'
+compile 'com.github.bumptech.glide:glide:4.2.0'
 ```
 
 Ezután a **ImagesAdapter**  **onBindViewHolder** függvényében töltsük be az adott fotót az **ImageView**-ba.
@@ -270,10 +283,10 @@ A [Retrofit](https://square.github.io/retrofit/) egy általános célú HTTP kö
 A Retrofit használatához vegyük fel a függőségek közé az alábbi kódot.
 
 ```
-compile 'com.squareup.retrofit2:retrofit:2.1.0'
-compile 'com.squareup.okhttp3:okhttp:3.4.2'
-compile 'com.google.code.gson:gson:2.7'
-compile 'com.squareup.retrofit2:converter-gson:2.1.0'
+compile 'com.squareup.retrofit2:retrofit:2.3.0'
+compile 'com.squareup.okhttp3:okhttp:3.9.0'
+compile 'com.google.code.gson:gson:2.8.2'
+compile 'com.squareup.retrofit2:converter-gson:2.3.0'
 ```
 
 Ezután hozzunk létre egy új csomagot **network** néven, benne egy új interface-t **GalleryAPI** néven. Ez lesz az API leírónk.
@@ -310,6 +323,8 @@ public class Image {
     public String encoding;
 }
 ```
+
+Figyeljünk rá hogy mindíg ezt az **Image** osztályt importáljuk.
 
 Látható, hogy a GSON automatikus megoldja majd az egyes tagváltozók szerializálását, kivéve az id mezőt, mivel azt a szerver `_id`-ként adja vissza. Ezt a `@SerializedName` annotációval írhatjuk felül.
 
@@ -572,9 +587,7 @@ public class UploadActivity extends AppCompatActivity {
         if (requestCode == REQUEST_CAMERA_IMAGE) {
             if (resultCode == RESULT_OK) {
                 try {
-                    Glide.with(this).load(Uri.fromFile(new File(IMAGE_PATH)))
-                            .diskCacheStrategy(DiskCacheStrategy.NONE)
-                            .skipMemoryCache(true).into(imageIV);
+                    Glide.with(this).load(Uri.fromFile(new File(IMAGE_PATH))).apply(new RequestOptions().signature(new ObjectKey(System.currentTimeMillis()))).into(imageIV);
 
                 } catch (Throwable t) {
                     t.printStackTrace();
@@ -629,8 +642,7 @@ Próbáljuk ki az alkalmazást!
 <img src="./images/screen4.png" width="250" align="middle">
 <img src="./images/screen5.png" width="250" align="middle">
 
-### A feltöltés megvalósítása
-
+## A feltöltés megvalósítása
 A feltöltéshez szükséges API definíció és Interactor hívás is definiálva van, így a **getPhotos**-hoz hasonlóan hívjuk meg ezt a hívást is a kép **Uri** paraméterével. Ezt az **UploadActivity** **onCreate(..)** metódusában tegyük meg.
 
 
