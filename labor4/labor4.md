@@ -110,9 +110,11 @@ Az Android hivatalos betűtípusa a Roboto család (annak ellenére, hogy beép�
 Ahhoz, hogy saját betűtípust alkalmazzunk meg kell változtassuk kódból a TextView-n.
 Viszont ezt minden TextView-n és szöveget megjelenítő komponensen el kellene végezni, így ehelyett egy kész megoldást használunk:
 
-[RobotoTextView Github](https://github.com/johnkil/Android-RobotoTextView)
+```xml
+compile 'com.github.johnkil.android-robototextview:robototextview:3.0.0'
+```
 
-Illesszük be a Gradle függőségek közé, leírása szerint (elvileg már rég szerepel ott a support v4)!
+Illesszük be a Gradle függőségek közé!
 
 A tárcsázó gombjainak (12 darab) stílusát fogjuk össze, illetve egy kicsit szabjuk át a kinézetet!
 

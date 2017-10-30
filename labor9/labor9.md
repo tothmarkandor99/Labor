@@ -479,4 +479,4 @@ A fenti alapok segítségével alakítsa tovább az alkalmazást!
 
 ### Feladat 2 - Swipe to delete
 
-Valósítsa meg a swipe gesztussal való törlést (és esetleg módosítást). Használhatja például a következő osztálykönyvtárat: [https://github.com/wdullaer/SwipeActionAdapter](https://github.com/wdullaer/SwipeActionAdapter)
+Valósítsa meg a swipe gesztussal való törlést (és esetleg módosítást). Példa megvalósítás: [https://medium.com/@ipaulpro/drag-and-swipe-with-recyclerview-b9456d2b1aaf](https://medium.com/@ipaulpro/drag-and-swipe-with-recyclerview-b9456d2b1aaf)
