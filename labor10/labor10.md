@@ -19,7 +19,27 @@ Elsőnek töltsük le a labor során használt kiinduló projektet, majd nyissuk
 
 [Kiinduló projekt](./assets/SpaceShipGame_skeleton.zip) 
 
-A Laborvezető segítségével vizsgáljuk meg a projekt felépítését.
+Frissítsük a **Gradlet** és a **Gradle Plugint**, ezeket a Studio megoldja nekünk.
+
+A module `build.grade` -ben frissítsük  a **Compile SDK** és a **Target SDK**-t `26`-ra, a **Build Tools** értékét `26.0.2`-re, az **AppCompat** könyvtárat pedíg `26.1.0`-ra.
+
+A project `build.gradle` -ben vegyük fel a **Google Maven** repositoryt.
+
+```
+allprojects {
+	repositories {
+		jcenter()
+		maven {url 'https://maven.google.com'}
+	}
+}
+```
+
+A források közül a test könyvtárat, illetve annak a tartalmát kitörölhetjük.
+
+Fordítsuk le a projektet, majd a Laborvezető segítségével vizsgáljuk meg a projekt felépítését.
+
+
+
 
 ### Általános
 
@@ -216,7 +236,8 @@ public void setElevation(float elevation){
 
 **Próbáljuk ki az alkalmazást**
 
-<img src="./images/screen1.png" width="600" " align="middle">
+![](./images/screen1.png)
+
 
 ## Irányítás
 
@@ -314,7 +335,8 @@ public class GameActivity extends AppCompatActivity {
 
 **Próbáljuk ki az alkalmazást.**
 
-<img src="./images/screen2.png" width="600" " align="middle">
+![](./images/screen2.png)
+
 
 ### Animáció
 
@@ -342,7 +364,7 @@ public void render(Canvas canvas) {
 
 **Próbáljuk ki az alkalmazást!** 
 
-<img src="./images/animate.gif" width="500" " align="middle">
+![](./images/animate.gif)
 
 
 ## FPS korlát elhelyezése
@@ -391,7 +413,8 @@ A renderelés kezdete és vége előtt eltelt időt nézzük és ha ez kisebb mi
 
 **Próbáljuk ki az alkalmazást!** 
 
-<img src="./images/animate.gif" width="500" " align="middle">
+![](./images/animate.gif)
+
 
 ## Önálló feladatok
 
@@ -407,4 +430,11 @@ Biztosítsa, hogy a játékos űrhajóját ne lehessen kimozgatni a játéktérb
 Biztosítsa, hogy a jaték alatt ne aludjon el a képernyő, akkor sem ha huzamosabb időn át nem érünk hozzá!
 
 Segítség: [Keeping the Device Awake](https://developer.android.com/training/scheduling/wakelock.html)
+
+### Feladat 4 - Okosabb memória kezelés
+Jelenleg minden ellenséges űrhajó képe külön be van töltve a memóriába. 
+
+Valósítsa meg hogy ezek csak egy példányban legyenek betöltve (pl. statikus objektum), illetve a képernyőről eltűnő ellenséges űrhajókat szabadítsa fel, azok ne foglaljanak helyet a memóriában.
+
+A képernyőről eltűnő űrhajókat a poziciójuk alapján (aktuális pocizió kisebb-e mint a bal szél=0 - a hajó mérete) vegye ki a listából (pl. iterátorral). Ha nincs már rájuk referencia, a GC felszabadítja.
 

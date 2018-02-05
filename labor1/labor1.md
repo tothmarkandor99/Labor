@@ -47,14 +47,14 @@ Navigáljunk a `res/values/strings.xml`-re, ahol a projekt szöveges erőforrás
 <resources>
     <string name="app_name">TicTacToe</string>
     <string name="btn_start">Új játék</string>
-    <string name="btn_highscore">Eredméyek</string>
+    <string name="btn_highscore">Eredmények</string>
     <string name="btn_about">Infó</string>
     <string name="toast_highscore">Eredmények</string>
     <string name="txt_about">Made by Hallgató</string>
 </resources>
 ```
 
-### Szükséges további Activity-k létrehozása
+## Szükséges további Activity-k létrehozása
 A fentiek alapján látható tehát, hogy a meglevő MainMenuActivity mellett még két másik Activity-t, a *GameActivity*-t és az *AboutActivity*-t kell létrehoznunk. Activity létrehozásakor tipikusan az alábbi forrás állományok változnak:
 
 * Létrejön az Activiy-hez tartozó Java file.
@@ -66,8 +66,9 @@ Az Activity létrehozást azonban megkönnyíti az Andriod Studio és a fenti l�
 
 1. Az Android Studioban a forrásra állva válasszuk a “jobbegér->New->Activity->Basic Activity” menüt és hozzuk létre a két Activity-t (*AboutActivity, GameActivity*). Activity létrehozásakor megadható, hogy melyik legyen a “szülő” Activity, amihez a vissza gomb visszanavigálja a felhasználót. Mindkét esetben legyen ez a *MainMenuActivity*.
 2. Létrehozás után az *res/values/strings.xml*-ben állítsuk be a két új Activity címét amelyet a létrehozáskor a Studio automatikusan kigenerált nekünk mint erőforrás (Például: *Az alkalmazásról* illetve *Játék* ).
-3. Nyissuk meg a két új Activity kódját, vizsgáljuk meg azokat és a fölösleges *FloatingActionButton*-t illetve annak *listener*-ét távolítsik el. Ha ez kész akkor az *Activity*-hez rendelt layout-ból is töröljük a widgetet (Tipp: az adott *Activity* *onCreate()* metódusában a *setContentView()*-ban az adott layout-ra CTRL + kattintással könnyen megnyithatjuk az XML leírót).
-4. Állítsuk be a manifest-ben, hogy az *AboutActivity* dialógus formában jelenjen meg:
+3. Nyissuk meg a két új Activity kódját, vizsgáljuk meg azokat és a fölösleges *FloatingActionButton*-t illetve annak *listener*-ét távolítsuk el. Ha ez kész, akkor az *Activity*-hez rendelt layout-ból is töröljük a widgetet (Tipp: az adott *Activity* *onCreate()* metódusában a *setContentView()*-ban az adott layout-ra CTRL + kattintással könnyen megnyithatjuk az XML leírót).
+4. Az *AboutActivity*-ből távolítsuk el a *Toolbar* kezeléséért felelős sorokat, mivel erre később nem lesz szükségünk.
+5. Állítsuk be a manifest-ben, hogy az *AboutActivity* dialógus formában jelenjen meg:
 
 ```xml
 <activity
@@ -83,7 +84,7 @@ Az Activity létrehozást azonban megkönnyíti az Andriod Studio és a fenti l�
 
 > ### __Létrehozás után ellenőrizzük a laborvezető segítségével a létrejött kódokat!__
 
-### MainMenuActivity felület:
+## MainMenuActivity felület:
 
 A *MainMenuActivity* a fenti ábra alapján három menüpontot tartalmaz középre igazodva. Ez a három menüpont gyakorlatilag három gomb egymás alatt egy *LinearLayout*-ban, mely kitölti a szülőt (*match_parent*) és benne az elemek középre vannak rendezve:
 
@@ -120,11 +121,11 @@ A *MainMenuActivity* a fenti ábra alapján három menüpontot tartalmaz közép
         android:layout_height="wrap_content"
         android:text="@string/btn_about" />
 </LinearLayout>
-
 ```
 
-A Studio egyből jelezni fogja nekünk, hogy a három string erőforrás amit használni szeretnénk, nem létezik, hozzuk létre őket a *strings.xml*-ben (Tipp: ha az erőforrás nevén áll a kurzor az XML-ben és ALT + ENTER -t nyomunk akkor a Studio felajánjla a string resource automatikus elkészítését az értékének megadásával)
-### Highscore gomb eseménykezelő
+A Studio egyből jelezni fogja nekünk, hogy a két *dimens* erőforrás amit használni szeretnénk, nem létezik, hozzuk létre őket a *dimens.xml*-ben, értékük legyen 16dp. (Tipp: ha az erőforrás nevén áll a kurzor az XML-ben és ALT + ENTER -t nyomunk akkor a Studio felajánjla a resource automatikus elkészítését az értékének megadásával.)
+
+## Highscore gomb eseménykezelő
 
 A Highscore menüpontra kattintva ahogy említettük egy *Toast* üzenet jelenjen meg. Ehhez meg kell keresni a Highscore menüpont gombját és be kell állítani az alábbi eseménykezelőt neki a *MainMenuActivity onCreate()* függvényén belül:
 
@@ -138,15 +139,12 @@ btnHighscore.setOnClickListener(new View.OnClickListener() {
 });
 ```
 
-(Tipp: az ALT + ENTER itt is működik a hiányzó string-re állítva a kurzort)
-### AboutActivity felület
+## AboutActivity felület
 
 Ahogy korábban említettük az About menü elindítja az új *AboutActivity*-t, ezért elsőként készítsük el az *AboutActivity* felületét, melyet az *activity_about.xml* ír le:
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/content_about"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -165,7 +163,7 @@ Ahogy korábban említettük az About menü elindítja az új *AboutActivity*-t,
 </RelativeLayout>
 ```
 
-### Játék logika
+## Játék logika
 
 A TicTacToe, 3x3-as táblajáték logikáját egy külön osztályban valósítjuk meg *Singleton* (amennyiben nem ismeri ezt a Design pattern-t, érdemes utána olvasni, illetve rákérdezni a laborvezetőnél) formájában, így könnyen hozzáférhetünk.
 
@@ -226,10 +224,10 @@ public class TicTacToeModel {
 ```
 
 
-> ###__A laborvezetővel vegyék át az osztály működését.__
+> ### __A laborvezetővel vegyék át az osztály működését.__
 
-### Navigáció megvalósítása Activity-k közt
-A következő lépésként valósítsuk meg a navigációt (váltást) az *Activity*-k között. Gyakorlatilag csak a Start game menüpont hatására kell átváltanunk a *GameActivity*-re, illetve az *About* menüpont hatására az *AboutActivity*-re. Acitivty-k közti váltást *Intent* segítségével tudunk megtenni, beszéljék meg a laborvezetővel az *Intent*-ek alapjait. Ezt a témát előadáson később mélyebben fogjuk még érinteni.
+## Navigáció megvalósítása Activity-k közt
+A következő lépésként valósítsuk meg a navigációt (váltást) az *Activity*-k között. Gyakorlatilag csak a Start game menüpont hatására kell átváltanunk a *GameActivity*-re, illetve az *About* menüpont hatására az *AboutActivity*-re. Activity-k közti váltást *Intent* segítségével tudunk megtenni, beszéljék meg a laborvezetővel az *Intent*-ek alapjait. Ezt a témát előadáson később mélyebben fogjuk még érinteni.
 
 Valósítsuk meg ezen két gomb eseménykezelőjét szintén a *MainMenuActivity onCreate()* függvényében:
 
@@ -239,7 +237,7 @@ btnStart.setOnClickListener(new View.OnClickListener() {
   @Override
   public void onClick(View view) {
     TicTacToeModel.getInstance().resetModel(); // modell törlése új játék indításakor
-    Intent i = new Intent(MainMenuActivity.this,GameActivity.class);
+    Intent i = new Intent(MainMenuActivity.this, GameActivity.class);
     startActivity(i);
   }
 });
@@ -248,13 +246,13 @@ Button btnAbout = (Button) findViewById(R.id.btnAbout);
 btnAbout.setOnClickListener(new View.OnClickListener() {
   @Override
   public void onClick(View view) {
-    Intent i = new Intent(MainMenuActivity.this,AboutActivity.class);
+    Intent i = new Intent(MainMenuActivity.this, AboutActivity.class);
     startActivity(i);
   }
 });
 ```
 
-### Játéktér kirajzolása
+## Játéktér kirajzolása
 A következő lépés a játéktér kirajzolása és annak hozzárendelése a *GameActivity*-hez.
 
 Első lépésként hozzunk létre egy *view* package-t a meglévő package hierarchia alá, majd abban egy *TicTacToeView* osztály, mely a *View*-ból származik le az alábbi vázzal:
@@ -316,7 +314,7 @@ public class TicTacToeView extends View {
   }
 }
 ```
-> ###__Vizsgálja meg a kódrészt a laborvezető segítségével.__
+> ### __Vizsgálja meg a kódrészt a laborvezető segítségével.__
 Látható, hogy az osztály gyakorlatilag egy nézet kirajzolásáért felelős. A konstruktorban létrehozunk két *Paint* objektumot, melyek a háttér és a pályaelemek kirajzolásárért felelős. Fontos, hogy ezeket a konstruktorba hozzuk létre és ne például az *onDraw()*-ba, hiszen az *onDraw()* gyakran meghívódik és sokszor hozná létre feleslegesen az objektumokat, lassítva ezzel a működést és megnehezítve a *garbage collector* dolgát.
 
 Az osztály egyik leglényegesebb függvénye, az *onDraw(Canvas canvas)*, mely a kapott *canvas* objektumra rajzolja ki gyakorlatilag a nézet tartalmát. A jelenlegi implementáció feketére festi a területet és meghívja a játéktér kirajzolásért (négyzetrács) és a játékosok (X és O) kirajzolásáért felelős – egyenlőre még üres – függvényeket.
@@ -329,8 +327,6 @@ Ahhoz, hogy a *GameActivity* ezt a játékteret megjelenítse, módosítsuk a ho
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/content_game"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -412,10 +408,10 @@ public boolean onTouchEvent(MotionEvent event) {
 }
 ```
 
-### Alkalmazás ikon lecserélése
+## Alkalmazás ikon lecserélése
 Az alkalmazás ikonját jelenleg a *res/drawable[-ldpi/mdpi/hdpi/xhdpi/...]* mappákban található *ic_launcher.png* jelképezi. A laborvezető segítségével keressen egy új ikont és cserélje le. Nem muszáj az ikont minden felbontásban elkészíteni, egyszerűen elhelyezhet egy méretet a drawable mappában is (melyet létre kell hozni), ekkor természetesen különböző felbontású eszközökön torzulhat az ikon képe.
 
-### Játéklogika ellenőrzése - önálló feladat
+## Játéklogika ellenőrzése - önálló feladat
 Valósítson meg egy függvényt, mely minden lépés után leellenőrzi, hogy nem győzött-e valamelyik játékos, vagy nincs-e döntetlen. Amennyiben vége a játéknak egy *Toast* üzenettel jelezze ezt a felhasználónak és lépjen vissza a főmenübe. A laborvezető segítségével vizsgálja meg, hogy a *View* osztályból hogyan érhető el az őt tartalmazó "host" Activity, aminek így például egy *endGame()* függvénye meghívható, ami megvalósítja a fent leírt játék befejezést.
 
 ```java
@@ -423,4 +419,4 @@ GameActivity gameActivity = (GameActivity) view.getContext();
 gameActivity.endGame();
 ```
 
-#Jó munkát kívánunk!
+Jó munkát kívánunk!
