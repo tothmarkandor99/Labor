@@ -57,15 +57,15 @@ Navigáljunk a `res/values/strings.xml`-re, ahol a projekt szöveges erőforrás
 ## Szükséges további Activity-k létrehozása
 A fentiek alapján látható tehát, hogy a meglevő MainMenuActivity mellett még két másik Activity-t, a *GameActivity*-t és az *AboutActivity*-t kell létrehoznunk. Activity létrehozásakor tipikusan az alábbi forrás állományok változnak:
 
-* Létrejön az Activiy-hez tartozó Java file.
+* Létrejön az Activity-hez tartozó Java file.
 * Létrejön az Activity-hez tartozó layout XML.
-* Az *AndroidManifest.xml*-be bekerül az Activity az *<application>* tag-en belül.
+* Az *AndroidManifest.xml*-be bekerül az Activity az `<application>` tag-en belül.
 * Az Activity-hez tartozó menü XML létrejön (erre nem mindig van szükség).
 
 Az Activity létrehozást azonban megkönnyíti az Andriod Studio és a fenti lépéseket nem kell egyesével elvégeznie a fejlesztőnek.
 
 1. Az Android Studioban a forrásra állva válasszuk a “jobbegér->New->Activity->Basic Activity” menüt és hozzuk létre a két Activity-t (*AboutActivity, GameActivity*). Activity létrehozásakor megadható, hogy melyik legyen a “szülő” Activity, amihez a vissza gomb visszanavigálja a felhasználót. Mindkét esetben legyen ez a *MainMenuActivity*.
-2. Létrehozás után az *res/values/strings.xml*-ben állítsuk be a két új Activity címét amelyet a létrehozáskor a Studio automatikusan kigenerált nekünk mint erőforrás (Például: *Az alkalmazásról* illetve *Játék* ).
+2. Létrehozás után a *res/values/strings.xml*-ben állítsuk be a két új Activity címét amelyet a létrehozáskor a Studio automatikusan kigenerált nekünk mint erőforrás (Például: *Az alkalmazásról*, illetve *Játék*).
 3. Nyissuk meg a két új Activity kódját, vizsgáljuk meg azokat és a fölösleges *FloatingActionButton*-t illetve annak *listener*-ét távolítsuk el. Ha ez kész, akkor az *Activity*-hez rendelt layout-ból is töröljük a widgetet (Tipp: az adott *Activity* *onCreate()* metódusában a *setContentView()*-ban az adott layout-ra CTRL + kattintással könnyen megnyithatjuk az XML leírót).
 4. Az *AboutActivity*-ből távolítsuk el a *Toolbar* kezeléséért felelős sorokat, mivel erre később nem lesz szükségünk.
 5. Állítsuk be a manifest-ben, hogy az *AboutActivity* dialógus formában jelenjen meg:
@@ -123,7 +123,7 @@ A *MainMenuActivity* a fenti ábra alapján három menüpontot tartalmaz közép
 </LinearLayout>
 ```
 
-A Studio egyből jelezni fogja nekünk, hogy a két *dimens* erőforrás amit használni szeretnénk, nem létezik, hozzuk létre őket a *dimens.xml*-ben, értékük legyen 16dp. (Tipp: ha az erőforrás nevén áll a kurzor az XML-ben és ALT + ENTER -t nyomunk akkor a Studio felajánjla a resource automatikus elkészítését az értékének megadásával.)
+A Studio egyből jelezni fogja nekünk, hogy a két *dimens* erőforrás amit használni szeretnénk, nem létezik. Hozzuk létre őket a *dimens.xml*-ben, értékük legyen 16dp. (Tipp: ha az erőforrás nevén áll a kurzor az XML-ben és ALT + ENTER -t nyomunk akkor a Studio felajánjla a resource automatikus elkészítését az értékének megadásával.)
 
 ## Highscore gomb eseménykezelő
 
@@ -167,7 +167,7 @@ Ahogy korábban említettük az About menü elindítja az új *AboutActivity*-t,
 
 A TicTacToe, 3x3-as táblajáték logikáját egy külön osztályban valósítjuk meg *Singleton* (amennyiben nem ismeri ezt a Design pattern-t, érdemes utána olvasni, illetve rákérdezni a laborvezetőnél) formájában, így könnyen hozzáférhetünk.
 
-Készítsünk a forráson belül egy *model* package-t, majd abba egy *TicTacToeModel* osztályt (model package-en *jobb gomb->new->Java class*). Az osztály gyakorlatilag egy 3*3-as mátrixban tárolja a játéktér mezőinek tartalmát és különféle publikus függvényeket biztosít a játéktér lekérdezéséhez és módosításához. A modell a *getInstance()* statikus függvénnyel elérhető el.
+Készítsünk a forráson belül egy *model* package-t, majd abba egy *TicTacToeModel* osztályt (model package-en *jobb gomb->new->Java class*). Az osztály egy 3*3-as mátrixban tárolja a játéktér mezőinek tartalmát és különféle publikus függvényeket biztosít a játéktér lekérdezéséhez és módosításához. A modell a *getInstance()* statikus függvénnyel elérhető el.
 
 ```java
 public class TicTacToeModel {
@@ -227,7 +227,8 @@ public class TicTacToeModel {
 > ### __A laborvezetővel vegyék át az osztály működését.__
 
 ## Navigáció megvalósítása Activity-k közt
-A következő lépésként valósítsuk meg a navigációt (váltást) az *Activity*-k között. Gyakorlatilag csak a Start game menüpont hatására kell átváltanunk a *GameActivity*-re, illetve az *About* menüpont hatására az *AboutActivity*-re. Activity-k közti váltást *Intent* segítségével tudunk megtenni, beszéljék meg a laborvezetővel az *Intent*-ek alapjait. Ezt a témát előadáson később mélyebben fogjuk még érinteni.
+
+A következő lépésként valósítsuk meg a navigációt (váltást) az *Activity*-k között. A *Start game* menüpont hatására a *GameActivity*-re, az *About* menüpont hatására pedig az *AboutActivity*-re kell átváltanunk. Activity-k közti váltást *Intent* segítségével tudunk megtenni - beszéljék meg a laborvezetővel az *Intent*-ek alapjait. Ezt a témát előadáson később mélyebben fogjuk még érinteni.
 
 Valósítsuk meg ezen két gomb eseménykezelőjét szintén a *MainMenuActivity onCreate()* függvényében:
 
@@ -288,11 +289,11 @@ public class TicTacToeView extends View {
   }
 
   private void drawGameArea(Canvas canvas) {
-    // TBD
+    // TODO
   }
 
   private void drawPlayers(Canvas canvas) {
-    // TBD
+    // TODO
   }
 
   @Override
@@ -307,7 +308,7 @@ public class TicTacToeView extends View {
   public boolean onTouchEvent(MotionEvent event) {
 
     if (event.getAction() == MotionEvent.ACTION_DOWN) {
-      // TBD
+      // TODO
     }
 
     return super.onTouchEvent(event);
@@ -315,15 +316,16 @@ public class TicTacToeView extends View {
 }
 ```
 > ### __Vizsgálja meg a kódrészt a laborvezető segítségével.__
-Látható, hogy az osztály gyakorlatilag egy nézet kirajzolásáért felelős. A konstruktorban létrehozunk két *Paint* objektumot, melyek a háttér és a pályaelemek kirajzolásárért felelős. Fontos, hogy ezeket a konstruktorba hozzuk létre és ne például az *onDraw()*-ba, hiszen az *onDraw()* gyakran meghívódik és sokszor hozná létre feleslegesen az objektumokat, lassítva ezzel a működést és megnehezítve a *garbage collector* dolgát.
+Látható, hogy az osztály egy nézet rajzolásáért felelős. A konstruktorban létrehozunk két *Paint* objektumot, melyek a háttér, illetve a pályaelemek rajzolásához lesznek használva. Fontos, hogy ezeket a konstruktorban hozzuk létre és ne például az *onDraw()*-ban, hiszen az *onDraw()* gyakran meghívódik és sokszor hozná létre feleslegesen az objektumokat, lassítva ezzel a működést és megnehezítve a *garbage collector* dolgát.
 
-Az osztály egyik leglényegesebb függvénye, az *onDraw(Canvas canvas)*, mely a kapott *canvas* objektumra rajzolja ki gyakorlatilag a nézet tartalmát. A jelenlegi implementáció feketére festi a területet és meghívja a játéktér kirajzolásért (négyzetrács) és a játékosok (X és O) kirajzolásáért felelős – egyenlőre még üres – függvényeket.
+Az osztály egyik leglényegesebb függvénye, az *onDraw(Canvas canvas)*, mely a kapott *canvas* objektumra rajzolja ki a nézet tartalmát. A jelenlegi implementáció feketére festi a területet és meghívja a játéktér kirajzolásért (négyzetrács) és a játékosok (X és O) kirajzolásáért felelős – egyelőre még üres – függvényeket.
 
 Az *onMeasure()* függvény felüldefiniálásával biztosítható, hogy a nézet mindig négyzetes formában jelenjen meg (ugyanakkora legyen a szélessége, mint a magassága).
 
-Végül az *onTouchEvent()* függvényben tudjuk kezelni az érintés eseményeket. Jelenleg az  *ACTION_DOWN* eseményt vizsgáljuk, de más érintés események is elkaphatóak itt.
+Végül az *onTouchEvent()* függvényben tudjuk kezelni az érintés eseményeket. Jelenleg az *ACTION_DOWN* eseményt vizsgáljuk, de más érintés események is elkaphatóak itt.
 
-Ahhoz, hogy a *GameActivity* ezt a játékteret megjelenítse, módosítsuk a hozzá tartozó layout filet (*res/layout/content_game.xml*). A felület egy szürkés hátterű *RelativeLayout* közepén jelenítse meg a *TicTacToeView* nézetünket:
+Ahhoz, hogy a *GameActivity* ezt a játékteret megjelenítse, módosítsuk a hozzá tartozó layout fájlt (*res/layout/content_game.xml*). A felület egy szürkés hátterű *RelativeLayout* közepén jelenítse meg a *TicTacToeView* nézetünket:
+
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -344,11 +346,14 @@ Ahhoz, hogy a *GameActivity* ezt a játékteret megjelenítse, módosítsuk a ho
 
 </RelativeLayout>
 ```
-Következő lépésként valósítsuk meg a játéktér kirajzolását a *drawGameArea()* függvényben, mely gyakorlatilag vízszintes és függőleges vonalak rajzolását jelenti:
+
+Következő lépésként valósítsuk meg a játéktér kirajzolását a *drawGameArea()* függvényben, azaz rajzoljuk meg a vízszintes és függőleges vonalakat:
+
 ```java
 private void drawGameArea(Canvas canvas) {
   // border
   canvas.drawRect(0, 0, getWidth(), getHeight(), paintLine);
+  
   // two horizontal lines
   canvas.drawLine(0, getHeight() / 3, getWidth(), getHeight() / 3,
     paintLine);
@@ -362,7 +367,8 @@ private void drawGameArea(Canvas canvas) {
     paintLine);
 }
 ```
-Ezt követően valósítsuk meg a modell alapján a játéktérbe az X-ek és O-ok kirajzolását az *drawPlayers(…)* függvényben. A megvalósítás során gyakorlatilag végigmegyünk a játéktér mátrixon és a benne található értékek szerint O-t vagy X-et rajzolunk az adott mezőbe:
+
+Ezt követően valósítsuk meg a modell alapján a játéktérbe az X-ek és O-k kirajzolását az *drawPlayers(…)* függvényben. A megvalósítás során végigmegyünk a játéktér mátrixon és a benne található értékek szerint O-t vagy X-et rajzolunk az adott mezőbe:
 ```java
 private void drawPlayers(Canvas canvas) {
   for (int i = 0; i < 3; i++) {
@@ -392,7 +398,7 @@ private void drawPlayers(Canvas canvas) {
 ```
 
 Végül valósítsuk meg az érintés eseményre való reagálást úgy, hogy a megfelelő mezőbe – ha az üres – elhelyezzük az aktuális játékost, melyet a modell *nextPlayer* változója reprezentál.
-> **A modell frissítése után az újrarajzolást a *invalidate()* függvényének hívásával tudjuk elérni.**
+> **A modell frissítése után az újrarajzolást az *invalidate()* függvény meghívásával tudjuk elérni.**
 ```java
 @Override
 public boolean onTouchEvent(MotionEvent event) {
@@ -412,7 +418,7 @@ public boolean onTouchEvent(MotionEvent event) {
 Az alkalmazás ikonját jelenleg a *res/drawable[-ldpi/mdpi/hdpi/xhdpi/...]* mappákban található *ic_launcher.png* jelképezi. A laborvezető segítségével keressen egy új ikont és cserélje le. Nem muszáj az ikont minden felbontásban elkészíteni, egyszerűen elhelyezhet egy méretet a drawable mappában is (melyet létre kell hozni), ekkor természetesen különböző felbontású eszközökön torzulhat az ikon képe.
 
 ## Játéklogika ellenőrzése - önálló feladat
-Valósítson meg egy függvényt, mely minden lépés után leellenőrzi, hogy nem győzött-e valamelyik játékos, vagy nincs-e döntetlen. Amennyiben vége a játéknak egy *Toast* üzenettel jelezze ezt a felhasználónak és lépjen vissza a főmenübe. A laborvezető segítségével vizsgálja meg, hogy a *View* osztályból hogyan érhető el az őt tartalmazó "host" Activity, aminek így például egy *endGame()* függvénye meghívható, ami megvalósítja a fent leírt játék befejezést.
+Valósítson meg egy függvényt, mely minden lépés után leellenőrzi, hogy nem győzött-e valamelyik játékos, vagy nincs-e döntetlen. Amennyiben vége a játéknak, egy *Toast* üzenettel jelezze ezt a felhasználónak és lépjen vissza a főmenübe. A laborvezető segítségével vizsgálja meg, hogy a *View* osztályból hogyan érhető el az őt tartalmazó "host" Activity, aminek így például egy *endGame()* függvénye meghívható, ami megvalósítja a fent leírt játék befejezést.
 
 ```java
 GameActivity gameActivity = (GameActivity) view.getContext();
