@@ -111,7 +111,7 @@ Ahhoz, hogy saját betűtípust alkalmazzunk meg kell változtassuk kódból a T
 Viszont ezt minden TextView-n és szöveget megjelenítő komponensen el kellene végezni, így ehelyett egy kész megoldást használunk:
 
 ```xml
-compile 'com.github.johnkil.android-robototextview:robototextview:3.0.0'
+implementation 'com.github.johnkil.android-robototextview:robototextview:4.0.0'
 ```
 
 Illesszük be a Gradle függőségek közé!
@@ -162,16 +162,16 @@ A tárcsázó gombjainak (12 darab) stílusát fogjuk össze, illetve egy kicsit
 
     <style name="DefaultText" parent="Widget.AppCompat.TextView.SpinnerItem">
         <!-- Attributes of RobotoTextView -->
-        <item name="fontFamily">roboto</item>
-        <item name="textWeight">normal</item>
-        <item name="textStyle">normal</item>
+        <item name="robotoFontFamily">roboto</item>
+        <item name="robotoTextWeight">normal</item>
+        <item name="robotoTextStyle">normal</item>
     </style>
 
     <style name="DialerButton" parent="Widget.AppCompat.Button">
         <!-- Attributes of RobotoButton -->
-        <item name="fontFamily">roboto</item>
-        <item name="textWeight">thin</item>
-        <item name="textStyle">italic</item>
+        <item name="robotoFontFamily">roboto</item>
+        <item name="robotoTextWeight">thin</item>
+        <item name="robotoTextStyle">italic</item>
 
         <item name="android:textColor">@color/primary_text</item>
         <item name="android:gravity">center</item>
@@ -224,9 +224,9 @@ A tárcsázó gombjainak (12 darab) stílusát fogjuk össze, illetve egy kicsit
         android:padding="15dp"
         android:text="@string/call"
         android:textSize="30sp"
-        app:fontFamily="roboto"
-        app:textStyle="normal"
-        app:textWeight="normal" />
+        app:robotoFontFamily="roboto"
+        app:robotoTextStyle="normal"
+        app:robotoTextWeight="normal" />
 
     <TableLayout
         android:id="@+id/tableLayout"
@@ -348,7 +348,7 @@ Az alkalmazásokat listázó Fragment tartalma egy RecyclerView. Laborvezetővel
 A RecyclerView support könyvtárként érhető el, ezt hivatkozzuk be a **build.gradle**-ben.
 
 ```groovy
-compile 'com.android.support:recyclerview-v7:25.0.0'
+implementation 'com.android.support:recyclerview-v7:26.1.0'
 ```
 
 
