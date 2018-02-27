@@ -358,13 +358,13 @@ Az **adapter** csomagba hozzuk létre az **ApplicationsAdapter** osztályt. Tart
 
 public class ApplicationsAdapter extends RecyclerView.Adapter<ApplicationsAdapter.ViewHolder> {
 
-    private Activity activity;
+    private Context context;
     private final List<ApplicationInfo> applications;
     private LayoutInflater mInflater;
 
-    public ApplicationsAdapter(Activity activity, List<ApplicationInfo> applications) {
-        this.mInflater = LayoutInflater.from(activity);
-        this.activity = activity;
+    public ApplicationsAdapter(Context context, List<ApplicationInfo> applications) {
+        this.mInflater = LayoutInflater.from(context);
+        this.context = context;
         this.applications = applications;
     }
 
@@ -383,7 +383,7 @@ public class ApplicationsAdapter extends RecyclerView.Adapter<ApplicationsAdapte
         holder.applicationsLL.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                activity.startActivity(app.getIntent());
+                context.startActivity(app.getIntent());
             }
         });
         
