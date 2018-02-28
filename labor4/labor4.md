@@ -112,7 +112,13 @@ Az Android hivatalos betűtípusa a Roboto család (annak ellenére, hogy beép�
 
 Töltsük le a Roboto betűtípust az Android Studio segítségével. Ehhez válasszunk egy olyan layout fájlt, amin van TextView (pl. fragment_applications.xml), és váltsunk az editorban a Design nézetre.
 
-Kattintsunk a TextView-re a renderelt eszköz képernyőn, majd jobb oldalon az Attributes-nál (ha nem látszik az összes meg kell nyomni alul a view all attributes gombot) keressük ki a fontFamily-t. A lenyíló listában alul válasszuk a **More fonts** opciót, majd töltsük le a Roboto Regular változatát ügyelve, hogy az **Add font to project** legyen kijelölve.
+Kattintsunk a TextView-re a renderelt eszköz képernyőn, majd jobb oldalon az Attributes-nál (ha nem látszik az összes meg kell nyomni alul a view all attributes gombot) keressük ki a fontFamily-t. A lenyíló listában alul válasszuk a **More fonts** opciót.
+
+<img src="./images/more_fonts.jpg" width="600" align="middle">
+
+Töltsük le a Roboto Regular változatát ügyelve, hogy az **Add font to project** legyen kijelölve.
+
+<img src="./images/font_download.jpg" width="400" align="middle">
 
 Ahhoz, hogy saját betűtípust alkalmazzunk meg kell változtassuk kódból a TextView-n. Használjunk stílust erre!
 
