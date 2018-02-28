@@ -13,9 +13,11 @@ Első lépésben készítsünk egy új alkalmazást **Launcher** néven.
 
 A package név legyen: **hu.bme.aut.amorg.examples.launcher**
 
+A Min Api level legyen **16**!
+
 
 Készítsünk egy új Empty Activity-t ,akár projekt létrehozásakor, akár később **LauncherActivity** néven, de gondoskodjunk róla,
-hogy a **FragmentActivity**-ből származik le!
+hogy a **AppCompatActivity**-ből származik le!
 
 A projektünkben ez az egy Activity lesz. Nem szeretnénk, hogy el lehessen forgatni, illetve szeretnénk, ha home alkalmazásként viselkedhetne.
 
@@ -50,6 +52,7 @@ Az Activity szempontjából egyetlen View kell az *activity_main* XML-be: egy Vi
 Ebben a ViewPagerben két Fragment jelenik meg. Készítsünk egy **fragments** nevű csomagot!
 
 Hozzunk létre benne 2 Fragment osztályt **DialerFragment** és **ApplicationsFragment** néven!
+(A fragment nevének megadásakor vegyük ki a pipát az **Include fragment factory methods** és **Include interface callbacks** opciók elől)
 
 A ViewPager működéséhez szükségünk van egy adapterre, ami szolgáltatja a Fragmenteket. Az Activity-nk kódja az alábbi módon alakul:
 
@@ -99,7 +102,7 @@ public class LauncherPagerAdapter extends FragmentStatePagerAdapter {
 ```
 Próbáljuk ki az alkalmazást!
 
-### Saját téma és RobotoTextView
+### Saját téma Roboto betűtípussal
 
 Az Android hivatalos betűtípusa a Roboto család (annak ellenére, hogy beépítve nem szerepel minden verzióban):
 
@@ -107,14 +110,17 @@ Az Android hivatalos betűtípusa a Roboto család (annak ellenére, hogy beép�
 * Roboto slab (talpas változat)
 * Roboto condensed (keskeny változat)
 
-Ahhoz, hogy saját betűtípust alkalmazzunk meg kell változtassuk kódból a TextView-n.
-Viszont ezt minden TextView-n és szöveget megjelenítő komponensen el kellene végezni, így ehelyett egy kész megoldást használunk:
+Töltsük le a Roboto betűtípust az Android Studio segítségével. Ehhez válasszunk egy olyan layout fájlt, amin van TextView (pl. fragment_applications.xml), és váltsunk az editorban a Design nézetre.
 
-```xml
-implementation 'com.github.johnkil.android-robototextview:robototextview:4.0.0'
-```
+Kattintsunk a TextView-re a renderelt eszköz képernyőn, majd jobb oldalon az Attributes-nál (ha nem látszik az összes meg kell nyomni alul a view all attributes gombot) keressük ki a fontFamily-t. A lenyíló listában alul válasszuk a **More fonts** opciót.
 
-Illesszük be a Gradle függőségek közé!
+<img src="./images/more_fonts.jpg" width="600" align="middle">
+
+Töltsük le a Roboto Regular változatát ügyelve, hogy az **Add font to project** legyen kijelölve.
+
+<img src="./images/font_download.jpg" width="400" align="middle">
+
+Ahhoz, hogy saját betűtípust alkalmazzunk meg kell változtassuk kódból a TextView-n. Használjunk stílust erre!
 
 A tárcsázó gombjainak (12 darab) stílusát fogjuk össze, illetve egy kicsit szabjuk át a kinézetet!
 
@@ -161,17 +167,11 @@ A tárcsázó gombjainak (12 darab) stílusát fogjuk össze, illetve egy kicsit
     </style>
 
     <style name="DefaultText" parent="Widget.AppCompat.TextView.SpinnerItem">
-        <!-- Attributes of RobotoTextView -->
-        <item name="robotoFontFamily">roboto</item>
-        <item name="robotoTextWeight">normal</item>
-        <item name="robotoTextStyle">normal</item>
+        <item name="fontFamily">@font/roboto</item>
     </style>
 
     <style name="DialerButton" parent="Widget.AppCompat.Button">
-        <!-- Attributes of RobotoButton -->
-        <item name="robotoFontFamily">roboto</item>
-        <item name="robotoTextWeight">thin</item>
-        <item name="robotoTextStyle">italic</item>
+        <item name="fontFamily">@font/roboto</item>
 
         <item name="android:textColor">@color/primary_text</item>
         <item name="android:gravity">center</item>
@@ -188,13 +188,12 @@ A tárcsázó gombjainak (12 darab) stílusát fogjuk össze, illetve egy kicsit
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="@dimen/activity_horizontal_margin"
     android:background="@color/primary_light">
 
-    <com.devspark.robototextview.widget.RobotoEditText
+    <EditText
         android:id="@+id/callEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -215,7 +214,7 @@ A tárcsázó gombjainak (12 darab) stílusát fogjuk össze, illetve egy kicsit
         android:layout_alignTop="@+id/callEditText"
         android:src="@drawable/ic_backspace_black_24dp" />
 
-    <com.devspark.robototextview.widget.RobotoButton
+    <Button
         android:id="@+id/call_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -224,9 +223,7 @@ A tárcsázó gombjainak (12 darab) stílusát fogjuk össze, illetve egy kicsit
         android:padding="15dp"
         android:text="@string/call"
         android:textSize="30sp"
-        app:robotoFontFamily="roboto"
-        app:robotoTextStyle="normal"
-        app:robotoTextWeight="normal" />
+        style="@style/DialerButton"/>
 
     <TableLayout
         android:id="@+id/tableLayout"
@@ -237,60 +234,60 @@ A tárcsázó gombjainak (12 darab) stílusát fogjuk össze, illetve egy kicsit
 
         <TableRow>
 
-            <com.devspark.robototextview.widget.RobotoButton
+            <Button
                 style="@style/DialerButton"
                 android:text="1" />
 
-            <com.devspark.robototextview.widget.RobotoButton
+            <Button
                 style="@style/DialerButton"
                 android:text="2" />
 
-            <com.devspark.robototextview.widget.RobotoButton
+            <Button
                 style="@style/DialerButton"
                 android:text="3" />
         </TableRow>
 
         <TableRow>
 
-            <com.devspark.robototextview.widget.RobotoButton
+            <Button
                 style="@style/DialerButton"
                 android:text="4" />
 
-            <com.devspark.robototextview.widget.RobotoButton
+            <Button
                 style="@style/DialerButton"
                 android:text="5" />
 
-            <com.devspark.robototextview.widget.RobotoButton
+            <Button
                 style="@style/DialerButton"
                 android:text="6" />
         </TableRow>
 
         <TableRow>
 
-            <com.devspark.robototextview.widget.RobotoButton
+            <Button
                 style="@style/DialerButton"
                 android:text="7" />
 
-            <com.devspark.robototextview.widget.RobotoButton
+            <Button
                 style="@style/DialerButton"
                 android:text="8" />
 
-            <com.devspark.robototextview.widget.RobotoButton
+            <Button
                 style="@style/DialerButton"
                 android:text="9" />
         </TableRow>
 
         <TableRow>
 
-            <com.devspark.robototextview.widget.RobotoButton
+            <Button
                 style="@style/DialerButton"
                 android:text="*" />
 
-            <com.devspark.robototextview.widget.RobotoButton
+            <Button
                 style="@style/DialerButton"
                 android:text="0" />
 
-            <com.devspark.robototextview.widget.RobotoButton
+            <Button
                 style="@style/DialerButton"
                 android:text="#" />
         </TableRow>
@@ -301,7 +298,7 @@ A tárcsázó gombjainak (12 darab) stílusát fogjuk össze, illetve egy kicsit
 ```
 
 Ez az elrendezés hivatkozik az **ic_action_backspace** erőforrásra. 
-Ezt töltsük le a [https://materialdesignicons.com/](https://materialdesignicons.com/) oldalról. Keressünk rá a backscape -re , majd válassuk ki a számunkra megfelelőt.
+Ezt töltsük le a [https://materialdesignicons.com/](https://materialdesignicons.com/) oldalról. Keressünk rá a backspace -re , majd válassuk ki a számunkra megfelelőt.
 
 Tömörítsük ki, majd az másoljuk be az összes erőforrást a **res** mappánkba illetve készítsük el a *call* string erőforrást.
 
@@ -312,7 +309,7 @@ Próbáljuk ki az alkalmazást! Mit tapasztalunk?
 Alakítsuk át a Fragment kódját, hogy ne jöjjön fel a billentyűzet, amikor fókuszt kap az EditText! A** fragment_dialer.xml **-ben a RobotoEditText `clickable` és `focusable` értékét állítsuk false-ra.
 
 ```xml
-    <com.devspark.robototextview.widget.RobotoEditText
+    <EditText
         android:id="@+id/callEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
