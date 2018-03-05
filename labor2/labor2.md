@@ -30,7 +30,7 @@ A kezdő projekthez adjuk hozzá egy **Empty Activity**-t, melynek neve legyen *
 
 A legenerált projektből töröljük ki a teszteket (ezekre most nem lesz szükség).
 
-A következő lépésben módosítsuk a az activity elrendezését (_activity_view_labor.xml_).
+A következő lépésben módosítsuk az activity elrendezését (_activity_view_labor.xml_).
 
 ```XML
 <ScrollView
