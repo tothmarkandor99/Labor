@@ -97,7 +97,7 @@ Vegyük fel a Manifest állományba a szükséges engedélyeket:
 <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 ```
 
-> Ezen engedélyek közül a kamera kezelés és a külső háttértár elérése veszélyes engedély, amit Android 6.0 felett megfelelően, futásidőben kell elkérni. A félév során lesz ennek a menetéről is szó. Mi ezt most a labor nem szeretnénk támogatni, ezért a `build.gradle`-ben a `targetSdkVersion` értékét vegyük le `22`-ra.
+> Ezen engedélyek közül a kamera kezelés és a külső háttértár elérése veszélyes engedély, amit Android 6.0 felett megfelelően, futásidőben kell elkérni. A félév során lesz ennek a menetéről is szó. Mi ezt most a labor nem szeretnénk támogatni, ezért a `build.gradle`-ben a `targetSdkVersion` értékét vegyük le `22`-re.
 
 A **build.gradle**-ben vegyük fel a RecyclerView függőséget:
 
@@ -643,6 +643,7 @@ Próbáljuk ki az alkalmazást!
 <img src="./images/screen5.png" width="250" align="middle">
 
 ## A feltöltés megvalósítása
+
 A feltöltéshez szükséges API definíció és Interactor hívás is definiálva van, így a **getPhotos**-hoz hasonlóan hívjuk meg ezt a hívást is a kép **Uri** paraméterével. Ezt az **UploadActivity** **onCreate(..)** metódusában tegyük meg.
 
 
