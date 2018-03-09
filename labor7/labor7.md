@@ -224,7 +224,7 @@ Ehhez a module build.gradle ben kell a dependencies részbe felvenni a könyvtá
 >Régebben erre az **android-apt** gradle plugin kellett, de az Android Gradle Plugin 2.2 óta beépítve elérhető, ha mégsem a legújabb gradle plugint használtnánk, azt a projekt _build.gradle_ -ben tudjuk frissíteni.
 
 ```java
-implements 'com.jakewharton:butterknife:8.8.1'
+implementation 'com.jakewharton:butterknife:8.8.1'
 annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
 ```
 
@@ -232,9 +232,9 @@ A könyvtár fordítás időben generálja le a findViewByID hívásokat, és el
 
 
 ```java
-public class MainActivity extends AppCompatActivity
-{
-	@BindView(R.id.usernameET) EditText usernameET;
+public class MainActivity extends AppCompatActivity{
+
+    @BindView(R.id.usernameET) EditText usernameET;
 	 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -773,7 +773,7 @@ A szükséges manifest engedély:
 Egészítsük ki az alkalmazást úgy, hogy a _WiFi_ állapotát és a hálózat nevét megjelenítsük a felhasználói felületen.  Segítség: 
 
 ``` java
-WifiManager wifiManager = (WifiManager) getSystemService(WIFI_SERVICE);
+WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
 WifiInfo wifiInfo = wifiManager.getConnectionInfo();
 Log.d("wifiInfo", wifiInfo.toString());
 Log.d("SSID",wifiInfo.getSSID());
