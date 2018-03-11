@@ -1006,7 +1006,7 @@ Első lépésként a ServiceLocation osztályba vegyünk fel egy belső osztály
 mely reprenzentálja a Binder-t:
 ```java
 public class BinderServiceLocation extends Binder {
-    public ServiceLocation getSerivce() {
+    public ServiceLocation getService() {
         return ServiceLocation.this;
     }
 }
@@ -1097,9 +1097,9 @@ Button btnGeocode = (Button) view.findViewById(R.id.btnGeocode);
 btnGeocode.setOnClickListener(new View.OnClickListener() {
     @Override
     public void onClick(View v) {
-        if (binderServiceLocation != null && binderServiceLocation.getSerivce() != null &&
-                binderServiceLocation.getSerivce().isLocationMonitorRunning()) {
-            Location loc = binderServiceLocation.getSerivce().getLastLocation();
+        if (binderServiceLocation != null && binderServiceLocation.getService() != null &&
+                binderServiceLocation.getService().isLocationMonitorRunning()) {
+            Location loc = binderServiceLocation.getService().getLastLocation();
             if (loc != null) {
                 new AsyncTask<Location, Void, String>() {
                     @Override
