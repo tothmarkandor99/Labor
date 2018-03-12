@@ -415,27 +415,27 @@ public class LocationDashboardFragment extends Fragment {
 
     private void initField(int fieldId, String headText) {
         View viewField = getView().findViewById(fieldId);
-        TextView tvHead = (TextView) viewField.findViewById(R.id.tvHead);
+        TextView tvHead = viewField.findViewById(R.id.tvHead);
         tvHead.setText(headText);
 
         switch (fieldId) {
             case R.id.fieldProvider:
-                tvProviderValue = (TextView) viewField.findViewById(R.id.tvValue);
+                tvProviderValue = viewField.findViewById(R.id.tvValue);
                 break;
             case R.id.fieldLat:
-                tvLatValue = (TextView) viewField.findViewById(R.id.tvValue);
+                tvLatValue = viewField.findViewById(R.id.tvValue);
                 break;
             case R.id.fieldLng:
-                tvLngValue = (TextView) viewField.findViewById(R.id.tvValue);
+                tvLngValue = viewField.findViewById(R.id.tvValue);
                 break;
             case R.id.fieldSpeed:
-                tvSpeedValue = (TextView) viewField.findViewById(R.id.tvValue);
+                tvSpeedValue = viewField.findViewById(R.id.tvValue);
                 break;
             case R.id.fieldAlt:
-                tvAltValue = (TextView) viewField.findViewById(R.id.tvValue);
+                tvAltValue = viewField.findViewById(R.id.tvValue);
                 break;
             case R.id.fieldPosTime:
-                tvPosTimeValue = (TextView) viewField.findViewById(R.id.tvValue);
+                tvPosTimeValue = viewField.findViewById(R.id.tvValue);
                 break;
             default:
                 break;
@@ -849,8 +849,8 @@ private void showFloatingWindow() {
     windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
 
     floatingView = ((LayoutInflater)getSystemService(LAYOUT_INFLATER_SERVICE)).inflate(R.layout.float_layout, null);
-    tvFloatLat = (TextView) floatingView.findViewById(R.id.tvFloatLat);
-    tvFloatLng = (TextView) floatingView.findViewById(R.id.tvFloatLng);
+    tvFloatLat = floatingView.findViewById(R.id.tvFloatLat);
+    tvFloatLng = floatingView.findViewById(R.id.tvFloatLng);
 
     final WindowManager.LayoutParams params = new WindowManager.LayoutParams(
             WindowManager.LayoutParams.WRAP_CONTENT,
@@ -1093,7 +1093,7 @@ hogy a gomb eseménykezelő hatására kérdezze le a csatolt Service által ism
 Fontos kiemelni, hogy a Geocoding hálózati kommunikációt használ, ezért kell külön szálban futtatni.
 Az AsyncTask doInBackground(…) függvénye külön szálon fut, míg az onPostExecute(…) már a főszálon.
 ```java
-Button btnGeocode = (Button) view.findViewById(R.id.btnGeocode);
+Button btnGeocode = view.findViewById(R.id.btnGeocode);
 btnGeocode.setOnClickListener(new View.OnClickListener() {
     @Override
     public void onClick(View v) {
