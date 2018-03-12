@@ -762,12 +762,27 @@ további lehetőségeit választva (**...**) tudunk pozíciót küldeni egyszer�
 ## 6. Értesítés megjelenítése
 Következő lépésként valósítsuk meg, hogy a Service *foreground* módban induljon el. Ehhez valósítsuk meg,
 hogy egy *Notification* is jelezze a Service futását, mely megjeleníti az aktuális koordinátákat
-és melyre kattintva elindul a *MainActivity*.
+és melyre kattintva elindul a *MainActivity*. Android Oreo óta a Notificationhöz tartoznia kell egy
+NotificationChannelnek is, ezért az őjabb verziókon ezt külön létre kell hozni.
 
-Vegyük fel az értesítés azonosító konstanst a *ServiceLocation* osztály elejére:
+Vegyük fel az értesítés azonosító konstanst és a channel konstansát a *ServiceLocation* osztály elejére:
 ```java
 private final int NOTIF_FOREGROUND_ID = 101;
+private final String NOTIF_CHANNEL_ID = "location_service";
 ```
+
+Az onStartCommand() elejére vegyük fel a NotificationChannel létrehozását:
+
+```java
+if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+    NotificationManager notifMan = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+    CharSequence name = getString(R.string.channel_name);// The user-visible name of the channel.
+    int importance = NotificationManager.IMPORTANCE_HIGH;
+    NotificationChannel mChannel = new NotificationChannel(NOTIF_CHANNEL_ID, name, importance);
+    notifMan.createNotificationChannel(mChannel);
+}
+```
+
 Készítsünk két függvényt a *ServiceLocation* osztályba a *Notification* megjelenítésére és frissítésére:
 ```java
 private Notification getMyNotification(String text) {
@@ -783,7 +798,8 @@ private Notification getMyNotification(String text) {
             .setContentText(text)
             .setSmallIcon(R.mipmap.ic_launcher)
             .setVibrate(new long[]{1000,2000,1000})
-            .setContentIntent(contentIntent).build(); // Régebbi API szintek esetén  használjuk a getNotification() metódust a build() helyett.
+            .setContentIntent(contentIntent)
+            .setChannelId(NOTIF_CHANNEL_ID).build(); // Régebbi API szintek getNotification() a build() helyett
     return  notification;
 }
 
