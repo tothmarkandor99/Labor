@@ -559,7 +559,6 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if (KEY_START_SERVICE.equals(key)) {
-            boolean startService = sharedPreferences.getBoolean(KEY_START_SERVICE, false);
             // TODO: Service indítása/leállítása
         }
     }
@@ -744,15 +743,38 @@ Ne felejtsük el a *Manifest*-ben is felvenni az új *Service*-t:
 <service android:name=".service.ServiceLocation" />
 ```
 Végül a Service indítása/leállítása céljából egészítsük ki a *SettingsActivity*-ben az
-*onSharedPreferenceChange(…)* függvényt, hogy valóban elindítsa/leállítsa a *Service*-t:
+*onSharedPreferenceChange(…)* függvényt, hogy valóban elindítsa/leállítsa a *Service*-t.
+Ehhez felveszünk egy statikus metódust is segítségül:
+
 ```java
-Intent i = new Intent(getApplicationContext(),ServiceLocation.class);
-if (startService) {
-    startService(i);
-} else {
-    stopService(i);
+@Override
+public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+    if (KEY_START_SERVICE.equals(key)) {
+    startServiceWhenEnabled(sharedPreferences, getApplicationContext());
+    }
+}
+
+static void startServiceWhenEnabled(SharedPreferences sharedPreferences, Context ctx) {
+    boolean startService = sharedPreferences.getBoolean(KEY_START_SERVICE, false);
+
+    Intent i = new Intent(ctx, ServiceLocation.class);
+
+    if (startService) {
+        ctx.startService(i);
+    } else {
+        ctx.stopService(i);
+    }
 }
 ```
+
+A fenti kód csak a beállítások változására reagál. Viszont ha újraindul az alkalmazás, akkor
+még nem fog a Service elindulni, hiába hagytuk bekapcsolva. Ezért a *MainActivity*
+*onCreate()* metódusának végén is hívjuk meg az indító kódot:
+
+```java
+SettingsActivity.startServiceWhenEnabled(PreferenceManager.getDefaultSharedPreferences(this), this);
+```
+
 *Próbáljuk ki* az alkalmazást! Régi típusú emulátoron teszteléshez nyissuk meg az Android Device Monitor-t
 és küldjünk pozíció információkat az emulátornak új típusú emulátoron az oldalsó vezérlő sáv
 további lehetőségeit választva (**...**) tudunk pozíciót küldeni egyszerűen az emulátornak.
@@ -973,24 +995,21 @@ Egészítsük ki a SettingsActivity kódját az elején egy konstanssal:
 ```java
 public static final String KEY_WITH_FLOATING = "with_floating";
 ```
-Valamint a SettingsActivity onSharedPreferenceChanged(…) függvényt valósítsuk meg úgy, hogy ellenőrizzük
+Valamint a SettingsActivity startServiceWhenEnabled(…) metódusát valósítsuk meg úgy, hogy ellenőrizzük
 a CheckBox állapotát és a Service-t indító Intent paramétereként adjuk meg, hogy megjelenjen-e
 a lebegő ablak vagy sem:
 ```java
-@Override
-public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-    if (KEY_START_SERVICE.equals(key)) {
-        boolean startService = sharedPreferences.getBoolean(KEY_START_SERVICE, false);
-        boolean withFloating = sharedPreferences.getBoolean(KEY_WITH_FLOATING, false);
+static void startServiceWhenEnabled(SharedPreferences sharedPreferences, Context ctx) {
+    boolean startService = sharedPreferences.getBoolean(KEY_START_SERVICE, false);
+    boolean withFloating = sharedPreferences.getBoolean(KEY_WITH_FLOATING, false);
 
-        Intent i = new Intent(getApplicationContext(), ServiceLocation.class);
+    Intent i = new Intent(ctx, ServiceLocation.class);
 
-        if (startService) {
-            i.putExtra(KEY_WITH_FLOATING, withFloating);
-            startService(i);
-        } else {
-            stopService(i);
-        }
+    if (startService) {
+        i.putExtra(KEY_WITH_FLOATING, withFloating);
+        ctx.startService(i);
+    } else {
+        ctx.stopService(i);
     }
 }
 ```
