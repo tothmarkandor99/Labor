@@ -14,7 +14,7 @@ A sablonválasztónál válasszuk a **Master/Detail Flow** opciót!
 
 <img src="./assets/master-detail-choose_new.PNG" width="200" align="middle">
 
-A következő ablakban írjuk be rendre, hogy **Todo, Todos, Todos**! Ennek csak a generált sablonban van szerepe, de legalább az activity nevét nem kell később átírjuk.
+A következő ablakban írjuk be rendre, hogy **Todo, Todos, Todos**! Ennek csak a generált sablonban van szerepe, de legalább az Activity nevét nem kell később átírnunk.
 
 Laborvezetővel elemezzék a generált alkalmazás működését, próbálják ki emulátoron, készüléken! A Master/Detail nézet célja, hogy egyetlen alkalmazással megoldjunk egy lista és annak egy elemének megjelenítését tableten és mobiltelefonon egyaránt. Működésének a lényege, hogy egy activity-hez tartozó layoutnak kétféle változata van. Egy kétpaneles és egy egypaneles változat. Egy módszer az, ha erőforrás minősítőkkel biztosítjuk, hogy tableten a kétpaneles változat töltődjön be, míg mobilon az egypaneles. Az activityben megpróbálunk referenciát szerezni a második panelre, és ha sikerül, akkor tableten vagyunk, ha nem, akkor mobilon. Az első panel tartalma egy **RecyclerView** a másodiké pedig egy sima Fragment a lista egy elemének megjelenítésére. Ha mobilon vagyunk, akkor a listaelemre kattintva új activitybe töltjük a részletező fragmentet, míg tableten egyszerűen betöltjük a jobb oldali panelbe. (a generált kód másképpen működik, ott a refs.xml állomány-t minősíti)
 
@@ -24,14 +24,20 @@ Készítsen egy új package-t **model** néven, ebbe pedig hozza létre a **Todo
 
 ```java
 public class Todo {
-    public enum Priority { LOW, MEDIUM, HIGH }
+
+
+    public interface Priority {
+        int LOW = 0;
+        int MEDIUM = 1;
+        int HIGH = 2;
+    }
 
     private String title;
-    private Priority priority;
+    private int priority;
     private String dueDate;
     private String description;
 
-    public Todo(String title, Priority priority, String dueDate, String description) {
+    public Todo(String title, int priority, String dueDate, String description) {
         this.title = title;
         this.priority = priority;
         this.dueDate = dueDate;
@@ -46,11 +52,11 @@ public class Todo {
         this.title = title;
     }
 
-    public Priority getPriority() {
+    public int getPriority() {
         return priority;
     }
 
-    public void setPriority(Priority priority) {
+    public void setPriority(int priority) {
         this.priority = priority;
     }
 
@@ -72,7 +78,7 @@ public class Todo {
 }
 ```
 
-Figyeljük meg az osztály eleji enumerációt! Ezen enumerációnak megfelelő ikonokat fogunk használni a listában.
+Figyeljük meg az osztály eleji interfészt! Az interfészben deklarált mezők **public static final** mezőkké fordulnak. Ezen konstansoknak megfelelő ikonokat fogunk használni a listában.
 
 Töröljük ki a **dummy** nevű package-t!
 
@@ -175,13 +181,13 @@ public class SimpleItemRecyclerViewAdapter
         holder.dueDate.setText(todos.get(position).getDueDate());
 
         switch (todos.get(position).getPriority()) {
-            case LOW:
+            case Todo.Priority.LOW:
                 holder.priority.setImageResource(R.drawable.ic_low);
                 break;
-            case MEDIUM:
+            case Todo.Priority.MEDIUM:
                 holder.priority.setImageResource(R.drawable.ic_medium);
                 break;
-            case HIGH:
+            case Todo.Priority.HIGH:
                 holder.priority.setImageResource(R.drawable.ic_high);
                 break;
             default:
@@ -291,13 +297,13 @@ Ez az adapter hivatkozik egy **row_todo.xml**-re. Hozzuk létre ezt az álloimá
 </LinearLayout>
 ```
 
-A három kép, mely szükséges a nézetekhez. Használjuk az [Asset Studiot](https://romannurik.github.io/AndroidAssetStudio/index.html) a képek legenerálásához, majd a kapott mappákat másoljuk a _res/drawable_ mappába:
+Szükségünk van még a nézetekhez az alábbi három képre. Ezek különböző méreteinek legenerálásához használjuk az [Asset Studio](https://romannurik.github.io/AndroidAssetStudio/index.html)-t (azon belül a Generic icon generator-t), majd a kapott mappákat másoljuk a _res_ mappába.
 
 <img src="./assets/high.png" align="middle" width="50">
 <img src="./assets/medium.png" align="middle" width="50">
 <img src="./assets/low.png" align="middle" width="50">
 
-Írjuk felül a TodoListActivity **SetupRecyclerView** metódusát az alábbi kóddal. (Ez a metódus felel az adapter példaadatokkal való feltöltéséért.)
+Írjuk felül a TodoListActivity **setupRecyclerView** metódusát az alábbi kóddal. (Ez a metódus felel az adapter példaadatokkal való feltöltéséért.)
 
 ```java
 private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
@@ -309,8 +315,6 @@ private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
 }
 ```
 
-
-A TodoListActivity-ben töröljük ki a belső adapter osztályt, erre nem lesz szűkségünk.
 
 Ha valamelyik osztályban még hibát jelezne az IDE, ellenőrizzük, hogy nem-e maradt felesleges import a **dummy** csomag elemeire.
 
@@ -358,7 +362,7 @@ Tipp: A gyorsabb teszteléshez, keresse ki a tablet mérethez tartozó (layout-w
 ## Todo törlése
 
 Az adapterben láttuk a törlésre szolgáló metódust, hát használjuk is! A cél, hogy egy Todora hosszan érintve megjelenjen egy menü, ahol törölhetjük a Todot.
-Az elemek érintés eseménykezelője már el van készítve, a todo törléséhez készítsünk az elemkhez hosszú érintés gesztúra detektálót, majd ekkor dobjunk fel egy popup ablakot, ahol a kívánt művelet kiválasztható lesz. Adjuk hozzá az alábbi sorokat az Adapter _onBindViewHolder_ metódusához:
+Az elemek érintés eseménykezelője már el van készítve, a todo törléséhez készítsünk az elemekhez hosszú érintés gesztus detektálót, majd ekkor dobjunk fel egy popup ablakot, ahol a kívánt művelet kiválasztható lesz. Adjuk hozzá az alábbi sorokat az Adapter _onBindViewHolder_ metódusához:
 
 ```java
 holder.mView.setOnLongClickListener(new View.OnLongClickListener() {
@@ -519,7 +523,7 @@ public class TodoCreateFragment extends DialogFragment{
         Button btnOk = (Button) root.findViewById(R.id.btnCreateTodo);
         btnOk.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Todo.Priority selectedPriority = Todo.Priority.LOW;
+                int selectedPriority = Todo.Priority.LOW;
 
                 switch (spnrTodoPriority.getSelectedItemPosition()) {
                     case 0:
@@ -770,7 +774,7 @@ public class DatePickerDialogFragment extends DialogFragment {
 }
 ```
 
-Ugorjunk vissza a _TodoCreateFragment_-re és valósítsuk meg az *DateListener* interfészt, illetve állítsuk be a txtDueDate onClickListener(…)-jében, hogy mutassunk egy DialogFragment-et.
+Ugorjunk vissza a _TodoCreateFragment_-re és valósítsuk meg a *DateListener* interfészt, illetve állítsuk be a txtDueDate onClickListener(…)-jében, hogy mutassunk egy DialogFragment-et.
 
 ```java
 public class TodoCreateFragment extends DialogFragment implements DatePickerDialogFragment.DateListener
@@ -779,27 +783,26 @@ public class TodoCreateFragment extends DialogFragment implements DatePickerDial
 
 
 ```java
-    private void showDatePickerDialog() {
-        FragmentManager fm = getFragmentManager();
+private void showDatePickerDialog() {
+    FragmentManager fm = getFragmentManager();
 
-        DatePickerDialogFragment datePicker = new DatePickerDialogFragment();
-        datePicker.setTargetFragment(this, 0);
-        datePicker.show(fm, DatePickerDialogFragment.TAG);
-    }
+    DatePickerDialogFragment datePicker = new DatePickerDialogFragment();
+    datePicker.setTargetFragment(this, 0);
+    datePicker.show(fm, DatePickerDialogFragment.TAG);
+}
 
-    @Override
-    public void onDateSelected(String date) {
-        txtDueDate.setText(date);
-    }
-
+@Override
+public void onDateSelected(String date) {
+    txtDueDate.setText(date);
+}
 ```
 
 Az onCreateView-ben adjuk hozzá a megfelelő metódust a Dátumválasztó textView-hoz
 
 ```java
-        txtDueDate.setOnClickListener(new OnClickListener() {
-            public void onClick(View v) {
-                showDatePickerDialog();
-            }
-        });
-  ```
+txtDueDate.setOnClickListener(new View.OnClickListener() {
+    public void onClick(View v) {
+        showDatePickerDialog();
+    }
+});
+```
