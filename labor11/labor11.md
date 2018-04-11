@@ -45,14 +45,14 @@ Vegyük fel a RecyclerView komponens függőségét, illetve állítsuk a target
 ```java
 dependencies {
 ...
-compile 'com.android.support:recyclerview-v7:25.0.0'
+compile 'com.android.support:recyclerview-v7:27.0.0'
 ...
 }
 ```
 
 ## Felhasználói felület
 
-Első lépésként készítsük el az alkalmazás felhasználói felületét XML erőforrásból. A felület egyetlen RecyclerView komponensből fog állni, mely az eszközön tárolt névjegyeket fogja megjeleníteni.
+Első lépésként készítsük el az alkalmazás felhasználói felületét XML erőforrásból. A felület egyetlen RecyclerView komponensből fog állni, mely az eszközön tárolt névjegyeket fogja megjeleníteni. Hozzuk létre a hiányzó dimen erőforrásokat is **16dp** értékkel.
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -185,7 +185,7 @@ Az adapter az **onCreateViewHolder()** metódusában hivatkozik a listaelem fel�
             android:layout_height="55dp"
             android:layout_marginLeft="10dp"
             android:layout_marginStart="10dp"
-            android:src="@drawable/ic_contact_mail_black_48dp"/>
+            android:src="@drawable/contact_mail"/>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -226,7 +226,7 @@ strings.xml-be:
 <string name="phone">Phone</string>
 ```
 
-A hiányzó ikont töltsük le a [https://materialdesignicons.com/](https://materialdesignicons.com/) -ról, keressük a **contact-mail** icon-t.
+A hiányzó ikont töltsük le a [https://materialdesignicons.com/](https://materialdesignicons.com/) -ról, keressük a **contact-mail** icon-t, és ezt drawable XML-ként töltsük le a res/drawable mappába.
 
 A névjegyek megjelenítéséhez az utolsó lépés az adapter pélányosítása, és beállítása a recyclerview komponenshez. Szükség van az eszközön tárolt névjegyek megszerzésére, ehhez adjuk hozzá a **ContactsActivity**-be az alábbi metódust:
 
@@ -438,7 +438,7 @@ Ahhoz, hogy alkalmazásunk hívásokat indíthasson, fel kell venni a következ�
 Magától értetődő, hogy ez az engedély is a veszélyes kategóriába tartozik, ezért ezt is megfelelően kell kezelnünk.
 Bővítsük a funkcionalitást olyan módon, hogy egy adott névjegy elemre kattintva hívást indítson az eszköz a névjegyen szereplő telefonszámra!
 
-Másoljuk az alábbi két metódust az adapterünkbe!
+Másoljuk az alábbi két metódust a **ContactsAdapterbe**!
 
 ```java
 private String lastPhoneNumber;
@@ -507,7 +507,7 @@ Itt is szükség van egy requestCode-ra, hozzuk létre public láthatósággal a
 public static final int MY_PERMISSIONS_REQUEST_PHONE_CALL = 101;
 ```
 
-Az engedélykérés válaszát ebben az esetben is a ContactsActivity fogja kezelni, ezért helyezzük el az alábbi ágat az onRequestPermissionsResult() metódusba!
+Az engedélykérés válaszát ebben az esetben is a **ContactsActivity** fogja kezelni, ezért helyezzük el az alábbi ágat az onRequestPermissionsResult() metódusba!
 
 ```java
 case ContactsAdapter.MY_PERMISSIONS_REQUEST_PHONE_CALL: {
@@ -550,4 +550,3 @@ A szükséges engedély:
 ```xml
 <uses-permission android:name="android.permission.SEND_SMS"/>
 ```
-
