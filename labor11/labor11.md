@@ -45,7 +45,7 @@ Vegyük fel a RecyclerView komponens függőségét, illetve állítsuk a target
 ```java
 dependencies {
 ...
-compile 'com.android.support:recyclerview-v7:27.0.0'
+implementation 'com.android.support:recyclerview-v7:26.1.0'
 ...
 }
 ```
@@ -82,7 +82,7 @@ private RecyclerView contactsRV;
 
 onCreate() metódusba:
 ```java
-contactsRV = (RecyclerView) findViewById(R.id.contactsRV);
+contactsRV = findViewById(R.id.contactsRV);
 ```
 
 ## Model
@@ -156,9 +156,9 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.Contac
         public ContactViewHolder(View itemView) {
             super(itemView);
             container = itemView.findViewById(R.id.container);
-            ivContactImage = (ImageView) itemView.findViewById(R.id.ivContactImage);
-            tvContactName = (TextView) itemView.findViewById(R.id.tvContactName);
-            tvPhoneNumber = (TextView) itemView.findViewById(R.id.tvPhoneNumber);
+            ivContactImage = itemView.findViewById(R.id.ivContactImage);
+            tvContactName = itemView.findViewById(R.id.tvContactName);
+            tvPhoneNumber = itemView.findViewById(R.id.tvPhoneNumber);
         }
     }
 }
@@ -323,7 +323,7 @@ onCreate():
 protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_contacts);
-    contactsRV = (RecyclerView) findViewById(R.id.contactsRV);
+    contactsRV = findViewById(R.id.contactsRV);
 
     loadContacts();
 }
