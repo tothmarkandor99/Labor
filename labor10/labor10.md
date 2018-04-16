@@ -19,21 +19,6 @@ Elsőnek töltsük le a labor során használt kiinduló projektet, majd nyissuk
 
 [Kiinduló projekt](./assets/SpaceShipGame_skeleton.zip) 
 
-Frissítsük a **Gradlet** és a **Gradle Plugint**, ezeket a Studio megoldja nekünk.
-
-A module `build.grade` -ben frissítsük  a **Compile SDK** és a **Target SDK**-t `26`-ra, a **Build Tools** értékét `26.0.2`-re, az **AppCompat** könyvtárat pedíg `26.1.0`-ra.
-
-A project `build.gradle` -ben vegyük fel a **Google Maven** repositoryt.
-
-```
-allprojects {
-	repositories {
-		jcenter()
-		maven {url 'https://maven.google.com'}
-	}
-}
-```
-
 A források közül a test könyvtárat, illetve annak a tartalmát kitörölhetjük.
 
 Fordítsuk le a projektet, majd a Laborvezető segítségével vizsgáljuk meg a projekt felépítését.
