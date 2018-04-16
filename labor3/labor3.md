@@ -24,14 +24,20 @@ Készítsen egy új package-t **model** néven, ebbe pedig hozza létre a **Todo
 
 ```java
 public class Todo {
-    public enum Priority { LOW, MEDIUM, HIGH }
+
+
+    public interface Priority {
+        int LOW = 0;
+        int MEDIUM = 1;
+        int HIGH = 2;
+    }
 
     private String title;
-    private Priority priority;
+    private int priority;
     private String dueDate;
     private String description;
 
-    public Todo(String title, Priority priority, String dueDate, String description) {
+    public Todo(String title, int priority, String dueDate, String description) {
         this.title = title;
         this.priority = priority;
         this.dueDate = dueDate;
@@ -46,11 +52,11 @@ public class Todo {
         this.title = title;
     }
 
-    public Priority getPriority() {
+    public int getPriority() {
         return priority;
     }
 
-    public void setPriority(Priority priority) {
+    public void setPriority(int priority) {
         this.priority = priority;
     }
 
@@ -72,7 +78,7 @@ public class Todo {
 }
 ```
 
-Figyeljük meg az osztály eleji enumerációt! Ezen enumerációnak megfelelő ikonokat fogunk használni a listában.
+Figyeljük meg az osztály eleji interfészt! Az interfészben deklarált mezők **public static final** mezőkké fordulnak. Ezen konstansoknak megfelelő ikonokat fogunk használni a listában.
 
 Töröljük ki a **dummy** nevű package-t!
 
@@ -175,13 +181,13 @@ public class SimpleItemRecyclerViewAdapter
         holder.dueDate.setText(todos.get(position).getDueDate());
 
         switch (todos.get(position).getPriority()) {
-            case LOW:
+            case Todo.Priority.LOW:
                 holder.priority.setImageResource(R.drawable.ic_low);
                 break;
-            case MEDIUM:
+            case Todo.Priority.MEDIUM:
                 holder.priority.setImageResource(R.drawable.ic_medium);
                 break;
-            case HIGH:
+            case Todo.Priority.HIGH:
                 holder.priority.setImageResource(R.drawable.ic_high);
                 break;
             default:
@@ -517,7 +523,7 @@ public class TodoCreateFragment extends DialogFragment{
         Button btnOk = (Button) root.findViewById(R.id.btnCreateTodo);
         btnOk.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Todo.Priority selectedPriority = Todo.Priority.LOW;
+                int selectedPriority = Todo.Priority.LOW;
 
                 switch (spnrTodoPriority.getSelectedItemPosition()) {
                     case 0:

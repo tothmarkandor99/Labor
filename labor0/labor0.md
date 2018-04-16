@@ -148,8 +148,8 @@ Ez a rész azoknak szól, akik korábban már használták az Eclipse nevű IDE-
     *   Névtelen belső osztályokkal is hasonlót tud, javítva a kód olvashatóságát.
     *   Kódkiegészítésnél szabad a kereső, a szótöredéket keresi, nem pedig a szóval kezdődő lehetőségeket (lásd képen)
     *   Változónév ajánlás: amikor változónévre van szükségünk, nyomjunk CTRL+SPACE-t. Ha adottak a körülmények, a Studio egész jó neveket tud felajánlani.
-    *   Szigorú lint. A Studio megengedi a warningot. Ezért szigorúbb a lint, több mindenre figyelmeztet (olyan apróságra is, hogy egy view egyik oldalán van padding, a másikon nincs)
-    *   Layout szerkesztés. A grafikus layout építés lehetséges, 2016-os béta verziós újítás: *CoordinatorLayout*.
+    *   Szigorú lint. A Studio megengedi a warningot. Ezért szigorúbb a lint, több mindenre figyelmeztet (olyan apróságra is, hogy egy View egyik oldalán van padding, a másikon nincs)
+    *   Layout szerkesztés. A grafikus layout építés lehetséges.
     *   CTRL-t lenyomva navigálhatunk a kódban (pl. osztályra, metódushívásra kattintva). Ezt a navigációt (és az egyszerű másik osztályba kattintást is) rögzíti, és a history előre-hátra gombokkal lehet lépkedni benne. Ha van az egerünkön/billentyűzetünkön ilyen gomb, és netes böngészés közben aktívan használjuk, ezt a funkciót nagyon hasznosnak fogjuk találni.
     *   Szín ikonja a sor elején; kiemelve jobb oldalon, hogy melyik nézeten vagyunk; szabadszavas kiegészítés; a “Hello world” igazából _“@string/very_very_very_long_hello_world”_
 
@@ -165,7 +165,7 @@ Ez a rész azoknak szól, akik korábban már használták az Eclipse nevű IDE-
 *   **CTRL + P:** Paraméterek mutatása
 *   **ALT + INSERT:** Metódus generálása
 *   **CTRL + O:** Metódus felüldefiniálása
-*   **CTRL +F9:** Fordítás
+*   **CTRL + F9:** Fordítás
 *   **SHIFT + F10:** Fordítás és futtatás
 *   **SHIFT SHIFT:** Keresés mindenhol
 
@@ -189,8 +189,8 @@ Lehetőség van felosztani a szerkesztőablakot, ehhez kattinsunk egy megnyitott
 A laborvezető segítségével állítsák be a következő hasznos funkciókat:
 
 *   kis- nagybetű érzékenység kikapcsolása a kódkiegészítőben (settingsben keresés: sensitive)
-*   "laptop mód" ki- és bekapcsolása (File/Power Saver mode)
-*   sorszámozás bekapcsolása (settingsben keresés: Show line numbers)
+*   "laptop mód" ki- és bekapcsolása (File/Power Save mode)
+*   sorszámozás bekapcsolása (kód melletti részen bal oldalt: jobb egérgomb, Show Line Numbers)
 *   beírás közbeni autoimport bekapcsolása (settingsben keresés: import, utána Editor/Auto import)
 
 ### Generálható elemek
@@ -203,7 +203,7 @@ A Studio sok sablont tartalmaz, röviden tekintsék át a lehetőségeket:
 
 ## Android Device Monitor
 
-A készülék erőforráashasználata [monitorozható](https://developer.android.com/studio/profile/android-monitor.html?utm_source=android-studio) ezen a felületen egyéb hasznos funkciók, mint a képernyőfelvétrel készítés (kamera ikon) mellett.
+A készülék erőforráshasználata [monitorozható](https://developer.android.com/studio/profile/android-monitor.html?utm_source=android-studio) ezen a felületen egyéb hasznos funkciók, mint a képernyőfelvétel készítés (kamera ikon) mellett.
 
 ![](assets/ADM.png)
 
@@ -225,6 +225,6 @@ Itt lehetséges virtuális SMS vagy telefonhívás küldése, fake GPS pozíció
 6.  Küldjön egy SMS-t a DDMS nézetről!
 7.  Változtassa a készülék pozícióját a DDMS nézeten!
 8.  Vizsgálja meg az elindított HelloWorld projekt nyitott szálait, memóriafoglalását!
-9.  Vizsgálja meg a LogCat nézet tartalmát!
-10.  Keresse ki a létrehozott HelloWorld projekt mappáját és a bin könyvtáron belül
+9.  Vizsgálja meg a Logcat panel tartalmát!
+10.  Keresse ki a létrehozott HelloWorld projekt mappáját és a build könyvtáron belül
     vizsgálja meg az .apk állomány tartalmát! Hol található a lefordított kód?
