@@ -941,7 +941,7 @@ keresztül követheted.
 Segítség: A hozzá tartozó hívás Retrofit leírója a következő:
 
 ```java
-    @POST("/rate/{id}")
+    @POST("rate/{id}")
     Call<ResponseBody> rate(@Path("id") String id, @Body Rating rating);
 ```
 
