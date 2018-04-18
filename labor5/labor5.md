@@ -107,7 +107,7 @@ public class DbConstants {
             "create table if not exists "+DATABASE_TABLE+" ( "
             + KEY_ROWID +" integer primary key autoincrement, "
             + KEY_TITLE + " text not null, "
-            + KEY_PRIORITY + " text, "
+            + KEY_PRIORITY + " integer, "
             + KEY_DUEDATE +" text, "
             + KEY_DESCRIPTION +" text"
             + "); ";
@@ -206,7 +206,7 @@ public long createTodo(Todo todo){
     values.put(DbConstants.Todo.KEY_TITLE, todo.getTitle());
     values.put(DbConstants.Todo.KEY_DUEDATE, todo.getDueDate());
     values.put(DbConstants.Todo.KEY_DESCRIPTION, todo.getDescription());
-    values.put(DbConstants.Todo.KEY_PRIORITY, todo.getPriority().name());
+    values.put(DbConstants.Todo.KEY_PRIORITY, todo.getPriority());
 
     return db.insert(DbConstants.Todo.DATABASE_TABLE, null, values);
 }
@@ -225,7 +225,7 @@ public boolean updateProduct(long rowId, Todo newTodo){
     values.put(DbConstants.Todo.KEY_TITLE, newTodo.getTitle());
     values.put(DbConstants.Todo.KEY_DUEDATE, newTodo.getDueDate());
     values.put(DbConstants.Todo.KEY_DESCRIPTION, newTodo.getDescription());
-    values.put(DbConstants.Todo.KEY_PRIORITY, newTodo.getPriority().name());
+    values.put(DbConstants.Todo.KEY_PRIORITY, newTodo.getPriority());
     return db.update(
             DbConstants.Todo.DATABASE_TABLE,
             values,
@@ -287,7 +287,7 @@ public Todo fetchTodo(long rowId){
 public static Todo getTodoByCursor(Cursor c){
     return new Todo(
             c.getString(c.getColumnIndex(DbConstants.Todo.KEY_TITLE)), // title
-            Todo.Priority.valueOf(c.getString(c.getColumnIndex(DbConstants.Todo.KEY_PRIORITY))), // priority
+            c.getInt(c.getColumnIndex(DbConstants.Todo.KEY_PRIORITY)), // priority
             c.getString(c.getColumnIndex(DbConstants.Todo.KEY_DUEDATE)), // dueDate
             c.getString(c.getColumnIndex(DbConstants.Todo.KEY_DESCRIPTION)) // description
             );
@@ -336,13 +336,13 @@ public class TodoAdapter extends CursorRecyclerViewAdapter<TodoAdapter.ViewHolde
         holder.dueDate.setText(todo.getDueDate());
 
         switch (todo.getPriority()) {
-            case LOW:
+            case Todo.Priority.LOW:
                 holder.priority.setImageResource(R.drawable.ic_low);
                 break;
-            case MEDIUM:
+            case Todo.Priority.MEDIUM:
                 holder.priority.setImageResource(R.drawable.ic_medium);
                 break;
-            case HIGH:
+            case Todo.Priority.HIGH:
                 holder.priority.setImageResource(R.drawable.ic_high);
                 break;
             default:
@@ -478,7 +478,6 @@ Törölni (**onCreate metódusból**):
 
 ```java
 setupRecyclerView(recyclerView);
-adapter = (SimpleItemRecyclerViewAdapter) recyclerView.getAdapter();
 ```
 
 Módosítsuk a setupRecyclerView metódust, amely immár nem példaadatokkal

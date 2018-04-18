@@ -19,7 +19,12 @@ Elsőnek töltsük le a labor során használt kiinduló projektet, majd nyissuk
 
 [Kiinduló projekt](./assets/SpaceShipGame_skeleton.zip) 
 
-A Laborvezető segítségével vizsgáljuk meg a projekt felépítését.
+A források közül a test könyvtárat, illetve annak a tartalmát kitörölhetjük.
+
+Fordítsuk le a projektet, majd a Laborvezető segítségével vizsgáljuk meg a projekt felépítését.
+
+
+
 
 ### Általános
 
@@ -410,4 +415,11 @@ Biztosítsa, hogy a játékos űrhajóját ne lehessen kimozgatni a játéktérb
 Biztosítsa, hogy a jaték alatt ne aludjon el a képernyő, akkor sem ha huzamosabb időn át nem érünk hozzá!
 
 Segítség: [Keeping the Device Awake](https://developer.android.com/training/scheduling/wakelock.html)
+
+### Feladat 4 - Okosabb memória kezelés
+Jelenleg minden ellenséges űrhajó képe külön be van töltve a memóriába. 
+
+Valósítsa meg hogy ezek csak egy példányban legyenek betöltve (pl. statikus objektum), illetve a képernyőről eltűnő ellenséges űrhajókat szabadítsa fel, azok ne foglaljanak helyet a memóriában.
+
+A képernyőről eltűnő űrhajókat a poziciójuk alapján (aktuális pocizió kisebb-e mint a bal szél=0 - a hajó mérete) vegye ki a listából (pl. iterátorral). Ha nincs már rájuk referencia, a GC felszabadítja.
 
