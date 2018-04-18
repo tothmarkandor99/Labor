@@ -30,7 +30,7 @@ A kezdő projekthez adjuk hozzá egy **Empty Activity**-t, melynek neve legyen *
 
 A legenerált projektből töröljük ki a teszteket (ezekre most nem lesz szükség).
 
-A következő lépésben módosítsuk a az activity elrendezését (_activity_view_labor.xml_).
+A következő lépésben módosítsuk az activity elrendezését (_activity_view_labor.xml_).
 
 ```XML
 <ScrollView
@@ -50,7 +50,7 @@ A következő lépésben módosítsuk a az activity elrendezését (_activity_vi
 
 		<TextView
 			style="@style/Subtitle"
-			android:text="Registration"
+			android:text="Regisztráció"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"/>
 
@@ -79,8 +79,9 @@ A következő lépésben módosítsuk a az activity elrendezését (_activity_vi
 
 	</LinearLayout>
 </ScrollView>
-
 ```
+
+Ha az ebben szereplő *dimen* erőforrások hiányoznak, rajtuk **Alt+Enter**-t nyomva hozzuk létre őket, értékük legyen 16dp.
 
 ## Material Palette
 
@@ -92,9 +93,9 @@ Nyissuk meg a honlapot, majd az alábbi beállításokkal generáljunk témát:
 
 1.  Elsődleges színnek válasszuk ki a **Green**-t
 2.  Másodlagos színnek pedig a **Light-Green**-t
-3.  Majd a **Download**-t kiválasztva …
+3.  Majd a **Download**-ot kiválasztva …
 4.  … **XML** formátumban töltsük is le.
-5.  A kapott file tartalmát másoljuk az **colors.xml**-be.
+5.  A kapott file tartalmát másoljuk a **colors.xml**-be.
 
 Az alkalmazásunkban használt stílusokat pedig a _styles.xml_ állományban definiáljuk.
 
@@ -144,7 +145,6 @@ Elsőként az egyedi jelszó nézetet valósítjuk meg. Ez a nézet egy beviteli
 Hozzunk létre egy PasswordEditText osztályt, melynek a kódja az alábbi:
 
 ```java
-
 public class PasswordEditText extends RelativeLayout {
 
 	protected EditText passwordEditText;
@@ -220,11 +220,9 @@ public class PasswordEditText extends RelativeLayout {
 }
 ```
 
-
 Az osztály a RelativeLayout-ból származik. A RelativeLayout elemei pedig egy EditText és egy ImageView lenne úgy, hogy az ImageView-t jobbra rendezzük és az EditText kitölti bal oldalt a rendelkezésre álló helyet. Ahhoz, hogy egy felüldefiniált ViewGroup-ból származó osztálynak kódból meg tudjuk adni az elrendezését szükségünk van egy úgynevezett merge_layout-ra. Ezt a layout-ot a LayoutInflater.from(context).inflate(R.layout.view_password_edittext, this, true); kóddal tudjuk a RelativeLayout-ba felfújni, aminek hatására a RelativeLayout-nak lesz két gyerek nézete, egy ImageView és egy EditText.
 
 Az elrendezéshez hozzunk létre egy _view_password_edittext.xml_ layout erőforrást és a tartalma legyen az alábbi kód:
-
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -247,7 +245,6 @@ Az elrendezéshez hozzunk létre egy _view_password_edittext.xml_ layout erőfor
 		android:layout_height="wrap_content"/>
 
 </merge>
-
 ```
 
 A laborvezetővel tekintsék át az ImageView és az EditText elhelyezését a RelativeLayout-on belül.
@@ -509,9 +506,9 @@ Második ChoiceLayout hozzáadása az activity_view_labor.xml-hez:
 </hu.bme.aut.amorg.examples.viewlabor.ChoiceLayout>
 ```
 
-A saját attribútumok saját névtéren keresztül érhetőek el, ez konvekció szerint **app**, az app névtérre állva _Alt+Enter_ segítségével felvehető.
+A saját attribútumok saját névtéren keresztül érhetőek el, ez konvenció szerint **app**, az app névtérre állva _Alt+Enter_ segítségével felvehető.
 
-Látható, hogy a saját View behivatkozás szintén a teljes, package nevet is tartalmazó osztálynév segítségével történik. A multiple attribútum használatára mindkét esetben látunk példát az erőforrásban. A **app** attribútumhoz is működik Android Studio alatt a kódkiegészítés, érdemes kipróbálni.
+Látható, hogy a saját View behivatkozás szintén a teljes, package nevet is tartalmazó osztálynév segítségével történik. A multiple attribútum használatára mindkét esetben látunk példát az erőforrásban. Az **app** attribútumhoz is működik Android Studio alatt a kódkiegészítés, érdemes kipróbálni.
 
 #### ChoiceLayout kiegészítése a dividerType attribútummal
 
@@ -570,7 +567,6 @@ Tehát ezt a két drawable elemet fogjuk felhasználni divider-ként a ChoiceLay
 Adjuk hozzá az osztályhoz a Divider lehetséges értékeit integer ként (Androidon kerüljük az enumerációk használatát, erről bővebben az előadásokon):
 
 ```java
-
 public static final int DIVIDER_NONE=0;
 public static final int DIVIDER_SIMPLE=1;
 public static final int DIVIDER_DOUBLE=2;
@@ -587,20 +583,20 @@ Hozzáadunk az osztályhoz egy új függvényt, ami a divider elem hozzáadást 
 
 ```java
 public void addDivider() {
-		if(dividerType != DIVIDER_NONE) {
-			ImageView div = new ImageView(getContext());
-			switch (dividerType) {
-				case DIVIDER_SIMPLE:
-					div.setImageResource(R.drawable.choice_divider_simple);
-					break;
-				case DIVIDER_DOUBLE:
-					div.setImageResource(R.drawable.choice_divider_double);
-					break;
-			}
-			LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-			super.addView(div, lp);
+    if(dividerType != DIVIDER_NONE) {
+		ImageView div = new ImageView(getContext());
+		switch (dividerType) {
+			case DIVIDER_SIMPLE:
+				div.setImageResource(R.drawable.choice_divider_simple);
+				break;
+			case DIVIDER_DOUBLE:
+				div.setImageResource(R.drawable.choice_divider_double);
+				break;
 		}
+		LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+		super.addView(div, lp);
 	}
+}
 ```
 
 A függvény létrehoz egy ImageView-t és a dividerType alapján beállítja az előbbiekben létrehozott két drawable közül a megfelelőt ennek az ImageView-nak. LayoutParams segítségével beállítjuk, hogy a magassága a tartalom alapján dőljön el, míg a szélessége a szülő alapján. Ezután az addView függvény segítségével hozzáadjuk a View-t a saját layout-hoz. Azért az ős függvényét hívjuk, hogy ne fusson le a saját addView logikánk, amit a kijelölhetőség érdekében hoztunk létre.

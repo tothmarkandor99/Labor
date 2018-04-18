@@ -2,7 +2,7 @@
 
 ## Bevezetés
 
-A labor célja a hálózati kommunikáció, a platformon leginkább használt, HTTP kommunikáció alapjainak bemutatása, valamint az ehhez kapcsolódó aszinkron hívások ismertetése. A labor során egy multiplayer labirintus játékhoz fogunk mobil klienst fejleszteni. A kliens segítségével irányíthatjuk a labirintusban egy bábut, továbbá lehetőség lesz üzenetek küldésére is. A labor az alábbi témákat érinti:
+A labor célja a hálózati kommunikáció, a platformon leginkább használt, HTTP kommunikáció alapjainak bemutatása, valamint az ehhez kapcsolódó aszinkron hívások ismertetése. A labor során egy multiplayer labirintus játékhoz fogunk mobil klienst fejleszteni. A kliens segítségével irányíthatunk a labirintusban egy bábut, továbbá lehetőség lesz üzenetek küldésére is. A labor az alábbi témákat érinti:
 
 *   Felületek használata ButterKnife segítségével
 *   HTTP hálózati hívások
@@ -17,7 +17,7 @@ A játék tényleges felülete nem az Android alkalmazás része, azt egy előre
 
 [http://android-labyrinth.node.autsoft.hu](http://android-labyrinth.node.autsoft.hu)
 
-A játék szabályai egyszerűek, a játékosunkat a készülékről négy gomb segítségével (bal, jobb, fel, le) irányíthatjuk, továbbá lehetőség van még üzenetküldésre is. Az első lépésünk során kerül rá az új játékos a játéktérre egy véletlen pozícióra. Ha egy játékos a másikra lép, akkor pontot kap! A feladatok megoldása során a hálózati kommunikációra és az aszinkron hívásokra egyre teljes körűbb, minden helyzetben jól használható megoldást mutatunk.
+A játék szabályai egyszerűek, a játékosunkat a készülékről négy gomb segítségével (bal, jobb, fel, le) irányíthatjuk, továbbá lehetőség van még üzenetküldésre is. Az első lépésünk során kerül rá az új játékos a játéktérre egy véletlen pozícióra (színes Github icon). Ha egy játékos egy pontot érő mezőre lép (színes pipa), akkor pontot szerez, és egy újabb pontot érő mező kerül a pályára véletlenszerű helyre. A játékosok nem tudnak a fal (fekete négyzet) elemen átlépni, illetve másik játékos által foglalt mezőre sem léphetnek!
 
 <img src="./images/game.png" width="600" align="middle">
 
@@ -207,7 +207,7 @@ Szabjuk testre a _dimens.xml_ file tartalmát.
 </resources>
 ```
 
-A tabletekre optimalizált dimens file-t törölhetjük is (figyeljük oda, hogy ne mind a kettőt töröljük, mert azt ajánlaná fel a Studió).Töröljük az **androidTest** és **test** könyvtárakat is, nem lesz most rá szükségünk. 
+A tabletekre optimalizált dimens file-t törölhetjük is (figyeljük oda, hogy ne mind a kettőt töröljük, mert azt ajánlaná fel a Studió). Töröljük az **androidTest** és **test** könyvtárakat is, nem lesz most rá szükségünk. 
 
 Mivel az alkalmazásunk interneten keresztül fog kommunikálni, vegyül fel a manifestbe az ehhez kapcsolódó permissiont.
 
@@ -219,20 +219,22 @@ Mivel az alkalmazásunk interneten keresztül fog kommunikálni, vegyül fel a m
 ## A felületi elemek egyszerű feloldása
 Az előző laborok során többször is használtuk a **findViewByID** hívást a nézetek feloldására. Ez a felületi elemekkel arányos mennyiségű kódolást kiván, mely egyébként nagyon repetativ. Azért hogy ezt ne _kézzel_ kelljen megcsinálnunk újra használjuk a [Butterknife](http://jakewharton.github.io/butterknife/) könyvtárat.
 
-Ehhez a module build.gradle ben kell a dependencies részbe felvenni a könyvátrat. Egyszer fel kell venni mint compile függőség, hogy az osztályait elérjük. Másrészt fel kell venni mint annotationProcessor-t, hogy az annotáció feldolgozás lefuthasson. (Régebben erre az **android-apt** gradle plugin kellett, de az Android Gradle Plugin 2.2 óta beépítve elérhető, ha mégsem a legújabb gradle plugint használtnánk, azt a projekt _build.gradle_ -ben tudjuk frissíteni.).
+Ehhez a module build.gradle ben kell a dependencies részbe felvenni a könyvtárat. Egyszer fel kell venni mint _implementation_ függőség, hogy az osztályait elérjük. Másrészt fel kell venni mint _annotationProcessor_ függőség, hogy az annotáció feldolgozás lefuthasson. 
+
+>Régebben erre az **android-apt** gradle plugin kellett, de az Android Gradle Plugin 2.2 óta beépítve elérhető, ha mégsem a legújabb gradle plugint használtnánk, azt a projekt _build.gradle_ -ben tudjuk frissíteni.
 
 ```java
-compile 'com.jakewharton:butterknife:8.4.0'
-annotationProcessor 'com.jakewharton:butterknife-compiler:8.4.0'
+implementation 'com.jakewharton:butterknife:8.8.1'
+annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
 ```
 
 A könyvtár fordítás időben generálja le a findViewByID hívásokat, és el is fedi előlünk, az összerendelést annotációkkal tudjuk megadni.
 
 
 ```java
-public class MainActivity extends AppCompatActivity
-{
-	@BindView(R.id.usernameET) EditText usernameET;
+public class MainActivity extends AppCompatActivity{
+
+    @BindView(R.id.usernameET) EditText usernameET;
 	 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -243,13 +245,13 @@ public class MainActivity extends AppCompatActivity
 }
 ```
 
-Viszont jól látható, hogy így is van feladatunk, meg kell adnunk a felületi elemeket és a hozzájuk tartozó tagváltozókat létrehozni. Szerencsére ez a feladat is automatizálható, a Butterknife Zelezny Android Studio Pluginnal.
+Viszont jól látható, hogy így is van feladatunk, meg kell adnunk a felületi elemeket és létre kell hoznunk a hozzájuk tartozó tagváltozókat. Szerencsére ez a feladat is automatizálható, a Butterknife Zelezny Android Studio Pluginnal.
 
-Ennek a telepítéséhez `Preferences` - `Plugings` - `Browser Repositories` - `keresés: Android ButterKnife Zelezny` , majd `Install` és Android Studio újraindítás.
+Ennek a telepítéséhez `File` - `Settings` - `Plugins` - `Browser Repositories` - `keresés: Android ButterKnife Zelezny` , majd `Install` és Android Studio újraindítás.
 
-Ha plugin már telepítve van, akkor  a setContentView(**R.layout.activity_main**); elemére állva, **Alt+Insert** _(CMD+N)_ majd **Generate Butterknife Injections**, majd válasszuk ki a generálni kívánt elemeket (gombok, usernév, üzenet).
+Ha a plugin már telepítve van, akkor  a setContentView(**R.layout.activity_main**); elemére állva, **Alt+Insert** _(CMD+N)_ majd **Generate Butterknife Injections**, majd válasszuk ki a generálni kívánt elemeket (gombok, usernév, üzenet).
 
-Jelen esetben csak az EditText és TextView mezőket fogjuk használni ilyen formában. A 4 gomb kezelésére használjuk a ButterKnife beépített `@OnClick(R.id.button)` annotációt.
+Jelen esetben csak az EditText és TextView mezőket fogjuk használni ilyen formában. A 4 gomb kezelésére használjuk a ButterKnife beépített `@OnClick(R.id.button)` annotációját.
 
 ```java
 @OnClick(R.id.downBTN)
@@ -257,7 +259,7 @@ public void onDownButtonClick() {
 	//...
 }
 ```
-Az összekötést (a tényleges findViewByID és setOnClickListener hívásokat) a ButterKnife.bind(this) hívás csinálja meg, azutána hívás után használhatóak a nézeteink és a listenerek.
+Az összekötést (a tényleges findViewByID és setOnClickListener hívásokat) a ButterKnife.bind(this) hívás csinálja meg, azután a hívás után használhatóak a nézeteink és a listenerek.
 
 ```java
 public class MainActivity extends AppCompatActivity {
@@ -310,10 +312,10 @@ Próbáljuk ki az alkalmazást, nézzük meg a felületét.
 
 ## Az API bemutatása
 
-A szerver egy PHP alapú oldal, amely HTTP GET kérésekben várja a lépéseket és az üzeneteket. Ezeket eltárolja egy adatbázisban, amelyet egy PHP oldalon tesz elérhetővé a megjelenítésért felelős JavaFX alkalmazás számára. A Java FX alkalmazás ezt a PHP oldalt pollozza relatív kis időközönként és kapott válaszok alapján frissíti a felhasználói felületét. A szerver alap címe az alábbi oldalon érhető el: 
+A szerver egy NodeJS alapú oldal, amely HTTP GET kérésekben várja a lépéseket és az üzeneteket. Ezeket eltárolja egy adatbázisban, amelyet egy REST híváson keresztül tesz elérhetővé a megjelenítésért felelős Angular alkalmazás számára. Az Angular alkalmazás ezt a NodeJS oldalt pollozza relatív kis időközönként és kapott válaszok alapján frissíti a felhasználói felületét. A szerver alap címe az alábbi oldalon érhető el: 
 ``` http://android-labyrinth.node.autsoft.hu ``` 
 
-Ezen belül kell majd a megfelelő PHP állományokat meghívni az előre definiált GET paraméterekkel. A PHP-ktől hiba esetén mindig „ERROR”-al kezdődő üzenetet kapunk.
+Ezen belül kell majd a megfelelő REST végpontokat meghívni az előre definiált GET paraméterekkel. A szervertől hiba esetén mindig „ERROR”-ral kezdődő üzenetet kapunk.
 
 ### Játékos mozgatása
 
@@ -356,8 +358,8 @@ A hálózatról érkező választ azonban általában a felhasználói felülete
 
 Arra, hogy egy mellék szálról hogyan térjünk vissza a fő szálra a platform több eszközt is biztosít:
 
-#### Erőssen csatolt megoldások
-Amennyiben van már refernciánk az activityre/view-ra.
+#### Erősen csatolt megoldások
+Amennyiben van már referenciánk az Activityre/Viewra.
 
 *   Activity.runOnUiThread(Runnable)
 *   View.post(Runnable)
@@ -365,19 +367,19 @@ Amennyiben van már refernciánk az activityre/view-ra.
 *   Handler
 *   Android [AsyncTask](http://developer.android.com/reference/android/os/AsyncTask.html) (Ez is egy feature-je)
 
-Probléma lehet hogyha pl. elfordul az activity ezért a refercia a régire mutat (memory leak), és az új nem kapja meg a hívás. Ha ez a veszély fenn áll célszerű kombinálni lazán csatolt megoldással.
+Probléma lehet hogyha pl. elfordul az Activity ezért a referencia a régire mutat (memory leak), és az új nem kapja meg a hívást. Ha ez a veszély fenn áll célszerű kombinálni lazán csatolt megoldással.
 
 #### Lazán csatolt megoldások
-A fő szálú objektum feliratkozik, majd leiratkozik az a válaszról, lazán csatolt módon. Hiába fordul el a nézet a hálózati hívás során, az új nézet fogja elkapni a régi által indított üzenete válaszát, és a régire nem marad referencia.
+A fő szálú objektum feliratkozik, majd leiratkozik a válaszról, lazán csatolt módon. Hiába fordul el a nézet a hálózati hívás során, az új nézet fogja elkapni a régi által indított üzenet válaszát, és a régire nem marad referencia.
 
-*   Broadcast receiver  (lazán csatolt, nem kell referencia, sorosítani kell a választ, lasabb)
+*   Broadcast receiver  (lazán csatolt, nem kell referencia, sorosítani kell a választ, lassabb)
 *   Eseménybuszok  (lazán csatolt, nem kell referencia, de picit bonyolultabb, 3rd party megoldás).
 
 A mostani laboron, a **Java Thread** és az **Eseménybusz** kombinációját fogjuk használni.
 
 ## Kommunikáció a szerver oldallal
 
-Következő feladatunk a szerver oldali kommunikációt biztosító osztály megvalósítása, mely végrehajtja a HTTP GET hívásokat és és a választ visszadja String formátumban.
+Következő feladatunk a szerver oldali kommunikációt biztosító osztály megvalósítása, mely végrehajtja a HTTP GET hívásokat és a választ visszaadja String formátumban.
 
 A **network** csomagban hozzunk létre a **LabyrinthAPI** osztályt.
 
@@ -401,15 +403,15 @@ public class LabyrinthAPI {
 }
 ```
 
-Ez az osztály fogja végezni a különböző api hívásokat, és egységbe zárni a http kérés és válasz feldolgozást.
+Ez az osztály fogja végezni a különböző API hívásokat, és egységbe zárni a HTTP kérés és válasz feldolgozást.
 
 ### HTTP hívások Androidon
-Az Android platform több megoldást is ad beépítve HTTP hívásokra. Egyrészt elérhető az Apache HTTP Client, valamint az Java HttpUrlConnection. Ezeket beépítve tartalmaza a platform. Az Apache HTTP Client mára elavult, az Android 6.0 feletti eszközök már csak kiegészítéésel támogatják, NE HASZNÁLJUK. A HttpUrlConnection elérhető mindenhol, viszont nagyon körülményes a használata, ezért a beépített megoldások helyett, egy széleskörben elterjed, harmadik féltől (3rd party) fejlesztőcsapattól ([Square](http://square.github.io)) származó, nyilt könyvtárat, az [OkHttp](http://square.github.io/okhttp/)-t fogjuk használni.
+Az Android platform több megoldást is ad beépítve HTTP hívásokra. Egyrészt elérhető az Apache HTTP Client, valamint az Java HttpUrlConnection. Ezeket beépítve tartalmazza a platform. Az Apache HTTP Client mára elavult, az Android 6.0 feletti eszközök már csak kiegészítéssel támogatják, NE HASZNÁLJUK. A HttpUrlConnection elérhető mindenhol, viszont nagyon körülményes a használata, ezért a beépített megoldások helyett, egy széleskörben elterjedt, harmadik féltől ([Square](http://square.github.io)) származó, nyilt könyvtárat, az [OkHttp](http://square.github.io/okhttp/)-t fogjuk használni.
 
-Ennek használatához fel kell vennük a következő sort az alklamzás build.gradle dependencies részéhez.
+Ennek használatához fel kell vennünk a következő sort az alkalmazás modul szintű `build.gradle` fájljának dependencies részéhez.
 
 ```java
-compile 'com.squareup.okhttp3:okhttp:3.4.1'
+implementation 'com.squareup.okhttp3:okhttp:3.10.0'
 ```
 
 Ezután a könyvtár nagyon egyszerűen használható. Készítsünk is egy általános HTTP GET hívást lebonyolító függvényt a LabyrinthAPI osztályba.
@@ -431,7 +433,7 @@ private static String httpGet(String URL) throws IOException {
 }
 ```
 
-Ezt fogjuk használni az összes HTTP GET híváshoz. Használjuk is az újonnal elkészített függvényünket, és implementáljuk a moveUser és writeMessage hívásokat. 
+Ezt fogjuk használni az összes HTTP GET híváshoz. Használjuk is az újonnan elkészített függvényünket, és implementáljuk a moveUser és writeMessage hívásokat. 
 > Megjegyzés: Jelen esetben a stringeket nyugodtan összefűzhetjük a + operátorral, a háttérben ezt a fordító kioptimalizálja, összetettebb összefüzésekre (pl. file sorainak összefűzése), használjuk a [StringBuilder](https://developer.android.com/reference/java/lang/StringBuilder.html) -t.
 
 ```java
@@ -483,14 +485,14 @@ Figyeljük meg, hogy az esetleges kivételeket try-catch blockban kezeltük, val
 
 Ezután vegyük fel az irányok értékeit konstansként a MainActivitybe
 
-```
+```java
 public static final int MOVE_LEFT = 1;
 public static final int MOVE_UP = 2;
 public static final int MOVE_RIGHT = 3;
 public static final int MOVE_DOWN = 4;
 ```
 
-Majd private field ként adjunk hozzá az előbb létrehozott LabyrithAPI osztályt, és használjuk a megfelelő események bekövetkeztekor.
+Majd private field-ként adjunk hozzá az előbb létrehozott LabyrinthAPI osztályt, és használjuk a megfelelő események bekövetkeztekor.
 
 
 ```java
@@ -558,11 +560,11 @@ public class MainActivity extends AppCompatActivity {
 
 Próbáljuk, ki az alkalmazást. Mit tapasztalunk?
 
-Azt tapasztaljuk, hogy minden kérésre ERROR-t kapunk, és ha megnézzük a LogCat kimentet, látjuk is hogy `android.os.NetworkOnMainThreadException` kivételt kapunk. Ezt a rendszer dobja, mert érzékeli, hogy a fő szálon szeretnénk hosszan tartó hálózati műveletet végezni. A látszik hogy a fő szálon, az onClic metódusban hívuk meg a moveUser-t ami a httpGet metóduson keresztül a blokkoló execute metódust. Ahhoz hogy ezt a problémát meg tudjuk oldani szálkezelésre lesz szűkségünk.
+Azt tapasztaljuk, hogy minden kérésre ERROR-t kapunk, és ha megnézzük a LogCat kimentet, látjuk is, hogy `android.os.NetworkOnMainThreadException` kivételt kapunk. Ezt a rendszer dobja, mert érzékeli, hogy a fő szálon szeretnénk hosszan tartó hálózati műveletet végezni. Az látszik, hogy a fő szálon, az onClick metódusban hívjuk meg a moveUser-t ami a httpGet metóduson keresztül a blokkoló execute metódust. Ahhoz, hogy ezt a problémát meg tudjuk oldani szálkezelésre lesz szükségünk.
 
 
 ### Szálkezelés elkészítése
-A szálkezeléshez használjuk az egyszerű, és könnyen testre szabható JavaThread-eket. Készítsünk el a MainActivityben 1-1 segéd függvényt a moveUser és writeMessage híváshoz. Elsőnek egy új szálat készítünk,melyben elindítjuk az API hívást, és amint az válaszolt, visszaadjuk a választ a fő szálra (runOnUIThread) ahol pedíg már a főszálon megjelenítjük a választ.
+A szálkezeléshez használjuk az egyszerű és könnyen testre szabható JavaThread-eket. Készítsünk el a MainActivityben 1-1 segéd függvényt a moveUser és writeMessage híváshoz. Elsőnek egy új szálat készítünk, melyben elindítjuk az API hívást és amint az válaszolt, visszaadjuk a választ a fő szálra (runOnUIThread). ahol pedíg már a főszálon megjelenítjük a választ.
 
 ```java
 private void asyncMoveUser(final String username, final int direction) {
@@ -621,20 +623,20 @@ Próbáljuk ki az alkalmazást.
 
 
 ## Megfelelő válasz kezelés
-Próbáljuk, ki mi történik, ha megnyumunk egy gombot, majd elfordítjuk a készüléket/emulátort.
-Azt tapasztaljuk, hogy az alkalmzás hibába ütközik. 
+Próbáljuk, ki mi történik, ha megnyomunk egy gombot, majd elfordítjuk a készüléket/emulátort.
+Azt tapasztaljuk, hogy az alkalmazás hibába ütközik. 
 
-Ennek az az oka, hogy a szálak tovább képesek élni, mint az Activity, és ha egy hálózati hívás keresztül ível egy actvity váltáson/újralétrehozáson, akkor a szál még az előző activityre rendelkezik referenciával, így NullpointerException-t kapunk. 
+Ennek az az oka, hogy a szálak tovább képesek élni, mint az Activity, és ha egy hálózati hívás keresztül ível egy Activity váltáson/újralétrehozáson, akkor a szál még az előző Activityre rendelkezik referenciával, így NullPointerException-t kapunk. 
 
-Ezt úgy lehet kiküszöbölni, hogy az erőss, referencia alapú csatolás helyett laza csatolást alkalmazunk. Ilyen esetben az activity amikor előtérbe kerül (onResume) feliratkozik, majd ha háttérbe kerül leiratkozik (onPause) egy eseményre. A hálózati hívás során, pedíg a választ nem direkt függvényhívásban állítjuk be, hanem csak egy eseményt váltunk ki.
+Ezt úgy lehet kiküszöbölni, hogy az erős, referencia alapú csatolás helyett laza csatolást alkalmazunk. Ilyen esetben az Activity amikor előtérbe kerül (onResume) feliratkozik, majd ha háttérbe kerül leiratkozik (onPause) az eseményről. A hálózati hívás során pedig a választ nem direkt függvényhívásban állítjuk be, hanem csak egy eseményt váltunk ki.
 
-Az Android platform beépítve támogatja az események kezelését Broadcast Receiverek formájában. Viszont egy alkalmazáson belül használva a broadcast receviereket, az üzenet sorosítása miatt overhead jelentkezik, valamint kényelmetlen is a használata. 
+Az Android platform beépítve támogatja az események kezelését Broadcast Receiverek formájában. Viszont egy alkalmazáson belül használva a broadcast receivereket, az üzenet sorosítása miatt overhead jelentkezik, valamint kényelmetlen is a használata. 
 
-Ennek kiküszöbölése érdekében használjunk esemény buszokat, melyek gyorsabbak, és egyszerűbben is használhatóak a broadcast receiverektől (ellenben csak egy alkalmazáson/processen belül működnek, és referencia szükséges az eseménybuszra).
+Ennek kiküszöbölése érdekében használjunk esemény buszokat, melyek gyorsabbak és egyszerűbben is használhatóak a Broadcast Receiverektől (ellenben csak egy alkalmazáson/processen belül működnek és referencia szükséges az eseménybuszra).
 
-Számos 3rd party eseménybusz megoldás van, mi az Greenrobot EventBus megoldását fogjuk használni. Ehhez vegyük fel a könyvtárat a függőségek közé:
+Számos 3rd party eseménybusz megoldás van, mi a Greenrobot EventBus megoldását fogjuk használni. Ehhez vegyük fel a könyvtárat a függőségek közé:
 
-`compile 'org.greenrobot:eventbus:3.0.0'`
+`implementation 'org.greenrobot:eventbus:3.1.1'`
 
 Majd definiáljunk esemény osztályokat. Hozzunk létre 1-1 esemény osztályt, a **MoveUser** és a **WriteMessage** eseményeknek, az **events** csomagban, **MoveUserResponseEvent** és **WriteMessageResponseEvent** néven. Mivel az eseménybuszok az osztály alapján dolgoznak ezért az egyes eseményekhez külön osztályok szükségesek. Mindenkét osztály standard Java osztály, mely 1-1 String-ben tárolja a választ.
 
@@ -711,11 +713,11 @@ public void onWriteMessageResponse(WriteMessageResponseEvent  event) {
     responseTV.setText("Write Message Response:" + event.getResponse());
 }
 ```
-Itt fontos hogy a @Subscribe annotáció használva legyen, ez mondja meg hogy ez egy elkapó metódus, valamint a thread mode main legyen, mert így az események a főszálon kerülnek továbbításra. Fontos hogy az elküldött objektumokat az osztály típusa szerint tudja a rendszer a megfelelő elkapó metódusnak elküldeni. Egyébként 1 eseményhez több elkapó metódus is lehet egyszerre beregisztrálva.
+Itt fontos hogy a **@Subscribe** annotáció használva legyen, ez mondja meg hogy ez egy elkapó metódus, valamint a thread mode **MAIN** legyen, mert így az események a főszálon kerülnek továbbításra. Fontos, hogy az elküldött objektumokat az osztály típusa szerint tudja a rendszer a megfelelő elkapó metódusnak elküldeni. Egyébként egy eseményhez több elkapó metódus is lehet egyszerre beregisztrálva.
 
 Ezután regisztráljuk be az elkapó metódusokat, pontosabban azt az osztályt amely ezeket tartalmazza (jelen esetben ez a MainActivity aktuális példánya (this)).
 
-Azt szeretnénk hogy akkor legyenek ezek az esemény elkapó metódusok aktívak, amikor az activity előtérben van, így az onResume-ban iratkorunk fel, és az onPause-ban le.
+Azt szeretnénk, hogy akkor legyenek ezek az esemény elkapó metódusok aktívak, amikor az Activity előtérben van, így az onResume-ban iratkozunk fel, és az onPause-ban le.
 
 ```java
 @Override
@@ -731,7 +733,7 @@ protected void onPause() {
 }
 ```
 
-Próbáljuk ki az alkalmazást. Láthatjuk, hogy mostmár a hálózati hívások _túlélik_ az activity elforgatást is.
+Próbáljuk ki az alkalmazást. Láthatjuk, hogy most már a hálózati hívások _túlélik_ az Activity elforgatást is.
   
 Végül próbáljuk ki az alkalmazást működés közben: 
 
@@ -745,7 +747,10 @@ Végül próbáljuk ki az alkalmazást működés közben:
 Egészítsük ki az alkalmazást úgy, hogy a felhasználói felületen megjelenítsük a szerverrel való kommunikáció során tapasztalt átlagos válaszidőt (üzenet küldése és válasz megérkezése közti idő).
 
 Tipp: Az aktuális időt legegyszerűbben a következő hívással érhetjük el:
-`long currentTime=System.currentTimeMillis();` 
+
+```java
+long currentTime=System.currentTimeMillis();
+```
 
 ## Bonus feladat 2 - Hálozat elérhető-e
 
@@ -757,17 +762,24 @@ NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
 boolean networkAvailable = activeNetworkInfo != null && activeNetworkInfo.isConnected();
 ``` 
 
-A szükséges manifest engedély: `<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>`
+A szükséges manifest engedély: 
+
+```xml
+<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+```
 
 ## Bonus feladat 3 - WiFi állapot kijelzése
 
 Egészítsük ki az alkalmazást úgy, hogy a _WiFi_ állapotát és a hálózat nevét megjelenítsük a felhasználói felületen.  Segítség: 
 
 ``` java
-WifiManager wifiManager = (WifiManager) getSystemService(WIFI_SERVICE);
+WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
 WifiInfo wifiInfo = wifiManager.getConnectionInfo();
 Log.d("wifiInfo", wifiInfo.toString());
 Log.d("SSID",wifiInfo.getSSID());
 ``` 
 
-A szükséges manifest engedély: `<uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>`
+A szükséges manifest engedély: 
+```xml
+<uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+```
