@@ -162,7 +162,7 @@ public class RenderLoop extends Thread {
 ```
 
 
-Egészítsük ki a **GameView**-t úgy hogy a renderelő szálat használja. Andjunk hozzá egy tagváltozót.
+Egészítsük ki a **GameView**-t úgy hogy a renderelő szálat használja. Adjunk hozzá egy tagváltozót.
 
 `private RenderLoop renderLoop;`
 
