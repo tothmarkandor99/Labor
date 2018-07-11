@@ -20,19 +20,19 @@ A mérés az alábbi témákat érinti:
 
 A projekt létrehozása után a forráskód az _src_ könyvtárban, míg a
 felhasználói felület leírására szolgáló XML állományok a _res_
-könyvtárban találhatók. Az erőforrás állományokat egy _R.java_
-állomány köti össze a forráskóddal, így könnyedén elérhetjük Java
-oldalról az XML-ben definiált felületi elemeket. Az Android projekt
-fordításának eredménye egy APK állomány, melyet közvetlenül
-telepíthetünk mobil eszközre.
+könyvtárban találhatók. Az erőforrás állományokat egy _R.java_ állomány
+köti össze a forráskóddal, így könnyedén elérhetjük Java oldalról az
+XML-ben definiált felületi elemeket. Az Android projekt fordításának
+eredménye egy APK állomány, melyet közvetlenül telepíthetünk mobil
+eszközre.
 
 1.  A fejlesztő elkészíti a Kotlin forráskódot, valamint az XML alapú
     felhasználói felület leírást a szükséges erőforrás állományokkal.
 
 2.  A fejlesztőkörnyezet az erőforrás állományokból folyamatosan
-    naprakészen tartja az _R.java_ erőforrás fájlt a fejlesztéshez és
-    a fordításhoz. **FONTOS: az _R.java_ állomány generált, kézzel
-    SOHA ne módosítsuk!** (Az Android Studio egyébként nem is hagyja.)
+    naprakészen tartja az _R.java_ erőforrás fájlt a fejlesztéshez és a
+    fordításhoz. **FONTOS: az _R.java_ állomány generált, kézzel SOHA ne
+    módosítsuk!** (Az Android Studio egyébként nem is hagyja.)
 
 3.  A fejlesztő a Manifest állományban beállítja az alkalmazás
     hozzáférési jogosultságait (pl. Internet elérés, szenzorok
@@ -66,8 +66,8 @@ Az Android Studio Gradle-t használ, ami lehetőséget biztosít köztes
     hasonlítható.
 
 *   A Manifest állományban meg kell adni a támogatni kívánt Android
-    verziót, mely felfele kompatibilis az újabb verziókkal, ennél régebbi
-    verzióra azonban az alkalmazás már nem telepíthető.
+    verziót, mely felfele kompatibilis az újabb verziókkal, ennél
+    régebbi verzióra azonban az alkalmazás már nem telepíthető.
 
 *   Az Android folyamatosan frissülő verziói nagy gondot jelentenek a
     fejlesztőknek.
@@ -134,8 +134,8 @@ minden, ami az első alkalmazásunkhoz kelleni fog.
 Az AVD az Android Virtual Device rövidítése. Ahogy arról már előadáson
 is szó esett, nem csak valódi eszközön futtathatjuk a kódunkat, hanem
 emulátoron is. (Mi is a különbség szimulátor és emulátor között?) Az AVD
-indítása a fejlesztői környezeten keresztül lehetséges (illetve 
-parancssorból is, de ennek a használatára csak speciális esetekben van 
+indítása a fejlesztői környezeten keresztül lehetséges (illetve
+parancssorból is, de ennek a használatára csak speciális esetekben van
 szükség).
 
 AVD ikon:
@@ -158,9 +158,11 @@ keresztül)!
     1.  Válasszunk az előre definiált készülék sablonokból.
     2.  Döntsük el, hogy milyen Android verziójú emulátort kívánunk
         használni. CPU/ABI alapvetően x86 alapú legyen, mivel ezekhez
-        kapunk [hardveres gyorsítást](https://developer.android.com/studio/run/emulator-acceleration) 
-        is. (Ha ez nem áll rendelkezésre, használjunk ARM alapú képfájlt). 
-        Itt válasszunk a rendelkezésre állók közül egyet majd "Next".
+        kapunk
+        [hardveres gyorsítást](https://developer.android.com/studio/run/emulator-acceleration)
+        is. (Ha ez nem áll rendelkezésre, használjunk ARM alapú
+        képfájlt). Itt válasszunk a rendelkezésre állók közül egyet majd
+        "Next".
     3.  Név legyen mondjuk “Labor_2″
     4.  Indulási orientáció beállítása.
     5.  Készülék keretének megjelenítési lehetősége.
@@ -170,23 +172,24 @@ keresztül)!
     1.  Kamera(ák): WebcamX, hardveres kamera, ami a számítógépre van
         csatlakoztatva; Emulated, egy szoftveres megoldás, most legalább
         az egyik kamera legyen ilyen.
-    2.  "Boot Options": Nemrég jelent meg az Android emulátor állapotáról 
-        való pillanatkép elmentésének lehetsége. Ez azt takarja, hogy a
-        virtuális operációs rendszer csak felfüggesztésre kerül az 
-        emulátor bezáráskor (például a megnyitott alkalmazás is megmarad,
-        a teljes állapotával), és "Quick boot" esetben a teljes OS indítása
-        helyett másodperceken belül elindul az emulált rendszer. "Cold 
-        Boot" esetben minden alkalommal leállítja és újra indítja a 
-        virtális eszköz teljes operációs rendszerét.
+    2.  "Boot Options": Nemrég jelent meg az Android emulátor
+        állapotáról való pillanatkép elmentésének lehetősége. Ez azt
+        takarja, hogy a virtuális operációs rendszer csak
+        felfüggesztésre kerül az emulátor bezáráskor (például a
+        megnyitott alkalmazás is megmarad, a teljes állapotával), és
+        "Quick boot" esetben a teljes OS indítása helyett másodperceken
+        belül elindul az emulált rendszer. "Cold Boot" esetben minden
+        alkalommal leállítja és újra indítja a virtális eszköz teljes
+        operációs rendszerét.
     3.  Memória mérete. A laborban lévő számítógépeken, mivel kevés a
-        rendszermemóriánk nem érdemes 768 MB-nál többet adni, mert könnyen
-        futhatunk problémákba. Ha az emulátor lefagy, vagy az egész OS 
-        megáll működés közben, akkor állítsuk alacsonyabbra az
+        rendszermemóriánk nem érdemes 768 MB-nál többet adni, mert
+        könnyen futhatunk problémákba. Ha az emulátor lefagy, vagy az
+        egész OS megáll működés közben, akkor állítsuk alacsonyabbra az
         értéket (saját laptop esetén 8 GB vagy több rendszermemória
-        esetén nyugodtan állíthatjuk az emulátor memóriáját
-        1024/2048 MB-ra). VM heap, az alkalmazások virtuális gépének
-        szól, maradhat az alapérték. Tudni kell, hogy készülékek
-        esetében gyártónként változik.
+        esetén nyugodtan állíthatjuk az emulátor memóriáját 1024/2048
+        MB-ra). VM heap, az alkalmazások virtuális gépének szól,
+        maradhat az alapérték. Tudni kell, hogy készülékek esetében
+        gyártónként változik.
     4.  Belső flash memória és SD kártya mérete.
 
 3.  Ha mindent rendben talál az ablak, akkor OK!
@@ -199,14 +202,14 @@ Az Android Virtual Device Manager-ben megjelent az imént létrehozott
 eszközünk. Itt lehetőség van a korábban megadott paraméterek
 szerkesztésére, a "készülékről" a felhasználói adatok törlésére (Wipe
 Data - Teljes visszaállítás), az emulátor példány duplikálására vagy
-törlésér, illetve a Play gombbal indíthatjuk az emulátort.
+törlésére, illetve a Play gombbal indíthatjuk az emulátort.
 
 Az elindított emulátoron próbálják ki az “API Demos” és “Dev Tools”
 alkalmazásokat!
 
 Megjegyzés: A gyári emulátoron kívül több alternatíva is létezik, a
-Genymotion ezek közül az egyik legjobb, viszont a Google féle emulátor
-a legelterjedtebb, amennyiben ezzel nem jelentkeznek problémáink,
+Genymotion ezek közül az egyik legjobb, viszont a Google féle emulátor a
+legelterjedtebb, amennyiben ezzel nem jelentkeznek problémáink,
 maradjunk ennél.
 
 Megjegyzés 2: Tesztelés céljából nagyon jól használható az emulátor
@@ -224,7 +227,7 @@ Android fejlesztésre a labor során a JetBrains IntelliJ alapjain nyugvó
 Android Studio-t fogjuk használni. A Studio-val ismerkedők számára
 kivételesen hasznos funkció a “Tip of the day”, érdemes egyből
 kipróbálni, megnézni az adott funkciót. Induláskor a legutóbbi projekt
-nyílik meg, ha nincs ilyen, vagy minden projektünket bezártuk, a nyitó 
+nyílik meg, ha nincs ilyen, vagy minden projektünket bezártuk, a nyitó
 képernyő. (A legutóbbi projekt újranyitását a _Settings -> Appeareance &
 Behavior -> System Settings -> Reopen last project on startup_ opcióval
 kikapcsolhatjuk.)
@@ -233,7 +236,8 @@ kikapcsolhatjuk.)
 ## Hello World
 
 A laborvezető segítségével készítsenek egy egyszerű Hello World
-alkalmazást, a varázsló nézeten az "Include Kotlin support" legyen bepipálva!
+alkalmazást, a varázsló nézeten az "Include Kotlin support" legyen
+bepipálva!
 
 ### Android Studio
 
@@ -281,9 +285,9 @@ képest.
         egerünkön/billentyűzetünkön ilyen gomb, és netes böngészés
         közben aktívan használjuk, ezt a funkciót nagyon hasznosnak
         fogjuk találni.
-        
-Szín ikonja a sor elején; kiemelve jobb oldalon, hogy melyik nézeten vagyunk;
-szabadszavas kiegészítés; a “Hello world” igazából 
+
+Szín ikonja a sor elején; kiemelve jobb oldalon, hogy melyik nézeten
+vagyunk; szabadszavas kiegészítés; a “Hello world” igazából
 _“@string/very_very_very_long_hello_world”_.
 
 ![](assets/nice_studio.png)
@@ -303,14 +307,15 @@ _“@string/very_very_very_long_hello_world”_.
 *   **SHIFT SHIFT:** Keresés mindenhol
 *   **CTRL + N:** Keresés osztályokban
 *   **CTRL + SHIFT + N:** Keresés fájlokban
-*   **CTRL + SHIFT + A:** Keresés a beállításokban, kiadható parancsokban.
+*   **CTRL + SHIFT + A:** Keresés a beállításokban, kiadható
+    parancsokban.
 
 
 ### Eszközök, szerkesztők
 
-A *View* menü *Tool Windows* menüpontjában lehetőség van különböző ablakok
-ki- és bekapcsolására. Laborvezető segítségével tekintsék át az alábbi
-eszközöket!
+A *View* menü *Tool Windows* menüpontjában lehetőség van különböző
+ablakok ki- és bekapcsolására. Laborvezető segítségével tekintsék át az
+alábbi eszközöket!
 
 *   Project
 *   Structure
@@ -332,8 +337,8 @@ A laborvezető segítségével állítsák be a következő hasznos funkciókat:
 *   "laptop mód" ki- és bekapcsolása (_File -> Power Save Mode_)
 *   sorszámozás bekapcsolása (kód melletti részen bal oldalt: jobb
     egérgomb, _Show Line Numbers_)
-*   beírás közbeni autoimport bekapcsolása (settingsben keresés: _import_,
-    utána _Editor -> Auto import_)
+*   beírás közbeni autoimport bekapcsolása (settingsben keresés:
+    _import_, utána _Editor -> Auto import_)
 
 ### Generálható elemek
 
@@ -363,10 +368,11 @@ Például részletes információt kaphatunk a hálózati forgalomról:
 2.  Helyezzenek breakpointot a kódba, és debug módban indítsák az
     alkalmazást! (Érdemes megyfigyelni, hogy most másik Gradle Task fut
     a képernyő alján.)
-3.  Indítsanak hívást és küldjenek SMS-t az emulátoron! Mit tapasztalnak?
+3.  Indítsanak hívást és küldjenek SMS-t az emulátoron! Mit
+    tapasztalnak?
 4.  Tekintse át az Android Profiler nézet funkcióit a laborvezető
     segítségével!
-5.  Változtassa a készülék pozícióját az emulátor megfelelő paneljének 
+5.  Változtassa a készülék pozícióját az emulátor megfelelő paneljének
     segítségével!
 6.  Vizsgálja meg az elindított HelloWorld projekt nyitott szálait,
     memóriafoglalását!
