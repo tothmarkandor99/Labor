@@ -19,7 +19,7 @@ A laborhoz kapcsolódó önálló feladat:
 A megvalósítandó játék felhasználói felületét az alábbi képernyőképek
 szemléltetik:
 
-<img src="./images/main.png" width= "630" align="middle"> 
+<img src="./images/main.png" width= "315" align="middle"> 
 
 ![](images/dialog.png) ![](images/game.png)
 
