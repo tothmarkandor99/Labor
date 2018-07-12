@@ -2,7 +2,7 @@
 
 ## Bevezetés
 
-A labor célja a több Activity-ből álló Android alkalmazás készítésének
+A labor célja egy több Activity-ből álló Android alkalmazás készítésének
 bemutatása, valamint az egyszerű rajzolás bemutatása egy TicTacToe játék
 segítéségével.
 
@@ -91,7 +91,7 @@ lépéseket nem kell egyesével elvégeznie a fejlesztőnek.
    Activity-t (*AboutActivity, GameActivity*), "Source Language"-nek
    válasszuk a "Kotlin"-t. Activity létrehozásakor megadható, hogy melyik
    legyen a “szülő” Activity, amihez a vissza gomb visszanavigálja a
-   felhasználót. Mindkét esetben legyen ez a *MainMenuActivity*.
+   felhasználót. Mindkét esetben legyen ez a *MainMenuActivity*. (Jelen pillanatban a Studio hibája miatt(3.1.3) a Hierarchical Parent választó nem mutat egyetlen értéket se viszont a ...-ra kattintva név szerint kikereshetjük a MainMenuActivity-t vagy package névvel együtt begépeljük)
 2. Létrehozás után a *res/values/strings.xml*-ben állítsuk be a két új
    Activity címét amelyet a létrehozáskor a Studio automatikusan
    kigenerált nekünk mint erőforrás (Például: *Az alkalmazásról*,
@@ -105,7 +105,7 @@ lépéseket nem kell egyesével elvégeznie a fejlesztőnek.
 4. Az *AboutActivity*-ből távolítsuk el a *Toolbar* kezeléséért felelős
    sorokat, mivel erre később nem lesz szükségünk.
 5. Állítsuk be a manifest-ben, hogy az *AboutActivity* dialógus formában
-   jelenjen meg:
+   jelenjen meg (A kódkiegészítés segít beírni a megfelelő témát a lehetőségek közül, kezdjük el a kezdő betűket beírni):
 
 ```xml
 <activity
@@ -124,46 +124,66 @@ lépéseket nem kell egyesével elvégeznie a fejlesztőnek.
 ## MainMenuActivity felület:
 
 A *MainMenuActivity* a fenti ábra alapján három menüpontot tartalmaz
-középre igazodva. Ez a három menüpont gyakorlatilag három gomb egymás
-alatt egy *LinearLayout*-ban, mely kitölti a szülőt (*match_parent*) és
-benne az elemek középre vannak rendezve:
+középre igazodva. Mivel a Studio már alapértelmezetten _Constraint Layout-ot_ generál, így ezt fogjuk most használni a megvalósításra. Mivel az anyagban csak később következik, így alább megtalálható az XML leíró, viszont akinek van kedve a gif alapján kipróbálhatja a használatát:
+
+![](images/constraint_layout_1.gif)
+Tipp: Shift + Kattintással lehet több elemet kijelölni
+
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/activity_main"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:gravity="center"
-    android:orientation="vertical"
-    tools:context="hu.bme.aut.amorg.examples.tictactoe.MainMenuActivity">
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	tools:context=".MainMenuActivity">
 
-    <Button
-        android:id="@+id/btnStart"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/btn_start" />
+	<Button
+		android:id="@+id/button_start"
+		android:layout_width="0dp"
+		android:layout_height="wrap_content"
+		android:layout_marginEnd="8dp"
+		android:layout_marginStart="8dp"
+		android:layout_marginTop="8dp"
+		android:text="@string/btn_start"
+		app:layout_constraintBottom_toTopOf="@+id/button_high_score"
+		app:layout_constraintEnd_toEndOf="parent"
+		app:layout_constraintHorizontal_bias="0.5"
+		app:layout_constraintStart_toStartOf="parent"
+		app:layout_constraintTop_toTopOf="parent"
+		app:layout_constraintVertical_chainStyle="packed" />
 
-    <Button
-        android:id="@+id/btnHighscore"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/btn_highscore" />
+	<Button
+		android:id="@+id/button_high_score"
+		android:layout_width="0dp"
+		android:layout_height="wrap_content"
+		android:layout_marginEnd="8dp"
+		android:layout_marginStart="8dp"
+		android:layout_marginTop="8dp"
+		android:text="@string/btn_highscore"
+		app:layout_constraintBottom_toTopOf="@+id/button_about"
+		app:layout_constraintEnd_toEndOf="parent"
+		app:layout_constraintHorizontal_bias="0.5"
+		app:layout_constraintStart_toStartOf="parent"
+		app:layout_constraintTop_toBottomOf="@+id/button_start" />
 
-    <Button
-        android:id="@+id/btnAbout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/btn_about" />
-</LinearLayout>
+	<Button
+		android:id="@+id/button_about"
+		android:layout_width="0dp"
+		android:layout_height="wrap_content"
+		android:layout_marginBottom="8dp"
+		android:layout_marginEnd="8dp"
+		android:layout_marginStart="8dp"
+		android:layout_marginTop="8dp"
+		android:text="@string/btn_about"
+		app:layout_constraintBottom_toBottomOf="parent"
+		app:layout_constraintEnd_toEndOf="parent"
+		app:layout_constraintHorizontal_bias="0.5"
+		app:layout_constraintStart_toStartOf="parent"
+		app:layout_constraintTop_toBottomOf="@+id/button_high_score" />
+</android.support.constraint.ConstraintLayout>
 ```
-
-A Studio egyből jelezni fogja nekünk, hogy a két *dimens* erőforrás amit
-használni szeretnénk, nem létezik. Hozzuk létre őket a *dimens.xml*-ben,
-értékük legyen 16dp. (Tipp: ha az erőforrás nevén áll a kurzor az
-XML-ben és ALT + ENTER -t nyomunk akkor a Studio felajánjla a resource
-automatikus elkészítését az értékének megadásával.)
 
 ## Highscore gomb eseménykezelő
 
@@ -172,37 +192,46 @@ jelenjen meg. Ehhez meg kell keresni a Highscore menüpont gombját és be
 kell állítani az alábbi eseménykezelőt neki a *MainMenuActivity
 onCreate()* függvényén belül:
 
-```java
-Button btnHighscore = (Button) findViewById(R.id.btnHighscore);
-btnHighscore.setOnClickListener(new View.OnClickListener() {
-  @Override
-  public void onClick(View view) {
-    Toast.makeText(MainMenuActivity.this,getString(R.string.toast_highscore),Toast.LENGTH_LONG).show();
-  }
-});
+```kotlin
+val btnHighScore = findViewById<Button>(R.id.button2)
+
+btnHighScore.setOnClickListener { Toast.makeText(this, getString(R.string.toast_highscore), Toast.LENGTH_LONG).show() }
 ```
 
 ## AboutActivity felület
 
 Ahogy korábban említettük az About menü elindítja az új
 *AboutActivity*-t, ezért elsőként készítsük el az *AboutActivity*
-felületét, melyet az *activity_about.xml* ír le:
+felületét, melyet az *content_about.xml* ír le. Mint korábban, itt is lehet Constraint Layoutot készíteni a segítséggel, vagy alább megtalálható az XML:
+
+![](images/constraint_layout_2.gif)
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/content_about"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	app:layout_behavior="@string/appbar_scrolling_view_behavior"
+	tools:context=".AboutActivity"
+	tools:showIn="@layout/activity_about">
 
-    <TextView
-        android:text="@string/txt_about"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="30sp"
-        android:layout_centerInParent="true"/>
-
-</RelativeLayout>
+	<TextView
+		android:id="@+id/textView3"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_marginBottom="8dp"
+		android:layout_marginEnd="8dp"
+		android:layout_marginStart="8dp"
+		android:layout_marginTop="8dp"
+		android:text="@string/txt_about"
+		android:textSize="30sp"
+		app:layout_constraintBottom_toBottomOf="parent"
+		app:layout_constraintEnd_toEndOf="parent"
+		app:layout_constraintStart_toStartOf="parent"
+		app:layout_constraintTop_toTopOf="parent" />
+</android.support.constraint.ConstraintLayout>
 ```
 
 ## Játék logika
@@ -219,57 +248,39 @@ tartalmát és különféle publikus függvényeket biztosít a játéktér
 lekérdezéséhez és módosításához. A modell a *getInstance()* statikus
 függvénnyel elérhető el.
 
-```java
-public class TicTacToeModel {
+```kotlin
+object TicTacToeModel {
 
-  private static TicTacToeModel instance = null;
+    const val EMPTY: Short = 0
+    const val CIRCLE: Short = 1
+    const val CROSS: Short = 2
 
-  private TicTacToeModel () {
-  }
+    var nextPlayer: Short = CIRCLE
 
-  public static TicTacToeModel getInstance() {
-    if (instance == null) {
-      instance = new TicTacToeModel();
+    private var model: Array<ShortArray> = arrayOf(
+            shortArrayOf(EMPTY, EMPTY, EMPTY),
+            shortArrayOf(EMPTY, EMPTY, EMPTY),
+            shortArrayOf(EMPTY, EMPTY, EMPTY))
+
+    fun resetModel() {
+        for (i in 0 until 3) {
+            for (j in 0 until 3) {
+                model[i][j] = EMPTY
+            }
+        }
     }
-    return instance;
-  }
 
-  public static final short EMPTY = 0;
-  public static final short CIRCLE = 1;
-  public static final short CROSS = 2;
+    fun getFieldContent(x: Int, y: Int): Short = model[x][y]
 
-  private short[][] model = {
-    { EMPTY, EMPTY, EMPTY },
-    { EMPTY, EMPTY, EMPTY },
-    { EMPTY, EMPTY, EMPTY }
-  };
-  private short nextPlayer = CIRCLE;
-
-  public void resetModel() {
-    for (int i = 0; i < 3; i++) {
-      for (int j = 0; j < 3; j++) {
-        model[i][j] = EMPTY;
-      }
+    fun changeNextPlayer() {
+        nextPlayer = if (nextPlayer == CIRCLE) CROSS else CIRCLE
     }
-    nextPlayer = CIRCLE;
-  }
 
-  public short getFieldContent(int x, int y) {
-    return model[x][y];
-  }
-
-  public short setFieldContent(int x, int y, short content) {
-    changeNextPlayer();
-    return model[x][y] = content;
-  }
-
-  public short getNextPlayer() {
-    return nextPlayer;
-  }
-
-  public void changeNextPlayer() {
-    nextPlayer = (nextPlayer == CIRCLE) ? CROSS : CIRCLE;
-  }
+    fun setFieldContent(x: Int, y: Int, content: Short): Short {
+        changeNextPlayer()
+        model[x][y] = content
+        return content
+    }
 }
 ```
 
@@ -289,25 +300,17 @@ segítségével tudunk megtenni - beszéljék meg a laborvezetővel az
 Valósítsuk meg ezen két gomb eseménykezelőjét szintén a
 *MainMenuActivity onCreate()* függvényében:
 
-```java
-Button btnStart = (Button) findViewById(R.id.btnStart);
-btnStart.setOnClickListener(new View.OnClickListener() {
-  @Override
-  public void onClick(View view) {
-    TicTacToeModel.getInstance().resetModel(); // modell törlése új játék indításakor
-    Intent i = new Intent(MainMenuActivity.this, GameActivity.class);
-    startActivity(i);
-  }
-});
+```kotlin
+val btnStart = findViewById<Button>(R.id.button_start)
+btnStart.setOnClickListener {
+	TicTacToeModel.resetModel()
+	startActivity(Intent(this, GameActivity::class.java))
+}
 
-Button btnAbout = (Button) findViewById(R.id.btnAbout);
-btnAbout.setOnClickListener(new View.OnClickListener() {
-  @Override
-  public void onClick(View view) {
-    Intent i = new Intent(MainMenuActivity.this, AboutActivity.class);
-    startActivity(i);
-  }
-});
+val btnAbout = findViewById<Button>(R.id.button_about)
+btnAbout.setOnClickListener{
+	startActivity(Intent(this, AboutActivity::class.java))
+}
 ```
 
 ## Játéktér kirajzolása
@@ -319,163 +322,159 @@ Első lépésként hozzunk létre egy *view* package-t a meglévő package
 hierarchia alá, majd abban egy *TicTacToeView* osztály, mely a
 *View*-ból származik le az alábbi vázzal:
 
-```java
-public class TicTacToeView extends View {
+```kotlin
+class TicTacToeView : View {
 
-  Paint paintBg;
-  Paint paintLine;
+    private val paintBg = Paint()
+    private val paintLine = Paint()
 
-  public TicTacToeView(Context context, AttributeSet attrs) {
-    super(context, attrs);
+    constructor(context: Context?) : super(context)
+    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
 
-    paintBg = new Paint();
-    paintBg.setColor(Color.BLACK);
-    paintBg.setStyle(Paint.Style.FILL);
+    init {
+        paintBg.color = Color.BLACK
+        paintBg.style = Paint.Style.FILL
 
-    paintLine = new Paint();
-    paintLine.setColor(Color.WHITE);
-    paintLine.setStyle(Paint.Style.STROKE);
-    paintLine.setStrokeWidth(5);
-  }
-
-  @Override
-  protected void onDraw(Canvas canvas) {
-    super.onDraw(canvas);
-
-    canvas.drawRect(0, 0, getWidth(), getHeight(), paintBg);
-
-    drawGameArea(canvas);
-
-    drawPlayers(canvas);
-  }
-
-  private void drawGameArea(Canvas canvas) {
-    // TODO
-  }
-
-  private void drawPlayers(Canvas canvas) {
-    // TODO
-  }
-
-  @Override
-  protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-    int w = MeasureSpec.getSize(widthMeasureSpec);
-    int h = MeasureSpec.getSize(heightMeasureSpec);
-    int d = w == 0 ? h : h == 0 ? w : w < h ? w : h;
-    setMeasuredDimension(d, d);
-  }
-
-  @Override
-  public boolean onTouchEvent(MotionEvent event) {
-
-    if (event.getAction() == MotionEvent.ACTION_DOWN) {
-      // TODO
+        paintLine.color = Color.WHITE
+        paintLine.style = Paint.Style.STROKE
+        paintLine.strokeWidth = 5F
     }
 
-    return super.onTouchEvent(event);
-  }
+    override fun onDraw(canvas: Canvas?) {
+        super.onDraw(canvas)
+        if (canvas == null) return
+        canvas.drawRect(0F, 0F, width.toFloat(), height.toFloat(), paintBg)
+
+        drawGameArea(canvas)
+        drawPlayers(canvas)
+    }
+
+    fun drawGameArea(canvas: Canvas) {
+        //TODO
+    }
+
+    fun drawPlayers(canvas: Canvas) {
+        //TODO
+    }
+
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        val w = MeasureSpec.getSize(widthMeasureSpec)
+        val h = MeasureSpec.getSize(heightMeasureSpec)
+        val d = when {
+            w == 0 -> h
+            h == 0 -> w
+            else -> min(w,h)
+        }
+        setMeasuredDimension(d, d)
+    }
+
+    override fun onTouchEvent(event: MotionEvent?): Boolean {
+        if (event == null) return super.onTouchEvent(event)
+
+        if (event.action == MotionEvent.ACTION_DOWN) {
+            //TODO
+        }
+
+        return super.onTouchEvent(event)
+    }
 }
 ```
 
 > ### __Vizsgálja meg a kódrészt a laborvezető segítségével.__
 >
-Látható, hogy az osztály egy nézet rajzolásáért felelős. A
-konstruktorban létrehozunk két *Paint* objektumot, melyek a háttér,
-illetve a pályaelemek rajzolásához lesznek használva. Fontos, hogy
-ezeket a konstruktorban hozzuk létre és ne például az *onDraw()*-ban,
+Látható, hogy az osztály egy nézet rajzolásáért felelős. Létrehozunk két *Paint* objektumot, melyek a háttér,
+illetve a pályaelemek rajzolásához lesznek használva. A konstruktorok mint látjuk gyakorlatilag csak egy super() hívást valósítanak meg, mivel az init block végzi ebben a megvalósításban a különböző elemek inicializálását. Fontos, hogy objektumokat ne az *onDraw()*-ban hozzuk létre,
 hiszen az *onDraw()* gyakran meghívódik és sokszor hozná létre
-feleslegesen az objektumokat, lassítva ezzel a működést és megnehezítve
+feleslegesen őket, lassítva ezzel a működést és megnehezítve
 a *garbage collector* dolgát.
 
-Az osztály egyik leglényegesebb függvénye, az *onDraw(Canvas canvas)*,
+Az osztály egyik leglényegesebb függvénye, az *override fun onDraw(canvas: Canvas?)*,
 mely a kapott *canvas* objektumra rajzolja ki a nézet tartalmát. A
 jelenlegi implementáció feketére festi a területet és meghívja a
 játéktér kirajzolásért (négyzetrács) és a játékosok (X és O)
 kirajzolásáért felelős – egyelőre még üres – függvényeket.
 
-Az *onMeasure()* függvény felüldefiniálásával biztosítható, hogy a nézet
-mindig négyzetes formában jelenjen meg (ugyanakkora legyen a szélessége,
+Az *override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int)* függvény felüldefiniálásával biztosítható, hogy a nézet mindig négyzetes formában jelenjen meg (ugyanakkora legyen a szélessége,
 mint a magassága).
 
-Végül az *onTouchEvent()* függvényben tudjuk kezelni az érintés
+Végül az *override fun onTouchEvent(event: MotionEvent?)* függvényben tudjuk kezelni az érintés
 eseményeket. Jelenleg az *ACTION_DOWN* eseményt vizsgáljuk, de más
 érintés események is elkaphatóak itt.
 
 Ahhoz, hogy a *GameActivity* ezt a játékteret megjelenítse, módosítsuk a
 hozzá tartozó layout fájlt (*res/layout/content_game.xml*). A felület
-egy szürkés hátterű *RelativeLayout* közepén jelenítse meg a
+egy szürkés hátterű *ConstraintLayout* közepén jelenítse meg a
 *TicTacToeView* nézetünket:
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/content_game"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#888888"
-    android:gravity="center_vertical">
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	app:layout_behavior="@string/appbar_scrolling_view_behavior"
+	tools:context=".GameActivity"
+	android:background="#888888"
+	tools:showIn="@layout/activity_game">
 
-    <hu.bme.aut.amorg.examples.tictactoe.view.TicTacToeView
-        android:id="@+id/ticView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-</RelativeLayout>
+	<hu.bme.aut.android.tictactoe.view.TicTacToeView
+		android:id="@+id/ticTacToeView"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_marginBottom="8dp"
+		android:layout_marginEnd="8dp"
+		android:layout_marginStart="8dp"
+		android:layout_marginTop="8dp"
+		app:layout_constraintBottom_toBottomOf="parent"
+		app:layout_constraintEnd_toEndOf="parent"
+		app:layout_constraintStart_toStartOf="parent"
+		app:layout_constraintTop_toTopOf="parent"
+		app:layout_constraintVertical_bias="0.495" />
+</android.support.constraint.ConstraintLayout>
 ```
 
 Következő lépésként valósítsuk meg a játéktér kirajzolását a
-*drawGameArea()* függvényben, azaz rajzoljuk meg a vízszintes és
+*fun drawGameArea(canvas: Canvas)* függvényben, azaz rajzoljuk meg a vízszintes és
 függőleges vonalakat:
 
-```java
-private void drawGameArea(Canvas canvas) {
-  // border
-  canvas.drawRect(0, 0, getWidth(), getHeight(), paintLine);
-  
-  // two horizontal lines
-  canvas.drawLine(0, getHeight() / 3, getWidth(), getHeight() / 3,
-    paintLine);
-  canvas.drawLine(0, 2 * getHeight() / 3, getWidth(),
-    2 * getHeight() / 3, paintLine);
+```kotlin
+private fun drawGameArea(canvas: Canvas) {
+	// border
+	canvas.drawRect(0F, 0F, width.toFloat(), height.toFloat(), paintLine)
 
-  // two vertical lines
-  canvas.drawLine(getWidth() / 3, 0, getWidth() / 3, getHeight(),
-    paintLine);
-  canvas.drawLine(2 * getWidth() / 3, 0, 2 * getWidth() / 3, getHeight(),
-    paintLine);
+	// two horizontal lines
+	canvas.drawLine(0F, height.toFloat() / 3, width.toFloat(), width.toFloat() / 3, paintLine)
+	canvas.drawLine(0F, 2 * height.toFloat() / 3, width.toFloat(), 2 * height.toFloat() / 3, paintLine)
+
+	// two vertical lines
+	canvas.drawLine(width.toFloat() / 3, 0F, width.toFloat() / 3, height.toFloat(), paintLine)
+	canvas.drawLine(2 * width.toFloat() / 3, 0F, 2 * width.toFloat() / 3, height.toFloat(), paintLine)
 }
 ```
 
 Ezt követően valósítsuk meg a modell alapján a játéktérbe az X-ek és O-k
-kirajzolását az *drawPlayers(…)* függvényben. A megvalósítás során
+kirajzolását az *fun drawPlayers(canvas: Canvas)* függvényben. A megvalósítás során
 végigmegyünk a játéktér mátrixon és a benne található értékek szerint
 O-t vagy X-et rajzolunk az adott mezőbe:
 
-```java
-private void drawPlayers(Canvas canvas) {
-  for (int i = 0; i < 3; i++) {
-    for (int j = 0; j < 3; j++) {
-      if (TicTacToeModel.getInstance().getFieldContent(i,j) == TicTacToeModel.CIRCLE) {
-
+```kotlin
+private fun drawPlayers(canvas: Canvas) {
         // draw a circle at the center of the field
-
         // X coordinate: left side of the square + half width of the square
-        float centerX = i * getWidth() / 3 + getWidth() / 6;
-        float centerY = j * getHeight() / 3 + getHeight() / 6;
-        int radius = getHeight() / 6 - 2;
-
-        canvas.drawCircle(centerX, centerY, radius, paintLine);
-
-      } else if (TicTacToeModel.getInstance().getFieldContent(i,j) == TicTacToeModel.CROSS) {
-        canvas.drawLine(i * getWidth() / 3, j * getHeight() / 3,
-          (i + 1) * getWidth() / 3,
-          (j + 1) * getHeight() / 3, paintLine);
-
-        canvas.drawLine((i + 1) * getWidth() / 3, j * getHeight() / 3,
-          i * getWidth() / 3, (j + 1) * getHeight() / 3, paintLine);
-      }
-    }
-  }
+        for (i in 0 until 3) {
+            for (j in 0 until 3) {
+                if (TicTacToeModel.getFieldContent(i, j) == TicTacToeModel.CIRCLE) {
+                    val centerX = i * width / 3 + width / 6
+                    val centerY = j * height / 3 + height / 6
+                    val radius = height / 6 - 2
+                    canvas.drawCircle(centerX.toFloat(), centerY.toFloat(), radius.toFloat(), paintLine)
+                } else if (TicTacToeModel.getFieldContent(i, j) == TicTacToeModel.CROSS) {
+                    canvas.drawLine((i * width / 3).toFloat(), (j * height / 3).toFloat(), ((i + 1) * width / 3).toFloat(), 						((j + 1) * height / 3).toFloat(), paintLine)
+                    canvas.drawLine(((i + 1) * width / 3).toFloat(), (j * height / 3).toFloat(), (i * width / 3).toFloat(), 						((j + 1) * height / 3).toFloat(), paintLine)
+                }
+            }
+        }
 }
 ```
 
@@ -485,18 +484,20 @@ a modell *nextPlayer* változója reprezentál.
 > **A modell frissítése után az újrarajzolást az *invalidate()* függvény
 > meghívásával tudjuk elérni.**
 
-```java
-@Override
-public boolean onTouchEvent(MotionEvent event) {
-    if (event.getAction() == MotionEvent.ACTION_DOWN) {
-        int tX = ((int) event.getX()) / (getWidth() / 3);
-        int tY = ((int) event.getY()) / (getHeight() / 3);
-        if (tX < 3 && tY < 3 && TicTacToeModel.getInstance().getFieldContent(tX, tY) == TicTacToeModel.EMPTY) {
-            TicTacToeModel.getInstance().setFieldContent(tX, tY, TicTacToeModel.getInstance().getNextPlayer());
-            invalidate();
+```kotlin
+override fun onTouchEvent(event: MotionEvent?): Boolean {
+        if (event == null) return super.onTouchEvent(event)
+
+        if (event.action == MotionEvent.ACTION_DOWN) {
+            val tX : Int = (event.x / (width / 3)).toInt()
+            val tY:Int = (event.y / (height / 3)).toInt()
+            if(tX < 3 && tY < 3 && TicTacToeModel.getFieldContent(tX, tY) == TicTacToeModel.EMPTY){
+                TicTacToeModel.setFieldContent(tX,tY, TicTacToeModel.nextPlayer)
+                invalidate()
+            }
         }
-    }
-    return super.onTouchEvent(event);
+
+        return super.onTouchEvent(event)
 }
 ```
 
