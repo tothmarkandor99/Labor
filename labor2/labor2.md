@@ -24,13 +24,150 @@ A Company Domain mező tartalmát töröljük ki és hagyjuk is üresen.
 
 A packagename legyen **hu.bme.aut.amorg.examples.viewlabor**
 
-A támogatott céleszközök a **Telefon és Tablet**, valamint a minimum SDK szint a **API15: Android 4.0.3**
+A támogatott céleszközök a **Telefon és Tablet**, valamint a minimum SDK szint a **API19: Android 4.4**
 
 A kezdő projekthez adjuk hozzá egy **Empty Activity**-t, melynek neve legyen **ViewLaborActivity**.
 
 A legenerált projektből töröljük ki a teszteket (ezekre most nem lesz szükség).
 
-A következő lépésben módosítsuk a az activity elrendezését (_activity_view_labor.xml_).
+## Material Palette
+
+URL: [https://www.materialpalette.com/](https://www.materialpalette.com/)
+
+A honlap segítségével saját Material színsémát generálhatunk az alkalmazásunkhoz, ahol két kiválasztott szín segítségével a Meterial színpalettáról állítja össze a holnap az alkalmazásunk szín világát.
+
+Nyissuk meg a honlapot, majd az alábbi beállításokkal generáljunk témát:
+
+1.  Elsődleges színnek válasszuk ki a **Green**-t
+2.  Másodlagos színnek pedig a **Light-Green**-t
+3.  Majd a **Download**-ot kiválasztva …
+4.  … **XML** formátumban töltsük is le.
+5.  A kapott file tartalmát másoljuk a **colors.xml**-be.
+
+Az alkalmazásunkban használt stílusokat pedig a _styles.xml_ állományban definiáljuk.
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<!-- Base application theme. -->
+	<style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+		<!-- Customize your theme here. -->
+		<item name="colorPrimary">@color/primary</item>
+		<item name="colorPrimaryDark">@color/primary_dark</item>
+		<item name="colorAccent">@color/accent</item>
+		<item name="android:textViewStyle">@style/TextView</item>
+	</style>
+
+	<style name="TextView" parent="android:Widget.TextView">
+		<item name="android:textColor">@color/primary</item>
+	</style>
+
+	<style name="Subtitle">
+		<item name="android:textSize">20sp</item>
+		<item name="android:paddingTop">16dp</item>
+		<item name="android:paddingBottom">16dp</item>
+	</style>
+
+</resources>
+```
+
+Az AndroidManifest állományt megnézve látható, hogy az alkalmazásunk alapértelmezett témája az AppTheme. Így amit ebben a stílusban definiálunk, az alapértelmezett lesz az alkalmazásunkat tekintve. Az android:textViewStyle definiálja, hogy hogy néz ki az adott alkalmazásban az alapértelmezett TextView egy felüldefiniált stílus segítségével. Ezeknek a felüldefiniált stílusoknak minden esetben a beépített stílusból kell leszármaznia, jelen esetünkben a saját TextView stílusunknak az android:Widget.TextView stílusból. Itt felüldefiniáljuk a textColor attribútumot, aminek hatására minden TextView alapértelmezett betűszíne megváltozik az ott megadottra.
+
+```xml
+<item name="android:textColor">@color/accent</item>
+<item name="android:textColorPrimary">@color/accent</item>
+<item name="android:textColorSecondary">@color/accent</item>
+```
+
+## Saját View létrehozása
+
+A következő lépés az egyedi nézetek létrehozása.
+
+### Egyedi jelszó nézet
+
+Elsőként az egyedi jelszó nézetet valósítjuk meg. Ez a nézet egy beviteli mezőből áll és egy képből, amelyre rákattintva a jelszó mező megmutatja, hogy mit gépeltünk a mezőbe.
+
+Hozzunk létre egy *view* package-et és azon belül egy *PasswordEditText* osztályt, melynek a kódja az alábbi:
+
+```kotlin
+class PasswordEditText : RelativeLayout {
+
+    private val passwordEditText by lazy { findViewById<EditText>(R.id.passwordET) }
+    private val eyeImageView by lazy { findViewById<ImageView>(R.id.passwordIV) }
+
+    constructor(context: Context) : super(context)
+    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
+    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
+
+    init {
+        LayoutInflater.from(context).inflate(R.layout.view_password_edittext, this, true)
+        eyeImageView.setOnTouchListener { view, motionEvent ->
+            if (motionEvent.action == MotionEvent.ACTION_DOWN) {
+                setTransformationMethod(null)
+                return@setOnTouchListener true
+            } else if (motionEvent.action == MotionEvent.ACTION_UP || motionEvent.action == MotionEvent.ACTION_CANCEL) {
+                setTransformationMethod(PasswordTransformationMethod.getInstance())
+                return@setOnTouchListener true
+            }
+            return@setOnTouchListener false
+        }
+
+        setTransformationMethod(PasswordTransformationMethod.getInstance())
+    }
+
+    private fun setTransformationMethod(method: TransformationMethod?) {
+        val ss = passwordEditText.selectionStart
+        val se = passwordEditText.selectionEnd
+        passwordEditText.transformationMethod = method
+        passwordEditText.setSelection(ss, se)
+    }
+
+    fun getText(): Editable? {
+        return passwordEditText.text
+    }
+
+    fun setError(str: CharSequence) {
+        passwordEditText.error = str
+    }
+
+    fun setText(text: CharSequence) {
+        passwordEditText.setText(text)
+    }
+
+    override fun getWindowToken(): IBinder? {
+        return passwordEditText.windowToken
+    }
+}
+```
+
+Az osztály a RelativeLayout-ból származik. A RelativeLayout elemei pedig egy EditText és egy ImageView lenne úgy, hogy az ImageView-t jobbra rendezzük és az EditText kitölti bal oldalt a rendelkezésre álló helyet. Ahhoz, hogy egy felüldefiniált ViewGroup-ból származó osztálynak kódból meg tudjuk adni az elrendezését szükségünk van egy úgynevezett merge_layout-ra. Ezt a layout-ot a LayoutInflater.from(context).inflate(R.layout.view_password_edittext, this, true); kóddal tudjuk a RelativeLayout-ba felfújni, aminek hatására a RelativeLayout-nak lesz két gyerek nézete, egy ImageView és egy EditText.
+
+Az elrendezéshez hozzunk létre egy _view_password_edittext.xml_ layout erőforrást és a tartalma legyen az alábbi kód:
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+
+	<ImageView
+		android:id="@+id/passwordIV"
+		android:layout_alignParentRight="true"
+		android:layout_width="50dp"
+		android:layout_height="50dp"
+		android:layout_centerVertical="true"
+		android:src="@android:drawable/ic_menu_view"/>
+
+	<EditText
+		android:id="@+id/passwordET"
+		android:layout_alignParentLeft="true"
+		android:layout_toLeftOf="@+id/passwordIV"
+		android:layout_centerVertical="true"
+		android:layout_width="0dp"
+		android:layout_height="wrap_content"/>
+
+</merge>
+```
+
+A következő lépésben módosítsuk az activity elrendezését (_activity_view_labor.xml_), a gyorsaság kedvéért most nem használunk ConstraintLayout-ot, csak az alábbi XML-t.
 
 ```XML
 <ScrollView
@@ -83,176 +220,12 @@ A következő lépésben módosítsuk a az activity elrendezését (_activity_vi
 
 Ha az ebben szereplő *dimen* erőforrások hiányoznak, rajtuk **Alt+Enter**-t nyomva hozzuk létre őket, értékük legyen 16dp.
 
-## Material Palette
-
-URL: [https://www.materialpalette.com/](https://www.materialpalette.com/)
-
-A honlap segítségével saját Material színsémát generálhatunk az alkalmazásunkhoz, ahol két kiválasztott szín segítségével a Meterial színpalettáról állítja össze a holnap az alkalmazásunk szín világát.
-
-Nyissuk meg a honlapot, majd az alábbi beállításokkal generáljunk témát:
-
-1.  Elsődleges színnek válasszuk ki a **Green**-t
-2.  Másodlagos színnek pedig a **Light-Green**-t
-3.  Majd a **Download**-ot kiválasztva …
-4.  … **XML** formátumban töltsük is le.
-5.  A kapott file tartalmát másoljuk a **colors.xml**-be.
-
-Az alkalmazásunkban használt stílusokat pedig a _styles.xml_ állományban definiáljuk.
-
-```xml
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-	<!-- Base application theme. -->
-	<style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-		<!-- Customize your theme here. -->
-		<item name="colorPrimary">@color/primary</item>
-		<item name="colorPrimaryDark">@color/primary_dark</item>
-		<item name="colorAccent">@color/accent</item>
-		<item name="android:textViewStyle">@style/TextView</item>
-	</style>
-
-	<style name="TextView" parent="android:Widget.TextView">
-		<item name="android:textColor">@color/primary</item>
-	</style>
-
-	<style name="Subtitle">
-		<item name="android:textSize">20sp</item>
-		<item name="android:paddingTop">16dp</item>
-		<item name="android:paddingBottom">16dp</item>
-	</style>
-
-</resources>
-```
-
-Az AndroidManifest állományt megnézve látható, hogy az alkalmazásunk alapértelmezett témája az AppTheme. Így amit ebben a stílusban definiálunk, az alapértelmezett lesz az alkalmazásunkat tekintve. Az android:textViewStyle definiálja, hogy hogy néz ki az adott alkalmazásban az alapértelmezett TextView egy felüldefiniált stílus segítségével. Ezeknek a felüldefiniált stílusoknak minden esetben a beépített stílusból kell leszármaznia, jelen esetünkben a saját TextView stílusunknak az android:Widget.TextView stílusból. Itt felüldefiniáljuk a textColor attribútumot, aminek hatására minden TextView alapértelmezett betűszíne megváltozik az ott megadottra.
-
-Figyeljük meg hogy az editText is követi a beállított értékeket (Kiválasztott esetben az téma **accent** színét). Adjuk hozzá az AppTheme-hez a következőket, és figyeljük meg hogy megváltozott az EditText szöveg színe.
-
-```xml
-<item name="android:textColor">@color/accent</item>
-<item name="android:textColorPrimary">@color/accent</item>
-<item name="android:textColorSecondary">@color/accent</item>
-```
-
-## Saját View létrehozása
-
-A következő lépés az egyedi nézetek létrehozása.
-
-### Egyedi jelszó nézet
-
-Elsőként az egyedi jelszó nézetet valósítjuk meg. Ez a nézet egy beviteli mezőből áll és egy képből, amelyre rákattintva a jelszó mező megmutatja, hogy mit gépeltünk a mezőbe.
-
-Hozzunk létre egy PasswordEditText osztályt, melynek a kódja az alábbi:
-
-```java
-public class PasswordEditText extends RelativeLayout {
-
-	protected EditText passwordEditText;
-	protected ImageView eyeImageView;
-
-	public PasswordEditText(Context context) {
-		super(context);
-		init(context);
-	}
-
-	public PasswordEditText(Context context, AttributeSet attrs) {
-		super(context, attrs);
-		init(context);
-	}
-
-	public PasswordEditText(Context context, AttributeSet attrs, int defStyle) {
-		super(context, attrs, defStyle);
-		init(context);
-	}
-
-	private void init(Context context) {
-		LayoutInflater.from(context).inflate(R.layout.view_password_edittext, this, true);
-
-		passwordEditText = (EditText) findViewById(R.id.passwordET);
-		eyeImageView = (ImageView) findViewById(R.id.passwordIV);
-
-		eyeImageView.setOnTouchListener(new OnTouchListener() {
-
-			@Override
-			public boolean onTouch(View v, MotionEvent event) {
-				if (event.getAction() == MotionEvent.ACTION_DOWN) {
-					setTransformationMethod(null);
-					return true;
-				} else if (event.getAction() == MotionEvent.ACTION_UP || event.getAction() == MotionEvent.ACTION_CANCEL) {
-					setTransformationMethod(PasswordTransformationMethod.getInstance());
-					return true;
-				}
-				return false;
-			}
-		});
-
-		setTransformationMethod(PasswordTransformationMethod.getInstance());
-	}
-
-	private void setTransformationMethod(TransformationMethod method) {
-		int ss = passwordEditText.getSelectionStart();
-		int se = passwordEditText.getSelectionEnd();
-		passwordEditText.setTransformationMethod(method);
-		passwordEditText.setSelection(ss, se);
-	}
-
-	public Editable getText() {
-		if(passwordEditText != null)
-			return passwordEditText.getText();
-		else
-			return null;
-	}
-
-	public void setError(CharSequence str) {
-		passwordEditText.setError(str);
-	}
-
-	public void setText(CharSequence text) {
-		passwordEditText.setText(text);
-	}
-
-	public IBinder getWindowToken() {
-       if (passwordEditText != null) {
-	        return passwordEditText.getWindowToken();
-       }
-       return null;
-	}
-}
-```
-
-Az osztály a RelativeLayout-ból származik. A RelativeLayout elemei pedig egy EditText és egy ImageView lenne úgy, hogy az ImageView-t jobbra rendezzük és az EditText kitölti bal oldalt a rendelkezésre álló helyet. Ahhoz, hogy egy felüldefiniált ViewGroup-ból származó osztálynak kódból meg tudjuk adni az elrendezését szükségünk van egy úgynevezett merge_layout-ra. Ezt a layout-ot a LayoutInflater.from(context).inflate(R.layout.view_password_edittext, this, true); kóddal tudjuk a RelativeLayout-ba felfújni, aminek hatására a RelativeLayout-nak lesz két gyerek nézete, egy ImageView és egy EditText.
-
-Az elrendezéshez hozzunk létre egy _view_password_edittext.xml_ layout erőforrást és a tartalma legyen az alábbi kód:
-
-```xml
-<?xml version="1.0" encoding="utf-8"?>
-<merge xmlns:android="http://schemas.android.com/apk/res/android">
-
-	<ImageView
-		android:id="@+id/passwordIV"
-		android:layout_alignParentRight="true"
-		android:layout_width="50dp"
-		android:layout_height="50dp"
-		android:layout_centerVertical="true"
-		android:src="@android:drawable/ic_menu_view"/>
-
-	<EditText
-		android:id="@+id/passwordET"
-		android:layout_alignParentLeft="true"
-		android:layout_toLeftOf="@+id/passwordIV"
-		android:layout_centerVertical="true"
-		android:layout_width="0dp"
-		android:layout_height="wrap_content"/>
-
-</merge>
-```
-
 A laborvezetővel tekintsék át az ImageView és az EditText elhelyezését a RelativeLayout-on belül.
 
-A java osztály fontosabb függvényei:
+A Kotlin osztály fontosabb függvényei:
 
 *   Konstruktorok: ezek szükségesek az ősosztály megfelelő inicializálásához
-*   init: a saját nézetünket inicializálja. Megkeresi az EditText-et és az ImageView-t, valamint beállítja az onClickListener-t az ImageView-hoz.
+*   init: a saját nézetünket inicializálja. "Felfújja" a view-kat valamint beállítja az onTouchListenert-t az ImageView-hoz.
 *   setTransformationMethod: átállítja az EditText-hez tartozó szöveg transzformációt, valamint elmenti és visszatölti a kijelölést.
 *   getText, setError, setText, getWindowToken: az EditText függvényei, melyet kiajánlunk a saját, RelativeLayout-ból származó osztályunkon kívülre.
 
