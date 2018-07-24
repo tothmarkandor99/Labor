@@ -83,6 +83,61 @@ Az AndroidManifest állományt megnézve látható, hogy az alkalmazásunk alap�
 
 A következő lépés az egyedi nézetek létrehozása.
 
+### Kiinduló elrendezés létrehozása
+
+Módosítsuk az activity elrendezését (_activity_view_labor.xml_), használjuk az alábbi XML-t.
+
+```XML
+<ScrollView
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent">
+
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:paddingLeft="@dimen/activity_horizontal_margin"
+		android:paddingRight="@dimen/activity_horizontal_margin"
+		android:paddingTop="@dimen/activity_vertical_margin"
+		android:paddingBottom="@dimen/activity_vertical_margin"
+		android:orientation="vertical">
+
+		<TextView
+			style="@style/Subtitle"
+			android:text="Regisztráció"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"/>
+
+		<EditText
+			android:hint="Felhasználónév"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"/>
+
+		<!-- Ide jön majd a saját jelszó nézet -->
+
+		<TextView
+			style="@style/Subtitle"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:text="Nem"/>
+
+		<!-- Ide jön single ChoiceLayout -->
+
+		<TextView
+			style="@style/Subtitle"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:text="Válassz max 3-at"/>
+
+		<!-- Ide jön multiple ChoiceLayout -->
+
+	</LinearLayout>
+</ScrollView>
+```
+
+Ha az ebben szereplő *dimen* erőforrások hiányoznak, rajtuk **Alt+Enter**-t nyomva hozzuk létre őket, értékük legyen 16dp.
+
 ### Egyedi jelszó nézet
 
 Elsőként az egyedi jelszó nézetet valósítjuk meg. Ez a nézet egy beviteli mezőből áll és egy képből, amelyre rákattintva a jelszó mező megmutatja, hogy mit gépeltünk a mezőbe.
@@ -167,59 +222,6 @@ Az elrendezéshez hozzunk létre egy _view_password_edittext.xml_ layout erőfor
 </merge>
 ```
 
-A következő lépésben módosítsuk az activity elrendezését (_activity_view_labor.xml_), a gyorsaság kedvéért most nem használunk ConstraintLayout-ot, csak az alábbi XML-t.
-
-```XML
-<ScrollView
-	xmlns:android="http://schemas.android.com/apk/res/android"
-	xmlns:tools="http://schemas.android.com/tools"
-	android:layout_width="match_parent"
-	android:layout_height="match_parent">
-
-	<LinearLayout
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:paddingLeft="@dimen/activity_horizontal_margin"
-		android:paddingRight="@dimen/activity_horizontal_margin"
-		android:paddingTop="@dimen/activity_vertical_margin"
-		android:paddingBottom="@dimen/activity_vertical_margin"
-		android:orientation="vertical">
-
-		<TextView
-			style="@style/Subtitle"
-			android:text="Regisztráció"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"/>
-
-		<EditText
-			android:hint="Felhasználónév"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"/>
-
-		<!-- Ide jön majd a saját jelszó nézet -->
-
-		<TextView
-			style="@style/Subtitle"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:text="Nem"/>
-
-		<!-- Ide jön single ChoiceLayout -->
-
-		<TextView
-			style="@style/Subtitle"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:text="Válassz max 3-at"/>
-
-		<!-- Ide jön multiple ChoiceLayout -->
-
-	</LinearLayout>
-</ScrollView>
-```
-
-Ha az ebben szereplő *dimen* erőforrások hiányoznak, rajtuk **Alt+Enter**-t nyomva hozzuk létre őket, értékük legyen 16dp.
-
 A laborvezetővel tekintsék át az ImageView és az EditText elhelyezését a RelativeLayout-on belül.
 
 A Kotlin osztály fontosabb függvényei:
@@ -240,8 +242,8 @@ A használathoz az alábbi kódot adjuk hozzá az _activity_view_labor.xml_ elre
 
 Ezután az Activity-ből az alábbi kóddal érhetjük el a saját osztályunkat:
 
-```java
-PasswordEditText passwordEditText = (PasswordEditText) findViewById(R.id.registrationPET);
+```kotlin
+val passwordEditText = findViewById<PasswordEditText>(R.id.registrationPET)
 ```
 
 ### ChoiceLayout
@@ -272,9 +274,9 @@ Hozzunk létre a drawable mappában egy _selector_choice_item.xml_ fájlt, majd 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android" android:enterFadeDuration="100" android:exitFadeDuration="100">
-	<item android:drawable="@color/choiceItemPressedBackground" android:state_pressed="true"/>
-	<item android:drawable="@color/choiceItemActiveBackground" android:state_selected="true"/>
-	<item android:drawable="@color/choiceItemBackground"/>
+	<item android:drawable="@color/choiceItemPressedBackground" android:state_pressed="true" />
+	<item android:drawable="@color/choiceItemActiveBackground" android:state_selected="true" />
+	<item android:drawable="@color/choiceItemBackground" />
 </selector>
 ```
 Szükséges stílus hozzáadása a _styles.xml_ fájlhoz:
@@ -293,7 +295,7 @@ Ez a stílus a selector-t használja háttérként, tehát az a View, amely ezt 
 
 #### Osztály létrehozása
 
-Kezdetben a dividerType attribútumot a Java osztályban kihagyjuk és csak a multiple attribútumot implementáljuk.
+Kezdetben a dividerType attribútumot a Kotlin osztályban kihagyjuk és csak a multiple attribútumot implementáljuk.
 
 Attribútumok (hozzuk létre az _attrs.xml_ fájlt):
 
@@ -306,101 +308,82 @@ Attribútumok (hozzuk létre az _attrs.xml_ fájlt):
 </resources>
 ```
 
-Java kód:
+Kotlin kód:
 
-```java
-public class ChoiceLayout extends LinearLayout {
+```kotlin
+class ChoiceLayout : LinearLayout {
 
-	int multiple = 1;
+    var multiple: Int = 1
 
-	public ChoiceLayout(Context context) {
-		super(context);
-		initLayout(context, null);
-	}
+    constructor(context: Context) : super(context, null)
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
+        init(context, attrs)
+    }
 
-	public ChoiceLayout(Context context, AttributeSet attrs) {
-		super(context, attrs);
-		initLayout(context, attrs);
-	}
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
+        init(context, attrs, defStyleAttr)
+    }
 
-	public ChoiceLayout(Context context, AttributeSet attrs, int defStyle) {
-		super(context, attrs, defStyle);
-		initLayout(context, attrs);
-	}
+    private fun init(context: Context, attrs: AttributeSet?, defStyleAttr: Int = 0) {
+        orientation = LinearLayout.VERTICAL
+        attrs ?: return
 
-	protected void initLayout(Context context, AttributeSet attrs) {
-		setOrientation(LinearLayout.VERTICAL);
-		if (attrs != null) {
-			TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.ChoiceLayout);
-			try {
-				multiple = a.getInt(R.styleable.ChoiceLayout_multiple, 1);
-			} finally {
-				a.recycle();
-			}
+        val a = context.obtainStyledAttributes(attrs, R.styleable.ChoiceLayout)
+        try {
+            multiple = a.getInt(R.styleable.ChoiceLayout_multiple, 1)
+        } finally {
+            a.recycle()
+        }
+    }
+
+    override fun addView(child: View?) {
+        super.addView(child)
+        refreshAfterAdd(child)
+    }
+
+    override fun addView(child: View?, params: ViewGroup.LayoutParams?) {
+        super.addView(child, params)
+        refreshAfterAdd(child)
+    }
+
+    private fun getSelectedCount(): Int {
+		var selectedCount = 0
+		for (i in 0 until childCount) {
+			if (getChildAt(i).isSelected) selectedCount++
 		}
-		Log.d("ChoiceLayout", "multiple: " + multiple);
+		return selectedCount
 	}
 
-	@Override
-	public void addView(View child) {
-		super.addView(child);
-		refreshAfterAdd(child);
-	}
-
-	@Override
-	public void addView(View child, android.view.ViewGroup.LayoutParams params) {
-		super.addView(child, params);
-		refreshAfterAdd(child);
-	}
-
-	private void refreshAfterAdd(final View newChild) {
-		newChild.setClickable(true);
-		newChild.setOnClickListener(choiceOnClickListener);
-	}
-
-	private int getSelectedCount() {
-		int selectedCnt = 0;
-		int count = getChildCount();
-		for (int i = 0; i < count; i++) {
-			if (getChildAt(i).isSelected()) {
-				selectedCnt++;
-			}
-		}
-		return selectedCnt;
-	}
-
-	private OnClickListener choiceOnClickListener = new OnClickListener() {
-		@Override
-		public void onClick(View view) {
-			if(multiple > 1) {
-				if (view.isSelected() || getSelectedCount() < multiple) {
-					view.setSelected(!view.isSelected());
-				}
-			} else {
-				int count = getChildCount();
-				for (int i = 0; i < count; i++) {
-					View v = getChildAt(i);
-					v.setSelected(v == view);
-				}
-			}
-		}
-	};
+    private fun refreshAfterAdd(child: View?) {
+        child?.isClickable = true
+        child?.setOnClickListener {
+            if (multiple > 1) {
+                if (it.isSelected || getSelectedCount() < multiple) {
+                    it.isSelected = !it.isSelected
+                }
+            } else {
+                for (i in 0 until childCount) {
+                    val v = getChildAt(i)
+                    v.isSelected = v == it
+                }
+            }
+        }
+    }
 }
 ```
 
 Fontosabb függvények:
 
 *   Konstruktorok: szintén az ős View miatt szükséges a 3 implementáció
-*   initLayout: a saját inicializáló függvény. Beállítjuk az orientationt, majd kiolvassuk az attribútumokat (ha elérhetőek).
+*   init: a saját inicializáló függvény. Beállítjuk az orientationt, majd kiolvassuk az attribútumokat (ha elérhetőek).
 *   addView felüldefiniálás: itt kapjuk el azt a hívást, ahol egy új View belekerül a Layout-ba. Itt meghívjuk az ős implementációját, majd a hozzáadott nézeten műveletet végzünk a refreshAfterAdd függvényben
 *   refreshAfterAdd: a paraméterként kapott View-t kattinthatóvá állítja, majd beállít egy onClickListener-t a View-ra.
 *   getSelectedCount: visszaadja, hogy hány gyerek elem van kiválasztva
-*   getSelectedChildren: visszaadja azokat a View-kat, amik ki vannak választva
 
 Az egyedi attribútumok eléréséhez a context obtainStyledAttributes függvényét használhatjuk. Ez 1\. paraméterként egy AttributeSet-et vár (amit az osztály konstruktorában kapunk meg), 2\. paraméterként pedig egy attribútum referencia tömböt. Ezt a tömböt a fordító automatikusan generálja az _attrs.xml_ fájlban megadott tag name attribútuma alapján. Tehát jelen esetben az R.styleable.ChoiceLayout reprezentálja ezt a tömböt.
 Az obtainStyledAttributes függvény visszatérési értéke egy TypedArray. Ez tartalmazza a lekért attribútumok értékét. A megfelelő get… függvény segítségével lekérhető a megfelelő integer, String vagy bármely egyéb érték, amit XML-ben megadtunk. **FONTOS, hogy a TypedArray használata után mindig kell az aktuális példányon egy recycle() függvényhívás**, amely felszabadítja a használt attribútumokat (erre van a try … finally megoldás a kódban).
 
-Az osztály végén található OnClickListener felelős az egyes elemek kiválasztásáért. Az implementáció két részre oszlik. Amennyiben a multiple változó értéke nagyobb mint 1, tehát több mint 1 elem választható ki: ha éppen kikattintunk egy elemet, akkor megváltoztatjuk a selected értékét az ellentétjére; ha pedig kiválasztunk egy elemet, akkor megnézzük, hogy elértük-e már a maximumot és ez alapján választjuk ki.
+Az OnClickListener felelős az egyes elemek kiválasztásáért. Az implementáció két részre oszlik. Amennyiben a multiple változó értéke nagyobb mint 1, tehát több mint 1 elem választható ki: ha éppen kikattintunk egy elemet, akkor megváltoztatjuk a selected értékét az ellentétjére; ha pedig kiválasztunk egy elemet, akkor megnézzük, hogy elértük-e már a maximumot és ez alapján választjuk ki.
 A másik esetben a multiple értéke 1\. Ilyenkor csak egyetlen elem választható ki; a kiválasztás során az előző kiválasztást kiszedjük és csak az újat hagyjuk bent.
 
 #### Használat XML-ből
@@ -539,36 +522,32 @@ Tehát ezt a két drawable elemet fogjuk felhasználni divider-ként a ChoiceLay
 
 Adjuk hozzá az osztályhoz a Divider lehetséges értékeit integer ként (Androidon kerüljük az enumerációk használatát, erről bővebben az előadásokon):
 
-```java
-public static final int DIVIDER_NONE=0;
-public static final int DIVIDER_SIMPLE=1;
-public static final int DIVIDER_DOUBLE=2;
-int dividerType;
+```kotlin
+val DIVIDER_NONE:Int = 0
+val DIVIDER_SIMPLE:Int = 1
+val DIVIDER_DOUBLE:Int = 2
+var dividerType:Int = DIVIDER_NONE
 ```
 
 Ezután ki kell olvasni az initLayout függvényben az elválasztó típust az attribútumok közül. Ehhez a multiple kiolvasás után adjuk hozzá az alábbi sort:
 
-```java
-dividerType = a.getInt(R.styleable.ChoiceLayout_dividerType, 0);
+```kotlin
+dividerType = a.getInt(R.styleable.ChoiceLayout_dividerType, 0)
 ```
 
 Hozzáadunk az osztályhoz egy új függvényt, ami a divider elem hozzáadást végzi:
 
-```java
-public void addDivider() {
-    if(dividerType != DIVIDER_NONE) {
-		ImageView div = new ImageView(getContext());
-		switch (dividerType) {
-			case DIVIDER_SIMPLE:
-				div.setImageResource(R.drawable.choice_divider_simple);
-				break;
-			case DIVIDER_DOUBLE:
-				div.setImageResource(R.drawable.choice_divider_double);
-				break;
-		}
-		LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-		super.addView(div, lp);
-	}
+```kotlin
+fun addDivider() {
+        if (dividerType != DIVIDER_NONE) {
+            val div: ImageView = ImageView(context)
+            when (dividerType) {
+                DIVIDER_SIMPLE -> div.setImageResource(R.drawable.choice_divider_simple)
+                DIVIDER_DOUBLE -> div.setImageResource(R.drawable.choice_divider_double)
+            }
+            val lp: LinearLayout.LayoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+            super.addView(div,lp)
+        }
 }
 ```
 
@@ -576,9 +555,9 @@ A függvény létrehoz egy ImageView-t és a dividerType alapján beállítja az
 
 Ezután mindkét addView függvény elejére beillesztjük az alábbi kódot:
 
-```java
-if(getChildCount() > 0) {
-	addDivider();
+```kotlin
+if(childCount > 0){
+	addDivider()
 }
 ```
 
