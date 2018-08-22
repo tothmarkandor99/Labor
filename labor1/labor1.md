@@ -193,9 +193,10 @@ kell állítani az alábbi eseménykezelőt neki a *MainMenuActivity
 onCreate()* függvényén belül:
 
 ```kotlin
-val btnHighScore = findViewById<Button>(R.id.button2)
-
-btnHighScore.setOnClickListener { Toast.makeText(this, getString(R.string.toast_highscore), Toast.LENGTH_LONG).show() }
+val btnHighScore = findViewById<Button>(R.id.button_high_score)
+btnHighScore.setOnClickListener {
+	Toast.makeText(this, getString(R.string.toast_highscore), Toast.LENGTH_LONG).show()
+}
 ```
 
 ## AboutActivity felület
@@ -251,16 +252,16 @@ függvénnyel elérhető el.
 ```kotlin
 object TicTacToeModel {
 
-    const val EMPTY: Short = 0
-    const val CIRCLE: Short = 1
-    const val CROSS: Short = 2
+    const val EMPTY: Byte = 0
+    const val CIRCLE: Byte = 1
+    const val CROSS: Byte = 2
 
-    var nextPlayer: Short = CIRCLE
+    var nextPlayer: Byte = CIRCLE
 
-    private var model: Array<ShortArray> = arrayOf(
-            shortArrayOf(EMPTY, EMPTY, EMPTY),
-            shortArrayOf(EMPTY, EMPTY, EMPTY),
-            shortArrayOf(EMPTY, EMPTY, EMPTY))
+    private var model: Array<ByteArray> = arrayOf(
+            byteArrayOf(EMPTY, EMPTY, EMPTY),
+            byteArrayOf(EMPTY, EMPTY, EMPTY),
+            byteArrayOf(EMPTY, EMPTY, EMPTY))
 
     fun resetModel() {
         for (i in 0 until 3) {
@@ -270,17 +271,18 @@ object TicTacToeModel {
         }
     }
 
-    fun getFieldContent(x: Int, y: Int): Short = model[x][y]
+    fun getFieldContent(x: Int, y: Int): Byte = model[x][y]
 
     fun changeNextPlayer() {
         nextPlayer = if (nextPlayer == CIRCLE) CROSS else CIRCLE
     }
 
-    fun setFieldContent(x: Int, y: Int, content: Short): Short {
+    fun setFieldContent(x: Int, y: Int, content: Byte): Byte {
         changeNextPlayer()
         model[x][y] = content
         return content
     }
+
 }
 ```
 
@@ -308,7 +310,7 @@ btnStart.setOnClickListener {
 }
 
 val btnAbout = findViewById<Button>(R.id.button_about)
-btnAbout.setOnClickListener{
+btnAbout.setOnClickListener {
 	startActivity(Intent(this, AboutActivity::class.java))
 }
 ```
@@ -341,8 +343,10 @@ class TicTacToeView : View {
     }
 
     override fun onDraw(canvas: Canvas?) {
-        super.onDraw(canvas)
-        if (canvas == null) return
+        if (canvas == null) {
+            return
+        }
+
         canvas.drawRect(0F, 0F, width.toFloat(), height.toFloat(), paintBg)
 
         drawGameArea(canvas)
@@ -369,13 +373,13 @@ class TicTacToeView : View {
     }
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
-        if (event == null) return super.onTouchEvent(event)
-
-        if (event.action == MotionEvent.ACTION_DOWN) {
-            //TODO
-        }
-
-        return super.onTouchEvent(event)
+       return when (event?.action) {
+		   MotionEvent.ACTION_DOWN -> {
+			   //TODO
+			   true
+		   }
+		   else -> super.onTouchEvent(event)
+	   }
     }
 }
 ```
@@ -440,16 +444,19 @@ függőleges vonalakat:
 
 ```kotlin
 private fun drawGameArea(canvas: Canvas) {
+	val widthFloat: Float = width.toFloat()
+	val heightFloat: Float = height.toFloat()
+
 	// border
-	canvas.drawRect(0F, 0F, width.toFloat(), height.toFloat(), paintLine)
+	canvas.drawRect(0F, 0F, widthFloat, heightFloat, paintLine)
 
 	// two horizontal lines
-	canvas.drawLine(0F, height.toFloat() / 3, width.toFloat(), width.toFloat() / 3, paintLine)
-	canvas.drawLine(0F, 2 * height.toFloat() / 3, width.toFloat(), 2 * height.toFloat() / 3, paintLine)
+	canvas.drawLine(0F, heightFloat / 3, widthFloat, widthFloat / 3, paintLine)
+	canvas.drawLine(0F, 2 * heightFloat / 3, widthFloat, 2 * heightFloat / 3, paintLine)
 
 	// two vertical lines
-	canvas.drawLine(width.toFloat() / 3, 0F, width.toFloat() / 3, height.toFloat(), paintLine)
-	canvas.drawLine(2 * width.toFloat() / 3, 0F, 2 * width.toFloat() / 3, height.toFloat(), paintLine)
+	canvas.drawLine(widthFloat / 3, 0F, widthFloat / 3, heightFloat, paintLine)
+	canvas.drawLine(2 * widthFloat / 3, 0F, 2 * widthFloat / 3, heightFloat, paintLine)
 }
 ```
 
@@ -486,18 +493,18 @@ a modell *nextPlayer* változója reprezentál.
 
 ```kotlin
 override fun onTouchEvent(event: MotionEvent?): Boolean {
-        if (event == null) return super.onTouchEvent(event)
-
-        if (event.action == MotionEvent.ACTION_DOWN) {
-            val tX : Int = (event.x / (width / 3)).toInt()
-            val tY:Int = (event.y / (height / 3)).toInt()
-            if(tX < 3 && tY < 3 && TicTacToeModel.getFieldContent(tX, tY) == TicTacToeModel.EMPTY){
-                TicTacToeModel.setFieldContent(tX,tY, TicTacToeModel.nextPlayer)
-                invalidate()
-            }
-        }
-
-        return super.onTouchEvent(event)
+	return when (event?.action) {
+		MotionEvent.ACTION_DOWN -> {
+			val tX: Int = (event.x / (width / 3)).toInt()
+			val tY: Int = (event.y / (height / 3)).toInt()
+			if (tX < 3 && tY < 3 && TicTacToeModel.getFieldContent(tX, tY) == TicTacToeModel.EMPTY) {
+				TicTacToeModel.setFieldContent(tX, tY, TicTacToeModel.nextPlayer)
+				invalidate()
+			}
+			true
+		}
+		else -> super.onTouchEvent(event)
+	}
 }
 ```
 
@@ -520,10 +527,5 @@ lépjen vissza a főmenübe. A laborvezető segítségével vizsgálja meg, hogy
 a *View* osztályból hogyan érhető el az őt tartalmazó "host" Activity,
 aminek így például egy *endGame()* függvénye meghívható, ami
 megvalósítja a fent leírt játék befejezést.
-
-```java
-GameActivity gameActivity = (GameActivity) view.getContext();
-gameActivity.endGame();
-```
 
 Jó munkát kívánunk!
