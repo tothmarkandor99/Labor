@@ -132,6 +132,7 @@ Módosítsuk az Activity elrendezését (*activity_view_labor.xml*), használjuk
 		<!-- Ide jön multiple ChoiceLayout -->
 
 	</LinearLayout>
+	
 </ScrollView>
 ```
 
@@ -144,6 +145,7 @@ Elsőként az egyedi jelszó nézetet valósítjuk meg. Ez a nézet egy beviteli
 Hozzunk létre egy *view* package-et és azon belül egy *PasswordEditText* osztályt, melynek a kódja az alábbi:
 
 ```kotlin
+@SuppressLint("ClickableViewAccessibility")
 class PasswordEditText : RelativeLayout {
 
     private val passwordEditText by lazy { findViewById<EditText>(R.id.passwordET) }
@@ -155,16 +157,20 @@ class PasswordEditText : RelativeLayout {
 
     init {
         LayoutInflater.from(context).inflate(R.layout.view_password_edittext, this, true)
+        
         eyeImageView.setOnTouchListener { view, motionEvent ->
-            if (motionEvent.action == MotionEvent.ACTION_DOWN) {
-                setTransformationMethod(null)
-                return@setOnTouchListener true
-            } else if (motionEvent.action == MotionEvent.ACTION_UP || motionEvent.action == MotionEvent.ACTION_CANCEL) {
-                setTransformationMethod(PasswordTransformationMethod.getInstance())
-                return@setOnTouchListener true
-            }
-            return@setOnTouchListener false
-        }
+			when (motionEvent.action) {
+				MotionEvent.ACTION_DOWN -> {
+					setTransformationMethod(null)
+					true
+				}
+				MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+					setTransformationMethod(PasswordTransformationMethod.getInstance())
+					true
+				}
+				else -> false
+			}
+		}
 
         setTransformationMethod(PasswordTransformationMethod.getInstance())
     }
@@ -191,6 +197,7 @@ class PasswordEditText : RelativeLayout {
     override fun getWindowToken(): IBinder? {
         return passwordEditText.windowToken
     }
+    
 }
 ```
 
@@ -328,10 +335,10 @@ class ChoiceLayout : LinearLayout {
     }
 
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
-        init(context, attrs, defStyleAttr)
+        init(context, attrs)
     }
 
-    private fun init(context: Context, attrs: AttributeSet?, defStyleAttr: Int = 0) {
+    private fun init(context: Context, attrs: AttributeSet?) {
         orientation = LinearLayout.VERTICAL
         attrs ?: return
 
@@ -343,12 +350,12 @@ class ChoiceLayout : LinearLayout {
         }
     }
 
-    override fun addView(child: View?) {
+    override fun addView(child: View) {
         super.addView(child)
         refreshAfterAdd(child)
     }
 
-    override fun addView(child: View?, params: ViewGroup.LayoutParams?) {
+    override fun addView(child: View, params: ViewGroup.LayoutParams?) {
         super.addView(child, params)
         refreshAfterAdd(child)
     }
@@ -356,14 +363,16 @@ class ChoiceLayout : LinearLayout {
     private fun getSelectedCount(): Int {
 		var selectedCount = 0
 		for (i in 0 until childCount) {
-			if (getChildAt(i).isSelected) selectedCount++
+			if (getChildAt(i).isSelected) {
+				selectedCount++
+			}
 		}
 		return selectedCount
 	}
 
-    private fun refreshAfterAdd(child: View?) {
-        child?.isClickable = true
-        child?.setOnClickListener {
+    private fun refreshAfterAdd(child: View) {
+        child.isClickable = true
+        child.setOnClickListener {
             if (multiple > 1) {
                 if (it.isSelected || getSelectedCount() < multiple) {
                     it.isSelected = !it.isSelected
@@ -527,12 +536,15 @@ Ebben az esetben egy kicsit komplexebb leírást használunk. Itt egy *layer-lis
 
 Tehát ezt a két drawable elemet fogjuk felhasználni divider-ként a ChoiceLayout-ban. Következő lépésben a ChoiceLayout osztályt kell kiegészíteni.
 
-Adjuk hozzá az osztályhoz a Divider lehetséges értékeit Int-ként:
+Adjuk hozzá az osztályhoz a Divider lehetséges értékeit companion object-ként:
 
 ```kotlin
-val DIVIDER_NONE:Int = 0
-val DIVIDER_SIMPLE:Int = 1
-val DIVIDER_DOUBLE:Int = 2
+companion object {
+	private const val DIVIDER_NONE = 0
+	private const val DIVIDER_SIMPLE = 1
+	private const val DIVIDER_DOUBLE = 2
+}
+
 var dividerType:Int = DIVIDER_NONE
 ```
 
@@ -545,9 +557,9 @@ dividerType = a.getInt(R.styleable.ChoiceLayout_dividerType, 0)
 Hozzáadunk az osztályhoz egy új függvényt, ami a divider elem hozzáadást végzi:
 
 ```kotlin
-fun addDivider() {
+private fun addDivider() {
     if (dividerType != DIVIDER_NONE) {
-        val div: ImageView = ImageView(context)
+        val div = ImageView(context)
         when (dividerType) {
             DIVIDER_SIMPLE -> div.setImageResource(R.drawable.choice_divider_simple)
             DIVIDER_DOUBLE -> div.setImageResource(R.drawable.choice_divider_double)
