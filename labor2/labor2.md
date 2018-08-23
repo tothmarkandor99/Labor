@@ -20,7 +20,7 @@ A labor során az alábbi regisztrációs nézetet rakjuk össze az egyedi View-
 
 1. Hozzunk létre egy új Android Studio projektet **ViewLabor** néven
 2. A Company domain mező tartalmát töröljük ki és hagyjuk is üresen
-3. A Package name legyen **hu.bme.aut.amorg.examples.viewlabor**
+3. A Package name legyen **hu.bme.aut.android.viewlabor**
 4. A támogatott céleszközök a **Telefon és Tablet**, a minimum SDK szint az **API19: Android 4.4**
 5. A kezdő projekthez adjuk hozzá egy **Empty Activity**-t, melynek neve legyen **ViewLaborActivity**
 6. A legenerált projektből töröljük ki a teszteket (ezekre most nem lesz szükség)
@@ -143,56 +143,53 @@ Hozzunk létre egy *view* package-et és azon belül egy *PasswordEditText* oszt
 @SuppressLint("ClickableViewAccessibility")
 class PasswordEditText : RelativeLayout {
 
-    private val passwordEditText by lazy { findViewById<EditText>(R.id.passwordET) }
-    private val eyeImageView by lazy { findViewById<ImageView>(R.id.passwordIV) }
-
     constructor(context: Context) : super(context)
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
 
     init {
         LayoutInflater.from(context).inflate(R.layout.view_password_edittext, this, true)
-        
-        eyeImageView.setOnTouchListener { view, motionEvent ->
-			when (motionEvent.action) {
-				MotionEvent.ACTION_DOWN -> {
-					setTransformationMethod(null)
-					true
-				}
-				MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-					setTransformationMethod(PasswordTransformationMethod.getInstance())
-					true
-				}
-				else -> false
-			}
-		}
+
+        ivPassword.setOnTouchListener { view, motionEvent ->
+            when (motionEvent.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    setTransformationMethod(null)
+                    true
+                }
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                    setTransformationMethod(PasswordTransformationMethod.getInstance())
+                    true
+                }
+                else -> false
+            }
+        }
 
         setTransformationMethod(PasswordTransformationMethod.getInstance())
     }
 
     private fun setTransformationMethod(method: TransformationMethod?) {
-        val ss = passwordEditText.selectionStart
-        val se = passwordEditText.selectionEnd
-        passwordEditText.transformationMethod = method
-        passwordEditText.setSelection(ss, se)
+        val ss = etPassword.selectionStart
+        val se = etPassword.selectionEnd
+        etPassword.transformationMethod = method
+        etPassword.setSelection(ss, se)
     }
 
     fun getText(): Editable? {
-        return passwordEditText.text
+        return etPassword.text
     }
 
     fun setError(str: CharSequence) {
-        passwordEditText.error = str
+        etPassword.error = str
     }
 
     fun setText(text: CharSequence) {
-        passwordEditText.setText(text)
+        etPassword.setText(text)
     }
 
     override fun getWindowToken(): IBinder? {
-        return passwordEditText.windowToken
+        return etPassword.windowToken
     }
-    
+
 }
 ```
 
@@ -211,7 +208,7 @@ Az elrendezéshez hozzunk létre egy _view_password_edittext.xml_ layout erőfor
 <merge xmlns:android="http://schemas.android.com/apk/res/android">
 
 	<ImageView
-		android:id="@+id/passwordIV"
+		android:id="@+id/ivPassword"
 		android:layout_alignParentRight="true"
 		android:layout_width="50dp"
 		android:layout_height="50dp"
@@ -219,9 +216,9 @@ Az elrendezéshez hozzunk létre egy _view_password_edittext.xml_ layout erőfor
 		android:src="@android:drawable/ic_menu_view"/>
 
 	<EditText
-		android:id="@+id/passwordET"
+		android:id="@+id/etPassword"
 		android:layout_alignParentLeft="true"
-		android:layout_toLeftOf="@+id/passwordIV"
+		android:layout_toLeftOf="@+id/ivPassword"
 		android:layout_centerVertical="true"
 		android:layout_width="0dp"
 		android:layout_height="wrap_content"/>
@@ -241,16 +238,10 @@ A Kotlin osztály fontosabb függvényei:
 A használathoz az alábbi kódot adjuk hozzá az _activity_view_labor.xml_ elrendezés “Ide jön majd a saját jelszó nézet” kommentje után:
 
 ```xml
-<hu.bme.aut.amorg.examples.viewlabor.PasswordEditText
-	android:id="@+id/registrationPET"
-	android:layout_width="match_parent"
-	android:layout_height="wrap_content"/>
-```
-
-Ezután az Activity-ből az alábbi kóddal érhetjük el a saját osztályunkat:
-
-```kotlin
-val passwordEditText = findViewById<PasswordEditText>(R.id.registrationPET)
+<hu.bme.aut.android.viewlabor.view.PasswordEditText
+    android:id="@+id/petRegistration"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" />
 ```
 
 ### ChoiceLayout
@@ -400,77 +391,79 @@ A másik esetben a multiple értéke 1\. Ilyenkor csak egyetlen elem választhat
 #### Használat XML-ből
 
 ```xml
-<hu.bme.aut.amorg.examples.viewlabor.ChoiceLayout
-	android:id="@+id/firstCL"
-	app:multiple="1"
-	android:layout_width="match_parent"
-	android:layout_height="wrap_content">
+<hu.bme.aut.android.viewlabor.view.ChoiceLayout
+    android:id="@+id/clFirst"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:dividerType="simple_divider"
+    app:multiple="1">
 
-	<TextView
-		style="@style/ChoiceOptionStyle"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:text="Férfi"/>
+    <TextView
+        style="@style/ChoiceOptionStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Férfi" />
 
-	<TextView
-		style="@style/ChoiceOptionStyle"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:text="Nő"/>
+    <TextView
+        style="@style/ChoiceOptionStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Nő" />
 
-	<TextView
-		style="@style/ChoiceOptionStyle"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:text="Egyéb"/>
-</hu.bme.aut.amorg.examples.viewlabor.ChoiceLayout>
+    <TextView
+        style="@style/ChoiceOptionStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Egyéb" />
+</hu.bme.aut.android.viewlabor.view.ChoiceLayout>
 ```
 
 Második *ChoiceLayout* hozzáadása az *activity_view_labor.xml*-hez:
 
 ```xml
-<hu.bme.aut.amorg.examples.viewlabor.ChoiceLayout
-	android:id="@+id/secondCL"
-	android:layout_width="match_parent"
-	android:layout_height="wrap_content"
-	app:multiple="3">
+<hu.bme.aut.android.viewlabor.view.ChoiceLayout
+    android:id="@+id/clSecond"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:dividerType="double_divider"
+    app:multiple="3">
 
-	<TextView
-		style="@style/ChoiceOptionStyle"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:text="Akármi1"/>
+    <TextView
+        style="@style/ChoiceOptionStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Akármi1" />
 
-	<TextView
-		style="@style/ChoiceOptionStyle"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:text="Akármi2"/>
+    <TextView
+        style="@style/ChoiceOptionStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Akármi2" />
 
-	<TextView
-		style="@style/ChoiceOptionStyle"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:text="Akármi3"/>
+    <TextView
+        style="@style/ChoiceOptionStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Akármi3" />
 
-	<TextView
-		style="@style/ChoiceOptionStyle"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:text="Akármi4"/>
+    <TextView
+        style="@style/ChoiceOptionStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Akármi4" />
 
-	<TextView
-		style="@style/ChoiceOptionStyle"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:text="Akármi5"/>
+    <TextView
+        style="@style/ChoiceOptionStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Akármi5" />
 
-	<TextView
-		style="@style/ChoiceOptionStyle"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:text="Akármi6"/>
-</hu.bme.aut.amorg.examples.viewlabor.ChoiceLayout>
+    <TextView
+        style="@style/ChoiceOptionStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Akármi6" />
+</hu.bme.aut.android.viewlabor.view.ChoiceLayout>
 ```
 
 A saját attribútumok saját névtéren keresztül érhetőek el, ez konvenció szerint **app**, az app névtérre állva _Alt+Enter_ segítségével felvehető.
