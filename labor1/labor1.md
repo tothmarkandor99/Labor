@@ -25,7 +25,7 @@ Első lépésként indítsuk el az Android Studio-t, majd:
 
 1. Hozzunk létre egy **TicTacToe** nevű projektet.
 2. A kezdő package legyen például
-   **hu.bme.aut.amorg.examples.tictactoe**
+   **hu.bme.aut.android.tictactoe**
 3. Pipáljuk be az "Include Kotlin Support" lehetőséget.
 4. A projekt létrehozásakor válasszuk a kezdeti Empty Activity-vel
    rendelkező konfigurációt.
@@ -113,7 +113,7 @@ lépéseket nem kell egyesével elvégeznie a fejlesztőnek.
     android:theme="@style/Theme.AppCompat.Light.Dialog">
     <meta-data
         android:name="android.support.PARENT_ACTIVITY"
-        android:value="hu.bme.aut.amorg.examples.tictactoe.MainMenuActivity" />
+        android:value="hu.bme.aut.android.tictactoe.MainMenuActivity" />
 </activity>
 ```
 
