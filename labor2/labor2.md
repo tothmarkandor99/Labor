@@ -1,8 +1,8 @@
 # Labor 2 - Nézetek
 
-A labor során egy regisztrációs nézetet készítünk el, melyben számos egyedi View található. Ezek az egyedi nézetek az előző laborhoz képest nem a View osztályt bővítik, hanem egy meglévő, komplexebb View elemet bővítenek.
+A labor során egy regisztrációs nézetet készítünk el, melyben számos egyedi View található. Ezek az egyedi nézetek az előző laborhoz képest nem a View ősosztályból származnak le, hanem meglévő, komplexebb View elemeket bővítenek ki.
 
-A labor során az alábbi dolgokat nézzük meg:
+A labor során az alábbiakat nézzük meg:
 
 *   Színek és stílusok definiálása erőforrásokban
 *   Alapértelmezett téma módosítása
@@ -14,21 +14,16 @@ A labor során az alábbi regisztrációs nézetet rakjuk össze az egyedi View-
 
 <img src="./assets/labor_3_ss1.png" width="200" align="middle">
 
-Alkalmazás felülete
+*Az alkalmazás felülete*
 
 ## Kezdő nézet
 
-Hozzunk létre egy új Android Studio Projektet **ViewLabor** néven.
-
-A Company Domain mező tartalmát töröljük ki és hagyjuk is üresen.
-
-A packagename legyen **hu.bme.aut.amorg.examples.viewlabor**
-
-A támogatott céleszközök a **Telefon és Tablet**, valamint a minimum SDK szint a **API19: Android 4.4**
-
-A kezdő projekthez adjuk hozzá egy **Empty Activity**-t, melynek neve legyen **ViewLaborActivity**.
-
-A legenerált projektből töröljük ki a teszteket (ezekre most nem lesz szükség).
+1. Hozzunk létre egy új Android Studio projektet **ViewLabor** néven
+2. A Company domain mező tartalmát töröljük ki és hagyjuk is üresen
+3. A Package name legyen **hu.bme.aut.amorg.examples.viewlabor**
+4. A támogatott céleszközök a **Telefon és Tablet**, a minimum SDK szint az **API19: Android 4.4**
+5. A kezdő projekthez adjuk hozzá egy **Empty Activity**-t, melynek neve legyen **ViewLaborActivity**
+6. A legenerált projektből töröljük ki a teszteket (ezekre most nem lesz szükség)
 
 ## Material Palette
 
@@ -71,7 +66,7 @@ Az alkalmazásunkban használt stílusokat pedig a _styles.xml_ állományban de
 </resources>
 ```
 
-Az AndroidManifest állományt megnézve látható, hogy az alkalmazásunk alapértelmezett témája az *AppTheme*. Így amit ebben a stílusban definiálunk, az lesz alapértelmezett kinézet az egész alkalmazásunkban. Az *android:textViewStyle* definiálja, hogy hogy néz ki az adott alkalmazásban az alapértelmezett TextView egy felüldefiniált stílus segítségével. Ezeknek a felüldefiniált stílusoknak minden esetben a beépített stílusból kell leszármaznia, jelen esetünkben a saját TextView stílusunknak az *android:Widget.TextView* stílusból. Ebben megadhatjuk a *textColor* attribútumot, aminek hatására minden TextView alapértelmezett betűszíne megváltozik az ott megadottra.
+Az *AndroidManifest* állományt megnézve látható, hogy az alkalmazásunk alapértelmezett témája az *AppTheme*. Így amit ebben a stílusban definiálunk, az lesz alapértelmezett kinézet az egész alkalmazásunkban. Az *android:textViewStyle* definiálja, hogy hogy néz ki az adott alkalmazásban az alapértelmezett TextView egy felüldefiniált stílus segítségével. Ezeknek a felüldefiniált stílusoknak minden esetben a beépített stílusból kell leszármaznia, jelen esetünkben a saját TextView stílusunknak az *android:Widget.TextView* stílusból. Ebben megadhatjuk a *textColor* attribútumot, aminek hatására minden TextView alapértelmezett betűszíne megváltozik az ott megadottra.
 
 ```xml
 <item name="android:textColor">@color/accent</item>
@@ -140,7 +135,7 @@ Ha az ebben szereplő *dimen* erőforrások hiányoznak, rajtuk **Alt+Enter**-t 
 
 ### Egyedi jelszó nézet
 
-Elsőként az egyedi jelszó nézetet valósítjuk meg. Ez a nézet egy beviteli mezőből áll és egy képből, amelyre rákattintva a jelszó mező megmutatja, hogy mit gépeltünk a mezőbe.
+Elsőként az egyedi jelszó nézetet valósítjuk meg. Ez a nézet egy beviteli mezőből áll és egy képből, amelyre rányomva a jelszó mező megmutatja, hogy mit gépeltünk a mezőbe.
 
 Hozzunk létre egy *view* package-et és azon belül egy *PasswordEditText* osztályt, melynek a kódja az alábbi:
 
@@ -201,13 +196,13 @@ class PasswordEditText : RelativeLayout {
 }
 ```
 
-Az osztály a RelativeLayout-ból származik. A RelativeLayout elemei pedig egy EditText és egy ImageView lenne úgy, hogy az ImageView-t jobbra rendezzük és az EditText kitölti bal oldalt a rendelkezésre álló helyet. Ahhoz, hogy egy felüldefiniált ViewGroup-ból származó osztálynak kódból meg tudjuk adni az elrendezését szükségünk van egy *merge* layout-ra. Ezt a layout-ot a 
+Az osztály a *RelativeLayout*-ból származik. A *RelativeLayout* elemei pedig egy *EditText* és egy *ImageView* lenne úgy, hogy az *ImageView*-t jobbra rendezzük és az *EditText* kitölti bal oldalt a rendelkezésre álló helyet. Ahhoz, hogy egy felüldefiniált *ViewGroup*-ból származó osztálynak kódból meg tudjuk adni az elrendezését szükségünk van egy *merge* layout-ra. Ezt a layout-ot a 
 
 ```kotlin
 LayoutInflater.from(context).inflate(R.layout.view_password_edittext, this, true)
 ```
  
-kóddal tudjuk a RelativeLayout-ba felfújni, aminek hatására a RelativeLayout-nak lesz két gyerek nézete, egy ImageView és egy EditText.
+kóddal tudjuk a *RelativeLayout*-ba felfújni, aminek hatására a *RelativeLayout*-nak lesz két gyerek nézete, egy *ImageView* és egy *EditText*.
 
 Az elrendezéshez hozzunk létre egy _view_password_edittext.xml_ layout erőforrást és a tartalma legyen az alábbi kód:
 
@@ -239,9 +234,9 @@ A laborvezetővel tekintsék át az ImageView és az EditText elhelyezését a R
 A Kotlin osztály fontosabb függvényei:
 
 *   Konstruktorok: ezek szükségesek az ősosztály megfelelő inicializálásához
-*   init: a saját nézetünket inicializálja. "Felfújja" a view-kat valamint beállítja az onTouchListenert-t az ImageView-hoz.
-*   setTransformationMethod: átállítja az EditText-hez tartozó szöveg transzformációt, valamint elmenti és visszatölti a kijelölést.
-*   getText, setError, setText, getWindowToken: az EditText függvényei, melyet kiajánlunk a saját, RelativeLayout-ból származó osztályunkon kívülre.
+*   init: a saját nézetünket inicializálja. "Felfújja" a View-kat, valamint beállítja a szükséges *onTouchListenert*-t az *ImageView*-hoz.
+*   setTransformationMethod: átállítja az *EditText*-hez tartozó szöveg transzformációt, valamint elmenti és visszatölti a kijelölést.
+*   getText, setError, setText, getWindowToken: az *EditText* függvényei, melyet kiajánlunk a saját, RelativeLayout-ból származó osztályunkon kívülre.
 
 A használathoz az alábbi kódot adjuk hozzá az _activity_view_labor.xml_ elrendezés “Ide jön majd a saját jelszó nézet” kommentje után:
 
@@ -260,7 +255,7 @@ val passwordEditText = findViewById<PasswordEditText>(R.id.registrationPET)
 
 ### ChoiceLayout
 
-A második egyedi nézet egy különleges választó. Ez egy olyan nézet, amelyhez XML-ben adhatunk gyermek elemeket, amelyek így kiválaszhatóvá válnak a szülőben. A szülő elemben pedig egyedi attribútumok segítségével módosíthatjuk a működést. A **multiple** attribútummal azt szeretnék beállítani, hogy hány elem legyen kijelölhető a ViewGroup-on belül. A **dividerType** attribútum pedig azt adja meg, hogy mi válassza el a benne lévő elemeket (lehet semmilyen, szimpla vonal, dupla vonal).
+A második egyedi nézet egy különleges választó. Ez egy olyan nézet, amelyhez XML-ben adhatunk gyermek elemeket, amelyek így kiválaszhatóvá válnak a szülőben. A szülő elemben pedig egyedi attribútumok segítségével módosíthatjuk a működést. A **multiple** attribútummal azt szeretnék beállítani, hogy hány elem legyen kijelölhető a *ViewGroup*-on belül. A **dividerType** attribútum pedig azt adja meg, hogy mi válassza el a benne lévő elemeket (lehet semmilyen, szimpla vonal, dupla vonal).
 
 Ezek alapján az Activity elrendezésében kétszer szeretnénk ezt a nézetet felhasználni.
 
@@ -280,7 +275,7 @@ Színek hozzáadása a _colors.xml_ fájlhoz:
 
 Ezeket a színeket használjuk majd a különböző állapotok hátteréhez.
 
-A háttér megadására több lehetőség van. Megoldhatjuk, hogy kódból figyeljük az egyes állapotok (lenyomva, kiválasztva, normál) változását és kódból állítgatjuk az elemek háttérszínét, azonban ez jelentős plusz munka lenne. Az Android platformon van ennél egyszerűbb megoldás is: használhatjuk a *selector* erőforrást. Ez egy olyan kirajzolható erőforrás, amely a View állapotától függ, amelyhez hozzárendeltük.
+A háttér megadására több lehetőség van. Megoldhatjuk, hogy kódból figyeljük az egyes állapotok (lenyomva, kiválasztva, normál) változását és kódból állítgatjuk az elemek háttérszínét, azonban ez jelentős plusz munka lenne. Az Android platformon van ennél egyszerűbb megoldás is: használhatjuk a *selector* erőforrást. Ez egy olyan kirajzolható erőforrás, amely kinézete a View állapotától függ, amelyhez hozzárendeltük.
 
 Hozzunk létre a drawable mappában egy _selector_choice_item.xml_ fájlt, majd a következő selector kódot másoljuk bele:
 
@@ -393,11 +388,11 @@ Fontosabb függvények:
 *   Konstruktorok: szintén az ős View miatt szükséges a 3 implementáció
 *   init: a saját inicializáló függvény. Beállítjuk az orientation-t, majd kiolvassuk az attribútumokat (ha elérhetőek).
 *   addView felüldefiniálás: itt kapjuk el azt a hívást, ahol egy új View belekerül a Layout-ba. Itt meghívjuk az ős implementációját, majd a hozzáadott nézeten műveletet végzünk a refreshAfterAdd függvényben
-*   refreshAfterAdd: a paraméterként kapott View-t kattinthatóvá állítja, majd beállít egy onClickListener-t a View-ra.
+*   refreshAfterAdd: a paraméterként kapott View-t kattinthatóvá teszi, majd beállít egy onClickListener-t a View-ra.
 *   getSelectedCount: visszaadja, hogy hány gyerek elem van kiválasztva
 
-Az egyedi attribútumok eléréséhez a context obtainStyledAttributes függvényét használhatjuk. Ez első paraméterként egy *AttributeSet*-et vár (amit az osztály konstruktorában kapunk meg), második paraméterként pedig egy attribútum referencia tömböt. Ezt a tömböt a fordító automatikusan generálja az _attrs.xml_ fájlban megadott tag name attribútuma alapján. Tehát jelen esetben az R.styleable.ChoiceLayout reprezentálja ezt a tömböt.
-Az obtainStyledAttributes függvény visszatérési értéke egy TypedArray, ez tartalmazza a lekért attribútumok értékét. A megfelelő get… függvény segítségével lekérhető a megfelelő integer, String vagy bármely egyéb érték, amit XML-ben megadtunk. **FONTOS, hogy a TypedArray használata után mindig kell az aktuális példányon egy recycle() függvényhívás**, amely felszabadítja a használt attribútumokat (erre van a try … finally megoldás a kódban).
+Az egyedi attribútumok eléréséhez a *Context* *obtainStyledAttributes* függvényét használhatjuk. Ez első paraméterként egy *AttributeSet*-et vár (amit az osztály konstruktorában kapunk meg), második paraméterként pedig egy attribútum referencia tömböt. Ezt a tömböt a fordító automatikusan generálja az _attrs.xml_ fájlban megadott tag name attribútuma alapján. Tehát jelen esetben az *R.styleable.ChoiceLayout* reprezentálja ezt a tömböt.
+Az *obtainStyledAttributes* függvény visszatérési értéke egy *TypedArray*, ez tartalmazza a lekért attribútumok értékét. A megfelelő get… függvény segítségével lekérhető a megfelelő Int, String vagy bármely egyéb érték, amit XML-ben megadtunk. **FONTOS, hogy a TypedArray használata után mindig kell az aktuális példányon egy recycle() függvényhívás**, amely felszabadítja a használt attribútumokat (erre van a try … finally megoldás a kódban).
 
 Az OnClickListener felelős az egyes elemek kiválasztásáért. Az implementáció két részre oszlik. Amennyiben a multiple változó értéke nagyobb mint 1, tehát több mint 1 elem választható ki: ha éppen kikattintunk egy elemet, akkor megváltoztatjuk a selected értékét az ellentétjére; ha pedig kiválasztunk egy elemet, akkor megnézzük, hogy elértük-e már a maximumot és ez alapján választjuk ki.
 A másik esetben a multiple értéke 1\. Ilyenkor csak egyetlen elem választható ki; a kiválasztás során az előző kiválasztást kiszedjük és csak az újat hagyjuk bent.
@@ -431,7 +426,7 @@ A másik esetben a multiple értéke 1\. Ilyenkor csak egyetlen elem választhat
 </hu.bme.aut.amorg.examples.viewlabor.ChoiceLayout>
 ```
 
-Második ChoiceLayout hozzáadása az activity_view_labor.xml-hez:
+Második *ChoiceLayout* hozzáadása az *activity_view_labor.xml*-hez:
 
 ```xml
 <hu.bme.aut.amorg.examples.viewlabor.ChoiceLayout
@@ -490,9 +485,9 @@ Ehhez első lépésben az _attrs.xml_ állományt kell módosítani. Hozzá kell
 
 ```xml
 <attr name="dividerType" format="enum">
-			<enum name="none" value="0" />
-			<enum name="simple_divider" value="1" />
-			<enum name="double_divider" value="2" />
+    <enum name="none" value="0" />
+    <enum name="simple_divider" value="1" />
+    <enum name="double_divider" value="2" />
 </attr>
 ```
 
@@ -532,11 +527,11 @@ A második elem a dupla vonal, melyhez a __choice_divider_double.xml__ erőforr�
 </layer-list>
 ```
 
-Ebben az esetben egy kicsit komplexebb leírást használunk. Itt egy *layer-list* elemben definiálunk több elemet. Ennek a lényege, hogy az egyes elemek majd egymásra rajzolódnak és így definiálható komplexebb grafika XML-ben. Az első item-e a layer-list-nek egy vonal, amely a 4dp magas vásznon 1dp széles vonalat húz alsó, 3dp-s padding-gal. A második elem pedig szintén egy ugyanilyen vonalat húz, de felső, 3dp-s padding-gal. Ennek eredménye egy 4 dp magas kép, aminek a felső és alsó pixele fekete. Ezt széltében nyújtva horizontális vonalat kapunk.
+Ebben az esetben egy kicsit komplexebb leírást használunk. Itt egy *layer-list* elemben definiálunk több elemet. Ennek a lényege, hogy az egyes elemek majd egymásra rajzolódnak és így definiálható komplexebb grafika XML-ben. Az első item-e a layer-list-nek egy vonal, amely a 4dp magas vásznon 1dp széles vonalat húz alsó, 3dp-s padding-gel. A második elem pedig szintén egy ugyanilyen vonalat húz, de felső, 3dp-s padding-gal. Ennek eredménye egy 4dp magas kép, aminek a felső és alsó pixele fekete. Ezt széltében nyújtva horizontális vonalat kapunk.
 
-Tehát ezt a két drawable elemet fogjuk felhasználni divider-ként a ChoiceLayout-ban. Következő lépésben a ChoiceLayout osztályt kell kiegészíteni.
+Tehát ezt a két drawable elemet fogjuk felhasználni divider-ként a *ChoiceLayout*-ban. Következő lépésben a *ChoiceLayout* osztályt kell kiegészíteni.
 
-Adjuk hozzá az osztályhoz a Divider lehetséges értékeit companion object-ként:
+Adjuk hozzá az osztályhoz a divider lehetséges értékeit companion object-ként:
 
 ```kotlin
 companion object {
@@ -570,7 +565,7 @@ private fun addDivider() {
 }
 ```
 
-A függvény létrehoz egy ImageView-t és a dividerType alapján beállítja az előbbiekben létrehozott két drawable közül a megfelelőt ennek az ImageView-nak. LayoutParams segítségével beállítjuk, hogy a magassága a tartalom alapján dőljön el, míg a szélessége a szülő alapján. Ezután az addView függvény segítségével hozzáadjuk a View-t a saját layout-hoz. Azért az ős függvényét hívjuk, hogy ne fusson le a saját addView logikánk, amit a kijelölhetőség érdekében hoztunk létre.
+A függvény létrehoz egy *ImageView*-t és a dividerType alapján beállítja az előbbiekben létrehozott két drawable közül a megfelelőt ennek az *ImageView*-nak. *LayoutParams* segítségével beállítjuk, hogy a magassága a tartalom alapján dőljön el, míg a szélessége a szülő szélességével egyezzen meg. Ezután az *addView* függvény segítségével hozzáadjuk a View-t a saját layout-hoz. Azért explicit módon az ős függvényét hívjuk, hogy itt ne fusson le a saját *addView* logikánk, amit a kijelölhetőség érdekében hoztunk létre.
 
 Ezután mindkét *addView* függvény elejére beillesztjük az alábbi kódot:
 
@@ -582,7 +577,7 @@ if (childCount > 0) {
 
 Ez biztosítja, hogy minden elem hozzáadás előtt bekerül egy divider a layout-ba (kivétel az első elem hozzáadásánál, mert ott nincs szükség rá).
 
-Ezzel végeztünk a ChoiceLayout osztály módosításával. Már csak egyetlen dolog maradt hátra: használjuk az új attribútumot. Ehhez az activity elrendezését módosítsuk úgy, hogy mindkét ChoiceLayout kapjon egy újabb custom attribútumot, dividerType névvel. Az első nézetnél legyen:
+Ezzel végeztünk a *ChoiceLayout* osztály módosításával. Már csak egyetlen dolog maradt hátra: használjuk az új attribútumot. Ehhez az Activity elrendezését módosítsuk úgy, hogy mindkét *ChoiceLayout* kapjon egy újabb custom attribútumot, dividerType névvel. Az első nézetnél legyen:
 
 ```xml
 app:dividerType="simple_divider"
@@ -594,17 +589,17 @@ A második nézetnél legyen:
 app:dividerType="double_divider"
 ```
 
-
-Érdemes megfigyelni, hogy az enumeráció lehetséges értékeiben segít a kódkiegészítés.
+Érdemes megfigyelni, hogy az enumeráció lehetséges értékeiben is segít a kódkiegészítés.
 
 ## Önálló feladat
 
-Módosítsa a PasswordEditText osztályt úgy, hogy attribútumként megadható legyen a jelszó mezőben található kép.
-Segítség:
+Módosítsa a *PasswordEditText* osztályt úgy, hogy attribútumként megadható legyen a jelszó mezőben található kép.
 
-*   Új attribútum az **attrs.xml**-be. A típusa legyen _reference_.
-*   Ezt a feldolgozó osztályban ResourceId-ként olvashatjuk ki (_getResourceId()_ függvény).
-*   Az így kapott azonosítóhoz tartozó Drawable-t, a _getResources().getDrawable(resourceId)_ függvény segítségével kérhetjük le.
-*   A PasswordEditText osztály _init_ függvényének bővítése, hogy az _attrs_ paraméterből olvassa ki a referenciát
-*   Az attribútum használata az Activity elrendezésében
-*   A kinyert Drawable beállítása az eyeImageView objektum képének (_setImageDrawable()_ függvény)
+Segítség, az ehhez szükséges lépések:
+
+*   Új attribútum az **attrs.xml**-be, a típusa legyen _reference_.
+*   Ezt a feldolgozó osztályban *ResourceId*-ként olvashatjuk ki (_getResourceId()_ függvény).
+*   Az így kapott azonosítóhoz tartozó *Drawable*-t a _getResources().getDrawable(resourceId)_ függvény segítségével kérhetjük le.
+*   A PasswordEditText osztály _init_ függvényének bővítése, hogy az _attrs_ paraméterből olvassa ki a referenciát.
+*   Az attribútum használata az Activity elrendezésében.
+*   A kinyert Drawable beállítása az *eyeImageView* objektum képének (_setImageDrawable()_ függvény).
