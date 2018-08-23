@@ -139,14 +139,14 @@ középre igazodva. Mivel a Studio már alapértelmezetten _ConstraintLayout-ot_
 	tools:context=".MainMenuActivity">
 
 	<Button
-		android:id="@+id/button_start"
+		android:id="@+id/btnStart"
 		android:layout_width="0dp"
 		android:layout_height="wrap_content"
 		android:layout_marginEnd="8dp"
 		android:layout_marginStart="8dp"
 		android:layout_marginTop="8dp"
 		android:text="@string/btn_start"
-		app:layout_constraintBottom_toTopOf="@+id/button_high_score"
+		app:layout_constraintBottom_toTopOf="@+id/btnHighScore"
 		app:layout_constraintEnd_toEndOf="parent"
 		app:layout_constraintHorizontal_bias="0.5"
 		app:layout_constraintStart_toStartOf="parent"
@@ -154,21 +154,21 @@ középre igazodva. Mivel a Studio már alapértelmezetten _ConstraintLayout-ot_
 		app:layout_constraintVertical_chainStyle="packed" />
 
 	<Button
-		android:id="@+id/button_high_score"
+		android:id="@+id/btnHighScore"
 		android:layout_width="0dp"
 		android:layout_height="wrap_content"
 		android:layout_marginEnd="8dp"
 		android:layout_marginStart="8dp"
 		android:layout_marginTop="8dp"
 		android:text="@string/btn_highscore"
-		app:layout_constraintBottom_toTopOf="@+id/button_about"
+		app:layout_constraintBottom_toTopOf="@+id/btnAbout"
 		app:layout_constraintEnd_toEndOf="parent"
 		app:layout_constraintHorizontal_bias="0.5"
 		app:layout_constraintStart_toStartOf="parent"
-		app:layout_constraintTop_toBottomOf="@+id/button_start" />
+		app:layout_constraintTop_toBottomOf="@+id/btnStart" />
 
 	<Button
-		android:id="@+id/button_about"
+		android:id="@+id/btnAbout"
 		android:layout_width="0dp"
 		android:layout_height="wrap_content"
 		android:layout_marginBottom="8dp"
@@ -180,7 +180,7 @@ középre igazodva. Mivel a Studio már alapértelmezetten _ConstraintLayout-ot_
 		app:layout_constraintEnd_toEndOf="parent"
 		app:layout_constraintHorizontal_bias="0.5"
 		app:layout_constraintStart_toStartOf="parent"
-		app:layout_constraintTop_toBottomOf="@+id/button_high_score" />
+		app:layout_constraintTop_toBottomOf="@+id/btnHighScore" />
 </android.support.constraint.ConstraintLayout>
 ```
 
@@ -192,9 +192,9 @@ kell állítani az alábbi eseménykezelőt neki a *MainMenuActivity
 onCreate()* függvényén belül:
 
 ```kotlin
-val btnHighScore = findViewById<Button>(R.id.button_high_score)
+val btnHighScore = findViewById<Button>(R.id.btnHighScore)
 btnHighScore.setOnClickListener {
-	Toast.makeText(this, getString(R.string.toast_highscore), Toast.LENGTH_LONG).show()
+    Toast.makeText(this, getString(R.string.toast_highscore), Toast.LENGTH_LONG).show()
 }
 ```
 
@@ -298,15 +298,15 @@ Valósítsuk meg ezen két gomb eseménykezelőjét szintén a
 *MainMenuActivity onCreate()* függvényében:
 
 ```kotlin
-val btnStart = findViewById<Button>(R.id.button_start)
+val btnStart = findViewById<Button>(R.id.btnStart)
 btnStart.setOnClickListener {
-	TicTacToeModel.resetModel()
-	startActivity(Intent(this, GameActivity::class.java))
+    TicTacToeModel.resetModel()
+    startActivity(Intent(this, GameActivity::class.java))
 }
 
-val btnAbout = findViewById<Button>(R.id.button_about)
+val btnAbout = findViewById<Button>(R.id.btnAbout)
 btnAbout.setOnClickListener {
-	startActivity(Intent(this, AboutActivity::class.java))
+    startActivity(Intent(this, AboutActivity::class.java))
 }
 ```
 
