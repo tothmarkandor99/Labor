@@ -4,7 +4,7 @@
 
 A labor célja a hálózati kommunikáció, a platformon leginkább használt, HTTP kommunikáció alapjainak bemutatása, valamint az ehhez kapcsolódó aszinkron hívások ismertetése. A labor során egy multiplayer labirintus játékhoz fogunk mobil klienst fejleszteni. A kliens segítségével irányíthatunk a labirintusban egy bábut, továbbá lehetőség lesz üzenetek küldésére is. A labor az alábbi témákat érinti:
 
-*   Felületek használata ButterKnife segítségével
+*   Felületek kezelése Kotlin -  Android Extensions segítségével
 *   HTTP hálózati hívások
 *   Aszinkron hívások szálakkal
 *   Események kezelése EventBus-al
@@ -23,12 +23,14 @@ A játék szabályai egyszerűek, a játékosunkat a készülékről négy gomb 
 
 ## A felhasználói felület elkészítése
 
-Hozzunk létre egy új Android Studio Projektet **NetworkLabor** néven. A Company Domain mező tartalmát töröljük ki és hagyjuk is üresen. 
+Hozzunk létre egy új Android Studio Projektet **NetworkLabor** néven, természetesen engedélyezve a Kotlin támogatást. A Company Domain mező tartalmát töröljük ki és hagyjuk is üresen. 
 
-A packagename legyen **hu.bme.aut.amorg.examples.networklabor** 
-A támogatott céleszközök a **Telefon és Tablet**, valamint a minimum SDK szint az **API15: Android 4.0.3** 
+A packagename legyen **hu.bme.aut.amorg.examples.networklabor** .
+A támogatott céleszközök a **Telefon és Tablet**, valamint a minimum SDK szint az **API19: Android 4.4** 
 
 A kezdő projekthez adjuk hozzá egy **Empty Activity**-t, melynek neve legyen **MainActivity**. 
+
+A ***test** és az **androidTest** mappákra nem lesz szükségünk, azokat törölhetjük!
 
 Első lépésként készítsük el az alkalmazás felhasználói felületét XML erőforrásból. A felületen helyezzünk el két _EditText_-et, egyet a felhasználónév bekéréséhez, egyet pedig üzenetküldéshez. Emellett legyen összesen 5 gomb, négy gomb az irányításhoz, egy pedig az üzenetküldéshez, valamint 3 TextView az üzenetek megjelenítéséhez. 
 
@@ -47,16 +49,16 @@ Az ehhez megfelelő XML állomány a következő:
     android:padding="@dimen/default_padding">
 
     <TextView
+        style="@style/DefaultViewMarginStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/title_username"
-        style="@style/DefaultViewMarginStyle" />
+        android:text="@string/title_username" />
 
     <EditText
         android:id="@+id/usernameET"
+        style="@style/DefaultViewMarginStyle"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        style="@style/DefaultViewMarginStyle" />
+        android:layout_height="wrap_content" />
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -66,54 +68,52 @@ Az ehhez megfelelő XML állomány a következő:
 
         <Button
             android:id="@+id/upBTN"
+            style="@style/DefaultViewMarginStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
-            style="@style/DefaultViewMarginStyle"
             android:text="@string/up" />
 
         <Button
             android:id="@+id/downBTN"
+            style="@style/DefaultViewMarginStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/upBTN"
             android:layout_centerHorizontal="true"
-            style="@style/DefaultViewMarginStyle"
             android:text="@string/down" />
 
         <Button
             android:id="@+id/leftBTN"
+            style="@style/DefaultViewMarginStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/upBTN"
-            style="@style/DefaultViewMarginStyle"
             android:layout_toLeftOf="@id/downBTN"
             android:text="@string/left" />
 
         <Button
             android:id="@+id/rightBTN"
+            style="@style/DefaultViewMarginStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/upBTN"
-            style="@style/DefaultViewMarginStyle"
             android:layout_toRightOf="@id/downBTN"
             android:text="@string/right" />
-
-
     </RelativeLayout>
 
     <TextView
+        style="@style/DefaultViewMarginStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        style="@style/DefaultViewMarginStyle"
         android:text="@string/title_message" />
 
     <EditText
         android:id="@+id/messageET"
+        style="@style/DefaultViewMarginStyle"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        style="@style/DefaultViewMarginStyle"  />
+        android:layout_height="wrap_content" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -123,20 +123,18 @@ Az ehhez megfelelő XML állomány a következő:
 
         <Button
             android:id="@+id/sendBTN"
+            style="@style/DefaultViewMarginStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            style="@style/DefaultViewMarginStyle"
             android:text="@string/send" />
     </LinearLayout>
 
     <TextView
         android:id="@+id/responseTV"
+        style="@style/DefaultViewMarginStyle"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        style="@style/DefaultViewMarginStyle"/>
-
+        android:layout_height="wrap_content" />
 </LinearLayout>
-
 ``` 
 
 A felület tartalmaz több szöveges konstanst is, ezért töltsük fel a _res/values_ könyvtárban lévő _strings.xml_ állományunkat a következő értékekkel: 
@@ -175,7 +173,6 @@ A felület tartalmaz stílusokat is, ezért töltsük fel a _res/values_ könyvt
     </style>
 
 </resources>
-
 ``` 
 
 Szabjuk testre az alkalmazás színeit _res/values_ könyvtárban lévő _color.xml_ állományban.
@@ -192,8 +189,6 @@ Szabjuk testre az alkalmazás színeit _res/values_ könyvtárban lévő _color.
   <color name="icons">#FFFFFF</color>
   <color name="divider">#BDBDBD</color>
 </resources>
-
-
 ``` 
 
 Szabjuk testre a _dimens.xml_ file tartalmát.
@@ -207,8 +202,6 @@ Szabjuk testre a _dimens.xml_ file tartalmát.
 </resources>
 ```
 
-A tabletekre optimalizált dimens file-t törölhetjük is (figyeljük oda, hogy ne mind a kettőt töröljük, mert azt ajánlaná fel a Studió). Töröljük az **androidTest** és **test** könyvtárakat is, nem lesz most rá szükségünk. 
-
 Mivel az alkalmazásunk interneten keresztül fog kommunikálni, vegyül fel a manifestbe az ehhez kapcsolódó permissiont.
 
 ```xml
@@ -217,93 +210,33 @@ Mivel az alkalmazásunk interneten keresztül fog kommunikálni, vegyül fel a m
 
 
 ## A felületi elemek egyszerű feloldása
-Az előző laborok során többször is használtuk a **findViewByID** hívást a nézetek feloldására. Ez a felületi elemekkel arányos mennyiségű kódolást kiván, mely egyébként nagyon repetativ. Azért hogy ezt ne _kézzel_ kelljen megcsinálnunk újra használjuk a [Butterknife](http://jakewharton.github.io/butterknife/) könyvtárat.
+Az előző laborok során többször is használtuk a **findViewByID** hívást a nézetek feloldására. Ez a felületi elemekkel arányos mennyiségű kódolást kiván, mely egyébként nagyon repetativ. Azért hogy ezt ne _kézzel_ kelljen megcsinálnunk újra használjuk a **Kotlin Android Extensions** megoldását.
 
-Ehhez a module build.gradle ben kell a dependencies részbe felvenni a könyvtárat. Egyszer fel kell venni mint _implementation_ függőség, hogy az osztályait elérjük. Másrészt fel kell venni mint _annotationProcessor_ függőség, hogy az annotáció feldolgozás lefuthasson. 
+Ezt a megoldást az Android Studio már fel is vette a projectünkbe, a **build.gradle**-ben ezt látszik is:
 
->Régebben erre az **android-apt** gradle plugin kellett, de az Android Gradle Plugin 2.2 óta beépítve elérhető, ha mégsem a legújabb gradle plugint használtnánk, azt a projekt _build.gradle_ -ben tudjuk frissíteni.
-
-```java
-implementation 'com.jakewharton:butterknife:8.8.1'
-annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
+```xml
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
 ```
 
-A könyvtár fordítás időben generálja le a findViewByID hívásokat, és el is fedi előlünk, az összerendelést annotációkkal tudjuk megadni.
+Az eszköz fordítás időben generálja le a findViewByID hívásokat, és el is fedi előlünk, az összerendelést pedíg név alapán, az adott property importálásával tehetjük meg. Ha elkezdjük gépelni pl. a usernameET-t az onCreate-ben (fontos hogy a setContentView után, mert ekkor kapnak értéket ezek a property-k) fel is ajánlja a stúdió. Látható is, hogy a megfelelő propery-t be is importálta a Stúdió:
 
 
-```java
-public class MainActivity extends AppCompatActivity{
+```kotlin
+import android.support.v7.app.AppCompatActivity
+import android.os.Bundle
+import kotlinx.android.synthetic.main.activity_main.*
 
-    @BindView(R.id.usernameET) EditText usernameET;
-	 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-		ButterKnife.bind(this);
+class MainActivity : AppCompatActivity() {
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        usernameET.setText("")
     }
 }
-```
 
-Viszont jól látható, hogy így is van feladatunk, meg kell adnunk a felületi elemeket és létre kell hoznunk a hozzájuk tartozó tagváltozókat. Szerencsére ez a feladat is automatizálható, a Butterknife Zelezny Android Studio Pluginnal.
-
-Ennek a telepítéséhez `File` - `Settings` - `Plugins` - `Browser Repositories` - `keresés: Android ButterKnife Zelezny` , majd `Install` és Android Studio újraindítás.
-
-Ha a plugin már telepítve van, akkor  a setContentView(**R.layout.activity_main**); elemére állva, **Alt+Insert** _(CMD+N)_ majd **Generate Butterknife Injections**, majd válasszuk ki a generálni kívánt elemeket (gombok, usernév, üzenet).
-
-Jelen esetben csak az EditText és TextView mezőket fogjuk használni ilyen formában. A 4 gomb kezelésére használjuk a ButterKnife beépített `@OnClick(R.id.button)` annotációját.
-
-```java
-@OnClick(R.id.downBTN)
-public void onDownButtonClick() {
-	//...
-}
-```
-Az összekötést (a tényleges findViewByID és setOnClickListener hívásokat) a ButterKnife.bind(this) hívás csinálja meg, azután a hívás után használhatóak a nézeteink és a listenerek.
-
-```java
-public class MainActivity extends AppCompatActivity {
-
-    @BindView(R.id.usernameET)
-    EditText usernameET;
-    @BindView(R.id.messageET)
-    EditText messageET;
-    @BindView(R.id.responseTV)
-    TextView responseTV;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        ButterKnife.bind(this);
-    }
-
-    @OnClick(R.id.downBTN)
-    public void onDownButtonClick() {
-        Toast.makeText(this,"Down",Toast.LENGTH_SHORT).show();
-    }
-
-    @OnClick(R.id.upBTN)
-    public void onUpButtonClick() {
-        Toast.makeText(this,"Up",Toast.LENGTH_SHORT).show();
-    }
-
-    @OnClick(R.id.leftBTN)
-    public void onLeftButtonClick() {
-        Toast.makeText(this,"Left",Toast.LENGTH_SHORT).show();
-    }
-
-    @OnClick(R.id.rightBTN)
-    public void onRightButtonClick() {
-        Toast.makeText(this,"Right",Toast.LENGTH_SHORT).show();
-    }
- 
-    @OnClick(R.id.sendBTN)
-    public void onSendButtonClick() {
-        Toast.makeText(this,"Send",Toast.LENGTH_SHORT).show();
-    }
-    
-}
 ```
 
 Próbáljuk ki az alkalmazást, nézzük meg a felületét.
@@ -351,6 +284,7 @@ Android platformon a hálózati kommunikáció emiatt új szálon kell történj
 *	Java Thread (Plain Old Java Thread, rugalmas, de testre kell szabni)
 *	Android [AsyncTask](http://developer.android.com/reference/android/os/AsyncTask.html) (Szálakra épül, sok beépített feature, de nem elég rugalmas)
 *	RxJava (sokkal bonyolultabb az előzőeknél, szálakra épül ez is)
+*  Kotlin Corutineok (sokkal bonyolultabb az előzőeknél, szálakra épül ez is)
 
 
 ### Visszatérés a fő szálra
@@ -383,179 +317,167 @@ Következő feladatunk a szerver oldali kommunikációt biztosító osztály meg
 
 A **network** csomagban hozzunk létre a **LabyrinthAPI** osztályt.
 
-```java
-public class LabyrinthAPI {
+```kotlin
+class LabyrinthAPI {
 
-    private static final String BASE_URL = "http://android-labyrinth.node.autsoft.hu";
-    private static final String UTF_8 = "UTF-8";
+    companion object {
+        private val BASE_URL = "http://android-labyrinth.node.autsoft.hu"
+        private val UTF_8 = "UTF-8"
+    }
+    
+    fun moveUser(userName: String, direction: Int): String {
+        //TODO
+        return ""
+    }
 
-  
-    public String moveUser(String userName, int direction) {
-		//TODO
-		return "";
-     }
-
-    public String writeMessage(String userName, String message) {
-		//TODO
-       return "";
+    fun writeMessage(userName: String, message: String): String {
+        //TODO
+        return ""
     }
 
 }
 ```
 
-Ez az osztály fogja végezni a különböző API hívásokat, és egységbe zárni a HTTP kérés és válasz feldolgozást.
+Ez az osztály fogja végezni a különböző API hívásokat, és egységbezárni a HTTP kérés és válasz feldolgozást.
 
 ### HTTP hívások Androidon
 Az Android platform több megoldást is ad beépítve HTTP hívásokra. Egyrészt elérhető az Apache HTTP Client, valamint az Java HttpUrlConnection. Ezeket beépítve tartalmazza a platform. Az Apache HTTP Client mára elavult, az Android 6.0 feletti eszközök már csak kiegészítéssel támogatják, NE HASZNÁLJUK. A HttpUrlConnection elérhető mindenhol, viszont nagyon körülményes a használata, ezért a beépített megoldások helyett, egy széleskörben elterjedt, harmadik féltől ([Square](http://square.github.io)) származó, nyilt könyvtárat, az [OkHttp](http://square.github.io/okhttp/)-t fogjuk használni.
 
 Ennek használatához fel kell vennünk a következő sort az alkalmazás modul szintű `build.gradle` fájljának dependencies részéhez.
 
-```java
-implementation 'com.squareup.okhttp3:okhttp:3.10.0'
+```kotlin
+implementation 'com.squareup.okhttp3:okhttp:3.11.0'
 ```
 
 Ezután a könyvtár nagyon egyszerűen használható. Készítsünk is egy általános HTTP GET hívást lebonyolító függvényt a LabyrinthAPI osztályba.
 
-```java
-private static String httpGet(String URL) throws IOException {
-     OkHttpClient client = new OkHttpClient.Builder()
+```kotlin
+@Throws(IOException::class)
+private fun httpGet(url: String): String {
+
+    val client = OkHttpClient.Builder()
             .connectTimeout(10, TimeUnit.SECONDS)
             .readTimeout(10, TimeUnit.SECONDS)
-            .build();
-            
-    Request request = new Request.Builder()
-            .url(URL)
-            .build();
+            .build()
+
+    val request = Request.Builder()
+            .url(url)
+            .build()
 
     //The execute call blocks the thread
-    Response response = client.newCall(request).execute();
-    return response.body().string();
+    val response = client.newCall(request).execute()
+    return response.body()?.string()?:"EMPTY"
 }
 ```
 
-Ezt fogjuk használni az összes HTTP GET híváshoz. Használjuk is az újonnan elkészített függvényünket, és implementáljuk a moveUser és writeMessage hívásokat. 
+Ezt fogjuk használni az összes HTTP GET híváshoz. 
+
+A HTTP karakterek megfelelő URL encodeolásához az `URLEncoder.encode(...)`  függvényét használjuk, UTF-8 karakterekkel. Azért hogy ezt ne kelljen feleslegesen többször leírni, használjunk egy segédfüggvényt:
+
+```kotlin
+private fun encode(url: String) = URLEncoder.encode(url, UTF_8)
+```
+Használjuk is az újonnan elkészített függvényünket, és implementáljuk a moveUser és writeMessage hívásokat. Figyeljük meg, hogy az esetleges kivételeket try-catch blockban kezeltük.
+
 > Megjegyzés: Jelen esetben a stringeket nyugodtan összefűzhetjük a + operátorral, a háttérben ezt a fordító kioptimalizálja, összetettebb összefüzésekre (pl. file sorainak összefűzése), használjuk a [StringBuilder](https://developer.android.com/reference/java/lang/StringBuilder.html) -t.
 
-```java
-private static final String TAG = "Network";
-private static final String ENDPOINT_STEP = "/api/step/";
-private static final String PARAM_USERNAME = "username";
-private static final String SEPARATOR = "/";
-private static final String ENDPOINT_MESSAGE = "/api/message/";
-private static final String RESPONSE_ERROR = "ERROR";
-
-
-public String moveUser(String userName, int direction) {
-    try {
-        String usernameURLEncoded = URLEncoder.encode(userName, UTF_8);
-
-        String moveUserUrl = ENDPOINT_STEP + usernameURLEncoded + SEPARATOR + direction;
-
-        Log.d(TAG,"Call to:"+moveUserUrl);
-        String response = httpGet(BASE_URL + moveUserUrl);
-        return response;
-
-    } catch (Exception e) {
-        e.printStackTrace();
-        return RESPONSE_ERROR;
-    }
+```kotlin
+companion object {
+    private const val BASE_URL = "http://android-labyrinth.node.autsoft.hu"
+    private const val UTF_8 = "UTF-8"
+    private const val TAG = "Network"
+    private const val RESPONSE_ERROR = "ERROR"
 }
 
-public String writeMessage(String userName, String message) {
-    try {
-        String usernameURLEncoded = URLEncoder.encode(userName, UTF_8);
-        String messageURLEncoded = URLEncoder.encode(message, UTF_8);
 
-        String writeMessageUrl = ENDPOINT_MESSAGE + usernameURLEncoded + SEPARATOR + messageURLEncoded;
+fun moveUser(username: String, direction: Int): String {
+    return try {
+        val moveUserUrl = "/api/step/${encode(username)}/$direction"
 
-        Log.d(TAG,"Call to:"+writeMessageUrl);
-        String response = httpGet(BASE_URL + writeMessageUrl);
-        return response;
+        Log.d(TAG, "Call to $moveUserUrl")
+        httpGet(BASE_URL + moveUserUrl)
 
-    } catch (Exception e) {
-        e.printStackTrace();
-        return RESPONSE_ERROR;
+    } catch (e: Exception) {
+        e.printStackTrace()
+        RESPONSE_ERROR
+    }
+
+}
+
+fun writeMessage(username: String, message: String): String {
+    return try {
+        val writeMessageUrl = "api/message/${encode(username)}/${encode(message)}"
+
+        Log.d(TAG, "Call to $writeMessageUrl")
+        httpGet(BASE_URL + writeMessageUrl)
+
+    } catch (e: Exception) {
+        e.printStackTrace()
+        RESPONSE_ERROR
     }
 
 }
 ```
-
-Figyeljük meg, hogy az esetleges kivételeket try-catch blockban kezeltük, valamint a HTTP karaktereket megfelelően URL encodeoltuk az `URLEncoder.encode(...)`  függvényével, mely beépítve rendelkezésünkre áll.
-
 
 Ezután vegyük fel az irányok értékeit konstansként a MainActivitybe
 
-```java
-public static final int MOVE_LEFT = 1;
-public static final int MOVE_UP = 2;
-public static final int MOVE_RIGHT = 3;
-public static final int MOVE_DOWN = 4;
+```kotlin
+companion object {
+    private const val MOVE_LEFT = 1
+    private const val MOVE_UP = 2
+    private const val MOVE_RIGHT = 3
+    private const val MOVE_DOWN = 4
+}
 ```
 
-Majd private field-ként adjunk hozzá az előbb létrehozott LabyrinthAPI osztályt, és használjuk a megfelelő események bekövetkeztekor.
+Majd private propery-ként adjunk hozzá az előbb létrehozott LabyrinthAPI osztályt, és használjuk a megfelelő események bekövetkeztekor, ezeket kössűk a megfelelő gombokhoz!
 
 
-```java
-public class MainActivity extends AppCompatActivity {
+```kotlin
+class MainActivity : AppCompatActivity() {
 
-    @BindView(R.id.usernameET) EditText usernameET;
-    @BindView(R.id.messageET) EditText messageET;
-    @BindView(R.id.responseTV) TextView responseTV;
-
-    public static final int MOVE_LEFT = 1;
-    public static final int MOVE_UP = 2;
-    public static final int MOVE_RIGHT = 3;
-    public static final int MOVE_DOWN = 4;
-
-    private LabyrinthAPI labyrinthAPI;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        ButterKnife.bind(this);
-
-        labyrinthAPI = new LabyrinthAPI();
+    companion object {
+        private const val MOVE_LEFT = 1
+        private const val MOVE_UP = 2
+        private const val MOVE_RIGHT = 3
+        private const val MOVE_DOWN = 4
     }
 
+    private val labyrinthAPI = LabyrinthAPI()
 
-    @OnClick(R.id.downBTN)
-    public void onDownButtonClick() {
-        String response=labyrinthAPI.moveUser(usernameET.getText().toString(),MOVE_DOWN);
-        showResponse(response);
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+        downBTN.setOnClickListener {
+            val response = labyrinthAPI.moveUser(usernameET.text.toString(), MOVE_DOWN)
+            showResponse(response)
+        }
+
+        upBTN.setOnClickListener {
+            val response = labyrinthAPI.moveUser(usernameET.text.toString(), MOVE_UP)
+            showResponse(response)
+        }
+
+        leftBTN.setOnClickListener {
+            val response = labyrinthAPI.moveUser(usernameET.text.toString(), MOVE_LEFT)
+            showResponse(response)
+        }
+
+        rightBTN.setOnClickListener {
+            val response = labyrinthAPI.moveUser(usernameET.text.toString(), MOVE_RIGHT)
+            showResponse(response)
+        }
+
+        sendBTN.setOnClickListener {
+            val response = labyrinthAPI.writeMessage(usernameET.text.toString(), messageET.text.toString())
+            showResponse(response)
+        }
     }
 
-    @OnClick(R.id.leftBTN)
-    public void onLeftButtonClick() {
-        String response=labyrinthAPI.moveUser(usernameET.getText().toString(),MOVE_LEFT);
-        showResponse(response);
-    }
+    private fun showResponse(response: String) = responseTV.text
 
-    @OnClick(R.id.rightBTN)
-    public void onRightButtonClick() {
-        String response=labyrinthAPI.moveUser(usernameET.getText().toString(),MOVE_RIGHT);
-        showResponse(response);
-    }
-
-    @OnClick(R.id.upBTN)
-    public void onUpButtonClick() {
-        String response=labyrinthAPI.moveUser(usernameET.getText().toString(),MOVE_UP);
-        showResponse(response);
-    }
-
-    @OnClick(R.id.sendBTN)
-    public void onSendButtonClick() {
-        String message = messageET.getText().toString();
-        String response=labyrinthAPI.writeMessage(usernameET.getText().toString(),message);
-        showResponse(response);
-
-    }
-
-    private void showResponse(String response) {
-        responseTV.setText(response);
-    }
-
-}  
+}
 ```
 
 Próbáljuk, ki az alkalmazást. Mit tapasztalunk?
@@ -564,62 +486,51 @@ Azt tapasztaljuk, hogy minden kérésre ERROR-t kapunk, és ha megnézzük a Log
 
 
 ### Szálkezelés elkészítése
-A szálkezeléshez használjuk az egyszerű és könnyen testre szabható JavaThread-eket. Készítsünk el a MainActivityben 1-1 segéd függvényt a moveUser és writeMessage híváshoz. Elsőnek egy új szálat készítünk, melyben elindítjuk az API hívást és amint az válaszolt, visszaadjuk a választ a fő szálra (runOnUIThread). ahol pedíg már a főszálon megjelenítjük a választ.
+A szálkezeléshez használjuk az egyszerű és könnyen testre szabható JavaThread-eket. Készítsünk el a MainActivityben egy segéd függvényt a moveUser és writeMessage híváshoz. Ebben elsőnek egy új szálat készítünk, melyben elindítjuk az API hívást és amint az válaszolt, visszaadjuk a választ a fő szálra (runOnUIThread). ahol pedíg már a főszálon megjelenítjük a választ a showResponse segítségével. Kihasználjuk a Kotlin nyelv nyujtotta lambdákat, és egy olyan függényt várunk paraméterként, melynek nincs paramétere és egy Strinel tér vissza. Mivel egy paramétere van ezt direct, kapcsok között is meghívhatjuk majd.
 
-```java
-private void asyncMoveUser(final String username, final int direction) {
-    new Thread(new Runnable() {
-        @Override
-        public void run() {
-            final String response = labyrinthAPI.moveUser(username, direction);
-
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    showResponse(response);
-                }
-            });
-
-        }
-    }).start();
-}
-
-private void asyncWriteMessage(final String username, final String message) {
-    new Thread(new Runnable() {
-        @Override
-        public void run() {
-            final String response = labyrinthAPI.writeMessage(username, message);
-
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    showResponse(response);
-                }
-            });
-
-        }
-    }).start();
+```kotlin
+private fun async(call: () -> String) {
+    Thread{
+        val response = call.invoke()
+        runOnUiThread { showResponse(response) }
+    }.start()
 }
 ```
 Hívjuk meg ezeket az onClick metódusokból, a direkt hívások helyett, és nézzük meg mit tapasztalunk.
 
-```java
-@OnClick(R.id.downBTN)
-public void onDownButtonClick() {
-  asyncMoveUser(usernameET.getText().toString(),MOVE_DOWN);
-}
+```kotlin
+downBTN.setOnClickListener {
+     async {
+         labyrinthAPI.moveUser(usernameET.text.toString(), MOVE_DOWN)
+     }
+ }
 
-// ...
+ upBTN.setOnClickListener {
+     async {
+         labyrinthAPI.moveUser(usernameET.text.toString(), MOVE_UP)
+     }
+ }
 
-@OnClick(R.id.sendBTN)
-public void onSendButtonClick() {
-    asyncWriteMessage(usernameET.getText().toString(),messageET.getText().toString());
-}
+ leftBTN.setOnClickListener {
+     async {
+         labyrinthAPI.moveUser(usernameET.text.toString(), MOVE_LEFT)
+     }
+ }
+
+ rightBTN.setOnClickListener {
+     async {
+         labyrinthAPI.moveUser(usernameET.text.toString(), MOVE_RIGHT)
+     }
+ }
+
+ sendBTN.setOnClickListener {
+     async {
+         labyrinthAPI.writeMessage(usernameET.text.toString(), messageET.text.toString())
+     }
+ }
 ```
 
 Próbáljuk ki az alkalmazást.
-
-
 
 
 ## Megfelelő válasz kezelés
@@ -630,7 +541,7 @@ Ennek az az oka, hogy a szálak tovább képesek élni, mint az Activity, és ha
 
 Ezt úgy lehet kiküszöbölni, hogy az erős, referencia alapú csatolás helyett laza csatolást alkalmazunk. Ilyen esetben az Activity amikor előtérbe kerül (onResume) feliratkozik, majd ha háttérbe kerül leiratkozik (onPause) az eseményről. A hálózati hívás során pedig a választ nem direkt függvényhívásban állítjuk be, hanem csak egy eseményt váltunk ki.
 
-Az Android platform beépítve támogatja az események kezelését Broadcast Receiverek formájában. Viszont egy alkalmazáson belül használva a broadcast receivereket, az üzenet sorosítása miatt overhead jelentkezik, valamint kényelmetlen is a használata. 
+Az Android platform beépítve támogatja az események kezelését Broadcast Receiverek formájában. Viszont egy alkalmazáson belül használva a broadcast receivereket, az üzenet sorosítása miatt overhead jelentkezik, valamint kényelmetlen is a használatuk. 
 
 Ennek kiküszöbölése érdekében használjunk esemény buszokat, melyek gyorsabbak és egyszerűbben is használhatóak a Broadcast Receiverektől (ellenben csak egy alkalmazáson/processen belül működnek és referencia szükséges az eseménybuszra).
 
@@ -638,79 +549,72 @@ Számos 3rd party eseménybusz megoldás van, mi a Greenrobot EventBus megoldás
 
 `implementation 'org.greenrobot:eventbus:3.1.1'`
 
-Majd definiáljunk esemény osztályokat. Hozzunk létre 1-1 esemény osztályt, a **MoveUser** és a **WriteMessage** eseményeknek, az **events** csomagban, **MoveUserResponseEvent** és **WriteMessageResponseEvent** néven. Mivel az eseménybuszok az osztály alapján dolgoznak ezért az egyes eseményekhez külön osztályok szükségesek. Mindenkét osztály standard Java osztály, mely 1-1 String-ben tárolja a választ.
+Majd definiáljunk esemény osztályokat. Hozzunk létre 1-1 esemény osztályt, a **MoveUser** és a **WriteMessage** eseményeknek, az **events** csomagban, **MoveUserResponseEvent** és **WriteMessageResponseEvent** néven. Mivel az eseménybuszok az osztály alapján dolgoznak ezért az egyes eseményekhez külön osztályok szükségesek. Mindenkét osztály Kotlin date osztály, mely 1-1 String-ben tárolja a választ.
 
-```java
-public class MoveUserResponseEvent {
-    private String response;
+```kotlin
+data class MoveUserEvent(val response: String)
 
-    public String getResponse() {
-        return response;
-    }
-
-    public void setResponse(String response) {
-        this.response = response;
-    }
-}
-
-//...
-
-public class WriteMessageResponseEvent {
-    private String response;
-
-    public String getResponse() {
-        return response;
-    }
-
-    public void setResponse(String response) {
-        this.response = response;
-    }
-}
+data class WriteMessageEvent(val response: String)
 ```
 
 Ezután az eseményeket a külön szálakban az `EventBus.getDefault().post(...)` segítségével küldjük ki. Minden eseményt a fenti osztályok 1-1 példánya reprezentál.
 
-```java
-private void asyncMoveUser(final String username, final int direction) {
-    new Thread(new Runnable() {
-        @Override
-        public void run() {
-            final String response = labyrinthAPI.moveUser(username, direction);
+Ahhoz hogy az aszinron segédfüggvényünket tudjuk használni, alakítjuk át úgy hogy a paraméter függvénynek ne legyen visszatérési értéke
 
-            MoveUserResponseEvent moveUserResponseEvent = new MoveUserResponseEvent();
-            moveUserResponseEvent.setResponse(response);
-            EventBus.getDefault().post(moveUserResponseEvent);
+```kotlin
+private fun async(call: () -> Unit) = Thread { call.invoke() }.start()
+```
 
-        }
-    }).start();
+Majd használjuk:
+
+```kotlin
+downBTN.setOnClickListener {
+    async {
+        val response = labyrinthAPI.moveUser(usernameET.text.toString(), MOVE_DOWN)
+        EventBus.getDefault().post(MoveUserEvent(response))
+    }
 }
 
-private void asyncWriteMessage(final String username, final String message) {
-    new Thread(new Runnable() {
-        @Override
-        public void run() {
-            final String response = labyrinthAPI.writeMessage(username, message);
+upBTN.setOnClickListener {
+    async {
+        val response = labyrinthAPI.moveUser(usernameET.text.toString(), MOVE_UP)
+        EventBus.getDefault().post(MoveUserEvent(response))
+    }
+}
 
-            WriteMessageResponseEvent writeMessageResponseEvent = new WriteMessageResponseEvent();
-            writeMessageResponseEvent.setResponse(response);
-            EventBus.getDefault().post(writeMessageResponseEvent);
+leftBTN.setOnClickListener {
+    async {
+        val response = labyrinthAPI.moveUser(usernameET.text.toString(), MOVE_LEFT)
+        EventBus.getDefault().post(MoveUserEvent(response))
+    }
+}
 
-        }
-    }).start();
+rightBTN.setOnClickListener {
+    async {
+        val response = labyrinthAPI.moveUser(usernameET.text.toString(), MOVE_RIGHT)
+        EventBus.getDefault().post(MoveUserEvent(response))
+    }
+}
+
+sendBTN.setOnClickListener {
+    async {
+        val response = labyrinthAPI.writeMessage(usernameET.text.toString(), messageET.text.toString())
+        EventBus.getDefault().post(WriteMessageEvent(response))
+    }
 }
 ```
 
 Ahhoz, hogy a kiváltott eseményeket el tudjuk kapni, a **MainActivity**ben definiáljuk az eseménybusz elkapó függvényeit.
 
-```java
+```kotlin
 @Subscribe(threadMode = ThreadMode.MAIN)
-public void onMoveUserResponse(MoveUserResponseEvent event) {
-    responseTV.setText("Move User Response:" + event.getResponse());
+fun onMoveUserResponse(event: MoveUserEvent) {
+    responseTV.text = "Move User Response:" + event.response
 }
 
 @Subscribe(threadMode = ThreadMode.MAIN)
-public void onWriteMessageResponse(WriteMessageResponseEvent  event) {
-    responseTV.setText("Write Message Response:" + event.getResponse());
+fun onWriteMessageResponse(event: WriteMessageEvent) {
+    responseTV.text = "Write Message Response:" + event.response
 }
 ```
 Itt fontos hogy a **@Subscribe** annotáció használva legyen, ez mondja meg hogy ez egy elkapó metódus, valamint a thread mode **MAIN** legyen, mert így az események a főszálon kerülnek továbbításra. Fontos, hogy az elküldött objektumokat az osztály típusa szerint tudja a rendszer a megfelelő elkapó metódusnak elküldeni. Egyébként egy eseményhez több elkapó metódus is lehet egyszerre beregisztrálva.
@@ -719,17 +623,15 @@ Ezután regisztráljuk be az elkapó metódusokat, pontosabban azt az osztályt 
 
 Azt szeretnénk, hogy akkor legyenek ezek az esemény elkapó metódusok aktívak, amikor az Activity előtérben van, így az onResume-ban iratkozunk fel, és az onPause-ban le.
 
-```java
-@Override
-protected void onResume() {
-    super.onResume();
-    EventBus.getDefault().register(this);
+```kotlin
+override fun onResume() {
+    super.onResume()
+    EventBus.getDefault().register(this)
 }
 
-@Override
-protected void onPause() {
-    EventBus.getDefault().unregister(this);
-    super.onPause();
+override fun onPause() {
+    EventBus.getDefault().unregister(this)
+    super.onPause()
 }
 ```
 
@@ -748,8 +650,8 @@ Egészítsük ki az alkalmazást úgy, hogy a felhasználói felületen megjelen
 
 Tipp: Az aktuális időt legegyszerűbben a következő hívással érhetjük el:
 
-```java
-long currentTime=System.currentTimeMillis();
+```kotlin
+val currentTime=System.currentTimeMillis()
 ```
 
 ## Bonus feladat 2 - Hálozat elérhető-e
@@ -757,9 +659,9 @@ long currentTime=System.currentTimeMillis();
 Egészítsük ki az alkalmazást úgy, hogy a hálózati hívások előtt ellenőrizzük, hogy elérhető-e a hálózat, ha nem, jelenítsünk meg hibaüzenetet pl. Toast-ban. Segítség: 
 
 ``` java
-ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-boolean networkAvailable = activeNetworkInfo != null && activeNetworkInfo.isConnected();
+val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+val activeNetworkInfo = connectivityManager.activeNetworkInfo
+val isNetworkAvailable = activeNetworkInfo != null && activeNetworkInfo.isConnected
 ``` 
 
 A szükséges manifest engedély: 
@@ -773,10 +675,10 @@ A szükséges manifest engedély:
 Egészítsük ki az alkalmazást úgy, hogy a _WiFi_ állapotát és a hálózat nevét megjelenítsük a felhasználói felületen.  Segítség: 
 
 ``` java
-WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
-WifiInfo wifiInfo = wifiManager.getConnectionInfo();
-Log.d("wifiInfo", wifiInfo.toString());
-Log.d("SSID",wifiInfo.getSSID());
+val wifiManager = applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+val wifiInfo = wifiManager.connectionInfo
+Log.d("wifiInfo", wifiInfo.toString())
+Log.d("SSID", wifiInfo.ssid)
 ``` 
 
 A szükséges manifest engedély: 
