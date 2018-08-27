@@ -192,7 +192,6 @@ Szabjuk testre az alkalmazás színeit _res/values_ könyvtárban lévő _color.
 ``` 
 
 Szabjuk testre a _dimens.xml_ file tartalmát.
-
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
@@ -406,7 +405,7 @@ fun moveUser(username: String, direction: Int): String {
 
 fun writeMessage(username: String, message: String): String {
     return try {
-        val writeMessageUrl = "api/message/${encode(username)}/${encode(message)}"
+        val writeMessageUrl = "/api/message/${encode(username)}/${encode(message)}"
 
         Log.d(TAG, "Call to $writeMessageUrl")
         httpGet(BASE_URL + writeMessageUrl)
