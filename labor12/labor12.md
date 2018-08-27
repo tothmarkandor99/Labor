@@ -45,7 +45,7 @@ Sikeres projekt létrehozás után fussák át a laborvezetővel közösen a Fir
 
 Hozzunk létre egy új projektet Android Studio-ban, a package name legyen **hu.bme.aut.android.bmeforumNEPTUN_KOD**. Fontos hogy a Neptun kód előtt ne legyen pont, mert ez gondot okozhat.
 
-Válasszuk az *Empty Activity* sablont és a kezdő Activity-nk neve legyen *LoginActivity*, mivel elsőként a regisztrációs és bejelentkező nézetet fogjuk megvalósítani. Az egyszerűség kedvéért ugyanazt a felületet fogjuk használni regisztráció és bejelentkezés céljából.
+Válasszuk az *Empty Activity* sablont és a kezdő Activity-nk neve legyen `LoginActivity`, mivel elsőként a regisztrációs és bejelentkező nézetet fogjuk megvalósítani. Az egyszerűség kedvéért ugyanazt a felületet fogjuk használni regisztráció és bejelentkezés céljából.
 
 Adjuk hozzá a Manifest fájlhoz az Internet használati engedélyt:
 
@@ -63,7 +63,7 @@ Amennyiben a Firebase Assistant-ot nem sikerül beüzemelni, manuálisan is öss
 Válasszuk az Assistant-ban az *Authentication* szakaszt és azon belül az *Email and password authentication*-t, majd a *Connect to Firebase* gombot.
 Ezt követően egy dialógus nyílik meg, ahol a második szakaszt (*Choose an existing Firebase or Google project*) választva kiválaszthatjuk a projektet amit a Firebase console-ban már létrehoztunk, ha megfelelőek az accountok. Itt egyébként lehetőség van új projektet is létrehozni. Ha elsőre hibát látunk a projekttel való összekapcsolásnál, próbáljuk újra, másodszorra általában sikeresen megtörténik a projekt szinkronizálása a Firebase projekttel.
 
-A háttérben valójában annyi történik, hogy az alkalmazásunk package neve és az aláíró kulcs *SHA-1*-e alapján hozzáadódik egy Android alkalmazás a Firebase console-ban lévő projektünkhöz, és az ahhoz tartozó konfigurációs *google-services.json* file letöltődik a projektünk könyvtárába az alapértelmezett (app) modul alá.
+A háttérben valójában annyi történik, hogy az alkalmazásunk package neve és az aláíró kulcs *SHA-1*-e alapján hozzáadódik egy Android alkalmazás a Firebase console-ban lévő projektünkhöz, és az ahhoz tartozó konfigurációs (`google-services.json`) file letöltődik a projektünk könyvtárába az alapértelmezett (app) modul alá.
 
 Ezt a lépéssorozatot manuálisan is végrehajthatjuk a Firebase console-ban az *Add Firebase to your Android app*-et választva. A debug kulcs SHA-1 lenyomata ilyenkor a *Gradle -> [projektnév] -> Tasks -> android -> signingReport* taskot futtatva kinyerhető alul az execution/text módot választva.
 
@@ -101,7 +101,7 @@ implementation 'com.github.bumptech.glide:glide:4.7.1'
 
 ## Regisztráció, bejelentkezés
 
-Első lépésként valósítsuk meg a regisztráció/bejelentkező képernyő felületét. Mivel ehhez hasonló felületeket már készítettünk korábban, az egyszerűség kedvéért megadjuk a felület kódját, amely az *activity_login.xml*-be kerül:
+Első lépésként valósítsuk meg a regisztráció/bejelentkező képernyő felületét. Mivel ehhez hasonló felületeket már készítettünk korábban, az egyszerűség kedvéért megadjuk a felület kódját, amely az `activity_login.xml`-be kerül:
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -180,11 +180,11 @@ Első lépésként valósítsuk meg a regisztráció/bejelentkező képernyő fe
 </ScrollView>
 ```
 
-Tekintsük át a felhasználói felület kódját. Figyeljük meg, hogy, hogy a jelszó mezőhöz tartozó *TextInputLayout*-nál az *app:passwordToggleEnabled="true"* beállítással a mező mellett megjelenik egy kis ikon, amely segítségével láthatóvá tehetjük az alkalmazásban a jelszót.
+Tekintsük át a felhasználói felület kódját. Figyeljük meg, hogy, hogy a jelszó mezőhöz tartozó `TextInputLayout`-nál az `app:passwordToggleEnabled="true"` beállítással a mező mellett megjelenik egy kis ikon, amely segítségével láthatóvá tehetjük az alkalmazásban a jelszót.
 
 <img src="./assets/bmeforum_login.png" width="512" align="middle">
 
-Az alkalmazás során több Activity-nk lesz, melyek közös funkcióit, mint például a progress dialog megjelenítést és felhasználói adatok lekérdezését kiszervezzük egy *BaseActivity* osztályba (ez csak egy absztrakt osztály, nem egy konkrét *Activity*, így nem kell a Manifestben regisztrálni):
+Az alkalmazás során több Activity-nk lesz, melyek közös funkcióit, mint például a progress dialog megjelenítést és felhasználói adatok lekérdezését kiszervezzük egy `BaseActivity` osztályba (ez csak egy absztrakt osztály, nem egy konkrét `Activity`, így nem kell a Manifestben regisztrálni):
 
 ```kotlin
 abstract class BaseActivity : AppCompatActivity() {
@@ -231,7 +231,7 @@ abstract class BaseActivity : AppCompatActivity() {
 }
 ```
 
-Származtassuk a meglevő *LoginActivity*-t a *BaseActivity*-ből, majd vegyük fel a Firebase authentikációért felelős `firebaseAuth` tagváltozót és inicializáljuk az *onCreate(...)*-ben:
+Származtassuk a meglevő `LoginActivity`-t a `BaseActivity`-ből, majd vegyük fel a Firebase authentikációért felelős `firebaseAuth` tagváltozót és inicializáljuk az `onCreate(...)`-ben:
 
 ```kotlin
 private lateinit var firebaseAuth: FirebaseAuth
@@ -244,7 +244,7 @@ override fun onCreate(savedInstanceState: Bundle?) {
 }
 ```
 
-Adjunk a *LoginActivity*-hez egy segédfüggvényt, mely az input mezők validációjáért lesz felelős:
+Adjunk a `LoginActivity`-hez egy segédfüggvényt, mely az input mezők validációjáért lesz felelős:
 
 ```kotlin
 private fun validateForm(): Boolean {
@@ -309,7 +309,7 @@ private fun registerClick() {
 }
 ```
 
-Végül valósítsuk meg a login eseménykezelőt (*PostsActivity*-nk még nincs, ezt hamarosan létrehozzuk, ezért az a sor egyelőre hibás lesz):
+Végül valósítsuk meg a login eseménykezelőt (`PostsActivity`-nk még nincs, ezt hamarosan létrehozzuk, ezért az a sor egyelőre hibás lesz):
 
 ```kotlin
 private fun loginClick() {
@@ -342,7 +342,7 @@ btnRegister.setOnClickListener { registerClick() }
 btnLogin.setOnClickListener { loginClick() }
 ```
 
-A *Navigation Drawer Activity* sablont használva készítsük el az új *PostsActivity*-t, és miután létrejött változtassuk meg az ősosztályát az *AppCompatActivity*-ről a saját *BaseActivity* osztályunkra.
+A *Navigation Drawer Activity* sablont használva készítsük el az új `PostsActivity`-t, és miután létrejött változtassuk meg az ősosztályát az `AppCompatActivity`-ről a saját `BaseActivity` osztályunkra.
 
 Próbáljuk ki az alkalmazás jelenlegi működését. Nézzük meg, hogy a Firebase console-ban is látszik-e a regisztrált felhasználó.
 
@@ -350,8 +350,8 @@ Próbáljuk ki az alkalmazás jelenlegi működését. Nézzük meg, hogy a Fire
 
 ## Postok listázása
 
-Első lépésként tekintse át a laborvezetővel a *PostsActivity* kódját és a hozzá tartozó felhasználói felületet.
-A *PostsActivity* feladata lesz a fórum üzenetek megjelenítése egy *RecyclerView*-ban. Az egyes üzenetek egy *CardView*-n kerülnek megjelenítésre. A lista valós időben fog frissülni  amikor egy új üzenet kerül fel a Firebase adatbázisba.
+Első lépésként tekintse át a laborvezetővel a `PostsActivity` kódját és a hozzá tartozó felhasználói felületet.
+A `PostsActivity` feladata lesz a fórum üzenetek megjelenítése egy `RecyclerView`-ban. Az egyes üzenetek egy `CardView`-n kerülnek megjelenítésre. A lista valós időben fog frissülni  amikor egy új üzenet kerül fel a Firebase adatbázisba.
 
 Adjuk hozzá a projekthez a *Firebase Realtime Database* támogatást (itt is fontos a verziószám):
 
@@ -361,7 +361,7 @@ implementation 'com.google.firebase:firebase-database:16.0.1'
 
 Kapcsoljuk be a *Realtime Database*-t a Firebase console-on is (figyeljünk rá, hogy ne a Cloud Firestore-t válasszuk, ez egy újabb, még bétában lévő adatbázis megoldás). Az adatbázist *test mode*-ban fogjuk használni, így egyelőre publikusan írható/olvasható lesz, de cserébe nem kell konfigurálnunk a hozzáférés szabályozást hozzá. Ezt természetesen később mindenképp meg kéne tenni egy éles projektben.
 
-Változtassuk meg a Navigation Drawer menüjét, hogy csak egy Logout menüpont szerepeljen rajta. Ezt a *res/menu/activity_posts_drawer.xml*-ben tehetjük meg:
+Változtassuk meg a Navigation Drawer menüjét, hogy csak egy *Logout* menüpont szerepeljen rajta. Ezt a `res/menu/activity_posts_drawer.xml`-ben tehetjük meg:
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -373,9 +373,9 @@ Változtassuk meg a Navigation Drawer menüjét, hogy csak egy Logout menüpont 
 </menu>
 ```
 
-A *PostsActivity* *onCreateOptionsMenu(...)* és *onOptionsItemSelected(...)* függvényei és a *menu/posts.xml* törölhetők, mivel a Toolbaron lévő menüt nem fogjuk használni.
+A `PostsActivity` `onCreateOptionsMenu(...)` és `onOptionsItemSelected(...)` függvényei és a `menu/posts.xml` törölhetők, mivel a Toolbaron lévő menüt nem fogjuk használni.
 
-A *NavigationDrawer* menü kezelő függvényében pedig csak a logout menüpontot kell kezelni, ezt egyszerűen egy [`when` kifejezéssel](https://kotlinlang.org/docs/reference/control-flow.html#when-expression) tehetjük meg:
+A *Navigation Drawer* menü kezelő függvényében pedig csak a *Logout* menüpontot kell kezelni, ezt egyszerűen egy [`when` kifejezéssel](https://kotlinlang.org/docs/reference/control-flow.html#when-expression) tehetjük meg:
 
 ```kotlin
 override fun onNavigationItemSelected(item: MenuItem): Boolean {
@@ -392,7 +392,7 @@ override fun onNavigationItemSelected(item: MenuItem): Boolean {
 }
 ```
 
-Cseréljük le az *app_bar_posts.xml*-ben az *AppBarLayout*-ot (csak azt, ne az egész fájl tartalmát!) az alábbira, amely az alkalmazás ikonját használva egy *KenBurns* effektet valósít meg (a kép tetszőlegesen lecserélhető).
+Cseréljük le az `app_bar_posts.xml`-ben az `AppBarLayout`-ot (csak azt, ne az egész fájl tartalmát!) az alábbira, amely az alkalmazás ikonját használva egy [*Ken Burns effektet*](https://en.wikipedia.org/wiki/Ken_Burns_effect) valósít meg (a kép tetszőlegesen lecserélhető).
 
 ```xml
 <android.support.design.widget.AppBarLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -430,7 +430,7 @@ Cseréljük le az *app_bar_posts.xml*-ben az *AppBarLayout*-ot (csak azt, ne az 
 </android.support.design.widget.AppBarLayout>
 ```
 
-A *PostsActivity* központi felülete a *content_posts.xml*-ben található, ennek a tartalma legyen az alábbi:
+A `PostsActivity` központi felülete a `content_posts.xml`-ben található, ennek a tartalma legyen az alábbi:
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -446,7 +446,7 @@ Próbáljuk ki a jelenlegi állapotot, ellenőrizzük a kijelentkezés funkció 
 
 <img src="./assets/bmeforum_navdrawer.png" width="512" align="middle">
 
-A következő lépés a Post listázás megvalósítása. Ehhez először hozzunk létre egy *data* package-t és benne egy *Post* osztályt a következő tartalommal:
+A következő lépés a Post listázás megvalósítása. Ehhez először hozzunk létre egy `data` package-t és benne egy `Post` osztályt a következő tartalommal:
 
 ```kotlin
 class Post(
@@ -460,7 +460,7 @@ class Post(
 
 Ez az osztály tárolja az üzenet szerzőjét, címét, tartalmát és a hozzá tartozó kép URL-jét opcionálisan.
 
-Valósítsuk meg az egy *Post*-ot megjelenítő felületet *card_post.xml* néven a *res/layout* mappába:
+Valósítsuk meg az egy `Post`-ot megjelenítő felületet `card_post.xml` néven a `res/layout` mappába:
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -515,7 +515,7 @@ Valósítsuk meg az egy *Post*-ot megjelenítő felületet *card_post.xml* néve
 </android.support.v7.widget.CardView>
 ```
 
-A következő lépés a *Post*-ok *RecyclerView*-ban való megjelenítéséért felelős *Adapter* osztály megírása. Ezt hozzuk létre egy új, *adapter* nevű package-ben, *PostsAdapter* néven:
+A következő lépés a `Post`-ok `RecyclerView`-ban való megjelenítéséért felelős adapter osztály megírása. Ezt hozzuk létre egy új, `adapter` nevű package-ben, `PostsAdapter` néven:
 
 ```kotlin
 class PostsAdapter(private val context: Context) : RecyclerView.Adapter<PostsAdapter.ViewHolder>() {
@@ -573,13 +573,13 @@ class PostsAdapter(private val context: Context) : RecyclerView.Adapter<PostsAda
 }
 ```
 
-A *RecyclerView* adapterrel való összekötését a *PostsActivity*-ben valósítjuk meg. Vegyünk fel egy tagváltozót az osztályba az adapter számára:
+A `RecyclerView` adapterrel való összekötését a `PostsActivity`-ben valósítjuk meg. Vegyünk fel egy tagváltozót az osztályba az adapter számára:
 
 ```kotlin
 private lateinit var postsAdapter: PostsAdapter
 ```
 
-Majd az *onCreate(...)* végére tegyük a *RecyclerView* adapterrel való összekötéséért felelős kódrészt:
+Majd az `onCreate(...)` végére tegyük a `RecyclerView` adapterrel való összekötéséért felelős kódrészt:
 
 ```kotlin
 postsAdapter = PostsAdapter(applicationContext)
@@ -590,9 +590,9 @@ rvPosts.layoutManager = LinearLayoutManager(this).apply {
 rvPosts.adapter = postsAdapter
 ```
 
-Ahhoz, hogy  az üzenet lista (*RecyclerView*) frissüljön, ha egy új üzenet érkezett, illetve, hogy kezdetben fel legyen töltve az eddigi adatokkal, a Firebase adatbázis "posts" ágára kell készítenünk egy *ChildEventListener*-t, melynek *onChildAdded(...)* függvénye első híváskor minden eddig bent levő elemre meghívódik, majd minden új elemre is. Látható, hogy ez az eseményekezlő aktiválódik további eseményekre is (változás, törlés, stb.), ezeket most nem fogjuk kezelni.
+Ahhoz, hogy  az üzenet lista (`RecyclerView`) frissüljön, ha egy új üzenet érkezett, illetve, hogy kezdetben fel legyen töltve az eddigi adatokkal, a Firebase adatbázis "posts" ágára kell készítenünk egy `ChildEventListener`-t, melynek `onChildAdded(...)` függvénye első híváskor minden eddig bent levő elemre meghívódik, majd minden új elemre is. Látható, hogy ez az eseményekezlő aktiválódik további eseményekre is (változás, törlés, stb.), ezeket most nem fogjuk kezelni.
 
-Valósítsuk meg az alábbi *initPostsListener()* függvényt és hívjuk is meg a *PostsActivity* *onCreate(...)* függvényének végén:
+Valósítsuk meg az alábbi `initPostsListener()` függvényt és hívjuk is meg a `PostsActivity` `onCreate(...)` függvényének végén:
 
 ```kotlin
 private fun initPostsListener() {
@@ -619,7 +619,7 @@ private fun initPostsListener() {
 }
 ```
 
-(Alternatív megoldásként a *Firebase-UI* osztálykönyvtár ad egy *FirebaseRecyclerAdapter* implementációt, melynek megoldása teljesen hasonló, de nehezebben testreszabható - https://github.com/firebase/FirebaseUI-Android - Jelen laborfoglalkozásban ezt nem használjuk.)
+(Alternatív megoldásként a *Firebase-UI* osztálykönyvtár ad egy `FirebaseRecyclerAdapter` implementációt, melynek megoldása teljesen hasonló, de nehezebben testreszabható - https://github.com/firebase/FirebaseUI-Android - Jelen laborfoglalkozásban ezt nem használjuk.)
 
 Próbáljuk ki az alkalmazás működését. A lista jelenleg még üres lesz, hacsak nem veszünk fel a Firebase console-on elemeket, de fontos, hogy már hiba nélkül kell futnia az alkalmazásnak.
 
@@ -635,7 +635,7 @@ implementation 'com.google.firebase:firebase-storage:16.0.1'
 
 A Firebase console-ban is inicializáljuk a Storage funkciót a megfelelő menüben.
 
-Hozzuk létre a *CreatePostActivity*-t az Empty Activity sablont használva, melynek felülete legyen az alábbi, és ez az osztály is a *BaseActivity*-ből származzon le:
+Hozzuk létre a `CreatePostActivity`-t az Empty Activity sablont használva, melynek felülete legyen az alábbi, és ez az osztály is a `BaseActivity`-ből származzon le:
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -689,9 +689,9 @@ Hozzuk létre a *CreatePostActivity*-t az Empty Activity sablont használva, mel
 
 <img src="./assets/bmeforum_createpost.png" width="512" align="middle">
 
-A *CreatePostActivity* felületén lehetőség van új üzenet írására a cím, szöveg és opcionálisan a kép megadásával. A kép megadáskor a beépített kamera alkalmazással van lehetőségünk képet készíteni, melynek módját korábbi laboron már áttekintettük (*implicit Intent* + *onActivityResult(...)*).
+A `CreatePostActivity` felületén lehetőség van új üzenet írására a cím, szöveg és opcionálisan a kép megadásával. A kép megadáskor a beépített kamera alkalmazással van lehetőségünk képet készíteni, melynek módját korábbi laboron már áttekintettük (implicit `Intent` + `onActivityResult(...)`).
 
-A következőkben megadjuk a *CreatePostActivity* kódját, de bemásolás után a laborvezetővel közösen nézze át a kódot, vizsgálja meg, hogy történik a Storage API-val a kép feltöltés, majd a Firebase-en eltárolt kép URL-jének lekérdezése és hozzáadása az új *Post*-hoz.
+A következőkben megadjuk a `CreatePostActivity` kódját, de bemásolás után a laborvezetővel közösen nézze át a kódot, vizsgálja meg, hogy történik a Storage API-val a kép feltöltés, majd a Firebase-en eltárolt kép URL-jének lekérdezése és hozzáadása az új `Post`-hoz.
 
 ```kotlin
 class CreatePostActivity : BaseActivity() {
@@ -786,9 +786,9 @@ class CreatePostActivity : BaseActivity() {
 }
 ```
 
-Ezt követően kössük be a *CreatePostActivity*-t a Floating Action Button megnyomására.
+Ezt követően kössük be a `CreatePostActivity`-t a Floating Action Button megnyomására.
 
-A *PostsActivity* *onCreate(...)* metódusában írjuk felül a Floating Action Button *onClickListener*-jének tartalmát:
+A `PostsActivity` `onCreate(...)` metódusában írjuk felül a Floating Action Button `onClickListener`-jének tartalmát:
 
 ```kotlin
 fab.setOnClickListener {
@@ -858,7 +858,7 @@ implementation 'com.crashlytics.sdk.android:crashlytics:2.9.4'
 
 <img src="./assets/firebase_crash.png" width="1024" align="middle">
 
-Vegyünk fel egy új menüpontot az *activity_post_drawer.xml* menübe, amellyel hibaüzenetet fogunk küldeni:
+Vegyünk fel egy új menüpontot az `activity_post_drawer.xml` menübe, amellyel hibaüzenetet fogunk küldeni:
 
 ```xml
 <item
@@ -867,7 +867,7 @@ Vegyünk fel egy új menüpontot az *activity_post_drawer.xml* menübe, amellyel
     android:title="Error" />
 ```
 
-Próbáljuk ki saját hibajelzések készítését a menü eseménykezelőjében. A *PostsActivity* osztály *onNavigationItemSelected(...)* metódusában kell egy új ágat felvennünk a `when` kifejezésbe, ahol egy Crashlytics függvény meghívásával szándékos crash-t okozunk:
+Próbáljuk ki saját hibajelzések készítését a menü eseménykezelőjében. A `PostsActivity` osztály `onNavigationItemSelected(...)` metódusában kell egy új ágat felvennünk a `when` kifejezésbe, ahol egy Crashlytics függvény meghívásával szándékos crash-t okozunk:
 
 ```kotlin
 when (item.itemId) {
@@ -919,4 +919,4 @@ Fontos kiemelni, hogy nem garantált, hogy az analitika valós időben látszik 
 ## Bónusz feladatok
 1. Sikeres regisztráció után automatikusan jelentkezzen is be a felhasználó.
 2. A *Navigation Drawer* fejléce a felhasználó nevét és e-mail címét mutassa.
-3. A *PostsActivity*-n a vissza gomb hatására egy megerősítő dialógus után logout történjen.
+3. A `PostsActivity`-n a vissza gomb hatására egy megerősítő dialógus után logout történjen.
