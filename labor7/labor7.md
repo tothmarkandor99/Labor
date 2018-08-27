@@ -551,9 +551,9 @@ Számos 3rd party eseménybusz megoldás van, mi a Greenrobot EventBus megoldás
 Majd definiáljunk esemény osztályokat. Hozzunk létre 1-1 esemény osztályt, a **MoveUser** és a **WriteMessage** eseményeknek, az **events** csomagban, **MoveUserResponseEvent** és **WriteMessageResponseEvent** néven. Mivel az eseménybuszok az osztály alapján dolgoznak ezért az egyes eseményekhez külön osztályok szükségesek. Mindenkét osztály Kotlin date osztály, mely 1-1 String-ben tárolja a választ.
 
 ```kotlin
-data class MoveUserEvent(val response: String)
+data class MoveUserResponseEvent(val response: String)
 
-data class WriteMessageEvent(val response: String)
+data class WriteMessageResponseEvent(val response: String)
 ```
 
 Ezután az eseményeket a külön szálakban az `EventBus.getDefault().post(...)` segítségével küldjük ki. Minden eseményt a fenti osztályok 1-1 példánya reprezentál.
@@ -570,35 +570,35 @@ Majd használjuk:
 downBTN.setOnClickListener {
     async {
         val response = labyrinthAPI.moveUser(usernameET.text.toString(), MOVE_DOWN)
-        EventBus.getDefault().post(MoveUserEvent(response))
+        EventBus.getDefault().post(MoveUserResponseEvent(response))
     }
 }
 
 upBTN.setOnClickListener {
     async {
         val response = labyrinthAPI.moveUser(usernameET.text.toString(), MOVE_UP)
-        EventBus.getDefault().post(MoveUserEvent(response))
+        EventBus.getDefault().post(MoveUserResponseEvent(response))
     }
 }
 
 leftBTN.setOnClickListener {
     async {
         val response = labyrinthAPI.moveUser(usernameET.text.toString(), MOVE_LEFT)
-        EventBus.getDefault().post(MoveUserEvent(response))
+        EventBus.getDefault().post(MoveUserResponseEvent(response))
     }
 }
 
 rightBTN.setOnClickListener {
     async {
         val response = labyrinthAPI.moveUser(usernameET.text.toString(), MOVE_RIGHT)
-        EventBus.getDefault().post(MoveUserEvent(response))
+        EventBus.getDefault().post(MoveUserResponseEvent(response))
     }
 }
 
 sendBTN.setOnClickListener {
     async {
         val response = labyrinthAPI.writeMessage(usernameET.text.toString(), messageET.text.toString())
-        EventBus.getDefault().post(WriteMessageEvent(response))
+        EventBus.getDefault().post(WriteMessageResponseEvent(response))
     }
 }
 ```
@@ -607,13 +607,13 @@ Ahhoz, hogy a kiváltott eseményeket el tudjuk kapni, a **MainActivity**ben def
 
 ```kotlin
 @Subscribe(threadMode = ThreadMode.MAIN)
-fun onMoveUserResponse(event: MoveUserEvent) {
-    responseTV.text = "Move User Response:" + event.response
+fun onMoveUserResponse(event: MoveUserResponseEvent) {
+   responseTV.text = "Move User Response:${event.response}"
 }
 
 @Subscribe(threadMode = ThreadMode.MAIN)
-fun onWriteMessageResponse(event: WriteMessageEvent) {
-    responseTV.text = "Write Message Response:" + event.response
+fun onWriteMessageResponse(event: WriteMessageResponseEvent) {
+    responseTV.text = "Write Message Response:${event.response}"
 }
 ```
 Itt fontos hogy a **@Subscribe** annotáció használva legyen, ez mondja meg hogy ez egy elkapó metódus, valamint a thread mode **MAIN** legyen, mert így az események a főszálon kerülnek továbbításra. Fontos, hogy az elküldött objektumokat az osztály típusa szerint tudja a rendszer a megfelelő elkapó metódusnak elküldeni. Egyébként egy eseményhez több elkapó metódus is lehet egyszerre beregisztrálva.
