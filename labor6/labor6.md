@@ -415,27 +415,27 @@ public class LocationDashboardFragment extends Fragment {
 
     private void initField(int fieldId, String headText) {
         View viewField = getView().findViewById(fieldId);
-        TextView tvHead = (TextView) viewField.findViewById(R.id.tvHead);
+        TextView tvHead = viewField.findViewById(R.id.tvHead);
         tvHead.setText(headText);
 
         switch (fieldId) {
             case R.id.fieldProvider:
-                tvProviderValue = (TextView) viewField.findViewById(R.id.tvValue);
+                tvProviderValue = viewField.findViewById(R.id.tvValue);
                 break;
             case R.id.fieldLat:
-                tvLatValue = (TextView) viewField.findViewById(R.id.tvValue);
+                tvLatValue = viewField.findViewById(R.id.tvValue);
                 break;
             case R.id.fieldLng:
-                tvLngValue = (TextView) viewField.findViewById(R.id.tvValue);
+                tvLngValue = viewField.findViewById(R.id.tvValue);
                 break;
             case R.id.fieldSpeed:
-                tvSpeedValue = (TextView) viewField.findViewById(R.id.tvValue);
+                tvSpeedValue = viewField.findViewById(R.id.tvValue);
                 break;
             case R.id.fieldAlt:
-                tvAltValue = (TextView) viewField.findViewById(R.id.tvValue);
+                tvAltValue = viewField.findViewById(R.id.tvValue);
                 break;
             case R.id.fieldPosTime:
-                tvPosTimeValue = (TextView) viewField.findViewById(R.id.tvValue);
+                tvPosTimeValue = viewField.findViewById(R.id.tvValue);
                 break;
             default:
                 break;
@@ -559,7 +559,6 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if (KEY_START_SERVICE.equals(key)) {
-            boolean startService = sharedPreferences.getBoolean(KEY_START_SERVICE, false);
             // TODO: Service indítása/leállítása
         }
     }
@@ -744,15 +743,38 @@ Ne felejtsük el a *Manifest*-ben is felvenni az új *Service*-t:
 <service android:name=".service.ServiceLocation" />
 ```
 Végül a Service indítása/leállítása céljából egészítsük ki a *SettingsActivity*-ben az
-*onSharedPreferenceChange(…)* függvényt, hogy valóban elindítsa/leállítsa a *Service*-t:
+*onSharedPreferenceChange(…)* függvényt, hogy valóban elindítsa/leállítsa a *Service*-t.
+Ehhez felveszünk egy statikus metódust is segítségül:
+
 ```java
-Intent i = new Intent(getApplicationContext(),ServiceLocation.class);
-if (startService) {
-    startService(i);
-} else {
-    stopService(i);
+@Override
+public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+    if (KEY_START_SERVICE.equals(key)) {
+    startServiceWhenEnabled(sharedPreferences, getApplicationContext());
+    }
+}
+
+static void startServiceWhenEnabled(SharedPreferences sharedPreferences, Context ctx) {
+    boolean startService = sharedPreferences.getBoolean(KEY_START_SERVICE, false);
+
+    Intent i = new Intent(ctx, ServiceLocation.class);
+
+    if (startService) {
+        ctx.startService(i);
+    } else {
+        ctx.stopService(i);
+    }
 }
 ```
+
+A fenti kód csak a beállítások változására reagál. Viszont ha újraindul az alkalmazás, akkor
+még nem fog a Service elindulni, hiába hagytuk bekapcsolva. Ezért a *MainActivity*
+*onCreate()* metódusának végén is hívjuk meg az indító kódot:
+
+```java
+SettingsActivity.startServiceWhenEnabled(PreferenceManager.getDefaultSharedPreferences(this), this);
+```
+
 *Próbáljuk ki* az alkalmazást! Régi típusú emulátoron teszteléshez nyissuk meg az Android Device Monitor-t
 és küldjünk pozíció információkat az emulátornak új típusú emulátoron az oldalsó vezérlő sáv
 további lehetőségeit választva (**...**) tudunk pozíciót küldeni egyszerűen az emulátornak.
@@ -762,12 +784,27 @@ további lehetőségeit választva (**...**) tudunk pozíciót küldeni egyszer�
 ## 6. Értesítés megjelenítése
 Következő lépésként valósítsuk meg, hogy a Service *foreground* módban induljon el. Ehhez valósítsuk meg,
 hogy egy *Notification* is jelezze a Service futását, mely megjeleníti az aktuális koordinátákat
-és melyre kattintva elindul a *MainActivity*.
+és melyre kattintva elindul a *MainActivity*. Android Oreo óta a Notificationhöz tartoznia kell egy
+NotificationChannelnek is, ezért az őjabb verziókon ezt külön létre kell hozni.
 
-Vegyük fel az értesítés azonosító konstanst a *ServiceLocation* osztály elejére:
+Vegyük fel az értesítés azonosító konstanst és a channel konstansát a *ServiceLocation* osztály elejére:
 ```java
 private final int NOTIF_FOREGROUND_ID = 101;
+private final String NOTIF_CHANNEL_ID = "location_service";
 ```
+
+Az onStartCommand() elejére vegyük fel a NotificationChannel létrehozását:
+
+```java
+if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+    NotificationManager notifMan = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+    CharSequence name = getString(R.string.channel_name);// The user-visible name of the channel.
+    int importance = NotificationManager.IMPORTANCE_HIGH;
+    NotificationChannel mChannel = new NotificationChannel(NOTIF_CHANNEL_ID, name, importance);
+    notifMan.createNotificationChannel(mChannel);
+}
+```
+
 Készítsünk két függvényt a *ServiceLocation* osztályba a *Notification* megjelenítésére és frissítésére:
 ```java
 private Notification getMyNotification(String text) {
@@ -783,7 +820,8 @@ private Notification getMyNotification(String text) {
             .setContentText(text)
             .setSmallIcon(R.mipmap.ic_launcher)
             .setVibrate(new long[]{1000,2000,1000})
-            .setContentIntent(contentIntent).build(); // Régebbi API szintek esetén  használjuk a getNotification() metódust a build() helyett.
+            .setContentIntent(contentIntent)
+            .setChannelId(NOTIF_CHANNEL_ID).build(); // Régebbi API szintek getNotification() a build() helyett
     return  notification;
 }
 
@@ -849,8 +887,8 @@ private void showFloatingWindow() {
     windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
 
     floatingView = ((LayoutInflater)getSystemService(LAYOUT_INFLATER_SERVICE)).inflate(R.layout.float_layout, null);
-    tvFloatLat = (TextView) floatingView.findViewById(R.id.tvFloatLat);
-    tvFloatLng = (TextView) floatingView.findViewById(R.id.tvFloatLng);
+    tvFloatLat = floatingView.findViewById(R.id.tvFloatLat);
+    tvFloatLng = floatingView.findViewById(R.id.tvFloatLng);
 
     final WindowManager.LayoutParams params = new WindowManager.LayoutParams(
             WindowManager.LayoutParams.WRAP_CONTENT,
@@ -957,24 +995,21 @@ Egészítsük ki a SettingsActivity kódját az elején egy konstanssal:
 ```java
 public static final String KEY_WITH_FLOATING = "with_floating";
 ```
-Valamint a SettingsActivity onSharedPreferenceChanged(…) függvényt valósítsuk meg úgy, hogy ellenőrizzük
+Valamint a SettingsActivity startServiceWhenEnabled(…) metódusát valósítsuk meg úgy, hogy ellenőrizzük
 a CheckBox állapotát és a Service-t indító Intent paramétereként adjuk meg, hogy megjelenjen-e
 a lebegő ablak vagy sem:
 ```java
-@Override
-public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-    if (KEY_START_SERVICE.equals(key)) {
-        boolean startService = sharedPreferences.getBoolean(KEY_START_SERVICE, false);
-        boolean withFloating = sharedPreferences.getBoolean(KEY_WITH_FLOATING, false);
+static void startServiceWhenEnabled(SharedPreferences sharedPreferences, Context ctx) {
+    boolean startService = sharedPreferences.getBoolean(KEY_START_SERVICE, false);
+    boolean withFloating = sharedPreferences.getBoolean(KEY_WITH_FLOATING, false);
 
-        Intent i = new Intent(getApplicationContext(), ServiceLocation.class);
+    Intent i = new Intent(ctx, ServiceLocation.class);
 
-        if (startService) {
-            i.putExtra(KEY_WITH_FLOATING, withFloating);
-            startService(i);
-        } else {
-            stopService(i);
-        }
+    if (startService) {
+        i.putExtra(KEY_WITH_FLOATING, withFloating);
+        ctx.startService(i);
+    } else {
+        ctx.stopService(i);
     }
 }
 ```
@@ -1006,7 +1041,7 @@ Első lépésként a ServiceLocation osztályba vegyünk fel egy belső osztály
 mely reprenzentálja a Binder-t:
 ```java
 public class BinderServiceLocation extends Binder {
-    public ServiceLocation getSerivce() {
+    public ServiceLocation getService() {
         return ServiceLocation.this;
     }
 }
@@ -1093,13 +1128,13 @@ hogy a gomb eseménykezelő hatására kérdezze le a csatolt Service által ism
 Fontos kiemelni, hogy a Geocoding hálózati kommunikációt használ, ezért kell külön szálban futtatni.
 Az AsyncTask doInBackground(…) függvénye külön szálon fut, míg az onPostExecute(…) már a főszálon.
 ```java
-Button btnGeocode = (Button) view.findViewById(R.id.btnGeocode);
+Button btnGeocode = view.findViewById(R.id.btnGeocode);
 btnGeocode.setOnClickListener(new View.OnClickListener() {
     @Override
     public void onClick(View v) {
-        if (binderServiceLocation != null && binderServiceLocation.getSerivce() != null &&
-                binderServiceLocation.getSerivce().isLocationMonitorRunning()) {
-            Location loc = binderServiceLocation.getSerivce().getLastLocation();
+        if (binderServiceLocation != null && binderServiceLocation.getService() != null &&
+                binderServiceLocation.getService().isLocationMonitorRunning()) {
+            Location loc = binderServiceLocation.getService().getLastLocation();
             if (loc != null) {
                 new AsyncTask<Location, Void, String>() {
                     @Override

@@ -3,16 +3,16 @@
 
 ## Bevezetés
 
-A mérés célja, hogy bemutassa az Android multimédia szolgáltatásait, külön kiemelve a kamerakezelés módszereit, valamint az előző labor során megismert hálózatkezelési megoldások egy magasabb szintjét, a HTTP API készítését megoldását **Retrofit** segítségével. 
+A labor célja, hogy bemutassa az Android multimédia szolgáltatásait, külön kiemelve a kamerakezelés módszereit, valamint az előző labor során megismert hálózatkezelési megoldások egy magasabb szintjét, a HTTP API implementálását **Retrofit** segítségével. 
 
-A mérés során egy Galéria alkalmazást készítünk, melyben lehetőség lesz:
+A labor során egy Galéria alkalmazást készítünk, melyben lehetőség lesz:
 
 * Fényképek listázására
-* Saját fotó készítésére (saját felület illetve beépített alkalmazás) 
+* Saját fotó készítésére (saját felület illetve beépített alkalmazással is) 
 * Fotó feltöltésére
 
 
-A mérés az alábbi témákat érinti:
+A labor az alábbi témákat érinti:
 
 *   HTTP API-k használata Retrofit segítségével
 *   File feltöltése szerverre
@@ -42,7 +42,7 @@ Az alábbi `GET` hívással:  `/images` lehetőségünk van a feltöltött fotó
  
  A válasz egy JSON tömb, ami a képek adatait tartalmazza, pl. 
  
- ```
+ ```javascript
 [
   {
     "_id": "58a5b80aa8e86411008ca8e4",
@@ -57,14 +57,14 @@ Az alábbi `GET` hívással:  `/images` lehetőségünk van a feltöltött fotó
 ]
  ```
  
- A képek url je, az api címe után fűzve érhető el. (Ne feledkezzünk meg a `/`-ről.)
+ A képek URL je, az API címe után fűzve érhető el. (Ne feledkezzünk meg a `/`-ről.)
 
 #### Fotó feltöltése
 Az alábbi `POST` hívással:  `/upload` lehetőségünk van fotót feltölteni. A kérés tartalma a bináris kép file `image` kulccsal.
 
 
 #### Szavazat feltöltése
-Az alábbi `POST` hívással:  `/rate/{id}` lehetőségünk van a feltöltött fotókat értékelni. Az `{id}` helyére a kép id-jét kell fűznünk.[]()
+Az alábbi `POST` hívással:  `/rate/{id}` lehetőségünk van a feltöltött fotókat értékelni. Az `{id}` helyére a kép ID-ját kell fűznünk.
 
 A kérés paraméterek:
 
@@ -97,23 +97,12 @@ Vegyük fel a Manifest állományba a szükséges engedélyeket:
 <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 ```
 
-> Ezen engedélyek közül a kamera kezelés és a külső háttértár elérése veszélyes engedély, amit Android 6.0 felett megfelelően, futásidőben kell elkérni. A félév során lesz ennek a menetéről is szó. Mi ezt most a labor nem szeretnénk támogatni, ezért a `build.gradle`-ben a `targetSdkVersion` értékét vegyük le `22`-re.
+> Ezen engedélyek közül a kamera kezelés és a külső háttértár elérése veszélyes engedély, amit Android 6.0 felett megfelelően, futásidőben kell elkérni. A félév során lesz ennek a menetéről is szó. Mi ezt most a laboron nem szeretnénk támogatni, ezért a `build.gradle`-ben a `targetSdkVersion` értékét vegyük le `22`-re.
 
 A **build.gradle**-ben vegyük fel a RecyclerView függőséget:
 
- `compile 'com.android.support:recyclerview-v7:26+'`
+ `implementation 'com.android.support:recyclerview-v7:27.1.0'`
  
-Mivel az újabb Google könyvtárak csak a Google Maven tárolójából érhetőek el, ezért ezt vegyük fel a project `build.gradle`-be.
-
-```
-allprojects {
-    repositories {
-        jcenter()
-        maven {url 'https://maven.google.com'}
-    }
-}
-```
-
 A **MainActivity** nézet fogja kilistázni a feltöltött képeket. Ez egy egyszerű RecyclerView, mely egy SwipeRefreshLayoutba van ágyazva, ez lehetőséget biztosít arra, hogy a listához egyszerűen implementáljunk pull-to-refresh működést. A hozzá tartozó **activity_main.xml** tartalma a következő:
 
 ```xml
@@ -143,10 +132,9 @@ A **MainActivity** nézet fogja kilistázni a feltöltött képeket. Ez egy egys
 
 A hiányzó dimenzió értékeket vegyük fel alt+enter segítségével. Értékük legyen `16dp`.
 
-A **MainActivity** kódja pedíg a következő. Látható hogy a `loadImages()` függvény végzi ez a photok letöltését (egyenlőre csak beégetett értékekkel), ez hívódik a nézetre navigálása után, illetve ha lehúzzással frissítjük a tartalmat.
+A **MainActivity** kódja pedíg a következő. Látható hogy a `loadImages()` függvény végzi ez a fotók letöltését (egyenlőre csak beégetett értékekkel), ez hívódik a nézetre navigálása után, illetve ha lehúzzással frissítjük a tartalmat.
 
 ```java
-
 public class MainActivity extends AppCompatActivity {
     private ImagesAdapter adapter;
     private RecyclerView imagesRV;
@@ -178,9 +166,15 @@ public class MainActivity extends AppCompatActivity {
 
     private void loadImages() {
         List<String> images = new ArrayList<>();
-        images.add("http://lorempixel.com/400/400/city/");
-        images.add("http://lorempixel.com/400/400/technics/");
-        images.add("http://lorempixel.com/400/400/nature/");
+        images.add("https://images.unsplash.com/photo-1486758206125-94d07f414b1c?ixlib=rb-0.3.5&s=2bda5e189cbdf19185f03f310a88ae5b&auto=format&fit=crop&w=1950&q=80");
+        images.add("https://images.unsplash.com/photo-1508881598441-324f3974994b?ixlib=rb-0.3.5&s=de7b102b9c6faa0b027644fcf35d37bc&auto=format&fit=crop&w=1050&q=80");
+        images.add("https://images.unsplash.com/photo-1486570318579-054c95b01160?ixlib=rb-0.3.5&s=8cb4fb1b4ac3ab4e5335a6f5961d5d86&auto=format&fit=crop&w=1190&q=80");
+        images.add("https://images.unsplash.com/photo-1486758206125-94d07f414b1c?ixlib=rb-0.3.5&s=2bda5e189cbdf19185f03f310a88ae5b&auto=format&fit=crop&w=1950&q=80");
+        images.add("https://images.unsplash.com/photo-1508881598441-324f3974994b?ixlib=rb-0.3.5&s=de7b102b9c6faa0b027644fcf35d37bc&auto=format&fit=crop&w=1050&q=80");
+        images.add("https://images.unsplash.com/photo-1486570318579-054c95b01160?ixlib=rb-0.3.5&s=8cb4fb1b4ac3ab4e5335a6f5961d5d86&auto=format&fit=crop&w=1190&q=80");
+        images.add("https://images.unsplash.com/photo-1486758206125-94d07f414b1c?ixlib=rb-0.3.5&s=2bda5e189cbdf19185f03f310a88ae5b&auto=format&fit=crop&w=1950&q=80");
+        images.add("https://images.unsplash.com/photo-1508881598441-324f3974994b?ixlib=rb-0.3.5&s=de7b102b9c6faa0b027644fcf35d37bc&auto=format&fit=crop&w=1050&q=80");
+        images.add("https://images.unsplash.com/photo-1486570318579-054c95b01160?ixlib=rb-0.3.5&s=8cb4fb1b4ac3ab4e5335a6f5961d5d86&auto=format&fit=crop&w=1190&q=80");
 
         adapter = new ImagesAdapter(getApplicationContext(), images);
         imagesRV.setAdapter(adapter);
@@ -189,7 +183,9 @@ public class MainActivity extends AppCompatActivity {
 }
 ```
 
-A képek listájának feltöltését a **ImagesAdapter** végzik. Hozzuk is létre ezt az osztályt a fő csomagban a következő tartalommal.
+> A statikus képek forrása az [Unsplash](https://unsplash.com)
+
+A képek listájának feltöltését a **ImagesAdapter** végzik. Hozzuk is létre ezt az osztályt az **adapter** csomagban a következő tartalommal.
 
 ```java
 public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.ViewHolder> {
@@ -233,7 +229,7 @@ public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.ViewHolder
 
 Az egyes képekhez tartozó cella elem felületét pedig az **li_image.xml** layout fileban definiáljuk.
 
-```
+```xml
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
@@ -255,19 +251,19 @@ Próbáljuk ki az alkalmazást!
 
 
 ## Képek megjelenítése - Glide
-Az alkalmazás jelenleg a képek helyén kék cellékat jelenít meg. Ez azért van mert bár a listát feltöltöttük, az `onBindViewHolder(...)` hívásban nem jelentettük meg a képet. A megjelenítendő képekről csak a webes URL áll rendelkezésünkre. Ilyen esetben a file-t le kell töltenünk a hálózaton keresztül, dekódolni a kapott byte-okat, és az így kapott Bitmap-et beállítani az ImageView forrásaként. Ezt a platform által nyújtott eszközökkel elég kényelmetlen implementálni, ezért egy elterjed, általános célű könyvtárat fogunk használni.
+Az alkalmazás jelenleg a képek helyén az alapértelmezett icont jelenít meg. Ez azért van mert bár a listát feltöltöttük, az `onBindViewHolder(...)` hívásban nem jelentettük meg a képet. A megjelenítendő képekről csak a webes URL áll rendelkezésünkre. Ilyen esetben a file-t le kell töltenünk a hálózaton keresztül, dekódolni a kapott byte-okat, és az így kapott Bitmap-et beállítani az ImageView forrásaként. Ezt a platform által nyújtott eszközökkel elég kényelmetlen implementálni, ezért egy elterjed, általános célű könyvtárat fogunk használni.
 
-A [Glide](https://github.com/bumptech/glide) egy általános célú képkezelő könyvtár, gyakorlatilag a fent említett műveleteket végzi el helyettünk 1 sor kód használatával, továbbá támogatja a cachelést, aszinkron letöltést, valamint több forrásból is képes megjeleníteni (web, háttértár, content provider, resource ...). 
+A [Glide](https://github.com/bumptech/glide) egy általános célú képkezelő könyvtár, gyakorlatilag a fent említett műveleteket végzi el helyettünk egyetlen kódsor használatával, továbbá támogatja a cachelést, aszinkron letöltést, valamint több forrásból is képes megjeleníteni (web, háttértár, content provider, resource ...). 
 
 Használatához a **build.gradle** be vegyük fel a következő függőséget a `dependencies` blokkban. 
 
-```
-compile 'com.github.bumptech.glide:glide:4.2.0'
+```groovy
+implementation 'com.github.bumptech.glide:glide:4.6.1'
 ```
 
 Ezután a **ImagesAdapter**  **onBindViewHolder** függvényében töltsük be az adott fotót az **ImageView**-ba.
 
-```       
+```java       
 Glide.with(holder.imageView.getContext()).load(images.get(position)).into(holder.imageView);
 ```
 
@@ -278,20 +274,22 @@ Próbáljuk ki az alkalmazást!
 
 ## Retrofit
 
-A [Retrofit](https://square.github.io/retrofit/) egy általános célú HTTP könyvtár Java környezetben. Széles körben használják, számos projektben bizonyított már (kvázi ipari standard). Azért használjuk, hogy ne kelljen alacson színtű hálózati hívásokat implementálni (mint az előző laboron az OkHttp-vel). Segítségével elég egy interfaceben annotációk segítségével leírni az API-t (ez pl. a Swagger eszközzel generálható is), majd e mögé készít a Retorfit egy olyan osztályt, mely a szükséges hálózati hívásokat elvégzi. A Retrofit a háttérben az OkHttp3-at használja, valamint az objektumok JSON formátumba történő sorosítását a GSON eszközzel végzi. Ezért ezeket is be kell hivatkozni.
+A [Retrofit](https://square.github.io/retrofit/) egy általános célú HTTP könyvtár Java környezetben. Széles körben használják, számos projektben bizonyított már (kvázi ipari standard). Azért használjuk, hogy ne kelljen alacsony színtű hálózati hívásokat implementálni (mint az előző laboron az OkHttp-vel).
+
+Segítségével elég egy interfaceben annotációk segítségével leírni az API-t (ez pl. a [Swagger](https://swagger.io/) eszközzel generálható is), majd e mögé készít a Retrofit egy olyan osztályt, mely a szükséges hálózati hívásokat elvégzi. A Retrofit a háttérben az OkHttp3-at használja, valamint az objektumok JSON formátumba történő sorosítását a GSON eszközzel végzi. Ezért ezeket is be kell hivatkozni.
 
 A Retrofit használatához vegyük fel a függőségek közé az alábbi kódot.
 
-```
-compile 'com.squareup.retrofit2:retrofit:2.3.0'
-compile 'com.squareup.okhttp3:okhttp:3.9.0'
-compile 'com.google.code.gson:gson:2.8.2'
-compile 'com.squareup.retrofit2:converter-gson:2.3.0'
+```groovy
+implementation 'com.squareup.retrofit2:retrofit:2.3.0'
+implementation 'com.squareup.okhttp3:okhttp:3.10.0'
+implementation 'com.google.code.gson:gson:2.8.2'
+implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
 ```
 
 Ezután hozzunk létre egy új csomagot **network** néven, benne egy új interface-t **GalleryAPI** néven. Ez lesz az API leírónk.
 
-```
+```java
 public interface GalleryAPI {
     String ENDPOINT_URL="http://android-gallery.node.autsoft.hu/api/";
     String IMAGE_PREFIX_URL="http://android-gallery.node.autsoft.hu/";
@@ -304,13 +302,13 @@ public interface GalleryAPI {
 
     @Multipart
     @POST("upload")
-     Call<ResponseBody> uploadImage(@Part MultipartBody.Part file, @Part("name") RequestBody name, @Part("description") RequestBody description);
+    Call<ResponseBody> uploadImage(@Part MultipartBody.Part file, @Part("name") RequestBody name, @Part("description") RequestBody description);
 }
 ```
 
 A képek adatait tartalmazó **Image** osztályt hozzuk létre a **model** csomagban.
 
-```
+```java
 public class Image {
     @SerializedName("_id")
     public String id;
@@ -328,11 +326,11 @@ Figyeljünk rá hogy mindíg ezt az **Image** osztályt importáljuk.
 
 Látható, hogy a GSON automatikus megoldja majd az egyes tagváltozók szerializálását, kivéve az id mezőt, mivel azt a szerver `_id`-ként adja vissza. Ezt a `@SerializedName` annotációval írhatjuk felül.
 
-Ezután hozzuk létre azt az osztályt ugyan ebben a csomagban,amely a fenti API-t használni fogja,  mivel ennek az osztálynak az a feladata hogy fenti API hívásokat egységbe fogja, és az előző laboron látott módon külön szálon vegezze el a hálózati hívásokat. **Az eseménybusz megoldást most idő hiányában nem használjuk, de abszolút releváns ebben a helyzetben is.** 
+Ezután hozzuk létre azt az osztályt a **network** csomagban,amely a fenti API-t használni fogja,  mivel ennek az osztálynak az a feladata hogy fenti API hívásokat egységbe fogja, és az előző laboron látott módon külön szálon vegezze el a hálózati hívásokat. **Az eseménybusz megoldást most idő hiányában nem használjuk, de abszolút releváns ebben a helyzetben is.** 
 
 Az osztály neve legyen **GalleryInteractor**.
 
-```
+```java
 public class GalleryInteractor {
     private final GalleryAPI galleryApi;
     private final Context context;
@@ -354,20 +352,20 @@ Látható, hogy a **Retrofit** objektumot felhasználva hozzuk létre a **Galler
 
 Azért, hogy a hálózati hívásokat külön szálra ütemezzük, majd a választ egy interfacen keresztül visszaütemezzük a főszálra **generikus függvényeket** fogunk használni. A hálózati hívások válaszát a következő generikus interface fogja biztosítani, ezt a **GalleryInteractorban** definiáljuk.
 
-```
+```java
 public interface ResponseListener<T> {
     void onResponse(T t);
     void onError(Exception e);
 }
 ```
 
-Itt látható hogy egy `T` generikus paramétert várunk, és egy ilyen típusu választ adunk vissza az `onRespons`e-ban, illetve egy `Exception`-t a hiba esetén.
+Itt látható hogy egy `T` generikus paramétert várunk, és egy ilyen típusu választ adunk vissza az `onResponse`-ban, illetve egy `Exception`-t a hiba esetén.
 
 Az API-ban definiált `Call` objektumok lehetővé teszik, hogy a hálózati hívások ne a definiálás (ne a függvényhívás) idejében történjenek, hanem később testszőlegesen (`.execute()` hívással) bármikor. Ez lehetőséget ad arra hogy az összeállított kéréseket generikusan kezeljük (nem kell minden kérésre külön implementálni a szálkezelést). 
 
-Készítsük is el a generikus statikus hívásunkat, mely egy tetszőleges típusu `Call` objektumot vár, azt egy külső szálon meghívja, majd a választ (`Handler` segítségével) visszaütemezi a főszálra, és ott meghívja az előbb létrehozott listener objektumot. A `Handler`-rel a `runOnUiThread`-hez hasonló működést tudunk elérni, anélkül hogy referenciánk lenne egy `Activity`-re. Enneka kódja a következő (ezt is a **GalleryInteractor**-ban definiáljunk):
+Készítsük is el a generikus statikus hívásunkat, mely egy tetszőleges típusu `Call` objektumot vár, azt egy külső szálon meghívja, majd a választ (`Handler` segítségével) visszaütemezi a főszálra, és ott meghívja az előbb létrehozott listener objektumot. A `Handler`-rel a `runOnUiThread`-hez hasonló működést tudunk elérni, anélkül hogy referenciánk lenne egy `Activity`-re. Ennek a kódja a következő (ezt is a **GalleryInteractor**-ban definiáljunk):
 
-```
+```java
 private static <T> void runCallOnBackgroundThread(final Call<T> call, final ResponseListener<T> listener) {
     final Handler handler = new Handler();
     new Thread(new Runnable() {
@@ -397,7 +395,7 @@ private static <T> void runCallOnBackgroundThread(final Call<T> call, final Resp
 ```
 Ezután a fenti segédfüggvényt felhasználva elkészíthetjük a az Interactorban a hívásokat.
 
-```
+```java
 public void getImages(ResponseListener<List<Image>> responseListener) {
     Call<List<Image>> getImagesRequest = galleryApi.getImages();
     runCallOnBackgroundThread(getImagesRequest, responseListener);
@@ -416,11 +414,11 @@ public void uploadImage(Uri fileUri,String name, String description, ResponseLis
 }
 ```
 
-Figyeljük meg, hogy az adott hívás nem egyből a válasz típusával tér vissza, hanem azt a már említett `Call` objektumba csomagolja, így nagyob rugalmasságot adva a fejlesztőknek.
+Figyeljük meg, hogy az adott hívás nem egyből a válasz típusával tér vissza, hanem azt a már említett `Call` objektumba csomagolja, így nagyobb rugalmasságot adva a fejlesztőknek.
 
 Ezután a **MainActivity**-ben példányosítsuk a **GalleryInteractor**-unkat, majd hívjuk meg a **getImages** hívást, melynek eredményét jelentsük meg a **ImagesAdapter** segítségével.
 
-```
+```java
 private void loadImages() {
     GalleryInteractor galleryInteractor = new GalleryInteractor(this);
     galleryInteractor.getImages(new GalleryInteractor.ResponseListener<List<Image>>() {
@@ -442,7 +440,7 @@ private void loadImages() {
 
 Mivel eddig String listát jelenítettünk meg az **ImagesAdapter** -el, így most át kell alakítani az adaptert, hogy egy **Image** listát kezeljen. Valamint az `IMAGE_PREFIX_URL` után kell fűznünk a kép **url** mezőjének tartalmát.
 
-```
+```java
 public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.ViewHolder> {
     private final LayoutInflater layoutInflater;
     private final Context context;
@@ -490,7 +488,7 @@ Próbáljuk ki az alkalmazást.
 ## Fotó feltöltés
 Hozzunk létre egy új **Empty Activity** -t **UploadActivity** néven. A hozzá tartozó *activity_upload.xml* felülete legyen a következő:
 
-```
+```xml
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
@@ -642,12 +640,12 @@ Próbáljuk ki az alkalmazást!
 <img src="./images/screen4.png" width="250" align="middle">
 <img src="./images/screen5.png" width="250" align="middle">
 
-## A feltöltés megvalósítása
+A feltöltés megvalósítása
 
 A feltöltéshez szükséges API definíció és Interactor hívás is definiálva van, így a **getPhotos**-hoz hasonlóan hívjuk meg ezt a hívást is a kép **Uri** paraméterével. Ezt az **UploadActivity** **onCreate(..)** metódusában tegyük meg.
 
 
-```
+```java
 uploadBTN.setOnClickListener(new View.OnClickListener() {
     @Override
     public void onClick(View view) {
@@ -673,7 +671,7 @@ uploadBTN.setOnClickListener(new View.OnClickListener() {
 });
 ```
 
-Figyeljük meg, hogy nekünk csak a file elérési utvonlát kellett megadnunk, a file beolvasását és feltöltését a **Retrofit** elvégzi helyettünk.
+Figyeljük meg, hogy nekünk csak a file elérési útvonalát kellett megadnunk, a file beolvasását és feltöltését a **Retrofit** elvégzi helyettünk.
 
 Próbáljuk ki az alkalmazást, és töltsünk fel egy fotót!
 
@@ -884,6 +882,12 @@ public class CameraActivity extends AppCompatActivity {
         cameraView.invalidate();
 
         camera.getParameters().setPreviewSize(selectedPreviewSize.width, selectedPreviewSize.height);
+        
+        if (this.getResources().getConfiguration().orientation != Configuration.ORIENTATION_LANDSCAPE) {
+            camera.setDisplayOrientation(270);
+        } else {
+            camera.setDisplayOrientation(0);
+        }
     }
 
     @Override
@@ -902,7 +906,7 @@ A `saveToFile(...)` függvény végzi a byte tömb fileba mentését, az `adjust
 
 Ezután módosítsuk az **UploadActivity** **captureBTN** listenerjét, hogy az általunk elkészített activity-t használja.
 
-```
+```java
 captureBTN.setOnClickListener(new View.OnClickListener() {
     @Override
     public void onClick(View view) {
@@ -922,6 +926,7 @@ Próbáljuk ki az alkalmazást!
 <img src="./images/screen8.png" width="250" align="middle">
 
 
+
 ## Önálló feladatok
 
 ### Feladat 1: EventBus használata
@@ -935,8 +940,8 @@ keresztül követheted.
 Segítség: A hozzá tartozó hívás Retrofit leírója a következő:
 
 ```java
-    @POST("/rate/{id}")
-    Call<ResponseBody> rate(@Path("id") String id, @Body Rating rating);
+@POST("rate/{id}")
+Call<ResponseBody> rate(@Path("id") String id, @Body Rating rating);
 ```
 
 A rating osztály pedíg:
