@@ -14,7 +14,7 @@ A Firebase manapság az egyik legnépszerűbb Backend as a Service megoldás And
 
 További általános információk a Firebase-ről: https://firebase.google.com/.
 
-A laborfogalkozás célja, hogy bemutassa a Firebase legfontosabb szolgáltatásait egy komplett alkalmazás megvalósítása keretében. A megvalósítandó alkalmazás egy fórum megoldás lesz, melyen keresztül a felhasználók szöveges üzeneteket tudnak megosztani egymással valós időben, melyekhez opcionálisan képek is csatolhatók.
+A laborfoglalkozás célja, hogy bemutassa a Firebase legfontosabb szolgáltatásait egy komplett alkalmazás megvalósítása keretében. A megvalósítandó alkalmazás egy fórum megoldás lesz, melyen keresztül a felhasználók szöveges üzeneteket tudnak megosztani egymással valós időben, melyekhez opcionálisan képek is csatolhatók.
 Az alkalmazás az alábbi fő funkciókat támogatja:
 - regisztráció, bejelentkezés
 - üzenetek listázása
@@ -43,7 +43,7 @@ Sikeres projekt létrehozás után fussák át a laborvezetővel közösen a Fir
 - Authentication, Database és Storage,
 - Database -> Rules.
 
-Hozzunk létre egy új projektet Android Studio-ban,a package name legyen **hu.bme.aut.android.bmeforumNEPTUN_KOD**. Fontos hogy a Neptun kód előtt ne legyen pont, mert ez gondot okozhat.
+Hozzunk létre egy új projektet Android Studio-ban, a package name legyen **hu.bme.aut.android.bmeforumNEPTUN_KOD**. Fontos hogy a Neptun kód előtt ne legyen pont, mert ez gondot okozhat.
 
 Válasszuk az *Empty Activity* sablont és a kezdő Activity-nk neve legyen *LoginActivity*, mivel elsőként a regisztrációs és bejelentkező nézetet fogjuk megvalósítani. Az egyszerűség kedvéért ugyanazt a felületet fogjuk használni regisztráció és bejelentkezés céljából.
 
@@ -53,27 +53,27 @@ Adjuk hozzá a Manifest fájlhoz az Internet használati engedélyt:
 <uses-permission android:name="android.permission.INTERNET" />
 ```
 
-A projekt létrehozása után válasszuk Android Studioba a **Tools->Firebase** menüpontot, melynek hatására jobb oldalt megnyílik a *Firebase Assistant* funkció.
+A projekt létrehozása után válasszuk Android Studioba a *Tools -> Firebase* menüpontot, melynek hatására jobb oldalt megnyílik a *Firebase Assistant* funkció.
 
 Amennyiben ilyen menüpont nem található a Studioban, telepíteni kell a plugint a *File -> Settings -> Plugins* alatt (Firebase Services).
 
 A Firebase Assistant akkor fogja megtalálni a Firebase console-ban létrehozott projektet, ha Android Studio-ba is ugyanazzal a Google accounttal vagyunk bejelentkezve mint amivel a console-ban létrehoztuk a projektet. Ellenőrizzük ezt mindkét helyen.
 Amennyiben a Firebase Assistant-ot nem sikerül beüzemelni, manuálisan is összeköthető a projekt. A leírásban ismertetni fogjuk a lépéseket, amit az Assistant generál.
 
-Válasszuk az Assistant-ban az *Authentication* szakaszt és azon belül az "Email and password authentication"-t, majd a *Connect to Firebase* gombot.
-Ezt követően egy dialógus nyílik meg, ahol a második szakaszt (*Choose an existing Firebase or Google project*) választva kiválaszthatjuk a projektet amit a Firebase console-ban már létrehoztunk, ha megfelelőek az accountok. Itt egyébként lehetőség van új projektet is létrehozni. Ha elsőre hibát látunk a projekttel való összekapcsolásnál próbáljuk újra, másodszorra általában sikeresen megtörténik a projekt szinkronizálása a Firebase projekttel.
+Válasszuk az Assistant-ban az *Authentication* szakaszt és azon belül az *Email and password authentication*-t, majd a *Connect to Firebase* gombot.
+Ezt követően egy dialógus nyílik meg, ahol a második szakaszt (*Choose an existing Firebase or Google project*) választva kiválaszthatjuk a projektet amit a Firebase console-ban már létrehoztunk, ha megfelelőek az accountok. Itt egyébként lehetőség van új projektet is létrehozni. Ha elsőre hibát látunk a projekttel való összekapcsolásnál, próbáljuk újra, másodszorra általában sikeresen megtörténik a projekt szinkronizálása a Firebase projekttel.
 
 A háttérben valójában annyi történik, hogy az alkalmazásunk package neve és az aláíró kulcs *SHA-1*-e alapján hozzáadódik egy Android alkalmazás a Firebase console-ban lévő projektünkhöz, és az ahhoz tartozó konfigurációs *google-services.json* file letöltődik a projektünk könyvtárába az alapértelmezett (app) modul alá.
-Ezt a lépéssorozatot manuálisan is végrehajthatjuk a Firebase console-ban az "Add Firebase to your Android app
-"-et választva. A debug kulcs SHA-1 lenyomata ilyenkor a *Gradle -> [projektnév] -> Tasks -> android -> signingReport* taskot futtatva kinyerhető alul az execution/text módot választva.
+
+Ezt a lépéssorozatot manuálisan is végrehajthatjuk a Firebase console-ban az *Add Firebase to your Android app*-et választva. A debug kulcs SHA-1 lenyomata ilyenkor a *Gradle -> [projektnév] -> Tasks -> android -> signingReport* taskot futtatva kinyerhető alul az execution/text módot választva.
 
 <img src="./assets/android_studio_signingreport.png" width="1024" align="middle">
 
-Következő lépésben szintén az Assistant-ban az "Email and password authentication" alatt válasszuk az "Add Firebase Authentication to your app" elemet, itt látható is, hogy milyen módosítások történnek a projekt és modul szintű build.gradle fájlokban.
+Következő lépésben szintén az Assistant-ban az *Email and password authentication* alatt válasszuk az *Add Firebase Authentication to your app* elemet, itt látható is, hogy milyen módosítások történnek a projekt és modul szintű build.gradle fájlokban.
 
 <img src="./assets/firebase_auth_connect.png" width="1024" align="middle">
 
-Sajnos a Firebase plugin már egy ideje nem lett frissítve, és a függőségek régi verzióját adja hozzá a `build.gradle` fájlokhoz (a labor utolsó frissítése idején). Ezért most frissíteni fogjuk az imént automatikusan felvett függőségeket, valamint innentől manuálisan fogjuk hozzáadni az újabbakat az Assistant használata helyett.
+Sajnos a Firebase plugin nincs rendszeresen frissítve, és így majdnem mindig a függőségek régi verzióját adja hozzá a `build.gradle` fájlokhoz. Ezért most frissíteni fogjuk az imént automatikusan felvett függőségeket, valamint innentől manuálisan fogjuk hozzáadni az újabbakat az Assistant használata helyett. Fontos, hogy mindenből az itt leírt verziót használjuk.
 
 Cseréljük le a projekt szintű `build.gradle` fájlban a `google-services`-t az alábbi verzióra:
 
@@ -101,7 +101,7 @@ implementation 'com.github.bumptech.glide:glide:4.7.1'
 
 ## Regisztráció, bejelentkezés
 
-Első lépésként valósítsuk meg a regisztráció/bejelentkező képernyő felületét. Mivel ehhez hasonló felületeket már készítettünk korábban egyszerűség kedvéért megadjuk a felület kódját, melyet helyezzen az *activity_login.xml*-be:
+Első lépésként valósítsuk meg a regisztráció/bejelentkező képernyő felületét. Mivel ehhez hasonló felületeket már készítettünk korábban, az egyszerűség kedvéért megadjuk a felület kódját, amely az *activity_login.xml*-be kerül:
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -184,7 +184,7 @@ Tekintsük át a felhasználói felület kódját. Figyeljük meg, hogy, hogy a 
 
 <img src="./assets/bmeforum_login.png" width="512" align="middle">
 
-Az alkalmazás során több Activity-nk lesz, melyek közös funkcióit, mint például progress dialog megjelenítést és felhasználói adatok lekérdezését kiszervezzük egy *BaseActivity* osztályba (ez csak egy abszrakt osztály, nem egy konkrét *Activity*, így nem kell a Manifestbe regisztrálni):
+Az alkalmazás során több Activity-nk lesz, melyek közös funkcióit, mint például a progress dialog megjelenítést és felhasználói adatok lekérdezését kiszervezzük egy *BaseActivity* osztályba (ez csak egy absztrakt osztály, nem egy konkrét *Activity*, így nem kell a Manifestben regisztrálni):
 
 ```kotlin
 abstract class BaseActivity : AppCompatActivity() {
@@ -260,7 +260,7 @@ private fun validateForm(): Boolean {
 }
 ```
 
-Itt láthatóan ugyanazt a kódot ismételjük többször (sőt, a következő képernyőinken is szükség lesz hasonló validációra), ezért jó lenne ezt kiszervezni valamilyen módon. Használjunk erre egy extension function-t. Hozzunk létre egy `extensions` package-et, azon belül pedig egy `EditText.kt` fájlt. Ide értelemszerűen az `EditText` osztályt bővítő függvényeinket fogjuk tenni. Az fenti kódot alapján, így validálhatjuk hogy egy `EditText` nem üres:
+Itt láthatóan ugyanazt a kódot ismételjük többször (sőt, a következő képernyőinken is szükség lesz hasonló validációra), ezért jó lenne ezt kiszervezni valamilyen módon. Használjunk erre egy [extension function](https://kotlinlang.org/docs/reference/extensions.html#extension-functions)-t. Hozzunk létre egy `extensions` package-et, azon belül pedig egy `EditText.kt` fájlt. Ide értelemszerűen az `EditText` osztályt bővítő függvényeinket fogjuk tenni. A fenti kód alapján így validáljuk hogy egy `EditText` nem üres:
 
 ```kotlin
 fun EditText.validateNonEmpty(): Boolean {
@@ -344,22 +344,22 @@ btnLogin.setOnClickListener { loginClick() }
 
 A *Navigation Drawer Activity* sablont használva készítsük el az új *PostsActivity*-t, és miután létrejött változtassuk meg az ősosztályát az *AppCompatActivity*-ről a saját *BaseActivity* osztályunkra.
 
-Próbáljuk ki az alkalmazás jelenlegi működését. Vizsgáljuk meg, hogy, Firebase console-ban látszik-e a regisztrált felhasználó.
+Próbáljuk ki az alkalmazás jelenlegi működését. Nézzük meg, hogy a Firebase console-ban is látszik-e a regisztrált felhasználó.
 
 <img src="./assets/firebase_user.png" width="1024" align="middle">
 
 ## Postok listázása
 
 Első lépésként tekintse át a laborvezetővel a *PostsActivity* kódját és a hozzá tartozó felhasználói felületet.
-A *PostsActivity* feladata lesz a fórum üzenetek megjelenítése egy *RecyclerView*-ban. Az egyes üzenetek egy *CardView*-n kerülnek megjelenítésre. A lista valós időben fog frissülni, amikor egy új üzenet kerül fel a Firebase-be.
+A *PostsActivity* feladata lesz a fórum üzenetek megjelenítése egy *RecyclerView*-ban. Az egyes üzenetek egy *CardView*-n kerülnek megjelenítésre. A lista valós időben fog frissülni  amikor egy új üzenet kerül fel a Firebase adatbázisba.
 
-Adjuk hozzá a projekthez a *Firebase Realtime Database* támogatást (figyeljünk a verziószámra!):
+Adjuk hozzá a projekthez a *Firebase Realtime Database* támogatást (itt is fontos a verziószám):
 
 ```groovy
 implementation 'com.google.firebase:firebase-database:16.0.1'
 ```
 
-Kapcsoljuk be a *Realtime Database*-t a Firebase console-on is (figyeljünk rá, hogy ne a Cloud Firestore-t válasszuk, ez egy újabb, még bétában lévő adatbázis megoldás). Ezt *test mode*-ban tegyük, így nem egyelőre publikusan írható/olvasható lesz az adatbázis, és nem kell konfigurálnunk a hozzáférés szabályozást hozzá. Ezt természetesen később mindenképp meg kéne tenni egy éles projektben.
+Kapcsoljuk be a *Realtime Database*-t a Firebase console-on is (figyeljünk rá, hogy ne a Cloud Firestore-t válasszuk, ez egy újabb, még bétában lévő adatbázis megoldás). Az adatbázist *test mode*-ban fogjuk használni, így egyelőre publikusan írható/olvasható lesz, de cserébe nem kell konfigurálnunk a hozzáférés szabályozást hozzá. Ezt természetesen később mindenképp meg kéne tenni egy éles projektben.
 
 Változtassuk meg a Navigation Drawer menüjét, hogy csak egy Logout menüpont szerepeljen rajta. Ezt a *res/menu/activity_posts_drawer.xml*-ben tehetjük meg:
 
@@ -375,7 +375,7 @@ Változtassuk meg a Navigation Drawer menüjét, hogy csak egy Logout menüpont 
 
 A *PostsActivity* *onCreateOptionsMenu(...)* és *onOptionsItemSelected(...)* függvényei és a *menu/posts.xml* törölhetők, mivel a Toolbaron lévő menüt nem fogjuk használni.
 
-A *NavigationDrawer* menü kezelő függvényében pedig csak a logout menüpontot kell kezelni:
+A *NavigationDrawer* menü kezelő függvényében pedig csak a logout menüpontot kell kezelni, ezt egyszerűen egy [`when` kifejezéssel](https://kotlinlang.org/docs/reference/control-flow.html#when-expression) tehetjük meg:
 
 ```kotlin
 override fun onNavigationItemSelected(item: MenuItem): Boolean {
@@ -515,7 +515,7 @@ Valósítsuk meg az egy *Post*-ot megjelenítő felületet *card_post.xml* néve
 </android.support.v7.widget.CardView>
 ```
 
-A következő lépés a *Post*-ok *RecyclerView*-ban való megjelenítéséért felelős *Adapter* osztály megírása, melyet egy új *adapter* nevű package-ben hozzunk létre, *PostsAdapter* néven:
+A következő lépés a *Post*-ok *RecyclerView*-ban való megjelenítéséért felelős *Adapter* osztály megírása. Ezt hozzuk létre egy új, *adapter* nevű package-ben, *PostsAdapter* néven:
 
 ```kotlin
 class PostsAdapter(private val context: Context) : RecyclerView.Adapter<PostsAdapter.ViewHolder>() {
@@ -590,9 +590,9 @@ rvPosts.layoutManager = LinearLayoutManager(this).apply {
 rvPosts.adapter = postsAdapter
 ```
 
-Ahhoz, hogy  az üzenet lista (*RecyclerView*) frissüljön, ha egy új üzenet érkezett, illetve, hogy kezdetben fel legyen töltve az eddigi adatokkal, a Firebase adatbázis "posts" ágára kell készítenünk egy *ChildEventListener*-t, melynek *onChildAdded(...)* függvénye első híváskor minden eddig bent levő elemre meghívódik, majd minden új elemre is. Látható, hogy ez az eseményekezlő aktiválódik további esetekben is (változás, törlés, stb.), ezeket most nem fogjuk kezelni.
+Ahhoz, hogy  az üzenet lista (*RecyclerView*) frissüljön, ha egy új üzenet érkezett, illetve, hogy kezdetben fel legyen töltve az eddigi adatokkal, a Firebase adatbázis "posts" ágára kell készítenünk egy *ChildEventListener*-t, melynek *onChildAdded(...)* függvénye első híváskor minden eddig bent levő elemre meghívódik, majd minden új elemre is. Látható, hogy ez az eseményekezlő aktiválódik további eseményekre is (változás, törlés, stb.), ezeket most nem fogjuk kezelni.
 
-Valósítsuk meg az alábbi *initPostsListener()* függvényt és hívjuk meg a *PostsActivity* *onCreate(...)* függvényének végén:
+Valósítsuk meg az alábbi *initPostsListener()* függvényt és hívjuk is meg a *PostsActivity* *onCreate(...)* függvényének végén:
 
 ```kotlin
 private fun initPostsListener() {
@@ -627,7 +627,7 @@ Próbáljuk ki az alkalmazás működését. A lista jelenleg még üres lesz, h
 
 ## Postok készítése
 
-A következő lépés az üzenetek írása, melynek hatására már tartalom kerülhet a listába. Ehhez vegyük fel a Firebase Storage használatát lehetővé tevő függőséget:
+A következő lépés az üzenetek írása, melynek hatására már tartalom kerülhet a listába. Ehhez vegyük fel a Firebase Storage függőséget, amit a képek feltöltéséhez fogunk használni:
 
 ```groovy
 implementation 'com.google.firebase:firebase-storage:16.0.1'
@@ -689,7 +689,7 @@ Hozzuk létre a *CreatePostActivity*-t az Empty Activity sablont használva, mel
 
 <img src="./assets/bmeforum_createpost.png" width="512" align="middle">
 
-A *CreatePostActivity* felületén lehetőség van új üzenet írására a cím, szöveg és opcionálisan a kép megadásával. A kép megadáskor a beépített kamera alkalmazással van lehetőségünk képet készíteni, melynek módját korábbi laboron már áttekintettük (*implicit Intent* + *onActivityResult(...)*);
+A *CreatePostActivity* felületén lehetőség van új üzenet írására a cím, szöveg és opcionálisan a kép megadásával. A kép megadáskor a beépített kamera alkalmazással van lehetőségünk képet készíteni, melynek módját korábbi laboron már áttekintettük (*implicit Intent* + *onActivityResult(...)*).
 
 A következőkben megadjuk a *CreatePostActivity* kódját, de bemásolás után a laborvezetővel közösen nézze át a kódot, vizsgálja meg, hogy történik a Storage API-val a kép feltöltés, majd a Firebase-en eltárolt kép URL-jének lekérdezése és hozzáadása az új *Post*-hoz.
 
@@ -726,13 +726,9 @@ class CreatePostActivity : BaseActivity() {
 
     private fun validateForm() = etTitle.validateNonEmpty() && etBody.validateNonEmpty()
 
-    private fun uploadPost(vararg imageUrl: String) {
+    private fun uploadPost(imageUrl: String? = null) {
         val key = FirebaseDatabase.getInstance().reference.child("posts").push().key ?: return
-        val newPost = Post(uid, userName, etTitle.text.toString(), etBody.text.toString())
-
-        if (imageUrl.isNotEmpty()) {
-            newPost.imageUrl = imageUrl[0]
-        }
+        val newPost = Post(uid, userName, etTitle.text.toString(), etBody.text.toString(), imageUrl)
 
         FirebaseDatabase.getInstance().reference
                 .child("posts")
@@ -815,11 +811,11 @@ Adjuk hozzá a projektünkhöz a `firebase-messaging` függőséget:
 implementation 'com.google.firebase:firebase-messaging:17.3.0'
 ```
 
-*Elméletileg* csupán ennyi elegendő a push alap működéséhez, innentől fogva, ha újrafordítjuk az alkalmazást, a Firebase felületéről, vagy API-jával küldött push üzeneteket automatikusan megkapják a mobil kliensek és egy notification-ben megjelenítik.
+Csupán ennyi elegendő a push alap működéséhez, innentől fogva ha újrafordítjuk az alkalmazást, a Firebase felületéről vagy API-jával küldött push üzeneteket automatikusan megkapják a mobil kliensek és egy notification-ben megjelenítik.
 
 <img src="./assets/firebase_push.png" width="1024" align="middle">
 
-Próbáljuk ki a push küldést a Firebase console-ból és vizsgáljuk meg hogyan érkezik meg telefonra, **ha nem fut az alkalmazás**.
+Próbáljuk ki a push küldést a Firebase console-ból és vizsgáljuk meg hogyan érkezik meg telefonra, **ha nem fut az alkalmazás**. (Amikor az alkalmazás, akkor tőlünk várja az üzenet lekezelését az API.)
 
 <img src="./assets/bmeforum_push.png" width="512" align="middle">
 
@@ -848,13 +844,13 @@ buildscript {
 }
 ```
 
-Ez egy Gradle plugint ad a projektünkhöz, amit a modul szintű `build.gradle` fájl elején be kell kapcsolnunk a már meglévők után:
+Ezekkel a módosításokkal egy Gradle plugint adtunk hozzá a projektünkhöz, amit a modul szintű `build.gradle` fájl elején be kell kapcsolnunk a már meglévők után:
 
 ```groovy
 apply plugin: 'io.fabric'
 ```
 
-Végül pedig szükségünk van egy egyszerű Gradle függőségre is, amit a meglévő Firebase függőségek mellé helyezhetünk, a modul szintű a `build.gradle` fájlban:
+Végül pedig szükségünk van egy egyszerű Gradle függőségre is, amit a meglévő Firebase függőségek mellé helyezhetünk, a modul szintű `build.gradle` fájlban:
 
 ```groovy
 implementation 'com.crashlytics.sdk.android:crashlytics:2.9.4'
@@ -871,7 +867,7 @@ Vegyünk fel egy új menüpontot az *activity_post_drawer.xml* menübe, amellyel
     android:title="Error" />
 ```
 
-Próbáljuk ki saját hibajelzések készítését a menü eseménykezelőjében. A *PostsActivity* osztály *onNavigationItemSelected(...)* metódusában kell egy új ágat felvennünk a `when` kifejezésbe:
+Próbáljuk ki saját hibajelzések készítését a menü eseménykezelőjében. A *PostsActivity* osztály *onNavigationItemSelected(...)* metódusában kell egy új ágat felvennünk a `when` kifejezésbe, ahol egy Crashlytics függvény meghívásával szándékos crash-t okozunk:
 
 ```kotlin
 when (item.itemId) {
@@ -886,7 +882,7 @@ when (item.itemId) {
 
 ## Analitika
 
-Az alkalmazás jelenleg is naplóz alapvető analitikákat, használati statisztikákat, melyek a Firebase console Analytics menüpontja alatt érhetők el.
+Az alkalmazás jelenleg is naplóz alapvető analitikákat, használati statisztikákat, melyek a Firebase console *Analytics* menüpontja alatt érhetőek el.
 
 Emellett természetesen lehetőség van az analitika kibővítésére és testreszabására is. Vegyük fel függőségnek a Firebase analitikát:
 
@@ -916,7 +912,7 @@ R.id.nav_analytics -> {
 }
 ```
 
-Fontos kiemelni, hogy nem garantált, hogy az analitika valós időben látszik a Firebase console-ban. 30 percig, vagy akár tovább is tarthat, mire egy-egy esemény itt megjelenik.
+Fontos kiemelni, hogy nem garantált, hogy az analitika valós időben látszik a Firebase console-ban. 30 percig vagy tovább is tarthat, mire egy-egy esemény itt megjelenik.
 
 <img src="./assets/firebase_analytics.png" width="1024" align="middle">
 
