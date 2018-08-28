@@ -6,9 +6,9 @@ Első lépésben készítsünk egy új alkalmazást, neve legyen **Todo** (Kotli
 
 A package név legyen:
 
-```xml
+`
 hu.bme.aut.android
-```
+`
 
 A sablonválasztónál válasszuk a **Master/Detail Flow** opciót!
 
@@ -41,9 +41,9 @@ Figyeljük meg az enum-ot az osztályunkban. Ezen konstansoknak megfelelő ikono
 
 Töröljük ki a **dummy** nevű package-t!
 
-Írjuk felül a TodoDetailFragment osztály tartalmát, mely a Todo leírását fogja megjeleníteni.
+Írjuk felül a `TodoDetailFragment` osztály tartalmát, mely a `Todo` leírását fogja megjeleníteni.
 
-A TodoDetailFragment tartalma az alábbi:
+A `TodoDetailFragment` tartalma az alábbi:
 
 ```kotlin
 class TodoDetailFragment : Fragment() {
@@ -90,7 +90,7 @@ class TodoDetailFragment : Fragment() {
 }
 ```
 
-A megváltozott kulcs illetve newInstance miatt át kell alakítani a `TodoDetailActivity` `onCreate` metódusát is.
+A megváltozott kulcs illetve a `newInstance` hívás miatt át kell alakítani a `TodoDetailActivity` `onCreate` metódusát is.
 
 ```kotlin
 val fragment = TodoDetailFragment.newInstance(intent.getStringExtra(KEY_DESC))
