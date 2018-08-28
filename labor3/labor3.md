@@ -1,26 +1,26 @@
 # 3. Labor - Todo Alkalmazás
 
-A labor célja, hogy bemutassa, hogyan lehet ún. Master/Detail nézetet tartalmazó alkalmazást készíteni, kiemelve a Fragment-eket és az  erőforrásminősítők használatát.
+A labor célja, hogy bemutassa, hogyan lehet ún. Master/Detail nézetet tartalmazó alkalmazást készíteni, kiemelve a `Fragment`-eket és az erőforrásminősítők használatát.
 
-Első lépésben készítsünk egy új alkalmazást, neve legyen **Todo** (Kotlin supportot ne felejtsük el kipipálni!).
+Első lépésben készítsünk egy új alkalmazást, neve legyen *Todo* (Kotlin supportot ne felejtsük el kipipálni!).
 
-A package név legyen:
+A package név legyen: `hu.bme.aut.android.todo`.
 
-`
-hu.bme.aut.android
-`
-
-A sablonválasztónál válasszuk a **Master/Detail Flow** opciót!
+A sablonválasztónál válasszuk a *Master/Detail Flow* opciót!
 
 <img src="./assets/master-detail-choose_new.PNG" width="200" align="middle">
 
-A következő ablakban írjuk be rendre, hogy **Todo, Todos, Todos**! Ennek csak a generált sablonban van szerepe, de legalább az Activity nevét nem kell később átírnunk.
+A következő ablakban írjuk be rendre, hogy *Todo*, *Todos*, *Todos*! Ennek csak a generált sablonban van szerepe, de legalább az `Activity` nevét nem kell később átírnunk.
 
-Laborvezetővel elemezzék a generált alkalmazás működését, próbálják ki emulátoron, készüléken! A Master/Detail nézet célja, hogy egyetlen alkalmazással megoldjunk egy lista és annak egy elemének megjelenítését tableten és mobiltelefonon egyaránt. Működésének a lényege, hogy egy activity-hez tartozó layoutnak kétféle változata van. Egy kétpaneles és egy egypaneles változat. Egy módszer az, ha erőforrás minősítőkkel biztosítjuk, hogy tableten a kétpaneles változat töltődjön be, míg mobilon az egypaneles. Az activityben megpróbálunk referenciát szerezni a második panelre, és ha sikerül, akkor tableten vagyunk, ha nem, akkor mobilon. Az első panel tartalma egy `RecyclerView` a másodiké pedig egy sima Fragment a lista egy elemének megjelenítésére. Ha mobilon vagyunk, akkor a listaelemre kattintva új activitybe töltjük a részletező fragmentet, míg tableten egyszerűen betöltjük a jobb oldali panelbe.
+Laborvezetővel elemezzék a generált alkalmazás működését, próbálják ki emulátoron, készüléken! A Master/Detail nézet célja, hogy egyetlen alkalmazással megoldjunk egy lista és annak egy elemének megjelenítését tableten és mobiltelefonon egyaránt. Működésének a lényege, hogy egy `Activity`-hez tartozó layoutnak kétféle változata van, egy kétpaneles és egy egypaneles változat. Az ezek közötti választást erőforrás minősítőkkel biztosítjuk, hogy tableten a kétpaneles változat töltődjön be, míg mobilon az egypaneles. 
+
+Ezután kódból az `Activity`-ben megpróbálunk referenciát szerezni a második panelre, és ha sikerül, akkor tableten vagyunk, ha nem, akkor mobilon. Az első panel tartalma egy `RecyclerView`, a másodiké pedig egy sima `Fragment` a lista egy elemének megjelenítésére. Ha mobilon vagyunk, akkor a listaelemre kattintva új `Activity`-be töltjük a részletező `Fragment`-et, míg tableten egyszerűen betöltjük a jobb oldali panelbe.
+
+*Tipp: Az egyszerűbb teszteléshez, keresse ki a tablet mérethez tartozó (`layout-w900dp`) felületleírót (`todo_list.xml`), majd másolja a `layout-land` mappába (hozza létre a mappát!). Ezáltal a mobiltelefon álló orientációjában egy-, míg fektetve kétpaneles viselkedést kapunk.*
 
 ## Átalakítás Todo alkalmazássá
 
-Készítsen egy új package-t **model** néven, ebbe pedig hozza létre a `Todo` osztályt! 
+Készítsünk egy új package-t `model` néven, ebben pedig hozzuk létre a `Todo` osztályt! 
 
 ```kotlin
 class Todo(
@@ -39,11 +39,9 @@ class Todo(
 
 Figyeljük meg az enum-ot az osztályunkban. Ezen konstansoknak megfelelő ikonokat fogunk használni a listában.
 
-Töröljük ki a **dummy** nevű package-t!
+Töröljük ki a `dummy` nevű package-t!
 
-Írjuk felül a `TodoDetailFragment` osztály tartalmát, mely a `Todo` leírását fogja megjeleníteni.
-
-A `TodoDetailFragment` tartalma az alábbi:
+Írjuk felül a `TodoDetailFragment` osztály tartalmát, mely a `Todo` leírását fogja megjeleníteni. Ez legyen az alábbi:
 
 ```kotlin
 class TodoDetailFragment : Fragment() {
@@ -96,7 +94,7 @@ A megváltozott kulcs illetve a `newInstance` hívás miatt át kell alakítani 
 val fragment = TodoDetailFragment.newInstance(intent.getStringExtra(KEY_DESC))
 ```
 
-A két Activity és a jobb oldali panel már fel van készítve az új működésre. A `TodoListActivity` el tudja dönteni, hogy egy vagy két panel jelenik meg, listenerként pedig majd betölti a `TodoDetailActivity`-t vagy a jobb oldali fragmentet.
+A két `Activity` és a jobb oldali panel már fel van készítve az új működésre. A `TodoListActivity` el tudja dönteni, hogy egy vagy két panel jelenik meg, listenerként pedig majd betölti a `TodoDetailActivity`-t vagy a jobb oldali `Fragment`-et.
 
 Már csak egy dolog van hátra: ahhoz, hogy a Todoink megfelelően jelenjenek meg a listában, módosítanunk kell a sablonban létrejött `SimpleItemRecyclerViewAdapter`-t. Először is töröljük a `TodoListActivity`-ből az `SimpleItemRecyclerViewAdapter` belső osztályt és hozzunk létre a `SimpleItemRecyclerViewAdapter` osztályt az **adapter** package-ben. Ennek tartalma legyen a következő:
 
@@ -174,10 +172,10 @@ class SimpleItemRecyclerViewAdapter : RecyclerView.Adapter<SimpleItemRecyclerVie
 
 }
 ```
-Figyeljük meg a `ViewHolder` patternt az adapterben. A `RecyclerView` már kikényszeríti ennek használatát, mivel így jóval gyorsabb szoftvert kapunk.
 
-Ez az adapter hivatkozik egy **row_todo.xml**-re. Hozzuk létre ezt az álloimányt a _res/layout_ mappába (new -> layout resource file -> Filename: row_todo.xml -> OK):
+Figyeljük meg a `ViewHolder` patternt az adapterben. A `RecyclerView` már kikényszeríti ennek használatát, mivel így hatékony, gyors listakezelést kapunk.
 
+Ez az adapter hivatkozik egy `row_todo.xml`-re. Hozzuk létre ezt a fájlt a `res/layout` mappába (*New -> Layout resource file -> Filename: `row_todo.xml` -> OK*):
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -221,13 +219,13 @@ Ez az adapter hivatkozik egy **row_todo.xml**-re. Hozzuk létre ezt az álloimá
 </LinearLayout>
 ```
 
-Szükségünk van még a nézetekhez az alábbi három képre. Ezek különböző méreteinek legenerálásához használjuk az [Asset Studio](https://romannurik.github.io/AndroidAssetStudio/index.html)-t (azon belül a Generic icon generator-t), majd a kapott mappákat másoljuk a _res_ mappába.
+Szükségünk van még a nézetekhez az alábbi három képre. Ezek különböző méreteinek legenerálásához használjuk az [Asset Studio](https://romannurik.github.io/AndroidAssetStudio/index.html)-t (azon belül a *Generic icon generator*-t), majd a kapott mappákat másoljuk a `res` mappába.
 
 <img src="./assets/high.png" align="middle" width="50">
 <img src="./assets/medium.png" align="middle" width="50">
 <img src="./assets/low.png" align="middle" width="50">
 
-Írjuk felül a `TodoListActivity` `setupRecyclerView` metódusát az alábbi kóddal. (Ez a metódus felel az adapter példaadatokkal való feltöltéséért)
+Írjuk felül a `TodoListActivity` `setupRecyclerView` metódusát az alábbi kóddal. (Ez a metódus felel az adapter példaadatokkal való feltöltéséért):
 
 ```kotlin
 private fun setupRecyclerView() {
@@ -243,7 +241,7 @@ private fun setupRecyclerView() {
 }
 ```
 
-Majd vegyük fel az `Activity`-ben a hiányzó adapter paramétert (A laborvezetővel egyeztessük a **lateinit** működését) 
+Majd vegyük fel az `Activity`-ben a hiányzó adapter property-t (a laborvezetővel egyeztessük a [`lateinit`](https://kotlinlang.org/docs/reference/properties.html#late-initialized-properties-and-variables) működését): 
 
 ```kotlin
 private lateinit var simpleItemRecyclerViewAdapter: SimpleItemRecyclerViewAdapter
@@ -270,7 +268,6 @@ override fun onItemClick(todo: Todo) {
 Ha valamelyik osztályban még hibát jelezne az IDE, ellenőrizzük, hogy nem-e maradt felesleges import a **dummy** csomag elemeire.
 
 Próbálja ki az alkalmazást!
-Tipp: A gyorsabb teszteléshez, keresse ki a tablet mérethez tartozó (layout-w900dp) `todo_list.xml` felületleírót, majd másolja a layount-land mappába (hozza létre a mappát!). Ezáltal a mobiltelefon álló orientációjában egy-, míg fekvtetve kétpaneles viselkedést kapunk.
 
 ## Todo törlése
 
@@ -292,8 +289,7 @@ override fun onItemLongClick(position: Int): Boolean {
 }
 ```
 
-Az ``onCreateContextMenu`` hivatkozik egy layout erőforrásra, ami tartalmazza a lehetséges menüpontokat. Hozzuk létre a `menu_todo.xml` fájlt a menu mappában.
-(Legegyszerűbb módon az `R.menu.menu_todo` piros részére helyezve a kurzort, majd ALT+ENTER -> “Create menu resource file…”)
+Az `onCreateContextMenu` hivatkozik egy layout erőforrásra, ami tartalmazza a lehetséges menüpontokat. Hozzuk létre a `menu_todo.xml` fájlt a `menu` mappában. (Legegyszerűbb módon az `R.menu.menu_todo` piros részére helyezve a kurzort, majd *Alt+Enter -> Create menu resource file…*)
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -314,9 +310,9 @@ Próbáljuk ki a törlést!
 
 ## Új Todo létrehozása
 
-A TodoListActivity-hez adjunk egy saját menüt, melyben egy „Create new Todo” menüpont található, melyet kiválasztva dialógus formában egy új DialogFragment jelenik meg, hasonlóan a korábbi laboron látott megoldáshoz.
+A `TodoListActivity`-hez adjunk egy saját menüt, melyben egy *Create new Todo* menüpont található, melyet kiválasztva dialógus formában egy új `DialogFragment` jelenik meg, hasonlóan a korábbi laboron látott megoldáshoz.
 
-Ehhez természetesen szükségünk lesz egy menü erőforrásra. A _menu_ mappában hozzuk létre a **menu_list.xml** állományt!
+Ehhez természetesen szükségünk lesz egy menü erőforrásra. A `menu` mappában hozzuk létre a `menu_list.xml` állományt!
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -326,8 +322,7 @@ Ehhez természetesen szükségünk lesz egy menü erőforrásra. A _menu_ mappá
 </menu>
 ```
 
-Hozzuk létre a hiányzó szöveges erőforrást is! (Hibára állva Alt+Enter segít):
-
+Hozzuk létre a hiányzó szöveges erőforrást is! (Hibára állva ismét segít az *Alt+Enter*):
 
 ```xml
 <string name="itemCreateTodo">Create</string>
@@ -350,7 +345,7 @@ override fun onOptionsItemSelected(item: MenuItem?): Boolean {
 }
 ```
 
-Készítsünk egy új osztályt `TodoCreateFragment` néven ami a `DialogFragment`-ből származik. Az ``onAttach`` hívás során ellenőrizzük, hogy van-e listener objektum beregisztrálva a dialógusunk számára. A `TodoListActivity` fog értesülni az új Todo-ról, úgy ahogyan a `TodoCreateFragment`-ünk is értesülni fog a dátumválasztásról.
+Készítsünk egy új osztályt `TodoCreateFragment` néven ami a `DialogFragment`-ből származik. Az `onAttach` hívás során ellenőrizzük, hogy van-e listener objektum beregisztrálva a dialógusunk számára. A `TodoListActivity` fog értesülni az új Todo-ról, úgy ahogyan a `TodoCreateFragment`-ünk is értesülni fog a dátumválasztásról.
 
 ```kotlin
 class TodoCreateFragment : DialogFragment(), DatePickerDialogFragment.DateListener {
@@ -440,7 +435,7 @@ override fun onTodoCreated(todo: Todo) {
 }
 ```
 
-Hozzuk létre a fragment layoutját, ez a **fragment_create.xml** ,tartalma a következő:
+Hozzuk létre a `Fragment` layoutját, ez a `fragment_create.xml`, tartalma a következő:
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -508,7 +503,7 @@ Hozzuk létre a fragment layoutját, ez a **fragment_create.xml** ,tartalma a k�
 </TableLayout>
 ```
 
-Szöveges erőforrásokat vagy hozzuk létre, vagy másoljuk be őket a **strings.xml**-be:
+A szöveges erőforrásokat vagy hozzuk létre a hibákból kiindulva, vagy másoljuk be őket a `strings.xml`-be:
 
 ```xml
 <string name="lblTodoTitle">Todo label</string>
@@ -616,7 +611,7 @@ override fun onDateSelected(date: String) {
 }
 ```
 
-Az `onCreateView`-ben adjuk hozzá a megfelelő metódust a dátumválasztó `TextView`-hoz:
+Végül az `onCreateView`-ben adjuk hozzá a megfelelő eseménykezelőt a dátumválasztó `TextView`-hoz:
 
 ```kotlin
 tvTodoDueDate.setOnClickListener { showDatePickerDialog() }
