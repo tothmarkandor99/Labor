@@ -90,7 +90,7 @@ Az `Activity` létrehozást azonban megkönnyíti az Android Studio és a fenti 
 
 A `MainMenuActivity` a fenti ábra alapján három menüpontot tartalmaz középre igazodva. Mivel a Studio már alapértelmezetten `ConstraintLayout`-ot generál, így most ezt fogjuk használni a megvalósításra. Az anyagban ennek működése csak később következik, így alább megtalálható a kész XML leíró, viszont akinek van kedve, a gif alapján kipróbálhatja a használatát:
 
-[](images/constraint_layout_1.gif)
+![](images/constraint_layout_1.gif)
 
 *Tipp: Shift + Kattintással lehet több elemet kijelölni*
 
@@ -165,7 +165,7 @@ btnHighScore.setOnClickListener {
 
 Ahogy korábban említettük az *About* menü elindítja az új `AboutActivity`-t, ezért elsőként készítsük el az `AboutActivity` felületét, melyet a `content_about.xml` ír le. Mint korábban, itt is lehet `ConstraintLayout`-ot készíteni a segítséggel, vagy alább megtalálható az XML:
 
-[](images/constraint_layout_2.gif)
+![](images/constraint_layout_2.gif)
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
