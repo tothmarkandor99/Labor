@@ -182,8 +182,8 @@ class ImagesAdapter(private val context: Context, private val images: MutableLis
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ImagesAdapter.ViewHolder {
-        val v = layoutInflater.inflate(R.layout.li_image, parent, false)
-        return ViewHolder(v)
+        val view = layoutInflater.inflate(R.layout.li_image, parent, false)
+        return ViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -192,8 +192,8 @@ class ImagesAdapter(private val context: Context, private val images: MutableLis
 
     override fun getItemCount()= images.size
 
-    class ViewHolder(v: View) : RecyclerView.ViewHolder(v) {
-        var imageView: ImageView = v.findViewById(R.id.ivImage) as ImageView
+    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val imageView: ImageView = view.ivImage
     }
 }
 ```
