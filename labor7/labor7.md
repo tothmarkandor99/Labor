@@ -175,7 +175,7 @@ A felület tartalmaz stílusokat is, ezért töltsük fel a `res/values` könyvt
 </resources>
 ``` 
 
-Szabjuk testre az alkalmazás színeit `res/values` könyvtárban lévő `color.xml` állományban.
+Szabjuk testre az alkalmazás színeit a `res/values` könyvtárban lévő `color.xml` állományban.
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -191,7 +191,7 @@ Szabjuk testre az alkalmazás színeit `res/values` könyvtárban lévő `color.
 </resources>
 ``` 
 
-Hozzuk létre `dimens.xml` fájlt, az alábbi tartalommal:
+Hozzuk létre a `res/values` könyvtárban a `dimens.xml` fájlt, az alábbi tartalommal:
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -202,7 +202,7 @@ Hozzuk létre `dimens.xml` fájlt, az alábbi tartalommal:
 </resources>
 ```
 
-Mivel az alkalmazásunk interneten keresztül fog kommunikálni, vegyül fel a manifestbe az ehhez kapcsolódó permissiont.
+Mivel az alkalmazásunk interneten keresztül fog kommunikálni, vegyük fel a manifestbe az ehhez kapcsolódó permissiont.
 
 ```xml
 <uses-permission android:name="android.permission.INTERNET"/>
@@ -220,7 +220,7 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 ```
 
-Az eszköz fordítás időben generálja le a findViewById hívásokat, és el is fedi előlünk, az összerendelést pedíg név alapján, az adott property importálásával tehetjük meg. Ha elkezdjük gépelni például az `etUsername`-et az `onCreate`-ben (fontos hogy a `setContentView` után, mert ekkor kapnak értéket ezek a property-k!) fel is ajánlja a Studio. Mutatja, hogy ez a property az Android Extensions-ből származik, illetve hogy melyik layout fájlban található és milyen típusú `View`-nak felel meg. 
+Az eszköz fordítás időben generálja le a `findViewById` hívásokat, és el is fedi előlünk, az összerendelést pedig név alapján, az adott property importálásával tehetjük meg. Ha elkezdjük gépelni például az `etUsername`-et az `onCreate`-ben (fontos hogy a `setContentView` után, mert ekkor kapnak értéket ezek a property-k!) fel is ajánlja a Studio. Mutatja, hogy ez a property az Android Extensions-ből származik, illetve hogy melyik layout fájlban található és milyen típusú `View`-nak felel meg. 
 
 <img src="./images/extensions.png" width="400" align="middle">
 
@@ -271,7 +271,7 @@ GET /api/step/hallgato/3
 
 ### Üzenet feltöltése
 
-Üzenet feltöltéséhez a `/api/message/{username}/{message}`-t kell hívni (`GET` hívás),amely szintén két paramétert vár:
+Üzenet feltöltéséhez a `/api/message/{username}/{message}`-t kell hívni (`GET` hívás), amely szintén két paramétert vár:
 
 *   `username`: felhasználónév (ne felejtsük URL encode-olni!)
 *   `message`: üzenet (ne felejtsük URL encode-olni!)
@@ -287,7 +287,7 @@ GET /api/message/hallgato/hello
 
 ### Mellék szálak kezelése
 
-Alapértelmezetten Androidon a hívások a fő szálon (UI thread, main thread) futnak. Ha itt hosszan tartó műveleteket végzünk akkor a fő szálat blokkoljuk, ami a felhasználó számára zavaró, mert megfagyasztja a felhasználói felületet.
+Alapértelmezetten Androidon a hívások a fő szálon (UI thread, main thread) futnak. Ha itt hosszan tartó műveleteket végzünk akkor a fő szálat blokkoljuk, ami a felhasználó számára zavaró, mert "megfagyasztja" a felhasználói felületet.
 
 Android platformon a hálózati kommunikáció emiatt új szálon kell hogy történjen. Ehhez mind a Java, mind az Android SDK, mind a Kotlin nyelv ad lehetőségeket:
 
@@ -299,7 +299,7 @@ Android platformon a hálózati kommunikáció emiatt új szálon kell hogy tör
 
 ### Visszatérés a fő szálra
 
-A hálózatról érkező választ általában a felhasználói felületen jelenítjük meg valamilyen módon, de a platform nem engedi, hogy más szálból a UI-t módosítsuk - ezt csak a fő szálról tehetjük meg. 
+A hálózatról érkező választ általában a felhasználói felületen jelenítjük meg valamilyen módon, de a platform nem engedi, hogy más szálból a UI-t módosítsuk - ezt mindig csak a fő szálról tehetjük meg. 
 
 Arra, hogy egy mellék szálról hogyan térjünk vissza a fő szálra a platform szintén több eszközt is biztosít:
 
@@ -313,11 +313,11 @@ Ezeket akkor használhatjuk, ha már van referenciánk egy `Activity`-re vagy `V
 *   [Handler](https://developer.android.com/reference/android/os/Handler)
 *   [AsyncTask](http://developer.android.com/reference/android/os/AsyncTask.html) (Ez is egy feature-je)
 
-Ezeknél probléma lehet hogyha pl. elfordul az Activity, és ezért a korábban eltárolt referencia a régire mutat (memory leak), és az új nem kapja meg a hívást. Ha ez a veszély fenn áll, célszerű kombinálni lazán csatolt megoldással.
+Ezeknél a megoldásoknál probléma lehet hogyha pl. elfordul az `Activity`, és ezért a korábban eltárolt referencia a régire mutat (memory leak), és az új nem kapja meg a hívást. Ha ez a veszély fenn áll, célszerű lazán csatolt megoldást választani.
 
 #### Lazán csatolt megoldások
 
-Ezeknél a megoldásoknál a fő szálú objektum feliratkozik, majd leiratkozik a válaszról, lazán csatolt módon. Hiába fordul el a nézet a hálózati hívás során, az új nézet fogja elkapni a régi által indított üzenet válaszát, és a régire nem marad referencia.
+Az alábbi megoldásoknál a fő szálú objektum feliratkozik, majd leiratkozik a válaszról, lazán csatolt módon. Hiába fordul el a nézet a hálózati hívás során, az új nézet fogja elkapni a régi által indított üzenet válaszát, és a régire nem marad referencia.
 
 *   Broadcast receiver (lazán csatolt, nem kell referencia, de sorosítani kell a választ, lassabb)
 *   Eseménybuszok (lazán csatolt, nem kell referencia, de picit bonyolultabb, 3rd party megoldás)
@@ -355,17 +355,17 @@ Ez az osztály fogja végezni a különböző API hívásokat, és egységbe zá
 
 ### HTTP hívások Androidon
 
-Az Android platform több megoldást is ad beépítve HTTP hívásokra. Egyrészt elérhető az Apache HTTP Client, valamint a Java HttpUrlConnection, ezeket beépítve tartalmazza a platform. Az Apache HTTP Client mára elavult, az Android 6.0 feletti eszközök már csak kiegészítéssel támogatják, *NE HASZNÁLJUK*. A HttpUrlConnection elérhető mindenhol, viszont nagyon körülményes a használata. 
+Az Android platform több megoldást is ad beépítve HTTP hívásokra. Egyrészt elérhető az *Apache HTTP Client*, valamint a Java `HttpUrlConnection`, ezeket beépítve tartalmazza a platform. Az *Apache HTTP Client* mára elavult, az Android 6.0 feletti eszközök már csak kiegészítéssel támogatják, *NE HASZNÁLJUK*. A `HttpUrlConnection` elérhető mindenhol, viszont nagyon körülményes a használata. 
 
 A fentiek miatt a beépített megoldások helyett egy széleskörben elterjedt, harmadik féltől ([Square](http://square.github.io)) származó, nyilt forráskódú könyvtárat, az [OkHttp](http://square.github.io/okhttp/)-t fogjuk használni.
 
-Ennek használatához fel kell vennünk a következő sort az alkalmazás modul szintű `build.gradle` fájljának dependencies részéhez.
+Ennek használatához fel kell vennünk a következő sort az alkalmazás modul szintű `build.gradle` fájljának `dependencies` részéhez:
 
 ```kotlin
 implementation 'com.squareup.okhttp3:okhttp:3.11.0'
 ```
 
-Ezután a könyvtár nagyon egyszerűen használható. Készítsünk is egy általános HTTP GET hívást lebonyolító függvényt a LabyrinthAPI osztályba.
+Ezután a könyvtár nagyon egyszerűen használható. Készítsünk is egy általános HTTP GET hívást lebonyolító függvényt a `LabyrinthAPI` osztályba.
 
 ```kotlin
 @Throws(IOException::class)
@@ -394,7 +394,7 @@ A HTTP karakterek megfelelő URL encodeolásához az `URLEncoder.encode(...)` f�
 private fun encode(url: String) = URLEncoder.encode(url, UTF_8)
 ```
 
-Használjuk is az újonnan elkészített függvényünket, és implementáljuk a `moveUser` és `writeMessage` hívásokat. Figyeljük meg, hogy az esetleges kivételeket [`try-catch` blockban](https://kotlinlang.org/docs/reference/exceptions.html) kezeltük.
+Használjuk is az újonnan elkészített függvényünket, és implementáljuk a `moveUser` és `writeMessage` hívásokat. Figyeljük meg, hogy az esetleges kivételeket [`try-catch` blockban](https://kotlinlang.org/docs/reference/exceptions.html) kezeltük, ami Kotlinban expression-ként is működik (van visszatérési értéke).
 
 ```kotlin
 companion object {
@@ -440,7 +440,7 @@ companion object {
 }
 ```
 
-Majd privát property-ként adjuk hozzá az előbb létrehozott LabyrinthAPI osztályt, és használjuk a megfelelő események bekövetkeztekor, ezeket kössűk a megfelelő gombokhoz!
+Majd privát property-ként adjunk hozzá egy példányt az előbb létrehozott `LabyrinthAPI` osztályból, és használjuk a megfelelő események bekövetkeztekor, ezeket kössűk a megfelelő gombokhoz!
 
 ```kotlin
 class MainActivity : AppCompatActivity() {
@@ -493,22 +493,23 @@ class MainActivity : AppCompatActivity() {
 
 Próbáljuk ki az alkalmazást! Mit tapasztalunk?
 
-Azt tapasztaljuk, hogy minden kérésre ERROR-t kapunk, és ha megnézzük a Logcat kimentet, látjuk is, hogy `android.os.NetworkOnMainThreadException` kivételt kapunk. Ezt a rendszer dobja, mert érzékeli, hogy a fő szálon szeretnénk hosszan tartó hálózati műveletet végezni. Az látszik, hogy a fő szálon, a gombok eseménykezelőjében hívjuk meg a `moveUser`-t, ami a `httpGet` metóduson keresztül meghívja a blokkoló `execute` metódust. Ennek a problémának a megoldásához szálkezelésre lesz szükségünk.
+Azt tapasztaljuk, hogy minden kérésre ERROR-t kapunk, és ha megnézzük a *Logcat* kimentet, látjuk is, hogy `android.os.NetworkOnMainThreadException` kivételt kapunk. Ezt a rendszer dobja, mert érzékeli, hogy a fő szálon szeretnénk hosszan tartó hálózati műveletet végezni. Látszik is, hogy a gombok eseménykezelőjében hívjuk meg a `moveUser`-t, ami a `httpGet` metóduson keresztül meghívja a blokkoló `execute` metódust. Ennek a problémának a megoldásához szálkezelésre lesz szükségünk.
 
 
 ### Szálkezelés elkészítése
 
-A szálkezeléshez használjuk az egyszerű és könnyen testre szabható Java Thread-eket. Készítsünk el a `MainActivity`-ben egy segéd függvényt a `moveUser` és `writeMessage` híváshoz. Ebben elsőnek egy új szálat készítünk, melyben elindítjuk az API hívást és amint az válaszolt, visszaadjuk a választ a fő szálra (`runOnUIThread`), ahol megjelenítjük a választ a `showResponse` segítségével. Kihasználjuk a Kotlin nyelv nyújtotta lambdákat, és egy olyan függvényt várunk paraméterként, melynek nincs paramétere és egy `String`-gel tér vissza. Mivel egy paramétere van, ezért ezt a lambdát csak kapcsos zárójelekkel is átadhatjuk a függvénynek.
+A szálkezeléshez használjuk az egyszerű és könnyen testre szabható Java Thread-eket. Készítsünk el a `MainActivity`-ben egy segédfüggvényt a `moveUser` és `writeMessage` hívásokhoz. Ebben egy új szálat készítünk, melyben elindítjuk az API hívást és amint az válaszolt, visszaadjuk a választ a fő szálra (`runOnUIThread`), ahol megjelenítjük a választ a `showResponse` segítségével. Kihasználjuk a Kotlin nyelv nyújtotta [lambdákat](https://kotlinlang.org/docs/reference/lambdas.html#instantiating-a-function-type): egy olyan függvényt várunk paraméterként a függvényünkbe, melynek nincs paramétere és egy `String`-gel tér vissza (ez az API válasza lesz, vagy az esetleges hiba).
 
 ```kotlin
 private fun async(call: () -> String) {
     Thread {
-        val response = call.invoke()
+        val response = call()
         runOnUiThread { showResponse(response) }
     }.start()
 }
 ```
-Hívjuk meg ezeket az onClick metódusokból a direkt hívások helyett, és nézzük meg mit tapasztalunk, ha újra kipróbáljuk az alkalmazást.
+
+Hívjuk meg az `async` függvényünk segítségével az API-t az `onClickListener`-ekből a direkt hívások helyett. Mivel egy paramétere van, ezért ezt a lambdát csak kapcsos zárójelekkel is átadhatjuk a függvénynek, az alább látható szintaxissal.
 
 ```kotlin
 btnDown.setOnClickListener {
@@ -542,10 +543,33 @@ btnSend.setOnClickListener {
 }
 ```
 
+Nézzük meg mit tapasztalunk, ha újra kipróbáljuk az alkalmazást.
+
+### Network security config
+
+[Android P-től kezdve](https://android-developers.googleblog.com/2018/04/protecting-users-with-tls-by-default-in.html) alapértelmezetten le van tiltva a titoksítatlan, plaintext hálózati kommunikáció, azaz csak a *https* használata megengedett a hálózati hívásoknál, a sima *http* nem. Ha ilyen eszközön próbáljuk az alkalmazást használni, ezzel kapcsolatos exception-t fogunk kapni. Mivel a szerverünk nem támogatja a https kommunikációt, erre most az jelenti a megoldást, ha explcit módon megengedjük a titkosítás nélküli kommunikációt az adott domain felé.
+
+Ehhez hozzunk létre egy `network_security_config.xml` fájlt a `res/xml` mappában:
+ 
+ ```xml
+<network-security-config>
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">node.autsoft.hu</domain>
+    </domain-config>
+</network-security-config>
+```
+
+És a manifestben is adjuk meg, hogy ezt a konfigurációt használjuk, az `application` tag-hez az alábbi attribútumot hozzáadva:
+
+```xml
+android:networkSecurityConfig="@xml/network_security_config"
+```
+
+*Éles projektben természetesen nem ez lenne a megoldás, ott kizárólag olyan szervert használnánk, amivel https felett is tudunk kommunikálni.*
+
 ## Megfelelő válasz kezelés
 
-Próbáljuk, ki mi történik, ha megnyomunk egy gombot, majd elfordítjuk a készüléket/emulátort.
-Azt tapasztaljuk, hogy az alkalmazás hibába ütközik. 
+Próbáljuk ki mi történik, ha megnyomunk egy gombot, majd elfordítjuk a készüléket/emulátort. Azt tapasztaljuk, hogy az alkalmazás hibába ütközik. 
 
 Ennek az az oka, hogy a szálak tovább képesek élni, mint az `Activity`, és ha egy hálózati hívás keresztül ível egy `Activity` váltáson/újralétrehozáson, akkor a szál még az előző `Activity`-re rendelkezik referenciával, így `NullPointerException`-t kapunk. 
 
@@ -553,26 +577,28 @@ Ezt úgy lehet kiküszöbölni, hogy az erős, referencia alapú csatolás helye
 
 Az Android platform beépítve támogatja az események kezelését *Broadcast Receiver*-ek formájában. Viszont ezeket egy alkalmazáson belül használva az üzenet sorosítása miatt overhead jelentkezik, valamint kényelmetlen is a használatuk. 
 
-Ennek kiküszöbölése érdekében használhatunk eseménybuszokat, melyek gyorsabbak és egyszerűbben is használhatóak a *Broadcast Receiverek*-nél (ellenben csak egy alkalmazáson/processen belül működnek és referencia szükséges az eseménybuszra).
+Helyettük használhatunk eseménybuszokat, melyek gyorsabbak és egyszerűbben is használhatóak a *Broadcast Receiverek*-nél (ellenben csak egy alkalmazáson/processen belül működnek, és a használóinak referenciára van szükségese az eseménybuszra).
 
 Számos 3rd party eseménybusz megoldás van, mi a [Greenrobot EventBus](https://github.com/greenrobot/EventBus) megoldását fogjuk használni. Ehhez vegyük fel a könyvtárat a függőségek közé:
 
-`implementation 'org.greenrobot:eventbus:3.1.1'`
-
-Először definiálnunk kell az eseményeinket. Hozzunk létre 1-1 külön osztályt a mozgatás és az üzenet küldés válaszának az `events` csomagban, `MoveUserResponseEvent` és `WriteMessageResponseEvent` néven. Mivel az eseménybuszok az osztály alapján dolgoznak ezért az egyes eseményekhez külön osztályok szükségesek. Mindenkét osztály Kotlin data class, mely 1-1 String-ben tárolja a választ.
-
-```kotlin
-data class MoveUserResponseEvent(val response: String)
-
-data class WriteMessageResponseEvent(val response: String)
+```groovy
+implementation 'org.greenrobot:eventbus:3.1.1'
 ```
 
-Ezután az eseményeket a külön szálakban az `EventBus.getDefault().post(...)` segítségével küldjük ki. Minden eseményt a fenti osztályok 1-1 példánya reprezentál.
-
-Ahhoz, hogy az aszinron segédfüggvényünket tudjuk használni, alakítsuk át úgy, hogy a paraméter függvénynek ne legyen visszatérési értéke:
+Először definiálnunk kell az eseményeinket. Hozzunk létre egy-egy külön osztályt a mozgatás és az üzenet küldés válaszának az `events` csomagban, `MoveUserResponseEvent` és `WriteMessageResponseEvent` néven. Azért szükségesek külön osztályok, mert az eseménybuszok az osztályuk alapján kézbesítik az eseményeket, és így tudjuk majd őket megkülönböztetni és külön kezelni később. Mindenkét osztály egy egysoros Kotlin osztály lesz, és `String`-ben tárolják az adott hívásra érkezett választ.
 
 ```kotlin
-private fun async(call: () -> Unit) = Thread { call.invoke() }.start()
+class MoveUserResponseEvent(val response: String)
+
+class WriteMessageResponseEvent(val response: String)
+```
+
+Ezután az eseményeket a külön szálakban az `EventBus.getDefault().post(...)` segítségével küldjük ki. Minden eseményt a fenti osztályok egy-egy példánya reprezentál.
+
+Ahhoz, hogy az aszinkron segédfüggvényünket tudjuk használni, alakítsuk át úgy, hogy a paraméter függvénynek ne legyen visszatérési értéke:
+
+```kotlin
+private fun async(call: () -> Unit) = Thread { call() }.start()
 ```
 
 Majd használjuk a következő módon:
@@ -628,11 +654,11 @@ fun onWriteMessageResponse(event: WriteMessageResponseEvent) {
 }
 ```
 
-Itt fontos hogy a `@Subscribe` annotáció használva legyen, ez mondja meg hogy ez egy elkapó metódus, valamint a thread mode `MAIN` legyen, mert így az események a főszálon kerülnek továbbításra. Fontos, hogy az elküldött objektumokat az osztály típusa szerint tudja a rendszer a megfelelő elkapó metódusnak elküldeni. Egyébként egy eseményhez több elkapó metódus is lehet egyszerre beregisztrálva.
+Itt fontos, hogy a `@Subscribe` annotáció használva legyen, ez mondja meg hogy ez egy eseménykezelő metódus, valamint a thread mode `MAIN` legyen, mert így az események a főszálon kerülnek továbbításra. Fontos, hogy az elküldött objektumokat az osztály típusa szerint tudja a rendszer a megfelelő eseménykezelőknek elküldeni. Egy eseményhez több eseménykezelő metódus is lehet egyszerre beregisztrálva, ilyenkor mindegyik megkapja az elküldött eseményt.
 
-Ezután regisztráljuk be az elkapó metódusokat, pontosabban azt az osztályt amely ezeket tartalmazza (jelen esetben ez a `MainActivity` aktuális példánya (`this`)).
+Ezután regisztráljuk be az metódusainkat, pontosabban azt az osztályt amely ezeket tartalmazza, ami a `MainActivity` aktuális példánya (`this`).
 
-Azt szeretnénk, hogy akkor legyenek ezek az esemény elkapó metódusok aktívak, amikor az `Activity` előtérben van, így az `onStart`-ban iratkozunk fel, és az `onStop`-ban le.
+Azt szeretnénk, hogy akkor legyenek ezek az eseménykezelő metódusok aktívak, amikor az `Activity` előtérben van, így az `onStart`-ban iratkozunk fel, és az `onStop`-ban le.
 
 ```kotlin
 override fun onStart() {
@@ -666,7 +692,7 @@ val currentTime = System.currentTimeMillis()
 
 ## Bónusz feladat 2 - Hálozat elérhető-e
 
-Egészítsük ki az alkalmazást úgy, hogy a hálózati hívások előtt ellenőrizzük, hogy elérhető-e a hálózat, és ha nem, jelenítsünk meg hibaüzenetet pl. Toast-ban. Segítség: 
+Egészítsük ki az alkalmazást úgy, hogy a hálózati hívások előtt ellenőrizzük, hogy elérhető-e a hálózat, és ha nem, akkor jelenítsünk meg hibaüzenetet pl. `Toast`-ban. Segítség: 
 
 ```kotlin
 val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
