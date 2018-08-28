@@ -640,7 +640,7 @@ Próbáljuk ki az alkalmazást!
 <img src="./images/screen4.png" width="250" align="middle">
 <img src="./images/screen5.png" width="250" align="middle">
 
-## A feltöltés megvalósítása
+A feltöltés megvalósítása
 
 A feltöltéshez szükséges API definíció és Interactor hívás is definiálva van, így a **getPhotos**-hoz hasonlóan hívjuk meg ezt a hívást is a kép **Uri** paraméterével. Ezt az **UploadActivity** **onCreate(..)** metódusában tegyük meg.
 
