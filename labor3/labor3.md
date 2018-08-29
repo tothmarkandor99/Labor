@@ -94,9 +94,17 @@ A megváltozott kulcs illetve a `newInstance` hívás miatt át kell alakítani 
 val fragment = TodoDetailFragment.newInstance(intent.getStringExtra(KEY_DESC))
 ```
 
+Vegyük fel a `TodoDetailActivity`-ben az alábbi kulcsot ami még hiányzik: 
+
+```kotlin
+companion object {
+	const val KEY_DESC = "KEY_DESC"
+}
+```
+
 A két `Activity` és a jobb oldali panel már fel van készítve az új működésre. A `TodoListActivity` el tudja dönteni, hogy egy vagy két panel jelenik meg, listenerként pedig majd betölti a `TodoDetailActivity`-t vagy a jobb oldali `Fragment`-et.
 
-Már csak egy dolog van hátra: ahhoz, hogy a Todoink megfelelően jelenjenek meg a listában, módosítanunk kell a sablonban létrejött `SimpleItemRecyclerViewAdapter`-t. Először is töröljük a `TodoListActivity`-ből az `SimpleItemRecyclerViewAdapter` belső osztályt és hozzunk létre a `SimpleItemRecyclerViewAdapter` osztályt az **adapter** package-ben. Ennek tartalma legyen a következő:
+Már csak egy dolog van hátra: ahhoz, hogy a Todoink megfelelően jelenjenek meg a listában, módosítanunk kell a sablonban létrejött `SimpleItemRecyclerViewAdapter`-t. Először is töröljük a `TodoListActivity`-ből az `SimpleItemRecyclerViewAdapter` belső osztályt és hozzunk létre a `SimpleItemRecyclerViewAdapter` osztályt az `adapter` package-ben. Ennek tartalma legyen a következő:
 
 ```kotlin
 class SimpleItemRecyclerViewAdapter : RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder>() {
@@ -265,17 +273,9 @@ override fun onItemClick(todo: Todo) {
 }
 ```
 
-Vegyük fel a `TodoDetailActivity`-ben az alábbi kulcsot ami még hiányzik: 
-```kotlin
-companion object {
-	const val KEY_DESC = "KEY_DESC"
-}
-```
-
-Minden fejlesztés során fontos a kódolási konvenciók betartása, hogy könyebben olvasható kódot adjunk ki a kezünkből amelyra ha más ránéz, nem lehet problémája a megértésével. Ezért itt alkalmazzuk a widget elemek típusukkal való prefixelését, tehát adjunk új id-t a `todo_detail.xml`-ben a `TextView`-nak **tvTodoDetail** néven majd a `row_todo.xml`-ben, amely a lista egy eleme, nevezzük át az id-kat értelemszerűen: **ivPriority**, **tvTitle**, **tvDueDate**-nak.
+Minden fejlesztés során fontos a kódolási konvenciók betartása, hogy könyebben olvasható kódot adjunk ki a kezünkből amelyra ha más ránéz, nem lehet problémája a megértésével. Ezért itt alkalmazzuk a widget elemek típusukkal való prefixelését, tehát adjunk új id-t a `todo_detail.xml`-ben a `TextView`-nak `tvTodoDetail` néven majd a `row_todo.xml`-ben, amely a lista egy eleme, nevezzük át az id-kat értelemszerűen: `ivPriority`, `tvTitle`, `tvDueDate`-nak.
  
- 
-Ha valamelyik osztályban még hibát jelezne az IDE, ellenőrizzük, hogy nem-e maradt felesleges import a **dummy** csomag elemeire.
+Ha valamelyik osztályban még hibát jelezne az IDE, ellenőrizzük, hogy nem-e maradt felesleges import a **dummy** csomag elemeire, valamint importáljuk be az imént átnevezett View-kat ID szerint.
 
 Próbálja ki az alkalmazást!
 
@@ -285,18 +285,18 @@ Az adapterben láttuk a törlésre szolgáló metódust, hát használjuk is! A 
 Az elemek érintés eseménykezelője már el van készítve, a todo törléséhez készítsünk az elemekhez hosszú érintés gesztus detektálót, majd ekkor dobjunk fel egy popup ablakot, ahol a kívánt művelet kiválasztható lesz. Adjuk hozzá az alábbi sorokat az `Activity` interfészt megvalósító metódusához:
 
 ```kotlin
-    override fun onItemLongClick(position: Int, view: View): Boolean {
-        val popup = PopupMenu(this, view)
-        popup.inflate(R.menu.menu_todo)
-        popup.setOnMenuItemClickListener { item ->
-            when (item.itemId) {
-                R.id.delete -> simpleItemRecyclerViewAdapter.deleteRow(position)
-            }
-            false
+override fun onItemLongClick(position: Int, view: View): Boolean {
+    val popup = PopupMenu(this, view)
+    popup.inflate(R.menu.menu_todo)
+    popup.setOnMenuItemClickListener { item ->
+        when (item.itemId) {
+            R.id.delete -> simpleItemRecyclerViewAdapter.deleteRow(position)
         }
-        popup.show()
-        return false
+        false
     }
+    popup.show()
+    return false
+}
 ```
 
 Az `onItemLongClick`-ben hivatkozunk egy layout erőforrásra, ami tartalmazza a lehetséges menüpontokat. Hozzuk létre a `menu_todo.xml` fájlt a `menu` mappában (amit el kell készítenünk).
@@ -538,7 +538,7 @@ Ezek után ellenőrizzük, hogy működik az új Todo felvitele (kivéve a dátu
 
 ### Dátumválasztó elkészítése
 
-A `TodoCreateFragment`-ünk implementálja a `DateListener` interfészét a `DatePickerDialogFragment`-ünknek, így a dátumválasztásról értesül az új Todo felvételére szolgáló `DialogFragment`-ünk. Először is csináljunk még egy `DialogFragment`-ből származó osztályt, ezúttal nevezzük `DatePickerDialogFragment`-nek.
+Először is csináljunk még egy `DialogFragment`-ből származó osztályt, ezúttal nevezzük `DatePickerDialogFragment`-nek. A `TodoCreateFragment`-ünk implementálja a `DateListener` interfészét a `DatePickerDialogFragment`-ünknek, így a dátumválasztásról értesül az új Todo felvételére szolgáló `DialogFragment`-ünk.
 
 ```kotlin
 class DatePickerDialogFragment : DialogFragment() {
