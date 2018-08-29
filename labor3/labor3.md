@@ -159,7 +159,7 @@ class SimpleItemRecyclerViewAdapter : RecyclerView.Adapter<SimpleItemRecyclerVie
             }
 
             itemView.setOnLongClickListener {
-                itemClickListener?.onItemLongClick(adapterPosition)
+                itemClickListener?.onItemLongClick(adapterPosition, it)
                 true
             }
         }
@@ -167,7 +167,7 @@ class SimpleItemRecyclerViewAdapter : RecyclerView.Adapter<SimpleItemRecyclerVie
 
     interface TodoItemClickListener {
         fun onItemClick(todo: Todo)
-        fun onItemLongClick(position: Int): Boolean
+        fun onItemLongClick(position: Int, view: View): Boolean
     }
 
 }
@@ -225,7 +225,7 @@ Szükségünk van még a nézetekhez az alábbi három képre. Ezek különböz�
 <img src="./assets/medium.png" align="middle" width="50">
 <img src="./assets/low.png" align="middle" width="50">
 
-Írjuk felül a `TodoListActivity` `setupRecyclerView` metódusát az alábbi kóddal. (Ez a metódus felel az adapter példaadatokkal való feltöltéséért):
+Írjuk felül a `TodoListActivity` `setupRecyclerView` metódusát az alábbi kóddal. (Ez a metódus felel az adapter példaadatokkal való feltöltéséért, ne felejtsük el a template által generált paramétert törölni a hívás helyén):
 
 ```kotlin
 private fun setupRecyclerView() {
@@ -247,7 +247,7 @@ Majd vegyük fel az `Activity`-ben a hiányzó adapter property-t (a laborvezet�
 private lateinit var simpleItemRecyclerViewAdapter: SimpleItemRecyclerViewAdapter
 ```
 
-Illetve generáljuk ki az interfész implementációs metódusokat, ebből az `onItemClick`:
+Illetve generáljuk ki az interfész implementációs metódusokat (tipp: a `setupRecyclerView()`-ban a `this`-en ALT+ENTERT nyomva az IDE felajánlja a generálást), ebből az `onItemClick` megvalósítása:
 
 ```kotlin
 override fun onItemClick(todo: Todo) {
@@ -265,6 +265,16 @@ override fun onItemClick(todo: Todo) {
 }
 ```
 
+Vegyük fel a `TodoDetailActivity`-ben az alábbi kulcsot ami még hiányzik: 
+```kotlin
+companion object {
+	const val KEY_DESC = "KEY_DESC"
+}
+```
+
+Minden fejlesztés során fontos a kódolási konvenciók betartása, hogy könyebben olvasható kódot adjunk ki a kezünkből amelyra ha más ránéz, nem lehet problémája a megértésével. Ezért itt alkalmazzuk a widget elemek típusukkal való prefixelését, tehát adjunk új id-t a `todo_detail.xml`-ben a `TextView`-nak **tvTodoDetail** néven majd a `row_todo.xml`-ben, amely a lista egy eleme, nevezzük át az id-kat értelemszerűen: **ivPriority**, **tvTitle**, **tvDueDate**-nak.
+ 
+ 
 Ha valamelyik osztályban még hibát jelezne az IDE, ellenőrizzük, hogy nem-e maradt felesleges import a **dummy** csomag elemeire.
 
 Próbálja ki az alkalmazást!
@@ -275,21 +285,21 @@ Az adapterben láttuk a törlésre szolgáló metódust, hát használjuk is! A 
 Az elemek érintés eseménykezelője már el van készítve, a todo törléséhez készítsünk az elemekhez hosszú érintés gesztus detektálót, majd ekkor dobjunk fel egy popup ablakot, ahol a kívánt művelet kiválasztható lesz. Adjuk hozzá az alábbi sorokat az `Activity` interfészt megvalósító metódusához:
 
 ```kotlin
-override fun onItemLongClick(position: Int): Boolean {
-	val popup = PopupMenu(this, content)
-	popup.inflate(R.menu.menu_todo)
-	popup.setOnMenuItemClickListener { item ->
-		when (item.itemId) {
-			R.id.delete -> simpleItemRecyclerViewAdapter.deleteRow(position)
-		}
-		false
-	}
-	popup.show()
-	return false
-}
+    override fun onItemLongClick(position: Int, view: View): Boolean {
+        val popup = PopupMenu(this, view)
+        popup.inflate(R.menu.menu_todo)
+        popup.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                R.id.delete -> simpleItemRecyclerViewAdapter.deleteRow(position)
+            }
+            false
+        }
+        popup.show()
+        return false
+    }
 ```
 
-Az `onCreateContextMenu` hivatkozik egy layout erőforrásra, ami tartalmazza a lehetséges menüpontokat. Hozzuk létre a `menu_todo.xml` fájlt a `menu` mappában. (Legegyszerűbb módon az `R.menu.menu_todo` piros részére helyezve a kurzort, majd *Alt+Enter -> Create menu resource file…*)
+Az `onItemLongClick`-ben hivatkozunk egy layout erőforrásra, ami tartalmazza a lehetséges menüpontokat. Hozzuk létre a `menu_todo.xml` fájlt a `menu` mappában (amit el kell készítenünk).
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -328,7 +338,7 @@ Hozzuk létre a hiányzó szöveges erőforrást is! (Hibára állva ismét seg�
 <string name="itemCreateTodo">Create</string>
 ```
 
-Majd az `TodoListActivity`-n belül kezeljük az ehhez tartozó metódusokat is. Az OptionsMenu-höz is van ``onCreate`` és ``onOptionsItemSelected`` metódus:
+Majd az `TodoListActivity`-n belül kezeljük az ehhez tartozó metódusokat is. Az OptionsMenu-höz is van `onCreate` és `onOptionsItemSelected` metódus:
 
 ```kotlin
 override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -348,7 +358,7 @@ override fun onOptionsItemSelected(item: MenuItem?): Boolean {
 Készítsünk egy új osztályt `TodoCreateFragment` néven ami a `DialogFragment`-ből származik. Az `onAttach` hívás során ellenőrizzük, hogy van-e listener objektum beregisztrálva a dialógusunk számára. A `TodoListActivity` fog értesülni az új Todo-ról, úgy ahogyan a `TodoCreateFragment`-ünk is értesülni fog a dátumválasztásról.
 
 ```kotlin
-class TodoCreateFragment : DialogFragment(), DatePickerDialogFragment.DateListener {
+class TodoCreateFragment : DialogFragment() {
 
     private lateinit var listener: TodoCreatedListener
 
@@ -381,7 +391,6 @@ class TodoCreateFragment : DialogFragment(), DatePickerDialogFragment.DateListen
                 listOf("Low", "Medium", "High")
         )
         tvTodoDueDate.text = "  -  "
-        tvTodoDueDate.setOnClickListener { showDatePickerDialog() }
 
         btnCreateTodo.setOnClickListener {
             val selectedPriority = when (spnrTodoPriority.selectedItemPosition) {
@@ -407,13 +416,7 @@ class TodoCreateFragment : DialogFragment(), DatePickerDialogFragment.DateListen
     }
 
     private fun showDatePickerDialog() {
-        val datePicker = DatePickerDialogFragment()
-        datePicker.setTargetFragment(this, 0)
-        datePicker.show(fragmentManager, DatePickerDialogFragment.TAG)
-    }
-
-    override fun onDateSelected(date: String) {
-        tvTodoDueDate.text = date
+        //TODO 
     }
 
     interface TodoCreatedListener {
@@ -440,66 +443,80 @@ Hozzuk létre a `Fragment` layoutját, ez a `fragment_create.xml`, tartalma a k�
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:stretchColumns="1">
-    <TableRow>
-        <TextView
-            android:layout_column="1"
-            android:text="@string/lblTodoTitle"
-            android:layout_width="wrap_content"
-            android:gravity="right"/>
-        <EditText
-            android:id="@+id/todoTitle"
-            android:width="200dp"/>
-    </TableRow>
-    <TableRow>
-        <TextView
-            android:layout_column="1"
-            android:text="@string/lblTodoPriority"
-            android:layout_width="wrap_content"
-            android:gravity="right"/>
-        <Spinner
-            android:id="@+id/todoPriority"
-            android:width="200dp"/>
-    </TableRow>
-    <TableRow>
-        <TextView
-            android:layout_column="1"
-            android:text="@string/lblTodoDueDate"
-            android:layout_width="wrap_content"
-            android:gravity="right"/>
-        <TextView
-            android:id="@+id/todoDueDate"
-            android:textSize="20dp"
-            android:width="200dp"
-            android:gravity="center"/>
-    </TableRow>
-    <TableRow>
-        <TextView
-            android:layout_column="1"
-            android:text="@string/lblTodoDescription"
-            android:layout_width="wrap_content"
-            android:gravity="right"/>
-        <EditText
-            android:id="@+id/todoDescription"
-            android:width="200dp"
-            android:text=""/>
-    </TableRow>
+	android:layout_width="wrap_content"
+	android:layout_height="wrap_content"
+	android:stretchColumns="1">
 
-    <TableRow>
-        <Button
-            android:id="@+id/btnCreateTodo"
-            android:layout_column="1"
-            android:text="@string/btnOk"
-            android:layout_width="wrap_content"
-            android:gravity="right"/>
-        <Button
-            android:id="@+id/btnCancelCreateTodo"
-            android:text="@string/btnCancel"
-            android:layout_width="wrap_content"
-            android:gravity="left"/>
-    </TableRow>
+	<TableRow>
+
+		<TextView
+			android:layout_column="1"
+			android:text="@string/lblTodoTitle"
+			android:layout_width="wrap_content"
+			android:gravity="right" />
+
+		<EditText
+			android:id="@+id/etTodoTitle"
+			android:width="200dp" />
+	</TableRow>
+
+	<TableRow>
+
+		<TextView
+			android:layout_column="1"
+			android:text="@string/lblTodoPriority"
+			android:layout_width="wrap_content"
+			android:gravity="right" />
+
+		<Spinner
+			android:id="@+id/spnrTodoPriority"
+			android:width="200dp" />
+	</TableRow>
+
+	<TableRow>
+
+		<TextView
+			android:layout_column="1"
+			android:text="@string/lblTodoDueDate"
+			android:layout_width="wrap_content"
+			android:gravity="right" />
+
+		<TextView
+			android:id="@+id/tvTodoDueDate"
+			android:textSize="20dp"
+			android:width="200dp"
+			android:gravity="center" />
+	</TableRow>
+
+	<TableRow>
+
+		<TextView
+			android:layout_column="1"
+			android:text="@string/lblTodoDescription"
+			android:layout_width="wrap_content"
+			android:gravity="right" />
+
+		<EditText
+			android:id="@+id/etTodoDescription"
+			android:width="200dp"
+			android:text="" />
+	</TableRow>
+
+	<TableRow>
+
+		<Button
+			android:id="@+id/btnCreateTodo"
+			android:layout_column="1"
+			android:text="@string/btnOk"
+			android:layout_width="wrap_content"
+			android:gravity="right" />
+
+		<Button
+			android:id="@+id/btnCancelCreateTodo"
+			android:text="@string/btnCancel"
+			android:layout_width="wrap_content"
+			android:gravity="left" />
+	</TableRow>
 </TableLayout>
 ```
 
@@ -521,7 +538,7 @@ Ezek után ellenőrizzük, hogy működik az új Todo felvitele (kivéve a dátu
 
 ### Dátumválasztó elkészítése
 
-A `TodoCreateFragment`-ünk implementálja a `DateListener` interfészét a `DatePickerDialogFragment`-ünknek, így a dátumválasztásról értesül az új Todo felvitele `DialogFragment`-ünk. Először is csináljunk még egy `DialogFragment`-ből származó osztályt, ezúttal nevezzük `DatePickerDialogFragment`-nek.
+A `TodoCreateFragment`-ünk implementálja a `DateListener` interfészét a `DatePickerDialogFragment`-ünknek, így a dátumválasztásról értesül az új Todo felvételére szolgáló `DialogFragment`-ünk. Először is csináljunk még egy `DialogFragment`-ből származó osztályt, ezúttal nevezzük `DatePickerDialogFragment`-nek.
 
 ```kotlin
 class DatePickerDialogFragment : DialogFragment() {
@@ -611,7 +628,7 @@ override fun onDateSelected(date: String) {
 }
 ```
 
-Végül az `onCreateView`-ben adjuk hozzá a megfelelő eseménykezelőt a dátumválasztó `TextView`-hoz:
+Végül az `onViewCreated`-ben adjuk hozzá a megfelelő eseménykezelőt a dátummegjelenítő `TextView`-hoz:
 
 ```kotlin
 tvTodoDueDate.setOnClickListener { showDatePickerDialog() }
