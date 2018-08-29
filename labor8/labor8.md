@@ -42,7 +42,7 @@ Az alábbi `GET` hívással:  `/images` lehetőségünk van a feltöltött fotó
  
  A válasz egy JSON tömb, ami a képek adatait tartalmazza, pl. 
  
- ```
+ ```javascript
 [
   {
     "_id": "58a5b80aa8e86411008ca8e4",
@@ -135,7 +135,6 @@ A hiányzó dimenzió értékeket vegyük fel alt+enter segítségével. Érték
 A **MainActivity** kódja pedíg a következő. Látható hogy a `loadImages()` függvény végzi ez a fotók letöltését (egyenlőre csak beégetett értékekkel), ez hívódik a nézetre navigálása után, illetve ha lehúzzással frissítjük a tartalmat.
 
 ```java
-
 public class MainActivity extends AppCompatActivity {
     private ImagesAdapter adapter;
     private RecyclerView imagesRV;
@@ -230,7 +229,7 @@ public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.ViewHolder
 
 Az egyes képekhez tartozó cella elem felületét pedig az **li_image.xml** layout fileban definiáljuk.
 
-```
+```xml
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
@@ -258,13 +257,13 @@ A [Glide](https://github.com/bumptech/glide) egy általános célú képkezelő 
 
 Használatához a **build.gradle** be vegyük fel a következő függőséget a `dependencies` blokkban. 
 
-```
+```groovy
 implementation 'com.github.bumptech.glide:glide:4.6.1'
 ```
 
 Ezután a **ImagesAdapter**  **onBindViewHolder** függvényében töltsük be az adott fotót az **ImageView**-ba.
 
-```       
+```java       
 Glide.with(holder.imageView.getContext()).load(images.get(position)).into(holder.imageView);
 ```
 
@@ -281,7 +280,7 @@ Segítségével elég egy interfaceben annotációk segítségével leírni az A
 
 A Retrofit használatához vegyük fel a függőségek közé az alábbi kódot.
 
-```
+```groovy
 implementation 'com.squareup.retrofit2:retrofit:2.3.0'
 implementation 'com.squareup.okhttp3:okhttp:3.10.0'
 implementation 'com.google.code.gson:gson:2.8.2'
@@ -290,7 +289,7 @@ implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
 
 Ezután hozzunk létre egy új csomagot **network** néven, benne egy új interface-t **GalleryAPI** néven. Ez lesz az API leírónk.
 
-```
+```java
 public interface GalleryAPI {
     String ENDPOINT_URL="http://android-gallery.node.autsoft.hu/api/";
     String IMAGE_PREFIX_URL="http://android-gallery.node.autsoft.hu/";
@@ -309,7 +308,7 @@ public interface GalleryAPI {
 
 A képek adatait tartalmazó **Image** osztályt hozzuk létre a **model** csomagban.
 
-```
+```java
 public class Image {
     @SerializedName("_id")
     public String id;
@@ -331,7 +330,7 @@ Ezután hozzuk létre azt az osztályt a **network** csomagban,amely a fenti API
 
 Az osztály neve legyen **GalleryInteractor**.
 
-```
+```java
 public class GalleryInteractor {
     private final GalleryAPI galleryApi;
     private final Context context;
@@ -353,7 +352,7 @@ Látható, hogy a **Retrofit** objektumot felhasználva hozzuk létre a **Galler
 
 Azért, hogy a hálózati hívásokat külön szálra ütemezzük, majd a választ egy interfacen keresztül visszaütemezzük a főszálra **generikus függvényeket** fogunk használni. A hálózati hívások válaszát a következő generikus interface fogja biztosítani, ezt a **GalleryInteractorban** definiáljuk.
 
-```
+```java
 public interface ResponseListener<T> {
     void onResponse(T t);
     void onError(Exception e);
@@ -366,7 +365,7 @@ Az API-ban definiált `Call` objektumok lehetővé teszik, hogy a hálózati hí
 
 Készítsük is el a generikus statikus hívásunkat, mely egy tetszőleges típusu `Call` objektumot vár, azt egy külső szálon meghívja, majd a választ (`Handler` segítségével) visszaütemezi a főszálra, és ott meghívja az előbb létrehozott listener objektumot. A `Handler`-rel a `runOnUiThread`-hez hasonló működést tudunk elérni, anélkül hogy referenciánk lenne egy `Activity`-re. Ennek a kódja a következő (ezt is a **GalleryInteractor**-ban definiáljunk):
 
-```
+```java
 private static <T> void runCallOnBackgroundThread(final Call<T> call, final ResponseListener<T> listener) {
     final Handler handler = new Handler();
     new Thread(new Runnable() {
@@ -396,7 +395,7 @@ private static <T> void runCallOnBackgroundThread(final Call<T> call, final Resp
 ```
 Ezután a fenti segédfüggvényt felhasználva elkészíthetjük a az Interactorban a hívásokat.
 
-```
+```java
 public void getImages(ResponseListener<List<Image>> responseListener) {
     Call<List<Image>> getImagesRequest = galleryApi.getImages();
     runCallOnBackgroundThread(getImagesRequest, responseListener);
@@ -419,7 +418,7 @@ Figyeljük meg, hogy az adott hívás nem egyből a válasz típusával tér vis
 
 Ezután a **MainActivity**-ben példányosítsuk a **GalleryInteractor**-unkat, majd hívjuk meg a **getImages** hívást, melynek eredményét jelentsük meg a **ImagesAdapter** segítségével.
 
-```
+```java
 private void loadImages() {
     GalleryInteractor galleryInteractor = new GalleryInteractor(this);
     galleryInteractor.getImages(new GalleryInteractor.ResponseListener<List<Image>>() {
@@ -441,7 +440,7 @@ private void loadImages() {
 
 Mivel eddig String listát jelenítettünk meg az **ImagesAdapter** -el, így most át kell alakítani az adaptert, hogy egy **Image** listát kezeljen. Valamint az `IMAGE_PREFIX_URL` után kell fűznünk a kép **url** mezőjének tartalmát.
 
-```
+```java
 public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.ViewHolder> {
     private final LayoutInflater layoutInflater;
     private final Context context;
@@ -489,7 +488,7 @@ Próbáljuk ki az alkalmazást.
 ## Fotó feltöltés
 Hozzunk létre egy új **Empty Activity** -t **UploadActivity** néven. A hozzá tartozó *activity_upload.xml* felülete legyen a következő:
 
-```
+```xml
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
@@ -641,12 +640,12 @@ Próbáljuk ki az alkalmazást!
 <img src="./images/screen4.png" width="250" align="middle">
 <img src="./images/screen5.png" width="250" align="middle">
 
-## A feltöltés megvalósítása
+A feltöltés megvalósítása
 
 A feltöltéshez szükséges API definíció és Interactor hívás is definiálva van, így a **getPhotos**-hoz hasonlóan hívjuk meg ezt a hívást is a kép **Uri** paraméterével. Ezt az **UploadActivity** **onCreate(..)** metódusában tegyük meg.
 
 
-```
+```java
 uploadBTN.setOnClickListener(new View.OnClickListener() {
     @Override
     public void onClick(View view) {
@@ -907,7 +906,7 @@ A `saveToFile(...)` függvény végzi a byte tömb fileba mentését, az `adjust
 
 Ezután módosítsuk az **UploadActivity** **captureBTN** listenerjét, hogy az általunk elkészített activity-t használja.
 
-```
+```java
 captureBTN.setOnClickListener(new View.OnClickListener() {
     @Override
     public void onClick(View view) {
@@ -941,8 +940,8 @@ keresztül követheted.
 Segítség: A hozzá tartozó hívás Retrofit leírója a következő:
 
 ```java
-    @POST("rate/{id}")
-    Call<ResponseBody> rate(@Path("id") String id, @Body Rating rating);
+@POST("rate/{id}")
+Call<ResponseBody> rate(@Path("id") String id, @Body Rating rating);
 ```
 
 A rating osztály pedíg:
