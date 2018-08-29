@@ -264,7 +264,7 @@ class GameActivity : AppCompatActivity() {
 
 Az animációk során **Sprite**-okat, olyan képeket használunk, ahol az animáció egyes állapotai mind megtalálhatóak ugyanazon a képen. Spriteok esetén az animáció a gyakorlatban abból áll, hogy a forrásképen egy maszkot tologatunk attól függően hogy milyen állapotban van az animáció. Így megspóroljuk a folyamatos kép betöltést, és a GC-t sem terheljük túl.
 
-A **Ship** osztály valamint a **Player** és **Enemy** már fel vannak készítve arra hogy különböző állapotok között animáljanak. A megfelelő képi erőforrások is biztosítottak, már csak a képeket kell elcsúsztatni az adott állapotba, a **Ship** osztály **render **függvényében: 
+A **Ship** osztály valamint a **Player** és **Enemy** már fel vannak készítve arra hogy különböző állapotok között animáljanak. A megfelelő képi erőforrások is biztosítottak, már csak a képeket kell elcsúsztatni az adott állapotba, a **Ship** osztály **render** függvényében: 
 
 ```java
 override fun render(canvas: Canvas) {
