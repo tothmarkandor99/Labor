@@ -547,7 +547,7 @@ Nézzük meg mit tapasztalunk, ha újra kipróbáljuk az alkalmazást.
 
 ### Network security config
 
-[Android P-től kezdve](https://android-developers.googleblog.com/2018/04/protecting-users-with-tls-by-default-in.html) alapértelmezetten le van tiltva a titoksítatlan, plaintext hálózati kommunikáció, azaz csak a *https* használata megengedett a hálózati hívásoknál, a sima *http* nem. Ha ilyen eszközön próbáljuk az alkalmazást használni, ezzel kapcsolatos exception-t fogunk kapni. Mivel a szerverünk nem támogatja a https kommunikációt, erre most az jelenti a megoldást, ha explcit módon megengedjük a titkosítás nélküli kommunikációt az adott domain felé.
+[Android P-től kezdve](https://android-developers.googleblog.com/2018/04/protecting-users-with-tls-by-default-in.html) alapértelmezetten le van tiltva a titkosítatlan, plaintext hálózati kommunikáció, azaz csak a *https* használata megengedett a hálózati hívásoknál, a sima *http* nem. Ha ilyen eszközön próbáljuk az alkalmazást használni, ezzel kapcsolatos exception-t fogunk kapni. Mivel a szerverünk nem támogatja a https kommunikációt, erre most az jelenti a megoldást, ha explcit módon megengedjük a titkosítás nélküli kommunikációt az adott domain felé.
 
 Ehhez hozzunk létre egy `network_security_config.xml` fájlt a `res/xml` mappában:
  
