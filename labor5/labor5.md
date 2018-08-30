@@ -25,25 +25,23 @@ A `SimpleItemRecyclerViewAdapter` a módosítások után nem a memóriában tár
 A feladat megvalósítása három részből áll:
 
 1. Todo objektumok perzisztens tárolásának megvalósítása adatbázissal
-2. A memóriában tárolt listával dolgozó adapter átalakítása adatbázissal (`Cursor`ral) működővé
+2. A memóriában tárolt listával dolgozó adapter átalakítása adatbázissal (`Cursor`-ral) működővé
 3. Workflow átírása
 
 ### Todo-k tárolása adatbázisban
 
 Az SQLite adatbáziskezelő használatához segítséget nyújt a platform, mégpedig az `SQLiteOpenHelper` osztállyal. Ebből származtatva olyan osztályt hozhatunk létre, ami referenciát szolgáltat az általunk használt teljes adatbázisra. Így több entitás osztály és adatbázis tábla esetén is elég egyetlen ilyen segédosztályt implementálni.
 
-Hozzunk létre a projektben a `hu.bme.aut.android.todo` package-en belül egy új package-et `database` néven.
-
-A `hu.bme.aut.android.todo.database` package-en belül hozzunk létre egy új osztályt `DatabaseHelper` néven, ami az `SQLiteOpenHelper` osztályból származik. 
+Hozzunk létre a projektben a `hu.bme.aut.android.todo` package-en belül egy új package-et `database` néven. Ezen belül hozzunk létre egy új osztályt `DatabaseHelper` néven, ami az `SQLiteOpenHelper` osztályból származik. 
 
 A `DatabaseHelper` osztály:
 
 ```kotlin
 class DatabaseHelper(
-    context: Context,
-    name: String,
-    factory: SQLiteDatabase.CursorFactory,
-    version: Int
+		context: Context,
+		name: String,
+		factory: SQLiteDatabase.CursorFactory,
+		version: Int
 ) : SQLiteOpenHelper(context, name, factory, version) {
 
 	override fun onCreate(db: SQLiteDatabase) {
@@ -53,31 +51,32 @@ class DatabaseHelper(
 	override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
 		// TODO Auto-generated method stub
 	}
+	
 }
 ```
 
-Az `SQLiteOpenHelper` osztályból történő származtatás az ősosztály konstruktorának meghívásán kívül két metódus kötelező felüldefiniálását írja elő. Az `onCreate()`-ben kell futtatni a séma létrehozó SQL szkriptet, míg az `onUpgrade()`-ben kezelhetők le az adatbázis verzióváltásával kapcsolatos feladatok. Legegyszerűbb esetben itt törölhető, majd újra létrehozható az egész séma. Ekkor viszont a felhasználó elveszíti a tárolt adatait, ami nem elfogadható felhasználói élmény.
+Az `SQLiteOpenHelper` osztályból történő származtatás az ősosztály konstruktorának meghívásán kívül két metódus kötelező felüldefiniálását írja elő. Az `onCreate()`-ben kell futtatni a séma létrehozó SQL szkriptet, míg az `onUpgrade()`-ben kezelhetők le az adatbázis verzióváltásával kapcsolatos feladatok. Legegyszerűbb esetben itt törölhető, majd újra létrehozható az egész séma. Ekkor viszont a felhasználó elveszíti a tárolt adatait, ami általában nem elfogadható felhasználói élmény.
 
-Az adatbáziskezelés során sok konstans jellegű változóval kell dolgoznunk, mint például a táblákban lévő oszlopok nevei, táblák neve, adatbázis fájl neve, séma létrehozó és törlő szkiptek, stb. Ezeket érdemes egy közös helyen tárolni, így szerkesztéskor vagy új entitás bevezetésekor nem kell a forrásfájlok között ugrálni, valamint egyszerűbb a teljes adatbázist létrehozó és törlő szkripteket generálni. Hozzunk létre egy új osztályt a `hu.bme.aut.android.todo.database` csomagban `DbConstants` néven, és konstans tagváltozóként vegyünk fel minden szükséges értéket:
+Az adatbáziskezelés során sok konstans jellegű változóval kell dolgoznunk, mint például a táblákban lévő oszlopok nevei, táblák neve, adatbázis fájl neve, séma létrehozó és törlő szkiptek, stb. Ezeket érdemes egy közös helyen tárolni, így szerkesztéskor vagy új entitás bevezetésekor nem kell a forrásfájlok között ugrálni, valamint egyszerűbb a teljes adatbázist létrehozó és törlő szkripteket generálni. Hozzunk létre egy új osztályt a `database` csomagban `DbConstants` néven, és konstans tagváltozóként vegyünk fel minden szükséges értéket:
 
 ```kotlin
 object DbConstants {
 
-  const val DATABASE_NAME = "data.db"
-  const val DATABASE_VERSION = 1
-  const val DATABASE_CREATE_ALL = Todo.DATABASE_CREATE
-  const val DATABASE_DROP_ALL = Todo.DATABASE_DROP
+    const val DATABASE_NAME = "data.db"
+    const val DATABASE_VERSION = 1
+    const val DATABASE_CREATE_ALL = Todo.DATABASE_CREATE
+    const val DATABASE_DROP_ALL = Todo.DATABASE_DROP
 
-  object Todo {
-	const val DATABASE_TABLE = "todo"
-	const val KEY_ROWID = "_id"
-	const val KEY_TITLE = "title"
-	const val KEY_PRIORITY = "priority"
-	const val KEY_DUEDATE = "dueDate"
-	const val KEY_DESCRIPTION = "description"
+    object Todo {
+        const val DATABASE_TABLE = "todo"
+        const val KEY_ROWID = "_id"
+        const val KEY_TITLE = "title"
+        const val KEY_PRIORITY = "priority"
+        const val KEY_DUEDATE = "dueDate"
+        const val KEY_DESCRIPTION = "description"
 
-	const val DATABASE_CREATE =
-		"""create table if not exists $DATABASE_TABLE ( 
+        const val DATABASE_CREATE =
+                """create table if not exists $DATABASE_TABLE ( 
 			$KEY_ROWID integer primary key autoincrement, 
 			$KEY_TITLE text not null, 
 			$KEY_PRIORITY integer, 
@@ -85,16 +84,19 @@ object DbConstants {
 			$KEY_DESCRIPTION text
 			); """
 
-	const val DATABASE_DROP = "drop table if exists $DATABASE_TABLE;"
-  }
+        const val DATABASE_DROP = "drop table if exists $DATABASE_TABLE;"
+    }
+	
 }
 ```
 
-Figyeljük meg hogy a `DbConstants` osztályon belül létrehoztunk egy belső `Todo` nevű osztályt, amiben a Todo entitásokat tároló táblához tartozó konstans értékeket tároljuk. Amennyiben az alkalmazásunk több entitást is adatbázisban tárol (gyakori eset!), akkor érdemes az egyes osztályokhoz tartozó konstansokat külön-külön belső osztályokban tárolni. Így sokkal átláthatóbb és karbantarthatóbb lesz a kód, mint ha ömlesztve felvennénk a `DbConstants`-ba az összes tábla összes konstansát. Ezek a belső osztályok praktikusan ugyanolyan névvel léteznek, mint az entitás osztályok (jelen esetben mindkettő neve Todo). Mivel más package-ben vannak, ez nem okoz fordítási hibát. Részben ezért is hoztuk létre a `database` nevű package-et.
+Figyeljük meg, hogy a `DbConstants` osztályon belül létrehoztunk egy belső `Todo` nevű osztályt, amiben a Todo entitásokat tároló táblához tartozó konstans értékeket tároljuk. Amennyiben az alkalmazásunk több entitást is adatbázisban tárol (gyakori eset!), akkor érdemes az egyes osztályokhoz tartozó konstansokat külön-külön belső osztályokban tárolni. Így sokkal átláthatóbb és karbantarthatóbb lesz a kód, mint ha ömlesztve felvennénk a `DbConstants`-ba az összes tábla összes konstansát. Ezek a belső osztályok praktikusan ugyanolyan névvel léteznek, mint az entitás osztályok (jelen esetben mindkettő neve Todo). Mivel más package-ben vannak, ez nem okoz fordítási hibát. Részben ezért is hoztuk létre a `database` nevű package-et.
 
-Erdemes megfigyelni továbbá azt, hogy az osztályokat nem a `class` kulcsszóval deklaráltuk. Helyette az`object`-et használjuk, amivel a Kotlin nyelv azt biztosítja számunkra, hogy a `DbConstants` és a benne lévő `Todo` osztályok singletonként viselkednek, azaz az alkalmazás futtatásakor létrejön belőlük egy példány, további példányokat pedig nem lehet létrehozni belőlük. Az `object`ként deklarált osztályok egyetlen példányára, ahogy később látszani is fog, egyszerűen a nevükkel lehet hivatkozni az alkalmazás kódjában.
+Érdemes megfigyelni továbbá azt, hogy az osztályokat nem a `class` kulcsszóval deklaráltuk. Helyette az`object`-et használjuk, amivel a Kotlin nyelv azt biztosítja számunkra, hogy a `DbConstants` és a benne lévő `Todo` osztályok singletonként viselkednek, azaz az alkalmazás futtatásakor létrejön belőlük egy példány, további példányokat pedig nem lehet létrehozni belőlük. Az `object`ként deklarált osztályok egyetlen példányára, ahogy később látszani is fog, egyszerűen a nevükkel lehet hivatkozni az alkalmazás kódjában. 
 
-Következő lépésként Implementáljuk a `DatabaseHelper` osztály metódusait. A konstruktor paraméterei közül törölhetjük a `CursorFactory`t és a verziószámot, és az ősosztály konstruktorának hívásakor a megfelelő helyen adjunk át null-t. Így az osztály az alapértelmezett `CursorFactory`t fogja használni. Verzióként adjuk át a `DbConstants.DATABASE\_VERSION` konstans értékét. Az `onCreate()` és `onUpgrade()` metódusokban használjuk a `DbConstants`-ban ebből a célból létrehozott konstansokat.
+Itt arra, hogy ezek az osztály példányok léteznek igazából nincs szükségünk, csak azért hozunk létre hosztályokat, hogy például a `KEY_ROWID` közvetlen leírása helyett (ha csak egy fájl szintű konstans lenne) a `DbConstants.Todo.KEY_ROWID` szintaxist használjuk.
+
+Következő lépésként implementáljuk a `DatabaseHelper` osztály metódusait. A konstruktor paraméterei közül törölhetjük a `CursorFactory`-t és a verziószámot, és az ősosztály konstruktorának hívásakor a megfelelő helyen adjunk át null-t. Így az osztály az alapértelmezett `CursorFactory`-t fogja használni. Verzióként adjuk át a `DbConstants.DATABASE_VERSION` konstans értékét. Az `onCreate()` és `onUpgrade()` metódusokban használjuk a `DbConstants`-ban ebből a célból létrehozott konstansokat.
 
 A módosított `DatabaseHelper` osztály:
 
@@ -112,15 +114,17 @@ class DatabaseHelper(
 		db.execSQL(DbConstants.DATABASE_DROP_ALL);
 		db.execSQL(DbConstants.DATABASE_CREATE_ALL);
 	}
+	
 }
 ```
 
-Az adatbázis séma létrehozásához és megnyitásához szükséges osztályok így már rendelkezésre állnak. A következő feladatunk az entitás osztályok és az adatbázis közötti kapcsolat implementálása. Ehhez meg kell írnunk azokat a kódrészleteket, melyek egy memóriában lévő Todo objektumot képesek adatbázisba írni, onnan visszaolvasni, módosítani valamint törölni. (Természetesen más, akár összetettebb funkciók is implementálhatók itt.) Ezt a kódot az entitás osztály helyett a karbantarthatóságot szem előtt tartva érdemes egy külön osztályban megvalósítani a `database` csomagon belül. 
+Az adatbázis séma létrehozásához és megnyitásához szükséges osztályok így már rendelkezésre állnak. A következő feladatunk az entitás osztályok és az adatbázis közötti kapcsolat implementálása. Ehhez meg kell írnunk azokat a kódrészleteket, melyek egy memóriában lévő Todo objektumot képesek adatbázisba írni, onnan visszaolvasni, módosítani, valamint törölni. (Természetesen más, akár összetettebb funkciók is implementálhatók itt.) Ezt a kódot az entitás osztály helyett a karbantarthatóságot szem előtt tartva érdemes egy külön osztályban megvalósítani a `database` csomagon belül. 
 
 A `TodoDbLoader` osztály: 
 
 ```kotlin
 class TodoDbLoader(private val context: Context) {
+
 	private lateinit var dbHelper: DatabaseHelper
 	private lateinit var db: SQLiteDatabase
 	
@@ -140,7 +144,7 @@ class TodoDbLoader(private val context: Context) {
 }
 ```
 
-`SQLException`ből használjuk az `android.database` package-ben lévőt.
+Az elérhető `SQLException`-ök közül használjuk az `android.database` package-ben lévőt.
 
 A létrehozó, módosító és törlő metódusok a `TodoDbLoader`en belül, a *CRUD és egyéb metódusok* komment után:
 
@@ -187,9 +191,9 @@ fun updateTodo(newTodo: Todo): Boolean {
 
 Fussuk át és értelmezzük a bemásolt kódot!
 
-A kód bemásolása után importáljuk be a megfelelő osztályokat. A `Todo` osztály két helyen is szerepel, egyrészt entitás osztályként a `.model` végű csomagban, másrészt az adatbázis konstansokat tároló belső osztályként a `.database` végű csomagban. A bemásolt kód célja, hogy a Todo entitásokat létrehozza, módosítsa vagy törölje az adatbázisban, így az entitás osztályt importáljuk be (`hu.bme.aut.android.todo.model.Todo`).
+A kód bemásolása után importáljuk be a megfelelő osztályokat. `Todo` osztály az alkalmazásunkban két helyen is szerepel, egyrészt entitás osztályként a `model` csomagban, másrészt az adatbázis konstansokat tároló belső osztályként a `database` csomagban. A bemásolt kód célja, hogy a Todo entitásokat létrehozza, módosítsa vagy törölje az adatbázisban, így az entitás osztályt importáljuk be (`hu.bme.aut.android.todo.model.Todo`).
 
-Általában szükséges az egyetlen rekordot és a teljes rekord halmazra mutató `Cursor`t visszaadó függvények implementálása is.
+Általában szükséges az egyetlen rekordot és a teljes rekord halmazra mutató `Cursor`-t visszaadó függvények implementálása is.
 
 Ezek implementációja a `TodoDbLoader` osztályban, a *CRUD műveletek* után:
 
@@ -264,17 +268,17 @@ companion object {
 
 ## Lista feltöltése adatbázisból
 
-Ha a Todo-kat megjelenítő lista adapterét adatbázisból szeretnénk feltölteni, akkor a `BaseAdapter` helyett a `CursorRecyclerViewAdapater` osztályból kell származtatnunk, így leegyszerűsítve a feladatot. Ez az osztály a következő linken érhető el:
+Ha a Todo-kat megjelenítő lista adapterét adatbázisból szeretnénk feltölteni, akkor a `BaseAdapter` helyett a `CursorRecyclerViewAdapter` osztályból kell származtatnunk, így leegyszerűsítve a feladatot. Ez az osztály a következő linken érhető el:
 
 [https://gist.github.com/skyfishjy/443b7448f59be978bc59#file-cursorrecyclerviewadapter-java](https://gist.github.com/skyfishjy/443b7448f59be978bc59#file-cursorrecyclerviewadapter-java)
 
-Hozzuk létre a `CursorRecyclerViewAdapter` nevű osztályt a `hu.bme.aut.android.todo.feature.list` package-ben és másoljuk be a kódját a fenti linkről.
+Hozzuk létre a `CursorRecyclerViewAdapter` nevű osztályt a `feature.list` package-ben és másoljuk be a kódját a fenti linkről.
 
-Figyeljük meg, hogy a másolt kód *Java* nyelven íródott. Ebből semmi probléma nem fog adódni, gond nélkül el fogjuk érni a Kotlinban írt kódunkban.
+Figyeljük meg, hogy a másolt kód *Java* nyelven íródott. Ez természetesen nem jelent problémát, a Kotlin nyelv interoperabilitási támogatásával gond tudjuk majd használni ezt az osztályt a Kotlinban írt kódunkban.
 
-A megoldás hasonló az előző adapter kódjához, de itt az `onBindViewHolder` metódusban egy `Cursor`t kapunk pozíció helyett, és ennek segítségével szerezhetjük meg a megjelenítendő adatokat. Ezen felül az osztály nem egy listában tárolja a `Todo` elemek referenciáit, hanem egy `Cursor`t tart az elemek kiolvasásához.
+A megoldás hasonló az előző adapter kódjához, de itt az `onBindViewHolder` metódusban egy `Cursor`-t kapunk pozíció helyett, és ennek segítségével szerezhetjük meg a megjelenítendő adatokat. Ezen felül az osztály nem egy listában tárolja a `Todo` elemek referenciáit, hanem egy `Cursor`-t tart az elemek kiolvasásához.
 
-Hozzuk létre a `TodoAdapter` osztályt a `hu.bme.aut.android.todo.feature.list` csomagban:
+Hozzuk létre a `TodoAdapter` osztályt a `feature.list` csomagban:
 
 ```kotlin
 class TodoAdapter(context: Context, cursor: Cursor) : CursorRecyclerViewAdapter<TodoAdapter.ViewHolder>(context, cursor) {
@@ -330,7 +334,7 @@ class TodoAdapter(context: Context, cursor: Cursor) : CursorRecyclerViewAdapter<
 
 ## Egyedi Application osztály készítése
 
-Készítsünk egy egyedi Application osztályt `TodoApplication` néven. Az `Application` az alkalmazás futása során folyamatosan jelen lévő objektum, melyet a futtatókörnyezet hoz létre automatikusan az alkalmazás indulásakor. Élettartama az alkalmazáshoz tartozó process élettartamázhoz kötődik. A `TodoApplication` fogja fenntartani az adatbáziskapcsolatot reprezentáló TodoDbLoader objektumot, így nem kell minden `Activity`ből külön-külön, erőforrás pazarló módon példányosítani.
+Készítsünk egy egyedi Application osztályt `TodoApplication` néven. Az `Application` az alkalmazás futása során folyamatosan jelen lévő objektum, melyet a futtatókörnyezet hoz létre automatikusan az alkalmazás indulásakor. Élettartama az alkalmazáshoz tartozó process élettartamához kötődik. A `TodoApplication` fogja fenntartani az adatbáziskapcsolatot reprezentáló TodoDbLoader objektumot, így nem kell minden `Activity`ből külön-külön, erőforrás pazarló módon példányosítani.
 
 A `hu.bme.aut.android.todo` package-en belül hozzuk létre a `TodoApplication` osztályt:
 
@@ -358,9 +362,9 @@ class TodoApplication : Application() {
 
 Figyeljük meg, hogy a fejlesztőkörnyezet figyelmeztet egy lehetséges hibára!
 
-Ebben a példa alkalmazásban nem fog gondot okozni egy `Context` referencia statikus tárolása, viszont érdemes tudni, hogy ez memóriaszivárgáshoz vezethet.
+Ebben a példa alkalmazásban nem fog gondot okozni egy `Context` referencia statikus tárolása (mivel az `Application` által nyújtott `Context`-et tároljuk, aminek az élettartama megegyezik a statikus változó élettartamával), viszont érdemes tudni, hogy ez memóriaszivárgáshoz vezethet (például ha egy `Activity` `Context`-jét tárolnánk el így).
 
-Az `AndroidManifest.xml`-ben állítsuk be, hogy a rendszer a `TodoApplication` osztályt példányosítsa az alkalmazás induláskor. Ehhez a manifestben lévő `<application>` node-ban fel kell vennünk egy attribútumot `android:name` néven, aminek az értéke legyen a `TodoApplication` minősített (fully-qualified) osztályneve:
+Az `AndroidManifest.xml`-ben állítsuk be, hogy a rendszer a `TodoApplication` osztályt példányosítsa az alkalmazás induláskor. Ehhez a manifestben lévő `<application>` tagben fel kell vennünk egy attribútumot `android:name` néven, aminek az értéke legyen a `TodoApplication` minősített (fully-qualified) osztályneve:
 
 ```xml
 <application
@@ -373,14 +377,13 @@ Az `AndroidManifest.xml`-ben állítsuk be, hogy a rendszer a `TodoApplication` 
 		android:name=".TodoApplication">
 ```
 
-Bár az `android:name` attribútum értékének egy fully-qualified osztálynévnek kell lennie, a rendszer elfogadja a manifestben beállított `package` névhez relatív értéket is. Figyeljük meg, hogy az `android:name` beállításakor a fejlesztőkörnyezet *ctrl+space* lenyomására segíti az osztálynév megadását.
+Bár az `android:name` attribútum értékének egy fully-qualified osztálynévnek kell lennie, a rendszer elfogadja a manifestben beállított `package` névhez relatív értéket is. Figyeljük meg, hogy az `android:name` beállításakor a fejlesztőkörnyezet *Ctrl+Space* lenyomására segíti az osztálynév megadását.
 
 Ezt követően a `TodoApplication` osztály `todoDbLoader` propertyjével bármikor elérhetjük az SQLite adatbázis kapcsolatunkat.
 
 ## TodoListActivity módosítása
 
-Az adatbázis alapú perzisztencia használatához minden rendelkezésre áll, már
-csak az `TodoListActivityben` kell áttérnünk az adatok adatbázisban tárolásra.
+Az adatbázis alapú perzisztencia használatához minden rendelkezésre áll, már csak az `TodoListActivityben` kell áttérnünk az adatok adatbázisban tárolásra.
 
 Adjuk hozzá a `TodoListActivity`hez az alábbi propertyket:
 
@@ -392,13 +395,13 @@ private lateinit var dbLoader: TodoDbLoader
 private var loadTodosTask: LoadTodosTask? = null
 ```
 
-Töröljük ki a `TodoListActivity`ből a régi adaptert, azaz az alábbi propertyt:
+*Töröljük ki* a `TodoListActivity`ből a régi adaptert, azaz az alábbi propertyt:
 
 ```kotlin
 private lateinit var simpleItemRecyclerViewAdapter: SimpleItemRecyclerViewAdapter
 ```
 
-Az adapter váltás miatt szükséges az, hogy a `TodoListActivity` ne a `SimpleItemRecyclerViewAdapter`ben definiált `TodoItemClickListener`t implementálja, hanem a `TodoAdapter`ben definiáltat.
+Az adapter váltás miatt szükséges az, hogy a `TodoListActivity` ne a `SimpleItemRecyclerViewAdapter`-ben definiált `TodoItemClickListener`-t implementálja, hanem a `TodoAdapter`ben definiáltat.
 
 A `TodoListActivity` új definíciója:
 
@@ -425,17 +428,16 @@ override fun onItemLongClick(view: View, todo: Todo): Boolean {
 }
 ```
 
-Módosítsuk a `setupRecyclerView()` metódust úgy, hogy a `RecyclerView` egy `TodoAdapter` segítségével adatbázisból kapja meg a Todo elemeket:
+Módosítsuk a `setupRecyclerView()` metódust úgy, hogy az új adapterünket használja, és csak ennek a `RecyclerView`-val és a `TodoListActivity`-vel való összekötését végezze el:
 
 ```kotlin
 private fun setupRecyclerView() {
-	adapter = TodoAdapter 
     adapter.itemClickListener = this
     rvTodoList.adapter = adapter
 }
 ```
 
-Ezek után már nincs szükség a korábban használt `SimpleItemRecyclerViewAdapter`re, törölhetjük az osztályt tartalmazó fájlt a `hu.bme.aut.android.todo.feature.list` package-ből.
+Ezek után már nincs szükség a korábban használt `SimpleItemRecyclerViewAdapter`-re, törölhetjük az osztályt tartalmazó fájlt a `hu.bme.aut.android.todo.feature.list` package-ből.
 
 Törölni kell az `onTodoCreated` függvény törzsét és módosítani kell  az `onItemLongClick` függvényben a `simpleItemRecyclerViewAdapter.deleteRow(position)` hívást, mert a `TodoAdapter` interfésze különbözik az eddig használt adapterétől.
 
@@ -445,36 +447,11 @@ Az `onTodoCreated` függvény törzséből törlendő sor:
 simpleItemRecyclerViewAdapter.addItem(todo)
 ```
 
-Az `onItemLongClick` függvényben módosítandó sor:
-
-```kotlin
-R.id.delete -> simpleItemRecyclerViewAdapter.deleteRow(position)
-```
-
-A módosítást követően az `onItemLongClick` függvény:
-
-```kotlin
-override fun onItemLongClick(view: View, todo: Todo): Boolean {
-	val popup = PopupMenu(this, view)
-	popup.inflate(R.menu.menu_todo)
-	popup.setOnMenuItemClickListener { item ->
-		when (item.itemId) {
-			R.id.delete -> {
-				// TODO
-			}
-		}
-		false
-	}
-	popup.show()
-	return false
-}
-```
-
 A törölt és módosított kódrészeket később újra meg fogjuk írni az új adapternek megfelelő hívásokkal.
 
 Az diszk I/O műveleteket javasolt a háttérszálon, aszinkron módon futtatni. ellenkező esetben könnyen megakaszthatják a UI szálat esetlegesen lassú lefutásukkal.
 
-Készítsük el a `LoadTodosTask` osztályt a `hu.bme.aut.android.todo.database` csomagban, ami származzon az `AsyncTask` osztályból. A `LoadTodosTask` aszinkron módon kérdezi majd le az adatbázisunkból az összes elmentett `Todo` rekordot.
+Készítsük el a `LoadTodosTask` osztályt a `database` csomagban, ami származzon az `AsyncTask` osztályból. A `LoadTodosTask` aszinkron módon kérdezi majd le az adatbázisunkból az összes elmentett `Todo` rekordot.
 
 A `LoadTodoTask` osztály:
 
@@ -507,6 +484,7 @@ class LoadTodosTask(private val listActivity: TodoListActivity, private val dbLo
 		Log.d(TAG, "Fetch completed, displaying cursor results")
     	listActivity.showTodos(result)
 	}
+	
 }
 ```
 
@@ -526,7 +504,7 @@ fun showTodos(todos: Cursor?) {
 
 Ezt követően a `TodoListActivity` életciklus-hívásait az alábbi módon adjuk meg:
 
-Az `onCreate()` függvényben kérjünk referenciát a `TodoApplication`től a nyitott adatbázis kapcsolatot tartalmazó `TodoDbLoader`-re, illetve töröljük ki a függvényből a `setupRecyclerView()` hívást.
+Az `onCreate()` függvényben kérjünk referenciát a `TodoApplication`-től a nyitott adatbázis kapcsolatot tartalmazó `TodoDbLoader`-re, illetve töröljük ki a függvényből a `setupRecyclerView()` hívást.
 
 Az `onCreate()` függvény a módosítások után:
 
@@ -597,6 +575,7 @@ private fun refreshList() {
 	this.loadTodosTask = loadTodosTask
 }
 ```
+
 Ha minden kódrészlet a megfelelő helyen van, akkor az alkalmazás indulásakor ugyanaz a felhasználói felület jelenik meg, mint a kiinduló projekt esetén. Azonban most még üres listát látunk, hiszen üres az adatbázis. Ahhoz, hogy újra működjön a Todo létrehozás funkció, módosítanunk kell az `onTodoCreated` callbacket:
 
 ```kotlin
@@ -614,5 +593,5 @@ Indítsuk el az alkalmazást! Próbáljuk ki, hogy forgatás, illetve az alkalma
 
 Az eredeti funkcionalitás további részeinek megvalósítása önálló feladatként oldandó meg:
 
--  Husszú nyomásra a kiválasztott Todo elem törlésének lehetősége
+-  Hosszú nyomásra a kiválasztott Todo elem törlésének lehetősége
 -  Az összes Todo elem törlésének lehetősége (pl. Options menüből elérve)
