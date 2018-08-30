@@ -38,20 +38,20 @@ A `DatabaseHelper` osztály:
 
 ```kotlin
 class DatabaseHelper(
-		context: Context,
-		name: String,
-		factory: SQLiteDatabase.CursorFactory,
-		version: Int
+        context: Context,
+        name: String,
+        factory: SQLiteDatabase.CursorFactory,
+        version: Int
 ) : SQLiteOpenHelper(context, name, factory, version) {
 
-	override fun onCreate(db: SQLiteDatabase) {
-		// TODO Auto-generated method stub
-	}
-	
-	override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-		// TODO Auto-generated method stub
-	}
-	
+    override fun onCreate(db: SQLiteDatabase) {
+        // TODO
+    }
+
+    override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
+        // TODO
+    }
+
 }
 ```
 
@@ -102,19 +102,19 @@ A módosított `DatabaseHelper` osztály:
 
 ```kotlin
 class DatabaseHelper(
-    context: Context,
-    name: String
+        context: Context,
+        name: String
 ) : SQLiteOpenHelper(context, name, null, DbConstants.DATABASE_VERSION) {
 
-	override fun onCreate(db: SQLiteDatabase) {
-		db.execSQL(DbConstants.DATABASE_CREATE_ALL)
-	}
-	
-	override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-		db.execSQL(DbConstants.DATABASE_DROP_ALL);
-		db.execSQL(DbConstants.DATABASE_CREATE_ALL);
-	}
-	
+    override fun onCreate(db: SQLiteDatabase) {
+        db.execSQL(DbConstants.DATABASE_CREATE_ALL)
+    }
+
+    override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
+        db.execSQL(DbConstants.DATABASE_DROP_ALL)
+        db.execSQL(DbConstants.DATABASE_CREATE_ALL)
+    }
+
 }
 ```
 
@@ -125,22 +125,22 @@ A `TodoDbLoader` osztály:
 ```kotlin
 class TodoDbLoader(private val context: Context) {
 
-	private lateinit var dbHelper: DatabaseHelper
-	private lateinit var db: SQLiteDatabase
-	
-	@Throws(SQLException::class)
-	fun open() {
-		dbHelper = DatabaseHelper(context, DbConstants.DATABASE_NAME)
-		db = dbHelper.writableDatabase
-	
-		dbHelper.onCreate(db)
-	}
-	
-	fun close() {
-		dbHelper.close()
-	}
-	
-	// CRUD és egyéb metódusok
+    private lateinit var dbHelper: DatabaseHelper
+    private lateinit var db: SQLiteDatabase
+
+    @Throws(SQLException::class)
+    fun open() {
+        dbHelper = DatabaseHelper(context, DbConstants.DATABASE_NAME)
+        db = dbHelper.writableDatabase
+
+        dbHelper.onCreate(db)
+    }
+
+    fun close() {
+        dbHelper.close()
+    }
+
+    // CRUD és egyéb metódusok
 }
 ```
 
@@ -151,41 +151,41 @@ A létrehozó, módosító és törlő metódusok a `TodoDbLoader`en belül, a *
 ```kotlin
 // INSERT
 fun createTodo(todo: Todo): Long {
-	val values = ContentValues()
-	values.put(DbConstants.Todo.KEY_TITLE, todo.title)
-	values.put(DbConstants.Todo.KEY_DUEDATE, todo.dueDate)
-	values.put(DbConstants.Todo.KEY_DESCRIPTION, todo.description)
-	values.put(DbConstants.Todo.KEY_PRIORITY, todo.priority.ordinal)
+    val values = ContentValues()
+    values.put(DbConstants.Todo.KEY_TITLE, todo.title)
+    values.put(DbConstants.Todo.KEY_DUEDATE, todo.dueDate)
+    values.put(DbConstants.Todo.KEY_DESCRIPTION, todo.description)
+    values.put(DbConstants.Todo.KEY_PRIORITY, todo.priority.ordinal)
 
-	return db.insert(DbConstants.Todo.DATABASE_TABLE, null, values)
+    return db.insert(DbConstants.Todo.DATABASE_TABLE, null, values)
 }
 
 // DELETE
 fun deleteTodo(rowId: Long): Boolean {
-	val deletedTodos = db.delete(
-			DbConstants.Todo.DATABASE_TABLE,
-			"${DbConstants.Todo.KEY_ROWID} = $rowId",
-			null
-	)
-	return deletedTodos > 0
+    val deletedTodos = db.delete(
+            DbConstants.Todo.DATABASE_TABLE,
+            "${DbConstants.Todo.KEY_ROWID} = $rowId",
+            null
+    )
+    return deletedTodos > 0
 }
 
 // UPDATE
 fun updateTodo(newTodo: Todo): Boolean {
-	val values = ContentValues()
-	values.put(DbConstants.Todo.KEY_TITLE, newTodo.title)
-	values.put(DbConstants.Todo.KEY_DUEDATE, newTodo.dueDate)
-	values.put(DbConstants.Todo.KEY_DESCRIPTION, newTodo.description)
-	values.put(DbConstants.Todo.KEY_PRIORITY, newTodo.priority.ordinal)
+    val values = ContentValues()
+    values.put(DbConstants.Todo.KEY_TITLE, newTodo.title)
+    values.put(DbConstants.Todo.KEY_DUEDATE, newTodo.dueDate)
+    values.put(DbConstants.Todo.KEY_DESCRIPTION, newTodo.description)
+    values.put(DbConstants.Todo.KEY_PRIORITY, newTodo.priority.ordinal)
 
-	val todosUpdated = db.update(
-			DbConstants.Todo.DATABASE_TABLE,
-			values,
-			"${DbConstants.Todo.KEY_ROWID} = ${newTodo.id}",
-			null
-	)
+    val todosUpdated = db.update(
+            DbConstants.Todo.DATABASE_TABLE,
+            values,
+            "${DbConstants.Todo.KEY_ROWID} = ${newTodo.id}",
+            null
+    )
 
-	return todosUpdated > 0
+    return todosUpdated > 0
 }
 ```
 
@@ -200,69 +200,69 @@ Ezek implementációja a `TodoDbLoader` osztályban, a *CRUD műveletek* után:
 ```kotlin
 // Get all Todos
 fun fetchAll(): Cursor {
-	// Cursor pointing to the result set of all Todos with all fields (where = null)
-	return db.query(
-			DbConstants.Todo.DATABASE_TABLE,
-			arrayOf(
-					DbConstants.Todo.KEY_ROWID,
-					DbConstants.Todo.KEY_TITLE,
-					DbConstants.Todo.KEY_DESCRIPTION,
-					DbConstants.Todo.KEY_DUEDATE,
-					DbConstants.Todo.KEY_PRIORITY
-			),
-			null,
-			null,
-			null,
-			null,
-			DbConstants.Todo.KEY_TITLE
-	)
+    // Cursor pointing to the result set of all Todos with all fields (where = null)
+    return db.query(
+            DbConstants.Todo.DATABASE_TABLE,
+            arrayOf(
+                    DbConstants.Todo.KEY_ROWID,
+                    DbConstants.Todo.KEY_TITLE,
+                    DbConstants.Todo.KEY_DESCRIPTION,
+                    DbConstants.Todo.KEY_DUEDATE,
+                    DbConstants.Todo.KEY_PRIORITY
+            ),
+            null,
+            null,
+            null,
+            null,
+            DbConstants.Todo.KEY_TITLE
+    )
 }
 
 // Querying for one of the Todos with the given id
 fun fetchTodo(id: Long): Todo? {
-	// Cursor pointing to a result set with 0 or 1 Todo
-	val c = db.query(
-			DbConstants.Todo.DATABASE_TABLE,
-			arrayOf(
-					DbConstants.Todo.KEY_ROWID,
-					DbConstants.Todo.KEY_TITLE,
-					DbConstants.Todo.KEY_DESCRIPTION,
-					DbConstants.Todo.KEY_DUEDATE,
-					DbConstants.Todo.KEY_PRIORITY
-			),
-			"${DbConstants.Todo.KEY_ROWID} = $id",
-			null,
-			null,
-			null,
-			DbConstants.Todo.KEY_TITLE
-	)
+    // Cursor pointing to a result set with 0 or 1 Todo
+    val c = db.query(
+            DbConstants.Todo.DATABASE_TABLE,
+            arrayOf(
+                    DbConstants.Todo.KEY_ROWID,
+                    DbConstants.Todo.KEY_TITLE,
+                    DbConstants.Todo.KEY_DESCRIPTION,
+                    DbConstants.Todo.KEY_DUEDATE,
+                    DbConstants.Todo.KEY_PRIORITY
+            ),
+            "${DbConstants.Todo.KEY_ROWID} = $id",
+            null,
+            null,
+            null,
+            DbConstants.Todo.KEY_TITLE
+    )
 
-	// Return with the found entry or null if there wasn't any with the given id
-	return if (c.moveToFirst()) {
-		getTodoByCursor(c)
-	} else {
-		null
-	}
+    // Return with the found entry or null if there wasn't any with the given id
+    return if (c.moveToFirst()) {
+        getTodoByCursor(c)
+    } else {
+        null
+    }
 }
 
 companion object {
-	fun getTodoByCursor(c: Cursor): Todo {
+    fun getTodoByCursor(c: Cursor): Todo {
 
-		val priority = when (c.getInt(c.getColumnIndex(DbConstants.Todo.KEY_PRIORITY))) {
-			0 -> Todo.Priority.LOW
-			1 -> Todo.Priority.MEDIUM
-			2 -> Todo.Priority.HIGH
-			else -> Todo.Priority.LOW
-		}
+        val priority = when (c.getInt(c.getColumnIndex(DbConstants.Todo.KEY_PRIORITY))) {
+            0 -> Todo.Priority.LOW
+            1 -> Todo.Priority.MEDIUM
+            2 -> Todo.Priority.HIGH
+            else -> Todo.Priority.LOW
+        }
 
-		return Todo(
-				id = c.getLong(c.getColumnIndex(DbConstants.Todo.KEY_ROWID)),
-				title = c.getString(c.getColumnIndex(DbConstants.Todo.KEY_TITLE)),
-				priority = priority,
-				dueDate = c.getString(c.getColumnIndex(DbConstants.Todo.KEY_DUEDATE)),
-				description = c.getString(c.getColumnIndex(DbConstants.Todo.KEY_DESCRIPTION))
-		)
-	}
+        return Todo(
+                id = c.getLong(c.getColumnIndex(DbConstants.Todo.KEY_ROWID)),
+                title = c.getString(c.getColumnIndex(DbConstants.Todo.KEY_TITLE)),
+                priority = priority,
+                dueDate = c.getString(c.getColumnIndex(DbConstants.Todo.KEY_DUEDATE)),
+                description = c.getString(c.getColumnIndex(DbConstants.Todo.KEY_DESCRIPTION))
+        )
+    }
 }
 ```
 
@@ -283,52 +283,53 @@ Hozzuk létre a `TodoAdapter` osztályt a `feature.list` csomagban:
 ```kotlin
 class TodoAdapter(context: Context, cursor: Cursor) : CursorRecyclerViewAdapter<TodoAdapter.ViewHolder>(context, cursor) {
 
-	var itemClickListener: TodoItemClickListener? = null
-	
-	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-		val view = LayoutInflater.from(parent.context).inflate(R.layout.row_todo, parent, false)
-		return ViewHolder(view)
-	}
-	
-	override fun onBindViewHolder(holder: ViewHolder, cursor: Cursor) {
-		val todo = TodoDbLoader.getTodoByCursor(cursor)
-	
-		holder.todo = todo
-	
-		holder.tvTitle.text = todo.title
-		holder.tvDueDate.text = todo.dueDate
-	
-		val resource = when (todo.priority) {
-	  		Todo.Priority.LOW -> R.drawable.ic_low
-	  		Todo.Priority.MEDIUM -> R.drawable.ic_medium
-	 		Todo.Priority.HIGH -> R.drawable.ic_high
-		}
-		holder.ivPriority.setImageResource(resource)
-	}
-	
-	inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-		val tvDueDate: TextView = view.tvDueDate
-		val tvTitle: TextView = view.tvTitle
-		val ivPriority: ImageView = view.ivPriority
-	
-		var todo: Todo? = null
-	
-		init {
-		  	itemView.setOnClickListener {
-				todo?.let { itemClickListener?.onItemClick(it) }
-		  	}
-		
-		  	itemView.setOnLongClickListener { clickedView ->
-				todo?.let { itemClickListener?.onItemLongClick(clickedView, it) }
-				true
-			}
-		}
-	}
-	
-	interface TodoItemClickListener {
-		fun onItemClick(todo: Todo)
-		fun onItemLongClick(view: View, todo: Todo): Boolean
-	}
+    var itemClickListener: TodoItemClickListener? = null
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.row_todo, parent, false)
+        return ViewHolder(view)
+    }
+
+    override fun onBindViewHolder(holder: ViewHolder, cursor: Cursor) {
+        val todo = TodoDbLoader.getTodoByCursor(cursor)
+
+        holder.todo = todo
+
+        holder.tvTitle.text = todo.title
+        holder.tvDueDate.text = todo.dueDate
+
+        val resource = when (todo.priority) {
+            Todo.Priority.LOW -> R.drawable.ic_low
+            Todo.Priority.MEDIUM -> R.drawable.ic_medium
+            Todo.Priority.HIGH -> R.drawable.ic_high
+        }
+        holder.ivPriority.setImageResource(resource)
+    }
+
+    inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val tvDueDate: TextView = view.tvDueDate
+        val tvTitle: TextView = view.tvTitle
+        val ivPriority: ImageView = view.ivPriority
+
+        var todo: Todo? = null
+
+        init {
+            itemView.setOnClickListener {
+                todo?.let { itemClickListener?.onItemClick(it) }
+            }
+
+            itemView.setOnLongClickListener { clickedView ->
+                todo?.let { itemClickListener?.onItemLongClick(clickedView, it) }
+                true
+            }
+        }
+    }
+
+    interface TodoItemClickListener {
+        fun onItemClick(todo: Todo)
+        fun onItemLongClick(view: View, todo: Todo): Boolean
+    }
+
 }
 ```
 
@@ -357,6 +358,7 @@ class TodoApplication : Application() {
 		todoDbLoader.close()
 		super.onTerminate()
 	}
+	
 }
 ```
 
@@ -439,9 +441,7 @@ private fun setupRecyclerView() {
 
 Ezek után már nincs szükség a korábban használt `SimpleItemRecyclerViewAdapter`-re, törölhetjük az osztályt tartalmazó fájlt a `hu.bme.aut.android.todo.feature.list` package-ből.
 
-Törölni kell az `onTodoCreated` függvény törzsét és módosítani kell  az `onItemLongClick` függvényben a `simpleItemRecyclerViewAdapter.deleteRow(position)` hívást, mert a `TodoAdapter` interfésze különbözik az eddig használt adapterétől.
-
-Az `onTodoCreated` függvény törzséből törlendő sor:
+Törölni kell még az `onTodoCreated` függvény törzséből az alábbi sort, mert  a `simpleItemRecyclerViewAdapter.deleteRow(position)` hívást, mert a `TodoAdapter` interfésze különbözik az eddig használt adapterétől.
 
 ```kotlin
 simpleItemRecyclerViewAdapter.addItem(todo)
@@ -456,35 +456,38 @@ Készítsük el a `LoadTodosTask` osztályt a `database` csomagban, ami származ
 A `LoadTodoTask` osztály:
 
 ```kotlin
-class LoadTodosTask(private val listActivity: TodoListActivity, private val dbLoader: TodoDbLoader) : AsyncTask<Void, Void, Cursor>() {
+class LoadTodosTask(
+        private val listActivity: TodoListActivity,
+        private val dbLoader: TodoDbLoader)
+    : AsyncTask<Unit, Unit, Cursor>() {
 
-	companion object {
-		private const val TAG = "LoadTodosTask"
-	}
+    companion object {
+        private const val TAG = "LoadTodosTask"
+    }
 
- 	override fun doInBackground(vararg params: Void): Cursor? {
-		return try {
+    override fun doInBackground(vararg params: Unit): Cursor? {
+        return try {
 
-      		val result = dbLoader.fetchAll()
+            val result = dbLoader.fetchAll()
 
-      		if (!isCancelled) {
-        		result
-      		} else {
-        		Log.d(TAG, "Cancelled, closing cursor")
-        		result.close()
-        		null
-      		}
-    	} catch (e: Exception) {
-     		Log.d(TAG, "An error occurred while fetching Todos")
-      		null
-    	}
-	}
+            if (!isCancelled) {
+                result
+            } else {
+                Log.d(TAG, "Cancelled, closing cursor")
+                result.close()
+                null
+            }
+        } catch (e: Exception) {
+            Log.d(TAG, "An error occurred while fetching Todos")
+            null
+        }
+    }
 
-	override fun onPostExecute(result: Cursor?) {
-		Log.d(TAG, "Fetch completed, displaying cursor results")
-    	listActivity.showTodos(result)
-	}
-	
+    override fun onPostExecute(result: Cursor?) {
+        Log.d(TAG, "Fetch completed, displaying cursor results")
+        listActivity.showTodos(result)
+    }
+
 }
 ```
 
@@ -499,6 +502,7 @@ fun showTodos(todos: Cursor?) {
 		// Handle the case when there was an error while fetching todos
 		// It's not part of this exercise
 	}
+	loadTodosTask = null
 }
 ```
 
