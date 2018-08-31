@@ -4,7 +4,7 @@ A labor során egy úgynevezett *Launcher*, avagy *Home Screen* alkalmazást fog
 
 Az alkamazás két nézetből fog állni, az egyik egy tárcsázó, a másik pedig a telepített alkalmazásokat listázza majd ki.
 
-A a nézetek `Fragment`-ek lesznek, két nézet között `ViewPager` használatával lehet majd navigálni.
+A nézetek `Fragment`-ek lesznek, és a két nézet között `ViewPager` használatával lehet majd navigálni.
 
 ![](images/dialer.png)
 ![](images/apps.png)
@@ -15,10 +15,10 @@ A *Company domain* mezőt töröljük ki, a package név legyen `hu.bme.aut.andr
 
 A támogatott form factor legyen *Phone and Tablet*, a minimum API level legyen *API 19: Android 4.4 (KitKat)*.
 
-A projekt létrehozásakor készítsünk egy új Empty Activity-t is `LauncherActivity` néven. Figyeljünk rá, hogy a *Backwards Compatibility (AppCompat)* checkbox be legyen jelölve.
+A projekt létrehozásakor készítsünk egy új *Empty Activity*-t is `LauncherActivity` néven. Figyeljünk rá, hogy a *Backwards Compatibility (AppCompat)* checkbox be legyen jelölve.
 
 
-A projektünkben ez az egy Activity lesz. Nem szeretnénk, hogy el lehessen forgatni, illetve szeretnénk, ha launcher alkalmazásként viselkedhetne.
+A projektünkben ez az egy `Activity` lesz. Nem szeretnénk, hogy el lehessen forgatni, illetve szeretnénk, ha launcher alkalmazásként viselkedhetne.
 
 Mindkét igény miatt az `AndroidManifest.xml` fájlt kell módosítani.
 
@@ -39,73 +39,71 @@ Módosítsuk az `<activity>` leíróját az alábbiak szerint:
     </intent-filter>
 </activity>
 ```
+
 A `LauncherActivity`-hez tartozó `activity_launcher.xml` fájlt módosítsuk úgy, hogy egyetlen `ViewPager`-ből álljon:
 
 ```xml
+<?xml version="1.0" encoding="utf-8"?>
 <android.support.v4.view.ViewPager xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/vpLauncherPanels"
     android:layout_width="match_parent"
     android:layout_height="match_parent" />
 ```
 
-Vegyük fel az alkalmazás függőségeihez a `com.android.support:viewpager:28.0.0-rc01` libraryt a `build.gradle (Module:app)` fájlban:
+Vegyük fel az alkalmazás függőségeihez a `ViewPager`-t tartalmazó könyvtárat a `build.gradle (Module: app)` fájlban:
 
 ```groovy
 dependencies {
     ...
-	implementation 'com.android.support:viewpager:28.0.0-rc01'
+	implementation 'com.android.support:viewpager:28.0.0-rc02'
     ...
 }
 ```
 
-Ha a létrehozott projektben más `com.android.support` package-ben lévő függőségek verziója különbözik a fentebb megadottól, akkor egyeztessük össze velük a `ViewPager` verzióját!
+Ha a létrehozott projektben más `com.android.support` group-ban lévő függőségek verziója különbözik a fentebb megadottól, akkor egyeztessük össze velük a `ViewPager` verzióját!
 
-A `ViewPager`-ben két `Fragment`-et szeretnénk megjeleníteni. Hozzuk létre a `hu.bme.aut.android.launcher.fragments` nevű csomagot!
+A `ViewPager`-ben két `Fragment`-et szeretnénk megjeleníteni. Hozzuk létre a `fragment` nevű csomagot!
 
-Hozzunk létre a `hu.bme.aut.android.launcher.fragments` package-ben két `Fragment` osztályt `DialerFragment` és `ApplicationsFragment` néven!
-Ha *jobb click -> New -> Fragment* módszerrel hozzuk létre a `Fragment`-eket, akkor a nevük megadásakor vegyük ki a jelölést az *Include fragment factory methods* és *Include interface callbacks* opciók elől, illetve *Source Language*-ként a *Kotlin* lehetőséget válasszuk! 
+Hozzunk létre a `hu.bme.aut.android.launcher.fragments` package-ben két `Fragment` osztályt `DialerFragment` és `ApplicationsFragment` néven! Ehhez használjuk a package-en a *jobb klikk -> New -> Fragment* módszert. A nevük megadása után vegyük ki a jelölést az *Include fragment factory methods* és *Include interface callbacks* opciók elől, illetve *Source Language*-ként a *Kotlin* lehetőséget válasszuk! A `Fragment` elkészülése után az osztályon kívülre generált kódot kitörölhetjük, erre nem lesz szükségünk.
 
 A `ViewPager` működéséhez szükség van egy adapterre, ami meghatározza az egyes oldalakon megjelenő `Fragment`-eket.
 
-Hozzuk létre a `hu.bme.aut.android.launcher.adapters` package-et, majd benne a `LauncherPagerAdapter` osztályt:
+Hozzuk létre a `adapter` package-et, majd benne a `LauncherPagerAdapter` osztályt:
 
 ```kotlin
 class LauncherPagerAdapter(manager: FragmentManager) : FragmentStatePagerAdapter(manager) {
+
+    companion object {
+        private const val NUM_PAGES = 2
+    }
+
+    override fun getCount(): Int = NUM_PAGES
 
     override fun getItem(position: Int): Fragment {
         return when (position) {
             0 -> DialerFragment()
             1 -> ApplicationsFragment()
-            else -> ApplicationsFragment()
+            else -> throw IllegalArgumentException("No such page!")
         }
     }
 
-    override fun getCount(): Int {
-        return NUM_PAGES
-    }
-
-    companion object {
-        private const val NUM_PAGES = 2
-    }
 }
 ```
 
-A `FragmentManager` és a `Fragment` osztályokat az `android.support.v4.app` package-ből importáljuk.
+A `FragmentManager` és a `Fragment` osztályokat fontos, hogy az `android.support.v4.app` package-ből importáljuk.
 
 Használjuk fel az eddig létrehozott `ViewPager`-t és `LauncherPagerAdapter`-t a `LauncherActivity`-ben:
 
 ```kotlin
 class LauncherActivity : AppCompatActivity() {
 
-    private lateinit var pagerAdapter : LauncherPagerAdapter
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_launcher)
 
-        pagerAdapter = LauncherPagerAdapter(supportFragmentManager)
-        vpLauncherPanels.adapter = pagerAdapter
+        vpLauncherPanels.adapter = LauncherPagerAdapter(supportFragmentManager)
     }
+
 }
 ```
 
@@ -115,7 +113,7 @@ Próbáljuk ki az alkalmazást!
 
 ### Saját téma Roboto betűtípussal
 
-Az Android hivatalos betűtípusa a Roboto család, annak ellenére, hogy beépítve nem szerepel minden verzióban:
+Az Android hivatalos betűtípusa a *Roboto* család, annak ellenére, hogy beépítve nem szerepel minden verzióban:
 
 * Roboto
 * Roboto Slab (talpas változat)
@@ -123,7 +121,7 @@ Az Android hivatalos betűtípusa a Roboto család, annak ellenére, hogy beép�
 
 Töltsük le a Roboto betűtípust az Android Studio segítségével. Ehhez válasszunk egy olyan layout fájlt, amin van TextView (pl. `fragment_applications.xml`) és váltsunk a szerkesztőben a *Design* nézetre.
 
-Kattintsunk a `TextView`-ra a renderelt előnézeten, jobb oldalon az *Attributes* panelen keressük ki a *fontFamily* tulajdonságot, kattintsunk ár, majd a lenyíló listában alul válasszuk a *More fonts* opciót.
+Kattintsunk a `TextView`-ra a renderelt előnézeten, jobb oldalon az *Attributes* panelen keressük ki a *fontFamily* tulajdonságot, kattintsunk rá, majd a lenyíló listában alul válasszuk a *More fonts* opciót.
 
 ![](images/more_fonts.png)
 
@@ -135,45 +133,47 @@ Ahhoz, hogy saját betűtípust alkalmazzunk meg kell változtatnunk kódból a 
 
 A tárcsázó gombjainak (12 darab) stílusát fogjuk össze, illetve módosítsuk a kinézetet!
 
-**colors.xml**
+Vegyük fel az alábbi színeket a `colors.xml` fájlba:
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<color name="colorPrimary">#9E9E9E</color>
-	<color name="colorPrimaryDark">#9E9E9E</color>
-	<color name="colorAccent">#F5F5F5</color>
-	<color name="accent">#607D8B</color>
-	<color name="primary_text">#212121</color>
-	<color name="secondary_text">#757575</color>
-	<color name="icons">#212121</color>
-	<color name="divider">#BDBDBD</color>
+    <color name="colorPrimary">#9E9E9E</color>
+    <color name="colorPrimaryDark">#9E9E9E</color>
+    <color name="colorAccent">#F5F5F5</color>
+    <color name="accent">#607D8B</color>
+    <color name="primary_text">#212121</color>
+    <color name="secondary_text">#757575</color>
+    <color name="icons">#212121</color>
+    <color name="divider">#BDBDBD</color>
 </resources>
 ```
 
-**dimens.xml** // létre kell hozni!!!
+Hozzuk létre a `dimens.xml` fájlt, és töltsük fel az alábbiakkal:
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Default screen margins, per the Android Design guidelines. -->
-    <dimen name="activity_horizontal_margin">16dp</dimen>
-    <dimen name="activity_vertical_margin">16dp</dimen>
-    <dimen name="dialer_text_size">40sp</dimen>
-    <dimen name="drawer_text_size">15dp</dimen>
+	<!-- Default screen margins, per the Android Design guidelines. -->
+	<dimen name="activity_horizontal_margin">16dp</dimen>
+	<dimen name="activity_vertical_margin">16dp</dimen>
+	<dimen name="dialer_text_size">40sp</dimen>
+	<dimen name="drawer_text_size">16sp</dimen>
 </resources>
 ```
 
-**styles.xml**
+Végül állítsunk be egy alapértelmezett szöveg típust, és adjuk hozzá a tárgyázó gombjainak stílusát a `styles.xml` fájlhoz:
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/primary</item>
-        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
         <item name="android:textViewStyle">@style/DefaultText</item>
     </style>
 
@@ -190,7 +190,8 @@ A tárcsázó gombjainak (12 darab) stílusát fogjuk össze, illetve módosíts
 
 </resources>
 ```
-A DialerFragment layoutjának kódja:
+
+A `DialerFragment` layoutjának kódja (`fragment_dialer.xml`):
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -205,12 +206,8 @@ A DialerFragment layoutjának kódja:
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:layout_above="@+id/tableLayout"
-		android:layout_alignParentLeft="true"
 		android:layout_alignParentStart="true"
-		android:layout_toLeftOf="@+id/btnCallBackSpace"
 		android:layout_toStartOf="@+id/btnCallBackSpace"
-		android:clickable="false"
-		android:focusable="false"
 		android:textSize="@dimen/dialer_text_size" />
 
 	<ImageButton
@@ -219,7 +216,6 @@ A DialerFragment layoutjának kódja:
 		android:layout_height="wrap_content"
 		android:layout_above="@+id/tableLayout"
 		android:layout_alignParentEnd="true"
-		android:layout_alignParentRight="true"
 		android:layout_alignTop="@+id/etCall"
 		android:src="@drawable/ic_backspace_black_24dp" />
 
@@ -257,6 +253,7 @@ A DialerFragment layoutjának kódja:
 				android:id="@+id/btnDialer3"
 				style="@style/DialerButton"
 				android:text="3" />
+
 		</TableRow>
 
 		<TableRow>
@@ -275,6 +272,7 @@ A DialerFragment layoutjának kódja:
 				android:id="@+id/btnDialer6"
 				style="@style/DialerButton"
 				android:text="6" />
+
 		</TableRow>
 
 		<TableRow>
@@ -293,6 +291,7 @@ A DialerFragment layoutjának kódja:
 				android:id="@+id/btnDialer9"
 				style="@style/DialerButton"
 				android:text="9" />
+
 		</TableRow>
 
 		<TableRow>
@@ -311,6 +310,7 @@ A DialerFragment layoutjának kódja:
 				android:id="@+id/btnDialerHashmark"
 				style="@style/DialerButton"
 				android:text="#" />
+
 		</TableRow>
 
 	</TableLayout>
@@ -318,9 +318,9 @@ A DialerFragment layoutjának kódja:
 </RelativeLayout>
 ```
 
-Ez az elrendezés hivatkozik az *ic_action_backspace* erőforrásra. 
+Ez az elrendezés hivatkozik a `@drawable/ic_backspace_black_24dp` erőforrásra. 
 
-A [https://materialdesignicons.com/](https://materialdesignicons.com/) oldalon keressünk rá a *backspace*-re, majd töltsük le a számunkra megfelelőt ikont.
+A [https://materialdesignicons.com/](https://materialdesignicons.com/) oldalon keressünk rá a *backspace*-re, majd töltsük le a számunkra megfelelőt ikont (ehhez válasszuk az *Icon Package*, majd az *Android 5.x* opciót). 
 
 Tömörítsük ki, majd másoljuk be az összes erőforrást a *res* mappába.
 
@@ -334,21 +334,19 @@ A laborvezető segítségével vizsgáljuk meg az elrendezést!
 
 Próbáljuk ki az alkalmazást! Mit tapasztalunk?
 
-Alakítsuk át a Fragment kódját, hogy ne jöjjön fel a billentyűzet, amikor fókuszt kap az EditText! A `fragment_dialer.xml`-ben az `EditText` `android:clickable` és `android:focusable` értékét állítsuk `false`-ra.
+Alakítsuk át a Fragment kódját, hogy ne jöjjön fel a billentyűzet, amikor fókuszt kap az `EditText`! A `fragment_dialer.xml`-ben az `EditText` `android:clickable` és `android:focusable` értékét állítsuk `false`-ra.
 
 ```xml
 <EditText
-	android:id="@+id/etCall"
-	android:layout_width="match_parent"
-	android:layout_height="wrap_content"
-	android:layout_above="@+id/tableLayout"
-	android:layout_alignParentLeft="true"
-	android:layout_alignParentStart="true"
-	android:layout_toLeftOf="@+id/callBackSpaceButton"
-	android:layout_toStartOf="@+id/callBackSpaceButton"
-	android:clickable="false"
-	android:focusable="false"
-	android:textSize="@dimen/dialer_text_size" />
+    android:id="@+id/etCall"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_above="@+id/tableLayout"
+    android:layout_alignParentStart="true"
+    android:layout_toStartOf="@+id/btnCallBackSpace"
+    android:clickable="false"
+    android:focusable="false"
+    android:textSize="@dimen/dialer_text_size" />
 ```
 
 ### Alkalmazások listája
@@ -357,17 +355,10 @@ Az alkalmazásokat listázó `ApplicationsFragment` egy `RecyclerView`-t fog meg
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/rvApplications"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/rvApplications"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
-
-</RelativeLayout>
+    android:layout_height="match_parent" />
 ```
 
 A RecyclerView külön libraryként érhető el. Vegyük fel a következő függőséget `build.gradle (Module: app)` fájlban:
@@ -375,59 +366,61 @@ A RecyclerView külön libraryként érhető el. Vegyük fel a következő függ
 ```groovy
 dependencies{
 	...
-	implementation 'com.android.support:recyclerview-v7:26.1.0'
+	implementation 'com.android.support:recyclerview-v7:28.0.0-rc02'
 	...
 }
 ```
 
-Készítsük el a modell osztályt, ami egy alkalmazás megjelenítendő adatait tudja tárolni. Hozzuk létre a `hu.bme.aut.android.launcher.model` package-et, majd abban az `AppInfo` nevű osztályt:
+Készítsük el a modell osztályt, ami egy alkalmazás megjelenítendő adatait tudja tárolni. Hozzuk létre a `model` package-et, majd abban az `AppInfo` nevű osztályt:
 
 ```kotlin
-class AppInfo(var title: CharSequence,
-              var icon: Drawable? = null,
-              var isFiltered: Boolean = false
+class AppInfo(
+        val title: CharSequence,
+        val icon: Drawable? = null,
+        className: ComponentName
 ) {
-    var intent: Intent? = null
-        private set
 
-    fun setActivity(className: ComponentName, launchFlags: Int) {
-        val intent = Intent(Intent.ACTION_MAIN)
+    val intent: Intent
+
+    init {
+        intent = Intent(Intent.ACTION_MAIN)
         intent.addCategory(Intent.CATEGORY_LAUNCHER)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
         intent.component = className
-        intent.flags = launchFlags
-
-        this.intent = intent
     }
+
 }
 ```
 
-Hozzunk létre a *res/layout* mappában egy `item_application.xml` nevű elrendezést: 
+Hozzunk létre a `res/layout` mappában egy `item_application.xml` nevű elrendezést: 
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:id="@+id/applicationLL"
+    android:gravity="center_horizontal"
     android:orientation="vertical">
 
     <ImageView
-        android:id="@+id/iconIV"
+        android:id="@+id/ivIcon"
         android:layout_width="50dp"
-        android:layout_height="50dp" />
+        android:layout_height="50dp"
+        android:layout_margin="4dp" />
 
     <TextView
-        android:id="@+id/nameTV"
+        android:id="@+id/tvName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="@dimen/drawer_text_size"
-       />
+        android:layout_margin="4dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textSize="@dimen/drawer_text_size" />
 
 </LinearLayout>
 ```
 
-A `hu.bme.aut.android.launcher.adapters` csomagban hozzunk létre egy `ApplicationsAdapter` nevű osztályt:
+Az `adapter` csomagban hozzunk létre egy `ApplicationsAdapter` nevű osztályt:
 
 ```kotlin
 class ApplicationsAdapter : RecyclerView.Adapter<ApplicationsAdapter.ViewHolder>() {
@@ -448,14 +441,18 @@ class ApplicationsAdapter : RecyclerView.Adapter<ApplicationsAdapter.ViewHolder>
         holder.app = app
     }
 
-    override fun getItemCount(): Int {
-        return applications.size
-    }
+    override fun getItemCount(): Int = applications.size
 
+    fun setApps(apps: List<AppInfo>) {
+        applications.clear()
+        applications.addAll(0, apps)
+        notifyDataSetChanged()
+    }
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         var name: TextView = itemView.tvName
         var icon: ImageView = itemView.ivIcon
+
         var app: AppInfo? = null
 
         init {
@@ -470,38 +467,38 @@ class ApplicationsAdapter : RecyclerView.Adapter<ApplicationsAdapter.ViewHolder>
     interface OnApplicationClickedListener {
         fun onApplicationClicked(appInfo: AppInfo)
     }
+
 }
 ```
 
-Ahhoz hogy a főképernyőn megjeleníthessünk minden telepített alkalmazást, a `PackageManager` osztály `queryIntentActivities()` függvényét használhatjuk. Ez a függvény visszaadja az eszközre telepített összes alkalmazás összes `Activity`-jét, ami megfelel a kapott `Intent`-nek. A háttérben egyébként `Intent` feloldást végez. Az így visszakapott `Activity`-k adatait olvassuk be AppInfo objektumok listájába, melyet az `ApplicationsFragment`-ben definiálunk. Hozzunk létre az `ApplicationsFragment`-ben egy `applications` nevű lista propertyt és egy függvényt, ami összegyűjti az információkat, majd feltölti az `applications` listát:
+Ahhoz hogy a főképernyőn megjeleníthessünk minden telepített alkalmazást, a `PackageManager` osztály `queryIntentActivities()` függvényét használhatjuk. Ez a függvény visszaadja az eszközre telepített összes alkalmazás összes `Activity`-jét, ami megfelel a kapott `Intent`-nek. A háttérben egyébként `Intent` feloldást végez. Az így visszakapott `Activity`-k adatait olvassuk be `AppInfo` objektumok listájába, melyet az `ApplicationsFragment`-ben definiálunk. Hozzunk létre az `ApplicationsFragment`-ben egy `applications` nevű lista propertyt és egy függvényt, ami összegyűjti az információkat, majd feltölti az `applications` listát:
 
 ```kotlin
 private val applications: MutableList<AppInfo> = mutableListOf()
 
 private fun loadApplications() {
-	val packageManager = requireActivity().packageManager
+    val packageManager = requireActivity().packageManager
 
-	// creating a list of every application we want to display
-	val mainIntent = Intent(Intent.ACTION_MAIN, null)
-	mainIntent.addCategory(Intent.CATEGORY_LAUNCHER)
-	val apps = packageManager.queryIntentActivities(mainIntent, 0)
-	// sorting by name
-	Collections.sort(apps, ResolveInfo.DisplayNameComparator(packageManager))
+    // creating a list of every application we want to display
+    val mainIntent = Intent(Intent.ACTION_MAIN, null)
+    mainIntent.addCategory(Intent.CATEGORY_LAUNCHER)
+    val apps = packageManager.queryIntentActivities(mainIntent, 0)
 
-	// filling the ApplicationInfo array for every app (we want to display)
-	applications.clear()
+    // sorting by name
+    apps.sortWith(ResolveInfo.DisplayNameComparator(packageManager))
 
-	apps.forEach { app ->
-		val appInfo = AppInfo(
-				title = app.loadLabel(packageManager),
-				icon = app.activityInfo.loadIcon(packageManager)
-		)
-		appInfo.setActivity(
-				ComponentName(app.activityInfo.applicationInfo.packageName, app.activityInfo.name),
-				Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED)
-						
-		applications += appInfo
-	}
+    // filling the AppInfo List with apps
+    applications.clear()
+
+    val appInfos = apps.map { app ->
+        AppInfo(
+                title = app.loadLabel(packageManager),
+                icon = app.activityInfo.loadIcon(packageManager),
+                className = ComponentName(app.activityInfo.applicationInfo.packageName, app.activityInfo.name)
+        )
+    }
+
+    applications += appInfos
 }
 ```
 
@@ -514,8 +511,7 @@ override fun onCreate(savedInstanceState: Bundle?) {
 }
 ```
 
-Ezek után össze kell kötnünk az összegyűjtött információkat a `RecyclerView`-val. Írjuk meg be az alábbi metódust,
-majd hívjuk meg az `ApplicationFragment` `onViewCreated` életciklus függvényében!
+Ezek után össze kell kötnünk az összegyűjtött információkat a `RecyclerView`-val. Írjuk meg be az alábbi metódust, majd hívjuk meg az `ApplicationFragment` `onViewCreated` életciklus függvényében!
 
 ```kotlin
 private fun setupRecyclerView() {
@@ -540,7 +536,7 @@ class ApplicationsFragment : Fragment(), ApplicationsAdapter.OnApplicationClicke
 	...
 	
 	override fun onApplicationClicked(appInfo: AppInfo) {
-        requireActivity().startActivity(appInfo.intent)
+        requireContext().startActivity(appInfo.intent)
     }
 }
 ```
@@ -566,7 +562,7 @@ val intent = Intent(
 		Intent.ACTION_CALL,
 		Uri.parse(phoneNumber)
 )
-requireActivity().startActivity(intent)
+requireContext().startActivity(intent)
 ```
 
 A telefonhíváshoz engedély szükséges, ezt a manifestben az `<application>` tagen kívül kell megadnunk. 
