@@ -88,6 +88,8 @@ class TodoDetailFragment : Fragment() {
 }
 ```
 
+> A [`let`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/let.html) függvény tetszőleges objektumon meghívható, és csupán annyit csinál, hogy lefuttatja a paramétereként adott lambdát, odaadva neki az objektumot. Ez önmagában elég haszontalan, viszont a [safe call operátorral](https://kotlinlang.org/docs/reference/null-safety.html#safe-calls) (`?.`) kombinálva a `null` ellenőrzések egyik legkényelmesebb formáját nyújtja. Amennyiben a `?.let` előtt álló kifejezés `null`, a `let` függvény nem hívódik meg (ezt csinálja az említett operátor), ha pedig nem `null`, akkor a `let` függvényen belül már biztosan nem `null`-ként kapjuk meg az objektumunkat. Jelen esetben ha az `arguments` értéke `null`, a `let` hívás nem történik meg, ha viszont nem az, akkor meghívódik, és a lambdába beérkező, `args` névvel ellátott paraméter már biztosan nem `null`, és így szabadon használható.
+
 A megváltozott kulcs illetve a `newInstance` hívás miatt át kell alakítani a `TodoDetailActivity` `onCreate` metódusát is.
 
 ```kotlin
@@ -154,20 +156,20 @@ class SimpleItemRecyclerViewAdapter : RecyclerView.Adapter<SimpleItemRecyclerVie
 
     override fun getItemCount() = todoList.size
 
-    inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val tvDueDate: TextView = view.tvDueDate
-        val tvTitle: TextView = view.tvTitle
-        val ivPriority: ImageView = view.ivPriority
+    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val tvDueDate: TextView = itemView.tvDueDate
+        val tvTitle: TextView = itemView.tvTitle
+        val ivPriority: ImageView = itemView.ivPriority
 
         var todo: Todo? = null
 
         init {
             itemView.setOnClickListener {
-                todo?.let { itemClickListener?.onItemClick(it) }
+                todo?.let { todo -> itemClickListener?.onItemClick(todo) }
             }
 
-            itemView.setOnLongClickListener {
-                itemClickListener?.onItemLongClick(adapterPosition, it)
+            itemView.setOnLongClickListener { view ->
+                itemClickListener?.onItemLongClick(adapterPosition, view)
                 true
             }
         }
@@ -182,6 +184,12 @@ class SimpleItemRecyclerViewAdapter : RecyclerView.Adapter<SimpleItemRecyclerVie
 ```
 
 Figyeljük meg a `ViewHolder` patternt az adapterben. A `RecyclerView` már kikényszeríti ennek használatát, mivel így hatékony, gyors listakezelést kapunk.
+
+> A [`mutableListOf`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/mutable-list-of.html) egy újabb collection létrehozó függvény a standard library-ből. Fontos különbség van a `List` és `MutableList` típusok között Kotlinban: előbbinek a tartalmát a létrehozása után nem tudjuk módosítani. Ha ilyen listára van szükségünk, a sima [`listOf()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/list-of.html) függvény áll rendelkezésünkre. Érdemes is listák létrehozásánál alapvetően ezt használni, és csak akkor módosíthatóvá tenni őket, ha erre tényleg szükségünk van, így elkerülhetjük a véletlen módosításokat.
+
+> A lista módosításánál kihasználjuk a Kotlinban elérhető operátorokat is. A `[]` operátor egy [`get`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/get.html) hívásnak, míg a `+=` operátor egy [`plusAssign`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/plus-assign.html) hívásnak felel meg.
+
+> Ismét látjuk a `?.let` és a `?.` operátor használatát is a `ViewHolder` listener implementációiban. Például a `setOnClickListener` csak akkor fogja meghívni az `onItemClick` függvényt, ha mind a `todo`, mind az `itemClickListener` nem `null` értékű.
 
 Ez az adapter hivatkozik egy `row_todo.xml`-re. Hozzuk létre ezt a fájlt a `res/layout` mappába (*New -> Layout resource file -> Filename: `row_todo.xml` -> OK*):
 
@@ -249,13 +257,15 @@ private fun setupRecyclerView() {
 }
 ```
 
-Majd vegyük fel az `Activity`-ben a hiányzó adapter property-t (a laborvezetővel egyeztessük a [`lateinit`](https://kotlinlang.org/docs/reference/properties.html#late-initialized-properties-and-variables) működését): 
+Majd vegyük fel az `Activity`-ben a hiányzó adapter property-t:
 
 ```kotlin
 private lateinit var simpleItemRecyclerViewAdapter: SimpleItemRecyclerViewAdapter
 ```
 
-Illetve generáljuk ki az interfész implementációs metódusokat (tipp: a `setupRecyclerView()`-ban a `this`-en ALT+ENTERT nyomva az IDE felajánlja a generálást), ebből az `onItemClick` megvalósítása:
+> A [`lateinit`](https://kotlinlang.org/docs/reference/properties.html#late-initialized-properties-and-variables) kulcsszóval megjelölt property-ket a fordító megengedi inicializálatlanul hagyni az osztály konstruktorának lefutása utánig, anélkül, hogy nullable-ként kéne azokat megjelölnünk. Ez praktikus olyan esetekben, amikor egy osztály inicializálása nem a konstruktorában történik (például ahogy az `Activity`-k esetében az `onCreate`-ben), mert később az esetleges `null` eset lekezelése nélkül használhatjuk majd a property-t. A `lateinit` használatával átvállaljuk a felelősséget a fordítótól, hogy a property-t az első használata előtt inicializálni fogjuk (ellenkező esetben kivételt kapunk).
+
+Illetve generáljuk ki az interfész implementációs metódusokat (tipp: a `setupRecyclerView()`-ban a `this`-en *Alt+Enter*-t nyomva az IDE felajánlja a generálást), ebből az `onItemClick` megvalósítása:
 
 ```kotlin
 override fun onItemClick(todo: Todo) {
@@ -426,6 +436,12 @@ class TodoCreateFragment : DialogFragment() {
 }
 ```
 
+> Az `onAttach` függvényben láthatjuk, hogy sok más konstrukcióval együtt Kotlinban az [`if-else`](https://kotlinlang.org/docs/reference/control-flow.html#if-expression) is használható kifejezésként, értéke pedig a lefutott ág utolsó kifejezése.
+
+> A `Todo` konstruktor hívásánál [elnevezett paraméterekkel](https://kotlinlang.org/docs/reference/functions.html#named-arguments) (illetve sortörésekkel) tettük olvashatóbbá a kódot. Elnevezett paramétereket bármilyen Kotlibnan definiált függvény meghívásakor használhatunk.
+
+> Abban az esetben, ha az `args.getString(...)` hívás `null` értéket adna vissza, az [Elvis operátor](https://kotlinlang.org/docs/reference/null-safety.html#elvis-operator) (`?:`) használatával adunk a visszatérési értéke helyett egy default értéket a `description` paraméternek. Ez az operátor ha a bal oldalán lévő kifejezés értéke nem `null`, akkor a bal oldali kifejezést, egyébként pedig a jobb oldali kifejezést adja vissza.
+
 Most ugorjunk vissza a `TodoListActivity`-re, és valósítsuk meg a `TodoCreatedListener` interfészt!
 
 ```kotlin
@@ -551,15 +567,17 @@ class DatePickerDialogFragment : DialogFragment() {
 
     private lateinit var listener: DateListener
 
-    private val dateSetListener = DatePickerDialog.OnDateSetListener { view, year, monthOfYear, dayOfMonth ->
-        // Setting the new date
-        calSelectedDate.set(Calendar.YEAR, year)
-        calSelectedDate.set(Calendar.MONTH, monthOfYear)
-        calSelectedDate.set(Calendar.DAY_OF_MONTH, dayOfMonth)
+    private val dateSetListener = object : DatePickerDialog.OnDateSetListener {
+        override fun onDateSet(datePicker: DatePicker?, year: Int, monthOfYear: Int, dayOfMonth: Int) {
+            // Setting the new date
+            calSelectedDate.set(Calendar.YEAR, year)
+            calSelectedDate.set(Calendar.MONTH, monthOfYear)
+            calSelectedDate.set(Calendar.DAY_OF_MONTH, dayOfMonth)
 
-        listener.onDateSelected(buildDateText())
+            listener.onDateSelected(buildDateText())
 
-        dismiss()
+            dismiss()
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -609,6 +627,8 @@ class DatePickerDialogFragment : DialogFragment() {
     }
 }
 ```
+
+> A `DatePickerDialog.OnDateSetListener` implementációhoz egy anonim osztályt használunk egy [`object expression`](https://kotlinlang.org/docs/reference/object-declarations.html#object-expressions)-nel leírva, ami az `object` kulcsszó harmadik előfordulása a nyelvben. (Mi volt az előző kettő?)
 
 Ugorjunk vissza a `TodoCreateFragment`-re és valósítsuk meg a `DateListener` interfészt, illetve állítsuk be a `txtDueDate` `onClickListener(…)`-jében, hogy mutassunk egy `DialogFragment`-et.
 
