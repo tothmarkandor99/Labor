@@ -550,7 +550,6 @@ Próbáljuk ki az alkalmazást!
 ![](images/dialer.png)
 ![](images/apps.png)
 
-
 ## Önálló feladat
 
 ### Írja meg a tárcsázó működését!
