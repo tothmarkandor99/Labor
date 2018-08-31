@@ -137,6 +137,33 @@ Ha az ebben szereplő `dimen` erőforrások hiányoznak, rajtuk *Alt+Enter*-t ny
 
 Elsőként az egyedi jelszó nézetet valósítjuk meg. Ez a nézet egy beviteli mezőből áll és egy képből, amelyre rányomva a jelszó mező megmutatja, hogy mit gépeltünk a mezőbe.
 
+Az elrendezéshez hozzunk létre egy `view_password_edittext.xml` layout erőforrást és a tartalma legyen az alábbi kód:
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <ImageView
+        android:id="@+id/ivPassword"
+        android:layout_alignParentRight="true"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_centerVertical="true"
+        android:src="@android:drawable/ic_menu_view"/>
+
+    <EditText
+        android:id="@+id/etPassword"
+        android:layout_alignParentLeft="true"
+        android:layout_toLeftOf="@+id/ivPassword"
+        android:layout_centerVertical="true"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"/>
+
+</merge>
+```
+
+A laborvezetővel tekintsék át az `ImageView` és az `EditText` elhelyezését a `RelativeLayout`-on belül.
+
 Hozzunk létre egy `view` package-et és azon belül egy `PasswordEditText` osztályt, melynek a kódja az alábbi:
 
 ```kotlin
@@ -203,32 +230,7 @@ kóddal tudjuk a `RelativeLayout`-ba felfújni, aminek hatására a `RelativeLay
 
 > A `View` ősosztálynak, és így a `RelativeLayout`-nak is számos különböző konstruktora van, amelyek attól függően hívódnak meg, hogy hogy jön létre a `View` példány (layout-ból "felfújva", stb.). Mi a saját `PasswordEditText` osztályunkban [secondary constructor](https://kotlinlang.org/docs/reference/classes.html#secondary-constructors)-ok segítségével hozunk létre ezeknek megfelelő konstruktorokat, és mindegyikből áthívunk az ősosztály azonos paraméterezésű konstruktorába.
 
-Az elrendezéshez hozzunk létre egy `view_password_edittext.xml` layout erőforrást és a tartalma legyen az alábbi kód:
-
-```xml
-<?xml version="1.0" encoding="utf-8"?>
-<merge xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <ImageView
-        android:id="@+id/ivPassword"
-        android:layout_alignParentRight="true"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_centerVertical="true"
-        android:src="@android:drawable/ic_menu_view"/>
-
-    <EditText
-        android:id="@+id/etPassword"
-        android:layout_alignParentLeft="true"
-        android:layout_toLeftOf="@+id/ivPassword"
-        android:layout_centerVertical="true"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"/>
-
-</merge>
-```
-
-A laborvezetővel tekintsék át az `ImageView` és az `EditText` elhelyezését a `RelativeLayout`-on belül.
+> Az `ivPassword` és az `etPassword` nevű `View`-kat a fenti kódban csak az ID-juk szerint hivatkoztuk, `findViewById` hívások nélkül. Ezt a kényelmi funkciót a [`Kotlin Android Extensions`](https://kotlinlang.org/docs/tutorials/android-plugin.html#view-binding) plugin adja, amely a Kotlin támogatással együtt automatikusan hozzá lett adva a projetünkhöz. A plugin custom `View`-kban, `Activity`-kben, és `Fragment`-ekben is hasonlóképpen tudja nekünk kikeresni a különböző `View`-kat. Használatakor mindig figyeljünk rá, hogy az általa nyújtott `kotlinx.` csomagnévvel kezdődő property-ket importáljuk, és ne az `R` fájlban lévő azonosítókat.
 
 A Kotlin osztály fontosabb függvényei:
 
