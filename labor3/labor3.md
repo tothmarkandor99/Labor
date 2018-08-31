@@ -195,6 +195,8 @@ Figyeljük meg a `ViewHolder` patternt az adapterben. A `RecyclerView` már kik�
 
 > Ismét látjuk a `?.let` és a `?.` operátor használatát is a `ViewHolder` listener implementációiban. Például a `setOnClickListener` csak akkor fogja meghívni az `onItemClick` függvényt, ha mind a `todo`, mind az `itemClickListener` nem `null` értékű.
 
+> A `ViewHolder` implementációjában a [Kotlin Android Extensions](https://kotlinlang.org/docs/tutorials/android-plugin.html#view-binding) egy új formáját használtuk, hogy az `itemView` gyerek elemei közül keressünk ki ID szerint `View`-kat. 
+
 Ez az adapter hivatkozik egy `row_todo.xml`-re. Hozzuk létre ezt a fájlt a `res/layout` mappába (*New -> Layout resource file -> Filename: `row_todo.xml` -> OK*):
 
 ```xml
