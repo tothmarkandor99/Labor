@@ -84,7 +84,7 @@ Az `Activity` létrehozást azonban megkönnyíti az Android Studio és a fenti 
 </activity>
 ```
 
-> ### __Létrehozás után ellenőrizzük a laborvezető segítségével a létrejött kódokat!__
+*Létrehozás után ellenőrizzük a laborvezető segítségével a létrejött kódokat!*
 
 ## MainMenuActivity felület:
 
@@ -161,6 +161,8 @@ btnHighScore.setOnClickListener {
 }
 ```
 
+> A [`setOnClickListener`](https://developer.android.com/reference/android/view/View.html#setOnClickListener(android.view.View.OnClickListener)) függvény valójában egy [`View.OnClickListener`](https://developer.android.com/reference/android/view/View.OnClickListener) interfészt megvalósító objektumot vár paraméterként, amelynek egyetlen megvalósítandó függvénye van. Ezt létrehozhatnánk a Java-s [anonim osztályok stílusában](https://kotlinlang.org/docs/reference/object-declarations.html#object-expressions) is, de helyette kihasználjuk, hogy Kotlinban elsőrendű tagjai a nyelvnek a függvények, és rendelkezünk rendes függvény típusokkal. Jelen esetben a paraméterben egy olyan [lambdát]() adunk át, amely fejléce megegyezik az elvárt interfész egyetlen függvényének fejlécével, a [SAM conversion](https://kotlinlang.org/docs/reference/java-interop.html#sam-conversions) nyelvi funkció pedig a háttérben ez alapján a lambda alapján létrehozza a megfelelő `View.OnClickListener` példányt. 
+
 ## AboutActivity felület
 
 Ahogy korábban említettük az *About* menü elindítja az új `AboutActivity`-t, ezért elsőként készítsük el az `AboutActivity` felületét, melyet a `content_about.xml` ír le. Mint korábban, itt is lehet `ConstraintLayout`-ot készíteni a segítséggel, vagy alább megtalálható az XML:
@@ -224,12 +226,17 @@ object TicTacToeModel {
         }
     }
 
-    fun getFieldContent(x: Int, y: Int): Byte = model[x][y]
-
-    fun changeNextPlayer() {
-        nextPlayer = if (nextPlayer == CIRCLE) CROSS else CIRCLE
+    fun getFieldContent(x: Int, y: Int): Byte {
+        return model[x][y]
     }
 
+    fun changeNextPlayer() {
+        if (nextPlayer == CIRCLE) {
+            nextPlayer = CROSS
+        } else {
+            nextPlayer = CIRCLE
+        }
+    }
     fun setFieldContent(x: Int, y: Int, content: Byte): Byte {
         changeNextPlayer()
         model[x][y] = content
@@ -239,8 +246,11 @@ object TicTacToeModel {
 }
 ```
 
+> Kotlinban nyelvi szintű támogatás van a singletonok létrehozására. Ahelyett, hogy nekünk kéne egyetlen statikus példányt felvennünk, elég csak a `class` kulcsszó helyett az [`object`](https://kotlinlang.org/docs/reference/object-declarations.html#object-declarations) kulcsszóval létrehoznunk az osztályt hogy egy singletont kapjunk.
 
-> ### __A laborvezetővel vegyék át az osztály működését.__
+> A fordítás időben konstans értékeket érdemes a [`const`](https://kotlinlang.org/docs/reference/properties.html#compile-time-constants) kulcsszóval megjelölnünk (erre a fejlesztőkörnyezet is figyelmeztet, ha nem tennénk), ezzel teljesítmény optimalizációkat érhetünk el, illetve a szándékainkat is tisztábban jelezzük.
+
+> A Kotlin standard library számos függvényt nyújt különböző collection-ök egyszerű létrehozására. Figyeljük meg a kódban az [`arrayOf`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/array-of.html) és a [`byteArrayOf`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/byte-array-of.html) használatát, amelyek meghívásával létrehozunk tömböket, és azonnal fel is töltjük őket elemekkel.
 
 ## Navigáció megvalósítása Activity-k közt
 
@@ -287,11 +297,7 @@ class TicTacToeView : View {
         paintLine.strokeWidth = 5F
     }
 
-    override fun onDraw(canvas: Canvas?) {
-        if (canvas == null) {
-            return
-        }
-
+    override fun onDraw(canvas: Canvas) {
         canvas.drawRect(0F, 0F, width.toFloat(), height.toFloat(), paintBg)
 
         drawGameArea(canvas)
@@ -309,35 +315,43 @@ class TicTacToeView : View {
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         val w = MeasureSpec.getSize(widthMeasureSpec)
         val h = MeasureSpec.getSize(heightMeasureSpec)
-        val d = when {
-            w == 0 -> h
-            h == 0 -> w
-            else -> min(w,h)
+        val d: Int
+
+        when {
+            w == 0 -> { d = h }
+            h == 0 -> { d = w }
+            else -> { d = min(w, h) }
         }
+
         setMeasuredDimension(d, d)
     }
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
-       return when (event?.action) {
-		   MotionEvent.ACTION_DOWN -> {
-			   //TODO
-			   true
-		   }
-		   else -> super.onTouchEvent(event)
-	   }
+        when (event?.action) {
+            MotionEvent.ACTION_DOWN -> {
+                // TODO
+                return true
+            }
+            else -> return super.onTouchEvent(event)
+        }
     }
+    
 }
 ```
 
-> ### __Vizsgálja meg a kódrészt a laborvezető segítségével.__
-
 Látható, hogy az osztály egy nézet rajzolásáért felelős. Létrehozunk két `Paint` objektumot, melyek a háttér, illetve a pályaelemek rajzolásához lesznek használva. A konstruktorok mint látjuk gyakorlatilag csak egy `super()` hívást valósítanak meg, mivel az `init` block végzi ebben a megvalósításban a különböző elemek inicializálását. Fontos, hogy objektumokat ne az `onDraw()`-ban hozzuk létre, hiszen az `onDraw()` gyakran meghívódik és sokszor hozná létre feleslegesen őket, lassítva ezzel a működést és megnehezítve a *garbage collector* dolgát.
 
-Az osztály egyik leglényegesebb függvénye, az `override fun onDraw(canvas: Canvas?)`, mely a kapott `canvas` objektumra rajzolja ki a nézet tartalmát. A jelenlegi implementáció feketére festi a területet és meghívja a játéktér kirajzolásért (négyzetrács) és a játékosok (X és O) kirajzolásáért felelős – egyelőre még üres – függvényeket.
+Az osztály egyik leglényegesebb függvénye, az `override fun onDraw(canvas: Canvas)`, mely a kapott `canvas` objektumra rajzolja ki a nézet tartalmát. A jelenlegi implementáció feketére festi a területet és meghívja a játéktér kirajzolásért (négyzetrács) és a játékosok (X és O) kirajzolásáért felelős – egyelőre még üres – függvényeket.
 
 Az `override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int)` függvény felüldefiniálásával biztosítható, hogy a nézet mindig négyzetes formában jelenjen meg (ugyanakkora legyen a szélessége, mint a magassága).
 
 Végül az `override fun onTouchEvent(event: MotionEvent?)` függvényben tudjuk kezelni az érintés eseményeket. Jelenleg az `ACTION_DOWN` eseményt vizsgáljuk, de más érintés események is elkaphatóak itt.
+
+> Figyeljük meg a [`when`](https://kotlinlang.org/docs/reference/control-flow.html#when-expression) kétféle használatát. Az `onTouchEvent` függvényben egy Java-s `switch`-hez hasonlóan futtat kódot a paraméterként megkapott kifejezés értékétől függően, míg az `onMeasure` függvényben egy kevésbé olvasható `if-else` lánc helyett használjuk, paraméter nélkül.
+
+> Az [`init`](https://kotlinlang.org/docs/reference/classes.html#constructors) blokkban végezhetjük el az osztályunk olyan inicializálási feladatait, amelyekre bármilyen konstruktor meghívásakor szükségünk van.
+
+> Kotlinban a `(float) x` és `(int) y` stílusú castolások helyett a numerikus típusok között a `toInt()`, `toFloat()`, [és hasonló függvényekkel](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-number/index.html) végezhetünk konverziót.
 
 Ahhoz, hogy a `GameActivity` ezt a játékteret megjelenítse, módosítsuk a hozzá tartozó layout fájlt (`res/layout/content_game.xml`). A felület egy szürkés hátterű `ConstraintLayout` közepén jelenítse meg a `TicTacToeView` nézetünket:
 
@@ -411,24 +425,26 @@ private fun drawPlayers(canvas: Canvas) {
 }
 ```
 
+> A Kotlin [`for` ciklusának](https://kotlinlang.org/docs/reference/control-flow.html#for-loops) nincs három részre bontott, `;`-vel elválasztott verziója, csak a fenti kódban is látható *for each* stílusú `for` ciklust támogatja a nyelv, amellyel azonban bármilyen iterálható objektumon ugyanúgy tudunk iterálni. Ha egyszerűen számokon szeretnénk ezt megtenni iterálni, létrehozhatunk egy iterálható [`Range`](https://kotlinlang.org/docs/reference/ranges.html)-et például a `0..100` szintaxissal amivel egy zárt intervallumot kapunk, vagy a fent használt [`0 until 100`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.ranges/until.html) szintaxissal, ami egy jobbról nyílt intervallumot hoz létre.
+
 Végül valósítsuk meg az érintés eseményre való reagálást úgy, hogy a megfelelő mezőbe – ha az üres – elhelyezzük az aktuális játékost, melyet a modell `nextPlayer` változója reprezentál. 
 
-> *A modell frissítése után az újrarajzolást az `invalidate()` függvény meghívásával tudjuk elérni.*
+*A modell frissítése után az újrarajzolást az `invalidate()` függvény meghívásával tudjuk elérni.*
 
 ```kotlin
 override fun onTouchEvent(event: MotionEvent?): Boolean {
-	return when (event?.action) {
-		MotionEvent.ACTION_DOWN -> {
-			val tX: Int = (event.x / (width / 3)).toInt()
-			val tY: Int = (event.y / (height / 3)).toInt()
-			if (tX < 3 && tY < 3 && TicTacToeModel.getFieldContent(tX, tY) == TicTacToeModel.EMPTY) {
-				TicTacToeModel.setFieldContent(tX, tY, TicTacToeModel.nextPlayer)
-				invalidate()
-			}
-			true
-		}
-		else -> super.onTouchEvent(event)
-	}
+    when (event?.action) {
+        MotionEvent.ACTION_DOWN -> {
+            val tX: Int = (event.x / (width / 3)).toInt()
+            val tY: Int = (event.y / (height / 3)).toInt()
+            if (tX < 3 && tY < 3 && TicTacToeModel.getFieldContent(tX, tY) == TicTacToeModel.EMPTY) {
+                TicTacToeModel.setFieldContent(tX, tY, TicTacToeModel.nextPlayer)
+                invalidate()
+            }
+            return true
+        }
+        else -> return super.onTouchEvent(event)
+    }
 }
 ```
 
