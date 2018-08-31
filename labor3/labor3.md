@@ -90,6 +90,10 @@ class TodoDetailFragment : Fragment() {
 
 > A [`let`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/let.html) függvény tetszőleges objektumon meghívható, és csupán annyit csinál, hogy lefuttatja a paramétereként adott lambdát, odaadva neki az objektumot. Ez önmagában elég haszontalan, viszont a [safe call operátorral](https://kotlinlang.org/docs/reference/null-safety.html#safe-calls) (`?.`) kombinálva a `null` ellenőrzések egyik legkényelmesebb formáját nyújtja. Amennyiben a `?.let` előtt álló kifejezés `null`, a `let` függvény nem hívódik meg (ezt csinálja az említett operátor), ha pedig nem `null`, akkor a `let` függvényen belül már biztosan nem `null`-ként kapjuk meg az objektumunkat. Jelen esetben ha az `arguments` nem `null`, meghívódik a `let` és a lambdába beérkező `args` nevű paraméter már biztosan nem `null`, így szabadon használható.
 
+> A `Todo` konstruktor hívásánál [elnevezett paraméterekkel](https://kotlinlang.org/docs/reference/functions.html#named-arguments) (illetve sortörésekkel) tettük olvashatóbbá a kódot. Elnevezett paramétereket bármilyen Kotlibnan definiált függvény meghívásakor használhatunk.
+
+> Abban az esetben, ha az `args.getString(...)` hívás `null` értéket adna vissza, az [Elvis operátor](https://kotlinlang.org/docs/reference/null-safety.html#elvis-operator) (`?:`) használatával adunk a visszatérési értéke helyett egy default értéket a `description` paraméternek. Ez az operátor ha a bal oldalán lévő kifejezés értéke nem `null`, akkor a bal oldali kifejezést, egyébként pedig a jobb oldali kifejezést adja vissza.
+
 A megváltozott kulcs illetve a `newInstance` hívás miatt át kell alakítani a `TodoDetailActivity` `onCreate` metódusát is.
 
 ```kotlin
@@ -437,10 +441,6 @@ class TodoCreateFragment : DialogFragment() {
 ```
 
 > Az `onAttach` függvényben láthatjuk, hogy sok más konstrukcióval együtt Kotlinban az [`if-else`](https://kotlinlang.org/docs/reference/control-flow.html#if-expression) is használható kifejezésként, értéke pedig a lefutott ág utolsó kifejezése.
-
-> A `Todo` konstruktor hívásánál [elnevezett paraméterekkel](https://kotlinlang.org/docs/reference/functions.html#named-arguments) (illetve sortörésekkel) tettük olvashatóbbá a kódot. Elnevezett paramétereket bármilyen Kotlibnan definiált függvény meghívásakor használhatunk.
-
-> Abban az esetben, ha az `args.getString(...)` hívás `null` értéket adna vissza, az [Elvis operátor](https://kotlinlang.org/docs/reference/null-safety.html#elvis-operator) (`?:`) használatával adunk a visszatérési értéke helyett egy default értéket a `description` paraméternek. Ez az operátor ha a bal oldalán lévő kifejezés értéke nem `null`, akkor a bal oldali kifejezést, egyébként pedig a jobb oldali kifejezést adja vissza.
 
 Most ugorjunk vissza a `TodoListActivity`-re, és valósítsuk meg a `TodoCreatedListener` interfészt!
 
