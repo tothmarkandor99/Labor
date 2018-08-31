@@ -92,6 +92,8 @@ class LauncherPagerAdapter(manager: FragmentManager) : FragmentStatePagerAdapter
 
 A `FragmentManager` és a `Fragment` osztályokat fontos, hogy az `android.support.v4.app` package-ből importáljuk.
 
+> Mivel a `getCount` függvény [egyetlen kifejezéssel tér vissza](https://kotlinlang.org/docs/reference/functions.html#single-expression-functions), nem kell törzset adnunk neki. Akár a visszatérési értékét is elhagyhatnánk (mivel kikövetkeztethető), ezt most csak a könnyebb érthetőség kedvéért nem tettük meg.
+
 Használjuk fel az eddig létrehozott `ViewPager`-t és `LauncherPagerAdapter`-t a `LauncherActivity`-ben:
 
 ```kotlin
@@ -502,7 +504,11 @@ private fun loadApplications() {
 }
 ```
 
-Ezt a metódust hívjuk meg az `ApplicationFragment` `onCreate` életciklus függvényében:
+> A [`sortWith`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/sort-with.html) a számos collection-ökön definiált [extension function](https://kotlinlang.org/docs/reference/extensions.html#extension-functions)-ök egyike a standard library-ből, ami helyben rendez egy `MutableList`-et (`List`-et nyilván nem is tudna!).
+
+> A [`map`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/map.html) függvény a neki átadott lambdát meghívja a collection minden elemére, és egy új listával tér vissza, ami az így transzformált elemeket tartalmazza. Jelen esetben a `List<ResolveInfo>` típusú `apps` listát képeztük le egy `(ResolveInfo) -> AppInfo` típusú lambdával, így a végeredményünk egy `List<AppInfo` lett.
+
+Hívjuk meg a `loadApplications` metódust az `ApplicationFragment` `onCreate` életciklus függvényében:
 
 ```kotlin
 override fun onCreate(savedInstanceState: Bundle?) {
