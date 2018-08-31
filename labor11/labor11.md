@@ -2,51 +2,83 @@
 
 ## Bevezető
 
-Android 6.0 (API level 23) verziótól kezdve a felhasználó futásidőben adhatja meg az alkalmazás engedélyeit, és nem az alkalmazás telepítésekor vagy frissítésekor. Dönthet úgy, hogy bizonyos engedélyeket nem ad meg egy alkalmazásnak, így nagyobb fokú irányítás kerül a kezébe. Az alkalmazásengedélyeket később bármikor módosíthatja az alkalmazásbeállítások képernyőn.
+Android 6.0 (API level 23, Marshmallow) verziótól kezdve a felhasználó futásidőben adhatja meg, vagy utasíthatja el az alkalmazás által kért engedélyeket, és nem az alkalmazás telepítésekor vagy frissítésekor. Dönthet úgy, hogy bizonyos engedélyeket nem ad meg egy alkalmazásnak, így nagyobb fokú irányítás kerül a kezébe. Az alkalmazásengedélyeket később bármikor módosíthatja a rendszerszintű alkalmazás beállításoknál.
 
-Az engedélyek két kategóriába vannak sorolva: normal/dangerous.
-A **normal** kategóriába tartozó engedélyek nem jelentenek közvetlen kockázatot a felhasználó érzékeny adataira, ezeket az engedélyeket a rendszer automatikusan megadja.
+Az engedélyek két kategóriába vannak sorolva: *normal* és *dangerous*
+A *normal* kategóriába tartozó engedélyek nem jelentenek közvetlen kockázatot a felhasználó személyes adataira, ezeket az engedélyeket a rendszer automatikusan megadja az alkalmazásnak, ha szüksége van rá.
 
-A **veszélyes** kategóriába tartozó engedélyek lehetőséget adhatnak az alkalmazásnak, hogy a felhasználó érzékeny adataihoz hozzáférjen. Ebben az esetben a felhasználónak kell megadni az engedélyt az alkalmazás számára.
+A *dangerous* kategóriába tartozó engedélyek lehetőséget adhatnak az alkalmazásnak, hogy a felhasználó személyes adataihoz hozzáférjen. Ebben az esetben a felhasználónak kell megadni az engedélyt az alkalmazás számára. Ennek a közvetlen következménye az, hogy az alkalmazásokat fel kell készíteni arra az esetre, ha nincs megadva egy adott funkció működéséhez elengedhetetlen engedély.
+
+Az alábbi oldalon található az összes engedély kategóriánként:
 
 https://developer.android.com/guide/topics/security/permissions.html#normal-dangerous
 
-Minden esetben meg kell adni a normal és a dangerous engedélyeket a manifest fájlban, de ennek hatása eltér a rendszer verziójától és a target sdk szinttől függően:
+Az `AndroidManifest.xml` fájlban Kategóriától függetlenül meg kell adni az alkalmazás számára szükséges összes engedélyt, de ennek hatása eltér a futtató  rendszer verziójától és a targetSdk értékétől függően:
 
-Ha az eszköz Android 5.1 vagy alacsonyabb verziót futtat, **VAGY** az alkalmazás target SDK szintje 22 vagy kisebb, akkor a rendszer telepítéskor kéri el az összes engedélyt, és ha a felhasználó nem fogadja el, akkor a telepítés leáll.
+Ha az eszköz Android 5.1 (API level 22) vagy alacsonyabb verziót futtat, **VAGY** az alkalmazás target SDK szintje 22 vagy kisebb, akkor a rendszer telepítéskor kéri el az összes szükséges engedélyt. Ha a felhasználó nem fogadja el egyben az összes kérést, akkor a telepítési folyamat leáll.
 
-Ha az eszköz Android 6.0 verzióval rendelkezik **ÉS** az alkalmazás target SDK szintje 23 vagy nagyobb, akkor az alkalmazás a futása során fogja elkérni a dangerous kategóriába tartozó engedélyeket, a normal engedélyeket pedig a rendszer automatikusan megadja. A felhasználó bármely engedélyt megadhat, vagy letilthat, emiatt az alkalmazás limitált funkcionalitással futhat tovább, melyet megfelelően kell kezelni.
+Ha az eszköz Android 6.0 (API level 23) vagy nagyobb verziót futtat **ÉS** az alkalmazás target SDK szintje 23 vagy nagyobb, akkor az alkalmazás a futása során fogja elkérni a *dangerous* kategóriába tartozó engedélyeket, a *normal* engedélyeket pedig a rendszer automatikusan megadja. Ebben az esetben a  felhasználó bármikor bármelyik engedélyt megadhatja, vagy letilthataja. Megtagadott engedélyekkel az alkalmazás limitált funkcionalitással futhat tovább, erre a helyzetre is fel kell készülni.
 
 ## Jogosultság ellenőrzése
-Amennyiben az alkalmazás funkciójának egy veszélyes engedélyre van szüksége, akkor minden esetben ellenőrízni kell még a funkció indítása előtt, hogy rendelkezik-e az engedéllyel, hiszen az engedélyeket a felhasználó bármikor módosíthatja.
-**ContextCompat.checkSelfPermission()**
+
+Amennyiben az alkalmazás egy funkciójának *dangerous* kategóriába eső engedélyekre van szüksége, akkor minden esetben ellenőrízni kell még a funkció indítása előtt, hogy rendelkezik-e az engedélyekkel, hiszen az engedélyeket a felhasználó bármikor módosíthatja.
+
+Az ellenőrzés a `ContextCompat.checkSelfPermission()` függvény meghívásával végezhető, ami a `PackageManager.PERMISSION_GRANTED` értékkel tér vissza, ha az alkalmazás rendelkezik a vizsgált engedéllyel, és `PackageManager.PERMISSION_DENIED` értékkel egyébként.
+
+Az alábbi kódrészlet a felhasználó naptárához való hozzáférési engedélyt ellenőrzi egy `Activity`-ben:
+
+```kotlin
+val permissionResult = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_CALENDAR)
+when (permissionResult) {
+	PackageManager.PERMISSION_GRANTED -> writeToCalendar(event)
+	else -> requestPermissions()
+}
+```
+
+## Jogosultság kérés magyarázata
+
+Egyes esetekben szükséges lehet arra, hogy tájékoztassuk a felhasználót arról, hogy miért kér az alkalmazás bizonyos *dangerous* engedélyeket. Ez növelheti a felhasználó bizalmát az alkalmazással szemben. Az `ActivityCompat.shouldShowRequestPermissionRationale()` függvény visszatérési értéke alapján eldönthető, hogy a kérdéses engedély elkérése a rendszer szerint szorul-e részletes magyarázatra:
+
+```kotlin
+ // Permission is not granted
+// Should we show an explanation?
+if (ActivityCompat.shouldShowRequestPermissionRationale(thisActivity, Manifest.permission.READ_CONTACTS)) {
+	// Show an explanation to the user *asynchronously* -- don't block
+	// this thread waiting for the user's response! After the user
+	// sees the explanation, try again to request the permission.
+} else {
+	// No explanation needed, we can request the permission.
+}
+```
 
 ## Jogosultság elkérése
-Az Android rendszer számos metódust biztosít egy jogosultság elkérésére. Ezeket meghívva egy nem testreszabható dialógust dob fel a rendszer.
-**ActivityCompat.requestPermissions()**
 
-## Jogosultság magyarázata
-Egyes esetekben szükséges lehet a felhasználót tájékoztatni, hogy miért kér az alkalmazás veszélyes engedélyeket.
-**ActivityCompat.shouldShowRequestPermissionRationale()**
+Engedélyek elkérésére az `ActivityCompat.requestPermissions()` függvény meghívásával van lehetőség, aminek eredményeképp egy nem testreszabható dialógust dob fel a rendszer.
+
+```kotlin
+ActivityCompat.requestPermissions(thisActivity, arrayOf(Manifest.permission.READ_CONTACTS), MY_PERMISSIONS_REQUEST_READ_CONTACTS)
+```
+
+A `MY_PERMISSIONS_REQUEST_READ_CONTACTS` ebben a kódrészletben egy általunk definiált konstans. Az engedélykérés végén a rendszer ezt az értéket adja vissza *requesCode*-ként az `onRequestPermissionsResult()` callbackben. 
 
 ## Kezdő lépések
 
-A labor során egy egyszerű telefonkönyv alkalmazást kell elkészíteni. Az alkalmazás listázni tudja a telefonon tárolt névjegyeket, majd egy adott elemre kattintva hívást lehet kezdeményezni.
+A labor során egy egyszerű telefonkönyv alkalmazást kell elkészíteni. Az alkalmazásnak tudnia kell kilistázni a telefonon tárolt névjegyeket, illetve egy névjegyre kattintással tudnia kell hívást kezdeményezni az ahhoz tartozó elsődleges telefonszámra.
 
-Hozzunk létre egy új Android Studio Projektet **PermissionsLabor** néven. A Company Domain mező tartalmát töröljük ki és hagyjuk is üresen.
+Hozzunk létre egy új Android Studio Projektet *Permissions* néven. A Company Domain mező tartalmát töröljük ki és hagyjuk is üresen.
 
-A packagename legyen **hu.bme.aut.amorg.examples.permissionslabor** A támogatott céleszközök a **Telefon és Tablet**, valamint a minimum SDK szint az **API15: Android 4.0.3**
+A *package name* legyen `hu.bme.aut.android.permissions`. A támogatott céleszközök a *telefon és tablet*, a minimum SDK szint legyen *API19: Android 4.4*.
 
-A kezdő projekthez adjuk hozzá egy **Empty Activity**-t, melynek neve legyen **ContactsActivity**.
+A projekthez adjuk hozzá egy *Empty Activity*-t, melynek neve legyen `ContactsActivity`.
 
-Vegyük fel a RecyclerView komponens függőségét, illetve állítsuk a targetSDK-t 23 vagy nagyobbra a **build.graddle(module:app)** fájlban, majd nyomjuk meg a **Sync Now** gombot. Amennyiben nincs 23, vagy magasabb SDK telepítve a gépre, akkor frissítsük az SDK Manager segítségével a szükséges komponenseket.
+Vegyük fel a RecyclerView komponenst függőségként, illetve állítsuk a targetSDK-t 23 vagy nagyobbra a `build.graddle(module:app)` fájlban, majd nyomjuk meg a *Sync Now* gombot. Amennyiben nincs 23, vagy magasabb SDK telepítve a gépre, akkor frissítsük az *SDK Manager* segítségével a szükséges komponenseket.
 
 
 ```java
 dependencies {
-...
-implementation 'com.android.support:recyclerview-v7:26.1.0'
-...
+	...
+	implementation 'com.android.support:recyclerview-v7:26.1.0'
+	...
 }
 ```
 
