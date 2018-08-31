@@ -201,6 +201,8 @@ LayoutInflater.from(context).inflate(R.layout.view_password_edittext, this, true
  
 kóddal tudjuk a `RelativeLayout`-ba felfújni, aminek hatására a `RelativeLayout`-nak lesz két gyerek nézete, egy `ImageView` és egy `EditText`.
 
+> A `View` ősosztálynak, és így a `RelativeLayout`-nak is osztálynak számos különböző konstruktora van, amelyek attól függően hívódnak meg, hogy hogy jön létre a `View` példány (layout-ból "felfújva", stb.). Mi a saját `PasswordEditText` osztályunkban [secondary constructor](https://kotlinlang.org/docs/reference/classes.html#secondary-constructors)-ok segítségével hozunk létre ezeknek megfelelő konstruktorokat, és mindegyikből áthívunk az ősosztály azonos paraméterezésű konstruktorába.
+
 Az elrendezéshez hozzunk létre egy `view_password_edittext.xml` layout erőforrást és a tartalma legyen az alábbi kód:
 
 ```xml
@@ -326,7 +328,10 @@ class ChoiceLayout : LinearLayout {
 
     private fun init(context: Context, attrs: AttributeSet?) {
         orientation = LinearLayout.VERTICAL
-        attrs ?: return
+        
+        if (attrs == null) {
+            return
+        }
 
         val a = context.obtainStyledAttributes(attrs, R.styleable.ChoiceLayout)
         try {
@@ -358,15 +363,15 @@ class ChoiceLayout : LinearLayout {
 
     private fun refreshAfterAdd(child: View) {
         child.isClickable = true
-        child.setOnClickListener {
+        child.setOnClickListener { view ->
             if (multiple > 1) {
-                if (it.isSelected || getSelectedCount() < multiple) {
-                    it.isSelected = !it.isSelected
+                if (view.isSelected || getSelectedCount() < multiple) {
+                    view.isSelected = !view.isSelected
                 }
             } else {
                 for (i in 0 until childCount) {
                     val v = getChildAt(i)
-                    v.isSelected = v == it
+                    v.isSelected = v == view
                 }
             }
         }
@@ -524,7 +529,7 @@ Ebben az esetben egy kicsit komplexebb leírást használunk. Itt egy `layer-lis
 
 Tehát ezt a két drawable elemet fogjuk felhasználni divider-ként a `ChoiceLayout`-ban. Következő lépésben a `ChoiceLayout` osztályt kell kiegészíteni.
 
-Adjuk hozzá az osztályhoz a divider lehetséges értékeit companion object-ként:
+Adjuk hozzá az osztályhoz a divider lehetséges értékeit:
 
 ```kotlin
 companion object {
@@ -535,6 +540,8 @@ companion object {
 
 var dividerType:Int = DIVIDER_NONE
 ```
+
+> Kotlinban nincs `static` kulcsszó, és így nincsenek statikus változók vagy függvények sem. Az osztály szintű funkcionalitást egy speciális, az osztályon belül elhelyezett singleton-ban, a [companion object](https://kotlinlang.org/docs/reference/object-declarations.html#companion-objects)-ben implementálhatjuk.
 
 Ezután ki kell olvasni az `initLayout` függvényben az elválasztó típust az attribútumok közül. Ehhez a *multiple* kiolvasás után adjuk hozzá az alábbi sort:
 
@@ -548,17 +555,23 @@ Hozzáadunk az osztályhoz egy új függvényt, ami a divider elem hozzáadást 
 private fun addDivider() {
     if (dividerType != DIVIDER_NONE) {
         val div = ImageView(context)
-        when (dividerType) {
-            DIVIDER_SIMPLE -> div.setImageResource(R.drawable.choice_divider_simple)
-            DIVIDER_DOUBLE -> div.setImageResource(R.drawable.choice_divider_double)
+
+        val imageResource = when (dividerType) {
+            DIVIDER_SIMPLE -> R.drawable.choice_divider_simple
+            DIVIDER_DOUBLE -> R.drawable.choice_divider_double
+            else -> throw IllegalArgumentException("No such divider type!")
         }
+        div.setImageResource(imageResource)
+
         val lp: LinearLayout.LayoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-        super.addView(div,lp)
+        super.addView(div, lp)
     }
 }
 ```
 
 A függvény létrehoz egy `ImageView`-t és a dividerType alapján beállítja az előbbiekben létrehozott két drawable közül a megfelelőt ennek az `ImageView`-nak. `LayoutParams` segítségével beállítjuk, hogy a magassága a tartalom alapján dőljön el, míg a szélessége a szülő szélességével egyezzen meg. Ezután az `addView` függvény segítségével hozzáadjuk a View-t a saját layout-hoz. Azért explicit módon az ős függvényét hívjuk, hogy itt ne fusson le a saját `addView` logikánk, amit a kijelölhetőség érdekében hoztunk létre.
+
+> Figyeljük meg a [`when`](https://kotlinlang.org/docs/reference/control-flow.html#when-expression) egy újabb tulajdonságát - van visszatérési értéke is, ami nem más, mint a lefutott ág utolsó kifejezése. Ezzel jelen esetben elkerüljük az értékadási logika leírását minden ágban, helyette egy változóba helyezzük a megfelelő erőforrást, és a `when` futása után beállítjuk azt az elválasztónak.
 
 Ezután mindkét `addView` függvény elejére beillesztjük az alábbi kódot:
 
