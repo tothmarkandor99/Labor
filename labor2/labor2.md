@@ -44,24 +44,24 @@ Az alkalmazásunkban használt stílusokat pedig a `styles.xml` állományban de
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<!-- Base application theme. -->
-	<style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-		<!-- Customize your theme here. -->
-		<item name="colorPrimary">@color/primary</item>
-		<item name="colorPrimaryDark">@color/primary_dark</item>
-		<item name="colorAccent">@color/accent</item>
-		<item name="android:textViewStyle">@style/TextView</item>
-	</style>
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="colorAccent">@color/accent</item>
+        <item name="android:textViewStyle">@style/TextView</item>
+    </style>
 
-	<style name="TextView" parent="android:Widget.TextView">
-		<item name="android:textColor">@color/primary</item>
-	</style>
+    <style name="TextView" parent="android:Widget.TextView">
+        <item name="android:textColor">@color/primary</item>
+    </style>
 
-	<style name="Subtitle">
-		<item name="android:textSize">20sp</item>
-		<item name="android:paddingTop">16dp</item>
-		<item name="android:paddingBottom">16dp</item>
-	</style>
+    <style name="Subtitle">
+        <item name="android:textSize">20sp</item>
+        <item name="android:paddingTop">16dp</item>
+        <item name="android:paddingBottom">16dp</item>
+    </style>
 
 </resources>
 ```
@@ -84,50 +84,50 @@ Módosítsuk az Activity elrendezését (`activity_view_labor.xml`), használjuk
 
 ```XML
 <ScrollView
-	xmlns:android="http://schemas.android.com/apk/res/android"
-	android:layout_width="match_parent"
-	android:layout_height="match_parent">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
-	<LinearLayout
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:paddingLeft="@dimen/activity_horizontal_margin"
-		android:paddingRight="@dimen/activity_horizontal_margin"
-		android:paddingTop="@dimen/activity_vertical_margin"
-		android:paddingBottom="@dimen/activity_vertical_margin"
-		android:orientation="vertical">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:orientation="vertical">
 
-		<TextView
-			style="@style/Subtitle"
-			android:text="Regisztráció"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"/>
+        <TextView
+            style="@style/Subtitle"
+            android:text="Regisztráció"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
 
-		<EditText
-			android:hint="Felhasználónév"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"/>
+        <EditText
+            android:hint="Felhasználónév"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
 
-		<!-- Ide jön majd a saját jelszó nézet -->
+        <!-- Ide jön majd a saját jelszó nézet -->
 
-		<TextView
-			style="@style/Subtitle"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:text="Nem"/>
+        <TextView
+            style="@style/Subtitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Nem"/>
 
-		<!-- Ide jön single ChoiceLayout -->
+        <!-- Ide jön single ChoiceLayout -->
 
-		<TextView
-			style="@style/Subtitle"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:text="Válassz max 3-at"/>
+        <TextView
+            style="@style/Subtitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Válassz max 3-at"/>
 
-		<!-- Ide jön multiple ChoiceLayout -->
+        <!-- Ide jön multiple ChoiceLayout -->
 
-	</LinearLayout>
-	
+    </LinearLayout>
+    
 </ScrollView>
 ```
 
@@ -201,7 +201,7 @@ LayoutInflater.from(context).inflate(R.layout.view_password_edittext, this, true
  
 kóddal tudjuk a `RelativeLayout`-ba felfújni, aminek hatására a `RelativeLayout`-nak lesz két gyerek nézete, egy `ImageView` és egy `EditText`.
 
-> A `View` ősosztálynak, és így a `RelativeLayout`-nak is osztálynak számos különböző konstruktora van, amelyek attól függően hívódnak meg, hogy hogy jön létre a `View` példány (layout-ból "felfújva", stb.). Mi a saját `PasswordEditText` osztályunkban [secondary constructor](https://kotlinlang.org/docs/reference/classes.html#secondary-constructors)-ok segítségével hozunk létre ezeknek megfelelő konstruktorokat, és mindegyikből áthívunk az ősosztály azonos paraméterezésű konstruktorába.
+> A `View` ősosztálynak, és így a `RelativeLayout`-nak is számos különböző konstruktora van, amelyek attól függően hívódnak meg, hogy hogy jön létre a `View` példány (layout-ból "felfújva", stb.). Mi a saját `PasswordEditText` osztályunkban [secondary constructor](https://kotlinlang.org/docs/reference/classes.html#secondary-constructors)-ok segítségével hozunk létre ezeknek megfelelő konstruktorokat, és mindegyikből áthívunk az ősosztály azonos paraméterezésű konstruktorába.
 
 Az elrendezéshez hozzunk létre egy `view_password_edittext.xml` layout erőforrást és a tartalma legyen az alábbi kód:
 
@@ -209,21 +209,21 @@ Az elrendezéshez hozzunk létre egy `view_password_edittext.xml` layout erőfor
 <?xml version="1.0" encoding="utf-8"?>
 <merge xmlns:android="http://schemas.android.com/apk/res/android">
 
-	<ImageView
-		android:id="@+id/ivPassword"
-		android:layout_alignParentRight="true"
-		android:layout_width="50dp"
-		android:layout_height="50dp"
-		android:layout_centerVertical="true"
-		android:src="@android:drawable/ic_menu_view"/>
+    <ImageView
+        android:id="@+id/ivPassword"
+        android:layout_alignParentRight="true"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_centerVertical="true"
+        android:src="@android:drawable/ic_menu_view"/>
 
-	<EditText
-		android:id="@+id/etPassword"
-		android:layout_alignParentLeft="true"
-		android:layout_toLeftOf="@+id/ivPassword"
-		android:layout_centerVertical="true"
-		android:layout_width="0dp"
-		android:layout_height="wrap_content"/>
+    <EditText
+        android:id="@+id/etPassword"
+        android:layout_alignParentLeft="true"
+        android:layout_toLeftOf="@+id/ivPassword"
+        android:layout_centerVertical="true"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"/>
 
 </merge>
 ```
@@ -275,9 +275,9 @@ Hozzunk létre a drawable mappában egy `selector_choice_item.xml` fájlt, majd 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android" android:enterFadeDuration="100" android:exitFadeDuration="100">
-	<item android:drawable="@color/choiceItemPressedBackground" android:state_pressed="true" />
-	<item android:drawable="@color/choiceItemActiveBackground" android:state_selected="true" />
-	<item android:drawable="@color/choiceItemBackground" />
+    <item android:drawable="@color/choiceItemPressedBackground" android:state_pressed="true" />
+    <item android:drawable="@color/choiceItemActiveBackground" android:state_selected="true" />
+    <item android:drawable="@color/choiceItemBackground" />
 </selector>
 ```
 
@@ -304,9 +304,9 @@ Attribútumok (hozzuk létre az `attrs.xml` fájlt):
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<declare-styleable name="ChoiceLayout">
-		<attr name="multiple" format="integer" />
-	</declare-styleable>
+    <declare-styleable name="ChoiceLayout">
+        <attr name="multiple" format="integer" />
+    </declare-styleable>
 </resources>
 ```
 
@@ -352,14 +352,14 @@ class ChoiceLayout : LinearLayout {
     }
 
     private fun getSelectedCount(): Int {
-		var selectedCount = 0
-		for (i in 0 until childCount) {
-			if (getChildAt(i).isSelected) {
-				selectedCount++
-			}
-		}
-		return selectedCount
-	}
+        var selectedCount = 0
+        for (i in 0 until childCount) {
+            if (getChildAt(i).isSelected) {
+                selectedCount++
+            }
+        }
+        return selectedCount
+    }
 
     private fun refreshAfterAdd(child: View) {
         child.isClickable = true
@@ -498,8 +498,8 @@ Az első elem a szimpla vonal, melyhez létrehozunk egy `choice_divider_simple.x
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-	<solid android:color="#000000" />
-	<size android:height="1dp" />
+    <solid android:color="#000000" />
+    <size android:height="1dp" />
 </shape>
 ```
 
@@ -510,18 +510,18 @@ A második elem a dupla vonal, melyhez a `choice_divider_double.xml` erőforrás
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-	<item android:bottom="3dp">
-		<shape android:shape="line">
-			<stroke android:color="#000000" android:width="1dp" />
-			<size android:height="4dp" />
-		</shape>
-	</item>
-	<item android:top="3dp">
-		<shape android:shape="line">
-			<stroke	android:color="#000000"	android:width="1dp" />
-			<size android:height="4dp" />
-		</shape>
-	</item>
+    <item android:bottom="3dp">
+        <shape android:shape="line">
+            <stroke android:color="#000000" android:width="1dp" />
+            <size android:height="4dp" />
+        </shape>
+    </item>
+    <item android:top="3dp">
+        <shape android:shape="line">
+            <stroke android:color="#000000" android:width="1dp" />
+            <size android:height="4dp" />
+        </shape>
+    </item>
 </layer-list>
 ```
 
@@ -533,9 +533,9 @@ Adjuk hozzá az osztályhoz a divider lehetséges értékeit:
 
 ```kotlin
 companion object {
-	private const val DIVIDER_NONE = 0
-	private const val DIVIDER_SIMPLE = 1
-	private const val DIVIDER_DOUBLE = 2
+    private const val DIVIDER_NONE = 0
+    private const val DIVIDER_SIMPLE = 1
+    private const val DIVIDER_DOUBLE = 2
 }
 
 var dividerType:Int = DIVIDER_NONE
@@ -577,7 +577,7 @@ Ezután mindkét `addView` függvény elejére beillesztjük az alábbi kódot:
 
 ```kotlin
 if (childCount > 0) {
-	addDivider()
+    addDivider()
 }
 ```
 
