@@ -382,7 +382,7 @@ private fun httpGet(url: String): String {
 
     //The execute call blocks the thread
     val response = client.newCall(request).execute()
-    return response.body()?.string()?:"EMPTY"
+    return response.body()?.string() ?: "EMPTY"
 }
 ```
 
@@ -394,7 +394,7 @@ A HTTP karakterek megfelelő URL encodeolásához az `URLEncoder.encode(...)` f�
 private fun encode(url: String) = URLEncoder.encode(url, UTF_8)
 ```
 
-Használjuk is az újonnan elkészített függvényünket, és implementáljuk a `moveUser` és `writeMessage` hívásokat. Figyeljük meg, hogy az esetleges kivételeket [`try-catch` blockban](https://kotlinlang.org/docs/reference/exceptions.html) kezeltük, ami Kotlinban expression-ként is működik (van visszatérési értéke).
+Használjuk is az újonnan elkészített függvényünket, és implementáljuk a `moveUser` és `writeMessage` hívásokat.
 
 ```kotlin
 companion object {
@@ -498,7 +498,7 @@ Azt tapasztaljuk, hogy minden kérésre ERROR-t kapunk, és ha megnézzük a *Lo
 
 ### Szálkezelés elkészítése
 
-A szálkezeléshez használjuk az egyszerű és könnyen testre szabható Java Thread-eket. Készítsünk el a `MainActivity`-ben egy segédfüggvényt a `moveUser` és `writeMessage` hívásokhoz. Ebben egy új szálat készítünk, melyben elindítjuk az API hívást és amint az válaszolt, visszaadjuk a választ a fő szálra (`runOnUIThread`), ahol megjelenítjük a választ a `showResponse` segítségével. Kihasználjuk a Kotlin nyelv nyújtotta [lambdákat](https://kotlinlang.org/docs/reference/lambdas.html#instantiating-a-function-type): egy olyan függvényt várunk paraméterként a függvényünkbe, melynek nincs paramétere és egy `String`-gel tér vissza (ez az API válasza lesz, vagy az esetleges hiba).
+A szálkezeléshez használjuk az egyszerű és könnyen testre szabható Java Thread-eket. Készítsünk el a `MainActivity`-ben egy segédfüggvényt a `moveUser` és `writeMessage` hívásokhoz. Ebben egy új szálat készítünk, melyben elindítjuk az API hívást és amint az válaszolt, visszaadjuk a választ a fő szálra (`runOnUIThread`), ahol megjelenítjük a választ a `showResponse` segítségével. 
 
 ```kotlin
 private fun async(call: () -> String) {
@@ -508,6 +508,8 @@ private fun async(call: () -> String) {
     }.start()
 }
 ```
+
+>Kihasználjuk a Kotlin nyelv nyújtotta [lambdákat](https://kotlinlang.org/docs/reference/lambdas.html#instantiating-a-function-type): egy olyan függvényt várunk paraméterként a függvényünkbe, melynek nincs paramétere és egy `String`-gel tér vissza (ez az API válasza lesz, vagy az esetleges hiba). Az ilyen, lambdákat paraméterként kapó vagy visszatérési értékként használó függvényeket [higher order function](https://kotlinlang.org/docs/reference/lambdas.html#higher-order-functions)-nek nevezzük.
 
 Hívjuk meg az `async` függvényünk segítségével az API-t az `onClickListener`-ekből a direkt hívások helyett. Mivel egy paramétere van, ezért ezt a lambdát csak kapcsos zárójelekkel is átadhatjuk a függvénynek, az alább látható szintaxissal.
 
