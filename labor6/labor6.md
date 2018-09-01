@@ -857,7 +857,7 @@ class FloatingWindowHelper(private val context: Context) {
 
 Nézzük át az osztály kódját!
 
-> Az `updateLocation` fügvvény [`let`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/let.html) hívásainál a `let`-eknek átadott lambdák elején nem jelöltük az abba beérkező paramétereket. Ezt azért tehettük meg, mert ezek a lambdák egyetlen paraméterrel rendelkeznek, ilyen esetekben ez az egyetlen paraméter az implicit [`it` néven érhető el](https://kotlinlang.org/docs/reference/lambdas.html#it-implicit-name-of-a-single-parameter) (amennyiben nem adtunk neki nevet).
+> Az `updateLocation` függvény [`let`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/let.html) hívásainál a `let`-eknek átadott lambdák elején nem jelöltük az abba beérkező paramétereket. Ezt azért tehettük meg, mert ezek a lambdák egyetlen paraméterrel rendelkeznek, ilyen esetekben ez az egyetlen paraméter az implicit [`it` néven érhető el](https://kotlinlang.org/docs/reference/lambdas.html#it-implicit-name-of-a-single-parameter) (amennyiben nem adunk neki nevet).
 
 Vegyünk fel egy példányt ebből az osztályból a `LocationService`-ben:
 
