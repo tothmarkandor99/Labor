@@ -511,7 +511,7 @@ private fun async(call: () -> String) {
 
 >Kihasználjuk a Kotlin nyelv nyújtotta [lambdákat](https://kotlinlang.org/docs/reference/lambdas.html#instantiating-a-function-type): egy olyan függvényt várunk paraméterként a függvényünkbe, melynek nincs paramétere és egy `String`-gel tér vissza (ez az API válasza lesz, vagy az esetleges hiba). Az ilyen, lambdákat paraméterként kapó vagy visszatérési értékként használó függvényeket [higher order function](https://kotlinlang.org/docs/reference/lambdas.html#higher-order-functions)-nek nevezzük.
 
-Hívjuk meg az `async` függvényünk segítségével az API-t az `onClickListener`-ekből a direkt hívások helyett. Mivel egy paramétere van, ezért ezt a lambdát csak kapcsos zárójelekkel is átadhatjuk a függvénynek, az alább látható szintaxissal.
+Hívjuk meg az `async` függvényünk segítségével az API-t az `onClickListener`-ekből a direkt hívások helyett.
 
 ```kotlin
 btnDown.setOnClickListener {
