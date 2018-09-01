@@ -389,7 +389,7 @@ fun uploadImage(
 
 Figyeljük meg, hogy az adott hívás nem egyből a válasz típusával tér vissza, hanem azt a már említett `Call` objektumba csomagolja, így nagyobb rugalmasságot adva a fejlesztőknek.
 
-Ezután a `MainActivity`-ben példányosítsuk a `GalleryInteractor`-unkat, majd hívjuk meg a `getImages` hívást, melynek eredményét jelentsük meg a `ImagesAdapter` segítségével. Figyeljük meg a lambdák helyére behivatkozott függvény referenciákat!
+Ezután a `MainActivity`-ben példányosítsuk a `GalleryInteractor`-unkat, majd hívjuk meg a `getImages` hívást, melynek eredményét jelentsük meg a `ImagesAdapter` segítségével.
 
 ```kotlin
 private fun loadImages() {
@@ -408,6 +408,8 @@ private fun showError(e: Throwable) {
     srlImages.isRefreshing = false
 }
 ```
+
+> A `getImages` által várt függvény paramétereket lambdák létrehozása helyett [metódus referenciákkal](https://kotlinlang.org/docs/reference/lambdas.html#instantiating-a-function-type) adtuk át, amihez természetesen a `showImages` és `showError` függvényeknek a megfelelő fejléccel kell rendelkezniük.
 
 Mivel eddig `String` listát jelenítettünk meg az `ImagesAdapter`-rel, most át kell alakítani az adaptert, hogy egy `Image` listát kezeljen. Ezen kívül az `IMAGE_PREFIX_URL` után kell fűznünk a kép `url` mezőjének tartalmát.
 
