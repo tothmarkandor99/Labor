@@ -16,7 +16,7 @@ Ez a Todo alkalmazás még csak memóriában tárolja a futása során létrehoz
 
 Tömörítsük ki a projektet tartalmazó mappát, indítsuk el az Android Studio-t, majd nyissuk meg a projektet.
 
-> Nézzük meg a `model` package-ben lévő `Todo` osztályt, amit a laboron már létrehoztunk. Ehhez hozzáadtunk egy `id` nevű property-t, ami az adatbázisban fogja egyedien azonosítani a példányokat. Ennek a property-nek adtunk egy [default értéket](https://kotlinlang.org/docs/reference/functions.html#default-arguments), hogy az explicit megadása nélkül is tudjunk `Todo` példányokat létrehozni.
+> Nézzük meg a `model` package-ben lévő `Todo` osztályt, amit a korábbi laboron már létrehoztunk. Ehhez hozzáadtunk egy `id` nevű property-t, ami az adatbázisban fogja egyedien azonosítani a példányokat. Ennek a property-nek adtunk egy [default értéket](https://kotlinlang.org/docs/reference/functions.html#default-arguments), hogy az explicit megadása nélkül is tudjunk `Todo` példányokat létrehozni.
 
 ## Adattárolás SQLite adatbázisban
 
@@ -150,7 +150,7 @@ class TodoDbLoader(private val context: Context) {
 
 Az elérhető `SQLException`-ök közül használjuk az `android.database` package-ben lévőt.
 
-> A [`@Throws`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.jvm/-throws/index.html) annotáció csak a [Java kóddal való interoperációt](https://kotlinlang.org/docs/reference/java-to-kotlin-interop.html#checked-exceptions) segíti, ha tisztán Kotlin alkalmazásunk van, igazából nem kell használnunk. A Java-val ellentétben Kotlinban ugyanis nincsenek kötelezően lekezelendő, ún. [checked exception](https://kotlinlang.org/docs/reference/exceptions.html#checked-exceptions)-ök.
+> A [`@Throws`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.jvm/-throws/index.html) annotáció csak a [Java kóddal való interoperációt](https://kotlinlang.org/docs/reference/java-to-kotlin-interop.html#checked-exceptions) segíti, ha tisztán Kotlin alkalmazásunk van, igazából nem kell használnunk. Java-val ellentétben Kotlinban ugyanis nincsenek kötelezően lekezelendő, ún. [checked exception](https://kotlinlang.org/docs/reference/exceptions.html#checked-exceptions)-ök.
 
 A létrehozó, módosító és törlő metódusok a `TodoDbLoader`en belül, a *CRUD és egyéb metódusok* komment után:
 
@@ -372,7 +372,7 @@ Figyeljük meg, hogy a fejlesztőkörnyezet figyelmeztet egy lehetséges hibára
 
 Ebben a példa alkalmazásban nem fog gondot okozni egy `Context` referencia statikus tárolása (mivel az `Application` által nyújtott `Context`-et tároljuk, aminek az élettartama megegyezik a statikus változó élettartamával), viszont érdemes tudni, hogy ez memóriaszivárgáshoz vezethet (például ha egy `Activity` `Context`-jét tárolnánk el így).
 
-> A `todoDbLoader` property-nél leírt `private set` segítségével azt érjük el, hogy a property settere privát lesz, de a gettere publikus marad (ha magára a property-re helyeznénk el a `private` kulcsszót, mindkettő priváttá válna). Ezzel elérjük, hogy az aktuális osztályon kívülről ne lehessen átállítani az értékét.
+> A `todoDbLoader` property-nél leírt [`private set`](https://kotlinlang.org/docs/reference/properties.html#getters-and-setters) segítségével azt érjük el, hogy a property settere privát lesz, de a gettere publikus marad (ha magára a property-re helyeznénk el a `private` kulcsszót, mindkettő priváttá válna). Ezzel elérjük, hogy az aktuális osztályon kívülről ne lehessen átállítani az értékét.
 
 Az `AndroidManifest.xml`-ben állítsuk be, hogy a rendszer a `TodoApplication` osztályt példányosítsa az alkalmazás induláskor. Ehhez a manifestben lévő `<application>` tagben fel kell vennünk egy attribútumot `android:name` néven, aminek az értéke legyen a `TodoApplication` minősített (fully-qualified) osztályneve:
 
