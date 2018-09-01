@@ -127,6 +127,8 @@ class FileSystemStatsIntentService : IntentService("FileSystemStatsIntentService
 
 Figyeljük meg, hogyan éri el a `Service` a `Messenger` objektumot amin keresztül vissza tud üzenni, valamint az üzenetet jelképező `Message`-et és annak használatát!
 
+> A `Message` konfigurációjánál a Kotlin standard library [`apply`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/apply.html) függvényét használjuk. Az ennek átadott lambdán belül annak az objektumnak a scope-jába kerülünk, amin a függvényt meghívtuk. Jelen esetben ez azt jelenti, hogy az `apply`-nak átadott kód blokkon belül a `this` a `Message` példányra mutat, így nem kell minden property beállításál leírnunk a változó nevét.
+
 A `Service` is egy teljes értékű alkalmazás komponens, ezért a Manifest állományban fel kell tüntetnünk:
 
 ```xml
@@ -529,6 +531,8 @@ class LocationHelper(private val context: Context, private val callback: Locatio
 
 Vizsgáljuk meg az osztály felépítését, az API felé intézett kérés felparaméterezését, az [`apply`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/apply.html) függvény használatát.
 
+> Itt ismét az `apply` függvényt használjuk, hogy egyszerűen és olvasható módon hozzunk létre egy `LocationRequest`-et.
+
 Következő lépésként a `service` package-ben hozzuk létre a `LocationService` osztályt:
 
 ```kotlin
@@ -853,6 +857,8 @@ class FloatingWindowHelper(private val context: Context) {
 
 Nézzük át az osztály kódját!
 
+> Az `updateLocation` fügvvény [`let`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/let.html) hívásainál a `let`-eknek átadott lambdák elején nem jelöltük az abba beérkező paramétereket. Ezt azért tehettük meg, mert ezek a lambdák egyetlen paraméterrel rendelkeznek, ilyen esetekben ez az egyetlen paraméter az implicit [`it` néven érhető el](https://kotlinlang.org/docs/reference/lambdas.html#it-implicit-name-of-a-single-parameter) (amennyiben nem adtunk neki nevet).
+
 Vegyünk fel egy példányt ebből az osztályból a `LocationService`-ben:
 
 ```kotlin
@@ -937,7 +943,7 @@ végigkövetni az alábbiakat.)
 
 Egészítsük ki a megoldást úgy, hogy a felületen helyezzünk el egy gombot az alábbi ábrának megfelelően, melyre kattintva az utolsó pozíció alapján (ha van), `Geocoder` segítségével kérdezzük le az aktuális címet.
 
-Első lépésként a `LocationService` osztályba vegyünk fel egy belső osztályt, mely reprenzentálja a `Binder`-t:
+Első lépésként a `LocationService` osztályba vegyünk fel egy belső osztályt, mely reprezentálja a `Binder`-t:
 
 ```kotlin
 inner class ServiceLocationBinder : Binder() {
@@ -945,6 +951,8 @@ inner class ServiceLocationBinder : Binder() {
         get() = this@LocationService
 }
 ```
+
+> A `service` egy speciális property: nem tárol tényleges adatot, helyette minden kiolvasásakor lefuttatja a custom [getterét](https://kotlinlang.org/docs/reference/properties.html#getters-and-setters), és ennek az eredményét adja vissza.
 
 Vegyünk fel egy property-t is a `LocationService`-ben, amelyben tároljuk ennek a belső osztálynak egy példányát:
 
