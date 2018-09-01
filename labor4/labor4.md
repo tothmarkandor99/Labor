@@ -378,7 +378,7 @@ Készítsük el a modell osztályt, ami egy alkalmazás megjelenítendő adatait
 ```kotlin
 class AppInfo(
         val title: CharSequence,
-        val icon: Drawable? = null,
+        val icon: Drawable,
         className: ComponentName
 ) {
 
