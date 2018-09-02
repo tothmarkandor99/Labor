@@ -2,7 +2,7 @@
 
 ## Bevezetés
 
-A labor célja egy több Activity-ből álló Android alkalmazás elkészítése, valamint az egyszerű rajzolás bemutatása egy TicTacToe játék segítségével.
+A labor célja egy több `Activity`-ből álló Android alkalmazás elkészítése, valamint az egyszerű rajzolás bemutatása egy TicTacToe játék segítségével.
 
 A labor során a következő funkciókat fogjuk megvalósítani:
 
@@ -22,11 +22,11 @@ A megvalósítandó játék felhasználói felületét az alábbi képernyőkép
 
 Első lépésként indítsuk el az Android Studio-t, majd:
 
-1. Hozzunk létre egy *TicTacToe* nevű projektet.
+1. Hozzunk létre egy `TicTacToe` nevű projektet.
 2. A kezdő package legyen `hu.bme.aut.android.tictactoe`.
 3. Pipáljuk be az *Include Kotlin Support* lehetőséget.
 4. A projekt létrehozásakor válasszuk a kezdeti *Empty Activity*-vel rendelkező konfigurációt.
-5. A kezdeti Activity neve legyen `MainMenuActivity`.
+5. A kezdeti `Activity` neve legyen `MainMenuActivity`.
 
 Sikeres projekt létrehozás után a laborvezető vezetésével vizsgálja meg a forrás felépítését.
 
@@ -57,7 +57,7 @@ Navigáljunk a `res/values/strings.xml`-re, ahol a projekt szöveges erőforrás
 
 ## Szükséges további Activity-k létrehozása
 
-A fentiek alapján látható tehát, hogy a meglevő `MainMenuActivity` mellett még két másik `Activity`-t, a `GameActivity`-t és az `AboutActivity`-t kell létrehoznunk. Activity létrehozásakor tipikusan az alábbi forrás állományok változnak:
+A fentiek alapján látható tehát, hogy a meglevő `MainMenuActivity` mellett még két másik `Activity`-t, a `GameActivity`-t és az `AboutActivity`-t kell létrehoznunk. `Activity` létrehozásakor tipikusan az alábbi forrás állományok változnak:
 
 * Létrejön az `Activity`-hez tartozó Kotlin fájl.
 * Létrejön az `Activity`-hez tartozó layout XML.
@@ -90,63 +90,63 @@ Az `Activity` létrehozást azonban megkönnyíti az Android Studio és a fenti 
 
 A `MainMenuActivity` a fenti ábra alapján három menüpontot tartalmaz középre igazodva. Mivel a Studio már alapértelmezetten `ConstraintLayout`-ot generál, így most ezt fogjuk használni a megvalósításra. Az anyagban ennek működése csak később következik, így alább megtalálható a kész XML leíró, viszont akinek van kedve, a gif alapján kipróbálhatja a használatát:
 
-![](images/constraint_layout_1.gif)
+[](images/constraint_layout_1.gif)
 
 *Tipp: Shift + Kattintással lehet több elemet kijelölni*
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	xmlns:app="http://schemas.android.com/apk/res-auto"
-	xmlns:tools="http://schemas.android.com/tools"
-	android:layout_width="match_parent"
-	android:layout_height="match_parent"
-	tools:context=".MainMenuActivity">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainMenuActivity">
 
-	<Button
-		android:id="@+id/btnStart"
-		android:layout_width="0dp"
-		android:layout_height="wrap_content"
-		android:layout_marginEnd="8dp"
-		android:layout_marginStart="8dp"
-		android:layout_marginTop="8dp"
-		android:text="@string/btn_start"
-		app:layout_constraintBottom_toTopOf="@+id/btnHighScore"
-		app:layout_constraintEnd_toEndOf="parent"
-		app:layout_constraintHorizontal_bias="0.5"
-		app:layout_constraintStart_toStartOf="parent"
-		app:layout_constraintTop_toTopOf="parent"
-		app:layout_constraintVertical_chainStyle="packed" />
+    <Button
+        android:id="@+id/btnStart"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/btn_start"
+        app:layout_constraintBottom_toTopOf="@+id/btnHighScore"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed" />
 
-	<Button
-		android:id="@+id/btnHighScore"
-		android:layout_width="0dp"
-		android:layout_height="wrap_content"
-		android:layout_marginEnd="8dp"
-		android:layout_marginStart="8dp"
-		android:layout_marginTop="8dp"
-		android:text="@string/btn_highscore"
-		app:layout_constraintBottom_toTopOf="@+id/btnAbout"
-		app:layout_constraintEnd_toEndOf="parent"
-		app:layout_constraintHorizontal_bias="0.5"
-		app:layout_constraintStart_toStartOf="parent"
-		app:layout_constraintTop_toBottomOf="@+id/btnStart" />
+    <Button
+        android:id="@+id/btnHighScore"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/btn_highscore"
+        app:layout_constraintBottom_toTopOf="@+id/btnAbout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnStart" />
 
-	<Button
-		android:id="@+id/btnAbout"
-		android:layout_width="0dp"
-		android:layout_height="wrap_content"
-		android:layout_marginBottom="8dp"
-		android:layout_marginEnd="8dp"
-		android:layout_marginStart="8dp"
-		android:layout_marginTop="8dp"
-		android:text="@string/btn_about"
-		app:layout_constraintBottom_toBottomOf="parent"
-		app:layout_constraintEnd_toEndOf="parent"
-		app:layout_constraintHorizontal_bias="0.5"
-		app:layout_constraintStart_toStartOf="parent"
-		app:layout_constraintTop_toBottomOf="@+id/btnHighScore" />
-		
+    <Button
+        android:id="@+id/btnAbout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/btn_about"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnHighScore" />
+    	
 </android.support.constraint.ConstraintLayout>
 ```
 
@@ -167,33 +167,33 @@ btnHighScore.setOnClickListener {
 
 Ahogy korábban említettük az *About* menü elindítja az új `AboutActivity`-t, ezért elsőként készítsük el az `AboutActivity` felületét, melyet a `content_about.xml` ír le. Mint korábban, itt is lehet `ConstraintLayout`-ot készíteni a segítséggel, vagy alább megtalálható az XML:
 
-![](images/constraint_layout_2.gif)
+[](images/constraint_layout_2.gif)
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	xmlns:app="http://schemas.android.com/apk/res-auto"
-	xmlns:tools="http://schemas.android.com/tools"
-	android:layout_width="match_parent"
-	android:layout_height="match_parent"
-	app:layout_behavior="@string/appbar_scrolling_view_behavior"
-	tools:context=".AboutActivity"
-	tools:showIn="@layout/activity_about">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context=".AboutActivity"
+    tools:showIn="@layout/activity_about">
 
-	<TextView
-		android:id="@+id/textView3"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:layout_marginBottom="8dp"
-		android:layout_marginEnd="8dp"
-		android:layout_marginStart="8dp"
-		android:layout_marginTop="8dp"
-		android:text="@string/txt_about"
-		android:textSize="30sp"
-		app:layout_constraintBottom_toBottomOf="parent"
-		app:layout_constraintEnd_toEndOf="parent"
-		app:layout_constraintStart_toStartOf="parent"
-		app:layout_constraintTop_toTopOf="parent" />
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/txt_about"
+        android:textSize="30sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 		
 </android.support.constraint.ConstraintLayout>
 ```
@@ -358,28 +358,29 @@ Ahhoz, hogy a `GameActivity` ezt a játékteret megjelenítse, módosítsuk a ho
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	xmlns:app="http://schemas.android.com/apk/res-auto"
-	xmlns:tools="http://schemas.android.com/tools"
-	android:layout_width="match_parent"
-	android:layout_height="match_parent"
-	app:layout_behavior="@string/appbar_scrolling_view_behavior"
-	tools:context=".GameActivity"
-	android:background="#888888"
-	tools:showIn="@layout/activity_game">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context=".GameActivity"
+    android:background="#888888"
+    tools:showIn="@layout/activity_game">
 
-	<hu.bme.aut.android.tictactoe.view.TicTacToeView
-		android:id="@+id/ticTacToeView"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:layout_marginBottom="8dp"
-		android:layout_marginEnd="8dp"
-		android:layout_marginStart="8dp"
-		android:layout_marginTop="8dp"
-		app:layout_constraintBottom_toBottomOf="parent"
-		app:layout_constraintEnd_toEndOf="parent"
-		app:layout_constraintStart_toStartOf="parent"
-		app:layout_constraintTop_toTopOf="parent"
-		app:layout_constraintVertical_bias="0.495" />
+    <hu.bme.aut.android.tictactoe.view.TicTacToeView
+        android:id="@+id/ticTacToeView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.495" />
+
 </android.support.constraint.ConstraintLayout>
 ```
 
@@ -387,19 +388,19 @@ Következő lépésként valósítsuk meg a játéktér kirajzolását a `fun dr
 
 ```kotlin
 private fun drawGameArea(canvas: Canvas) {
-	val widthFloat: Float = width.toFloat()
-	val heightFloat: Float = height.toFloat()
+    val widthFloat: Float = width.toFloat()
+    val heightFloat: Float = height.toFloat()
 
-	// border
-	canvas.drawRect(0F, 0F, widthFloat, heightFloat, paintLine)
+    // border
+    canvas.drawRect(0F, 0F, widthFloat, heightFloat, paintLine)
 
-	// two horizontal lines
-	canvas.drawLine(0F, heightFloat / 3, widthFloat, widthFloat / 3, paintLine)
-	canvas.drawLine(0F, 2 * heightFloat / 3, widthFloat, 2 * heightFloat / 3, paintLine)
+    // two horizontal lines
+    canvas.drawLine(0F, heightFloat / 3, widthFloat, widthFloat / 3, paintLine)
+    canvas.drawLine(0F, 2 * heightFloat / 3, widthFloat, 2 * heightFloat / 3, paintLine)
 
-	// two vertical lines
-	canvas.drawLine(widthFloat / 3, 0F, widthFloat / 3, heightFloat, paintLine)
-	canvas.drawLine(2 * widthFloat / 3, 0F, 2 * widthFloat / 3, heightFloat, paintLine)
+    // two vertical lines
+    canvas.drawLine(widthFloat / 3, 0F, widthFloat / 3, heightFloat, paintLine)
+    canvas.drawLine(2 * widthFloat / 3, 0F, 2 * widthFloat / 3, heightFloat, paintLine)
 }
 ```
 
@@ -407,21 +408,21 @@ Ezt követően valósítsuk meg a modell alapján a játéktérbe az X-ek és O-
 
 ```kotlin
 private fun drawPlayers(canvas: Canvas) {
-        // draw a circle at the center of the field
-        // X coordinate: left side of the square + half width of the square
-        for (i in 0 until 3) {
-            for (j in 0 until 3) {
-                if (TicTacToeModel.getFieldContent(i, j) == TicTacToeModel.CIRCLE) {
-                    val centerX = i * width / 3 + width / 6
-                    val centerY = j * height / 3 + height / 6
-                    val radius = height / 6 - 2
-                    canvas.drawCircle(centerX.toFloat(), centerY.toFloat(), radius.toFloat(), paintLine)
-                } else if (TicTacToeModel.getFieldContent(i, j) == TicTacToeModel.CROSS) {
-                    canvas.drawLine((i * width / 3).toFloat(), (j * height / 3).toFloat(), ((i + 1) * width / 3).toFloat(), 						((j + 1) * height / 3).toFloat(), paintLine)
-                    canvas.drawLine(((i + 1) * width / 3).toFloat(), (j * height / 3).toFloat(), (i * width / 3).toFloat(), 						((j + 1) * height / 3).toFloat(), paintLine)
-                }
+    // draw a circle at the center of the field
+    // X coordinate: left side of the square + half width of the square
+    for (i in 0 until 3) {
+        for (j in 0 until 3) {
+            if (TicTacToeModel.getFieldContent(i, j) == TicTacToeModel.CIRCLE) {
+                val centerX = i * width / 3 + width / 6
+                val centerY = j * height / 3 + height / 6
+                val radius = height / 6 - 2
+                canvas.drawCircle(centerX.toFloat(), centerY.toFloat(), radius.toFloat(), paintLine)
+            } else if (TicTacToeModel.getFieldContent(i, j) == TicTacToeModel.CROSS) {
+                canvas.drawLine((i * width / 3).toFloat(), (j * height / 3).toFloat(), ((i + 1) * width / 3).toFloat(), 						((j + 1) * height / 3).toFloat(), paintLine)
+                canvas.drawLine(((i + 1) * width / 3).toFloat(), (j * height / 3).toFloat(), (i * width / 3).toFloat(), 						((j + 1) * height / 3).toFloat(), paintLine)
             }
         }
+    }
 }
 ```
 
