@@ -8,7 +8,7 @@ Ma már igen sok alkalmazás található a Play áruházban, köszönhető ez t�
 Tartsuk szem előtt, hogy ez csak néhány egyszerű ötlet, és ahogy a lollipopos megjelenésű elemektől még nem lesz material egy alkalmazás megjelenése, úgy mi sem leszünk mindenható dizájnerek a labor után. Ez a témakör koránt sem olyan egyértelmű, mint a mérnöki tanulmányok jó része, az itt alkalmazott lépések nem feltétlenül univerzálisak.
 
 
-##Material és UX alapok
+## Material és UX alapok
 
 Először is, akinek szándékában áll végigolvasni a teljes útmutatót később, az itt megteheti:
 [https://material.google.com/#](https://material.google.com/#)
@@ -36,8 +36,6 @@ Először is, akinek szándékában áll végigolvasni a teljes útmutatót kés
 * Tartsunk megfelelő távolságokat az elemek között, különösen ügyelve az interaktív elemekre. Lesz olyan, akinek nálunk nagyobb az ujjbegye, gondoljunk rá is! A tartalom ne kezdődjön a képernyő 0. pixelénél! Az ajánlásokban elég részletesen taglalják a számokat: az új guideline szerint minden elem egy 8dp-s rácsban helyezkedik el. Ez alól kivételek a szövegek (amiknek alapvonala igazodik 4dp-hez) és a toolbar ikonjai (szintén 4 dp). Tehát alapvetően mindennek a mérete vagy a távolsága n x 8dp. A kijelző szélétől tartandó margó például 16dp, az érinthető területek minimum mérete 48 x 48dp, a köztük tartandó távolság pedig minimum 8dp, de inkább több.
 * A képi elemek legyen inkább személyesek. Ne használjunk pár élettelen mosolyú modell arcát mutató sotck fotókat, a képnek legyen köze a tartalomhoz. A személyes (felhasználó készítette) képek még jobbak. A képek töltsék ki a teret, amennyire csak lehet! Ez azt jelenti, hogy szélességben a teljes kijelzőt fedje, magasságban pedig lehetőleg valamilyen jellegzetes arány vonalát kövesse. Van néhány ajánlás, ezekre az arányokra – mármint arra hogy bizonyos képarányú elemek magassága hol helyezkedik el.
 
-<img src="./images/keylines.png" width="300" " align="middle">
-
 * Ne használjuk a kártyanézeteket (tipikusan Google asszisztens) olyan elemekre, amik megjelenése azonos! Ezesetben egy listáról beszélünk, aminek használatát megnehezíti, hogy a kártyák közt van kihagyott terület és árnyékot is vetnek.
 
 
@@ -63,35 +61,65 @@ Tömörítsük ki a mappát, indítsuk el az Android Studio-t, majd az Open seg�
 
 <img src="./images/screen1_framed.png" width="200" align="middle">
 
-Ennek az alkalmazásnak az a feladata, hogy meglátogatandó helyeket gyűjtsünk benne. A prototípus arra koncentrál, hogy minimális funkcionalitást valósítson meg gyorsan. Az adatok perzisztens tárolásához a *Sugar ORM* ([http://satyan.github.io/sugar/](http://satyan.github.io/sugar/)) könyvtárat használja . Laborvezetővel tekintsék át a kódot és a működést! Főbb elemei:
+Ennek az alkalmazásnak az a feladata, hogy meglátogatandó helyeket gyűjtsünk benne. A prototípus arra koncentrál, hogy minimális funkcionalitást valósítson meg gyorsan. Az adatok perzisztens tárolásához a Google új, hivatalos *Room* API ([Room - Android Developers](https://developer.android.com/topic/libraries/architecture/room.html)) könyvtárat használja . Laborvezetővel tekintsék át a kódot és a működést! Főbb elemei:
 
-* A Sugar ORM számára a Manifest-ben elhelyezett meta-data tag-ek segítségével adhatjuk meg az adatbázist tartalmazó fájl nevét és verzióját, hogy logolja-e a query-ket, illetve hogy milyen domain-t használunk.
-
-
-```xml 
-    <meta-data android:name="DATABASE" android:value="sugar_places.db" />
-    <meta-data android:name="VERSION" android:value="2" />
-    <meta-data android:name="QUERY_LOG" android:value="true" />
-    <meta-data android:name="DOMAIN_PACKAGE_NAME" android:value="hu.bme.aut.amorg.examples.placestovisit.data" />
-```
-
-* Az applicationnek a SugarApp-ból kell származnia, ezzel biztosítjuk a Sugar ORM megfelelő inicializálását, illetve lezárását. Esetünkben nincs szükség külön application objektumra, használhatjuk a SugarAppot.
-
-```xml
-<application 
-    android:name="com.orm.SugarApp" 
-    android:allowBackup="true" 
-    android:icon="@mipmap/ic_launcher"
-    android:label="@string/app_name" 
-    android:supportsRtl="true" 
-    android:theme="@style/AppTheme">
-```
-
-* A modell osztálynál (Place) ősosztályként a SugarRecordot használtuk, ez biztosítja, hogy az osztály példányait adatbázisba lehessen menteni. Ehhez implementáljuk a Serializable interfészt is.
-
+* A Room számára annotációkkal adhatjuk meg hogy pontosan hogyan történjen az adott modell objektum mentése.
 
 ```java
-public class Place extends SugarRecord implements Serializable {...}
+@Entity
+public class Place implements Serializable {
+
+    @PrimaryKey(autoGenerate = true)
+    private Long id = null;
+    @ColumnInfo(name = "place_type")
+    private PlaceType placeType;
+    @ColumnInfo(name = "place_name")
+    private String placeName;
+    @ColumnInfo(name = "description")
+    private String description;
+    @ColumnInfo(name = "pick_up_date")
+    private Date pickUpDate;
+    ...
+}
+```
+
+* Az adatok manipulálását az úgynevezett DAO (Data Access Object) osztályokon keresztől végezetjük. Mi csak egy megfelelő annotációkkal ellátott interfacet definiálunk (az nnotáció magáért beszél, a `@Query`-be SQL kódot írhatunk, kódkiegészítésel **!!!**)
+
+```java
+@Dao
+public interface PlaceDao {
+
+    @Insert
+    void insertAll(Place... places);
+
+    @Query("SELECT * FROM Place")
+    List<Place> getAll();
+
+    @Update
+    int updatePlace(Place place);
+
+
+    @Delete
+    void delete(Place plave);
+}
+
+``` 
+
+* A DAO-hoz generált kód a Database osztály segítségével érhető el. Ez is egy abstract osztály, melyhez az implementációt a Room generálja. Az adatbázis általános beállításai is itt adhatóak meg, szintén annotációkkal.
+
+```java
+@Database(entities = {Place.class}, version = 1, exportSchema = false)
+@TypeConverters({DateTypeConverter.class, PlaceTypeConverter.class})
+public abstract class PlaceDatabase extends RoomDatabase {
+    public abstract PlaceDao placeDao();
+}
+```
+
+* Az adatbázishoz, és így a generált kódokhoz hozzáférést a Room osztály factory metódusainak segítségével kaphatunk.
+
+```java
+PlaceDatabase db = Room.databaseBuilder(getApplicationContext(), 
+    PlaceDatabase.class, "place-db").build();
 ```
 
 
@@ -102,8 +130,7 @@ public class Place extends SugarRecord implements Serializable {...}
 A PlacesListActivityben az OnCreatebe:
 
 ```java
-FloatingActionButton fab =
-        (FloatingActionButton) findViewById(R.id.addButton);
+FloatingActionButton fab = findViewById(R.id.addButton);
     fab.setOnClickListener(new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -208,7 +235,7 @@ Kevesen készülnek arra a lehetőségre, hogy mi fogadja a felhasználót akkor
 ```
 
 ```xml
-<string name="add_places_to_visit">Add_places to visit</string>
+<string name="add_places_to_visit">Add places to visit</string>
 ```
 
 Figyeljük meg a FrameLayoutot! Egyszerre csak egyik gyermeke látható. Most már csak meg kell oldanunk, hogy üres RecyclerView esetén csak a TextView jelenjen meg:
@@ -320,9 +347,12 @@ private EmptyRecyclerView emptyRecyclerView;
 ```
 
 ```java
-emptyRecyclerView = (EmptyRecyclerView) findViewById(R.id.placesListERV);
-emptyRecyclerView.setLayoutManager(new LinearLayoutManager((this)));
-adapter = new PlacesToVisitAdapter(this, placesToVisit);
+emptyRecyclerView = findViewById(R.id.placesListERV);
+```
+
+```java
+emptyRecyclerView.setLayoutManager(new LinearLayoutManager((getApplicationContext())));
+adapter = new PlacesToVisitAdapter(PlacesListActivity.this, db, placesToVisit);
 emptyRecyclerView.setAdapter(adapter);
 registerForContextMenu(emptyRecyclerView);
 ```
@@ -330,8 +360,8 @@ registerForContextMenu(emptyRecyclerView);
 Végül szerezzünk referenciát a `content_places_list.xml`-ben létrehozott TextView-ra, és állítsuk be az EmptyRecyclerView emptyView-jának:
 
 ```java
-View emptyView = findViewById(R.id.emptyTV);
-emptyRecyclerView.setEmptyView(emptyView);
+View emptyTV= findViewById(R.id.emptyTV);
+emptyRecyclerView.setEmptyView(emptyTV);
 ```
 
 Próbáljuk ki az alkalmazást! Láthatjuk, hogy üres lista helyett valóban az "Add places to visit" felirat jelenik meg.
@@ -460,8 +490,7 @@ private CoordinatorLayout coordinatorLayout;
 ```
 
 ```java
-coordinatorLayout = (CoordinatorLayout) 
-        findViewById(R.id.main_coordinator_layout);
+coordinatorLayout = findViewById(R.id.main_coordinator_layout);
 ```
 
 Próbáljuk ki a Snakcbart!
@@ -475,10 +504,9 @@ Próbáljuk ki a Snakcbart!
 
 A fenti alapok segítségével alakítsa tovább az alkalmazást!
 
-* Csökkentse a listában megjelenített információkat
 * Készítsen új képernyőt, ahol részletesen jeleníti meg az adott helyet
 * Készítse fel a felületet arra, hogy később a felhasználónak lehetősége lesz képet rögzíteni a helyről
 
 ### Feladat 2 - Swipe to delete
 
-Valósítsa meg a swipe gesztussal való törlést (és esetleg módosítást). Használhatja például a következő osztálykönyvtárat: [https://github.com/wdullaer/SwipeActionAdapter](https://github.com/wdullaer/SwipeActionAdapter)
+Valósítsa meg a swipe gesztussal való törlést (és esetleg módosítást). Példa megvalósítás: [https://medium.com/@ipaulpro/drag-and-swipe-with-recyclerview-b9456d2b1aaf](https://medium.com/@ipaulpro/drag-and-swipe-with-recyclerview-b9456d2b1aaf)

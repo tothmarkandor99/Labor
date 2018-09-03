@@ -12,9 +12,9 @@ elnavigál az alkalmazásunkból, vagy elforgatja azt.
 
 Töltsük le a kezdeti alkalmazást:
 
-[Kiinduló project](./assets/Todo05Start.zip)
+[Kiinduló project](./assets/Todo_kiindulo.zip)
 
-Ez a Todo alkalmazás Fragment-es verziója, azonban nem tárolja
+Ez a Todo alkalmazás azonban nem tárolja
 perzisztens módon el a létrehozott Todo objektumokat.
 
 Tömörítsük ki a mappát, indítsuk el az Android Studio-t, majd az Open
@@ -83,45 +83,35 @@ adatbázis fájl neve, séma létrehozó és törlő szkiptek, stb. Ezeket
 érdemes egy közös helyen tárolni, így szerkesztéskor vagy új entitás
 bevezetésekor nem kell a forrásfájlok között ugrálni, valamint
 egyszerűbb a teljes adatbázist létrehozó és törlő szkripteket generálni.
-Hozzunk létre egy új osztályt a **datastorage** csomagban *DbConstants*
+Hozzunk létre egy új osztályt a **db** csomagban *DbConstants*
 néven, és statikus tagváltozóként vegyünk fel minden szükséges
 konstanst:
 
 ```java
 public class DbConstants {
 
-    // Broadcast Action, amely az adatbazis modosulasat jelzi
-    public static final String ACTION_DATABASE_CHANGED = "hu.bute.daai.amorg.examples.DATABASE_CHANGED";
-
-    // fajlnev, amiben az adatbazis lesz
     public static final String DATABASE_NAME = "data.db";
-    // verzioszam
     public static final int DATABASE_VERSION = 1;
-    // osszes belso osztaly DATABASE_CREATE szkriptje osszefuzve
     public static String DATABASE_CREATE_ALL = Todo.DATABASE_CREATE;
-    // osszes belso osztaly DATABASE_DROP szkriptje osszefuzve
     public static String DATABASE_DROP_ALL = Todo.DATABASE_DROP;
 
-    /* Todo osztaly DB konstansai */
     public static class Todo{
-        // tabla neve
         public static final String DATABASE_TABLE = "todo";
-        // oszlopnevek
         public static final String KEY_ROWID = "_id";
         public static final String KEY_TITLE = "title";
         public static final String KEY_PRIORITY = "priority";
         public static final String KEY_DUEDATE = "dueDate";
         public static final String KEY_DESCRIPTION = "description";
-        // sema letrehozo szkript
+
         public static final String DATABASE_CREATE =
             "create table if not exists "+DATABASE_TABLE+" ( "
             + KEY_ROWID +" integer primary key autoincrement, "
             + KEY_TITLE + " text not null, "
-            + KEY_PRIORITY + " text, "
+            + KEY_PRIORITY + " integer, "
             + KEY_DUEDATE +" text, "
             + KEY_DESCRIPTION +" text"
             + "); ";
-        // sema torlo szkript
+        
         public static final String DATABASE_DROP =
             "drop table if exists " + DATABASE_TABLE + "; ";
     }
@@ -176,32 +166,33 @@ kódrészleteket, melyek egy memóriába lévő Todo objektumot képesek
 adatbázisba írni, onnan visszaolvasni, módosítani valamint törölni
 (természetesen más funkciók is szükségesek lehetnek). Ezt a kódot az
 entitás osztály (Todo) helyett érdemes egy külön osztályban
-megvalósítani a *datastorage* csomagon belül (TodoDbLoader, *SQL exceptionsból használjuk az android.database-t*):
+megvalósítani a *db* csomagon belül (TodoDbLoader, *SQL exceptionsból használjuk az android.database-t*):
 
 ```java
 public class TodoDbLoader {
 
-    private Context ctx;
+    private Context context;
     private DatabaseHelper dbHelper;
-    private SQLiteDatabase mDb;
+    private SQLiteDatabase db;
 
-    public TodoDbLoader(Context ctx) {
-        this.ctx = ctx;
+    public TodoDbLoader(Context context) {
+        this.context = context;
     }
 
     public void open() throws SQLException{
-        // DatabaseHelper objektum
+      
         dbHelper = new DatabaseHelper(
-                ctx, DbConstants.DATABASE_NAME);
-        // adatbázis objektum
-        mDb = dbHelper.getWritableDatabase();
-        // ha nincs még séma, akkor létrehozzuk
-        dbHelper.onCreate(mDb);
+                context, DbConstants.DATABASE_NAME);
+      
+        db = dbHelper.getWritableDatabase();
+      
+        dbHelper.onCreate(db);
     }
 
     public void close(){
         dbHelper.close();
     }
+    
     // CRUD és egyéb metódusok
 }
 ```
@@ -210,19 +201,19 @@ A létrehozó, módosító és törlő metódusok (TodoDbLoader-en belül!):
 
 ```java
 // INSERT
-public long createTodo(Todo todo){//data.Todo
+public long createTodo(Todo todo){
     ContentValues values = new ContentValues();
     values.put(DbConstants.Todo.KEY_TITLE, todo.getTitle());
     values.put(DbConstants.Todo.KEY_DUEDATE, todo.getDueDate());
     values.put(DbConstants.Todo.KEY_DESCRIPTION, todo.getDescription());
-    values.put(DbConstants.Todo.KEY_PRIORITY, todo.getPriority().name());
+    values.put(DbConstants.Todo.KEY_PRIORITY, todo.getPriority());
 
-    return mDb.insert(DbConstants.Todo.DATABASE_TABLE, null, values);
+    return db.insert(DbConstants.Todo.DATABASE_TABLE, null, values);
 }
 
 // DELETE
 public boolean deleteTodo(long rowId){
-    return mDb.delete(
+    return db.delete(
             DbConstants.Todo.DATABASE_TABLE,
             DbConstants.Todo.KEY_ROWID + "=" + rowId,
             null) > 0;
@@ -234,8 +225,8 @@ public boolean updateProduct(long rowId, Todo newTodo){
     values.put(DbConstants.Todo.KEY_TITLE, newTodo.getTitle());
     values.put(DbConstants.Todo.KEY_DUEDATE, newTodo.getDueDate());
     values.put(DbConstants.Todo.KEY_DESCRIPTION, newTodo.getDescription());
-    values.put(DbConstants.Todo.KEY_PRIORITY, newTodo.getPriority().name());
-    return mDb.update(
+    values.put(DbConstants.Todo.KEY_PRIORITY, newTodo.getPriority());
+    return db.update(
             DbConstants.Todo.DATABASE_TABLE,
             values,
             DbConstants.Todo.KEY_ROWID + "=" + rowId ,
@@ -246,12 +237,12 @@ public boolean updateProduct(long rowId, Todo newTodo){
 Fussuk át és értelmezzük a bemásolt kódot!
 
  A kód bemásolása után importáljuk be a megfelelő osztályokat. A *Todo*
-osztály két helyen is szerepel, egyrészt entitás osztályként (a .data
+osztály két helyen is szerepel, egyrészt entitás osztályként (a .model
 végű csomagban), másrészt az adatbázis konstansokat tároló belső
 osztályként (a *.db* végű csomagban). A bemásolt kód célja, hogy a Todo
 entitásokat létrehozza, módosítsa vagy törölje az adatbázisban, így az
 entitás osztályt importáljuk be
-(*hu.bme.aut.amorg.examples.todo.data.Todo*).
+(*hu.bme.aut.amorg.examples.todo.model.Todo*).
 
 Általában igaz, hogy szükséges olyan metódusok megírása, melyek képesek
 egy rekordot visszaadni, valamint egy kurzor objektummal visszatérni,
@@ -262,7 +253,7 @@ TodoDbLoader osztályban):
 // minden Todo lekérése
 public Cursor fetchAll(){
     // cursor minden rekordra (where = null)
-    return mDb.query(
+    return db.query(
             DbConstants.Todo.DATABASE_TABLE,
             new String[]{
                     DbConstants.Todo.KEY_ROWID,
@@ -276,7 +267,7 @@ public Cursor fetchAll(){
 // egy Todo lekérése
 public Todo fetchTodo(long rowId){
     // a Todo-ra mutato cursor
-    Cursor c = mDb.query(
+    Cursor c = db.query(
             DbConstants.Todo.DATABASE_TABLE,
             new String[]{
                     DbConstants.Todo.KEY_ROWID,
@@ -292,24 +283,33 @@ public Todo fetchTodo(long rowId){
     // egyebkent null-al terunk vissza
     return null;
 }
-```
 
-A kód bemásolása és importok rendezése után hibát kapunk a forrás
-végénél a getTodoByCursor(c) metódushívásra. Ez még valóban nincs
-implementálva, hamarosan pótoljuk.
+public static Todo getTodoByCursor(Cursor c){
+    return new Todo(
+            c.getString(c.getColumnIndex(DbConstants.Todo.KEY_TITLE)), // title
+            c.getInt(c.getColumnIndex(DbConstants.Todo.KEY_PRIORITY)), // priority
+            c.getString(c.getColumnIndex(DbConstants.Todo.KEY_DUEDATE)), // dueDate
+            c.getString(c.getColumnIndex(DbConstants.Todo.KEY_DESCRIPTION)) // description
+            );
+}
+```
 
 ## Lista feltöltése adatbázisból
 
 
 Ha az Adapter osztályunkat adatbázisból szeretnénk feltölteni, akkor a
 BaseAdapter helyett a *CursorRecyclerViewAdapater* ősosztályból kell
-származtatnunk, amit a kiindulóprojekt tartalmaz. A megoldás hasonló a ListActivity-ben lévő adapter
+származtnunk, így leegyszerűsítve a feladatunkat. Ez az osztályt a következő linken érhetjük el:
+
+[https://gist.github.com/skyfishjy/443b7448f59be978bc59#file-cursorrecyclerviewadapter-java](https://gist.github.com/skyfishjy/443b7448f59be978bc59#file-cursorrecyclerviewadapter-java)
+
+A megoldás hasonló az előző adapter
 kódjához, de itt az onBindViewHolder metódusban egy Cursor-t kapunk
 pozíció helyett, és ennek segítségével szerezhetjük meg az aktuális Todo
 objektumot. Ezen felül a konstruktorában nem az elemeket adjuk át, hanem
 egy kontextust és egy Cursor-t.
 
- Hozzuk létre a TodoAdapter osztályt az adapter mappában:
+ Hozzuk létre a TodoAdapter osztályt az adapter csomagban:
 
 ```java
 public class TodoAdapter extends CursorRecyclerViewAdapter<TodoAdapter.ViewHolder> {
@@ -323,7 +323,7 @@ public class TodoAdapter extends CursorRecyclerViewAdapter<TodoAdapter.ViewHolde
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.todorow, parent, false);
+                .inflate(R.layout.row_todo, parent, false);
         return new ViewHolder(view);
     }
 
@@ -336,17 +336,17 @@ public class TodoAdapter extends CursorRecyclerViewAdapter<TodoAdapter.ViewHolde
         holder.dueDate.setText(todo.getDueDate());
 
         switch (todo.getPriority()) {
-            case LOW:
-                holder.priority.setImageResource(R.drawable.low);
+            case Todo.Priority.LOW:
+                holder.priority.setImageResource(R.drawable.ic_low);
                 break;
-            case MEDIUM:
-                holder.priority.setImageResource(R.drawable.medium);
+            case Todo.Priority.MEDIUM:
+                holder.priority.setImageResource(R.drawable.ic_medium);
                 break;
-            case HIGH:
-                holder.priority.setImageResource(R.drawable.high);
+            case Todo.Priority.HIGH:
+                holder.priority.setImageResource(R.drawable.ic_high);
                 break;
             default:
-                holder.priority.setImageResource(R.drawable.high);
+                holder.priority.setImageResource(R.drawable.ic_high);
                 break;
         }
 
@@ -390,24 +390,6 @@ public class TodoAdapter extends CursorRecyclerViewAdapter<TodoAdapter.ViewHolde
 }
 ```
 
-Az implementáció hivatkozik a *TodoLoader* még nem létező statikus
-*getTodoByCursor(Cursor)* metódusára, ami egy rekordra állított
-*Cursor*-t kap paraméterként, és egy *Todo* objektummal tér vissza.
-Ennek kódja triviális (visszatér egy adatbázisból lekért adatokkal
-példányosított Todo objektummal). Írjuk meg a metódust a
-***TodoDbLoader*** osztály végén.
-
-```java
-public static Todo getTodoByCursor(Cursor c){
-    return new Todo(
-            c.getString(c.getColumnIndex(DbConstants.Todo.KEY_TITLE)), // title
-            Todo.Priority.valueOf(c.getString(c.getColumnIndex(DbConstants.Todo.KEY_PRIORITY))), // priority
-            c.getString(c.getColumnIndex(DbConstants.Todo.KEY_DUEDATE)), // dueDate
-            c.getString(c.getColumnIndex(DbConstants.Todo.KEY_DESCRIPTION)) // description
-            );
-}
-```
-
 ## Egyedi Application objektum készítése
 
 
@@ -433,16 +415,13 @@ public class TodoApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-
         dbLoader = new TodoDbLoader(this);
         dbLoader.open();
     }
 
     @Override
     public void onTerminate() {
-        // Close the internal db
         dbLoader.close();
-
         super.onTerminate();
     }
 }
@@ -458,7 +437,7 @@ minősített (fully-qualified) osztálynevét:
 ....
     <application
         android:name=".application.TodoApplication"
-        android:icon="@drawable/ic_launcher"
+        android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
 ....
@@ -479,11 +458,10 @@ Adjuk hozzá a TodoListActivity-hez az alábbi mezőket:
 public class TodoListActivity extends AppCompatActivity implements TodoCreateFragment.ITodoCreateFragment {
     // State
     private TodoAdapter adapter;
-    private LocalBroadcastManager lbm;
 
     // DBloader
     private TodoDbLoader dbLoader;
-    private GetAllTask getAllTask;
+    private LoadTodosTask loadTodosTask;
     ...
 ```
 
@@ -500,7 +478,6 @@ Törölni (**onCreate metódusból**):
 
 ```java
 setupRecyclerView(recyclerView);
-adapter = (SimpleItemRecyclerViewAdapter) recyclerView.getAdapter();
 ```
 
 Módosítsuk a setupRecyclerView metódust, amely immár nem példaadatokkal
@@ -514,16 +491,8 @@ private void setupRecyclerView(@NonNull RecyclerView recyclerView, TodoAdapter a
 ```
 
 Ezek után már nincs szüksége a korábban használt adapterre, ezt
-törölhetjük a kódból (TodoListActivity-ben szerepel belső osztályként).
+törölhetjük az adapter csomagból.
 
- Törölni:
-
-```java
-public class SimpleItemRecyclerViewAdapter
-        extends RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder> {
-    ...
-}
-```
 
 Törölni kell még az onTodoCreated metódus belsejét is, mert az új
 adapternek más metódusai vannak.
@@ -540,14 +509,21 @@ Ezt később újra meg fogjuk írni az új adapternek megfelelő hívásokkal.
 
 Az diszk I/O műveleteket javasolt külön szálon, aszinkron módon
 futtatni, mivel könnyen megakaszthatják a UI szálat lassú lefutásukkal.
-Készítsünk a *TodoListActivity* osztályban egy *AsyncTask* osztályból
-származó belső osztályt **GetAllTask** néven, amely aszinkron módon kérdezi
+
+Készítsünk az a **LoadTodosTask** osztályt a **db** csomagban, mely származzon egy *AsyncTask* osztályból, amely aszinkron módon kérdezi
 le az adatbázisunktól az összes elmentett Todo rekordot:
 
 ```java
-private class GetAllTask extends AsyncTask<Void, Void, Cursor> {
+public class LoadTodosTask extends AsyncTask<Void, Void, Cursor> {
 
-    private static final String TAG = "GetAllTask";
+    private static final String TAG = "LoadTodosTask";
+    private TodoDbLoader dbLoader;
+    private TodoListActivity listActivity;
+
+    public LoadTodosTask(TodoListActivity listActivity, TodoDbLoader dbLoader) {
+        this.listActivity = listActivity;
+        this.dbLoader = dbLoader;
+    }
 
     @Override
     protected Cursor doInBackground(Void... params) {
@@ -576,70 +552,52 @@ private class GetAllTask extends AsyncTask<Void, Void, Cursor> {
 
         Log.d(TAG, "Fetch completed, displaying cursor results!");
         try {
-            if (adapter == null) {
-                adapter = new TodoAdapter(getApplicationContext(), result, mTwoPane);
-                setupRecyclerView(recyclerView, adapter);
-            } else {
-                adapter.changeCursor(result);
+
+            if (listActivity != null) {
+                listActivity.showTodos(result);
+
             }
-            getAllTask = null;
         } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }
 ```
 
-Most a fordító nem találja a *recyclerView* viewElement-et, amit eddig csak az *onCreate*-ben lokálisan deklaráltuk és használtunk. Deklaráljuk most *globálisan* az osztályban, ezzel megoldva a problémát!
-
-Készítsünk egy helyi* BroadcastReceiver* osztályt (ezt is a
-*TodoListActivity*-n belül!), amely figyel azokra a Broadcast-üzenetekre,
-melyek az adatbázis módosulását jelzik. Erre az eseményre a
-BroadcastReceiver osztályunk a Todo-lista tartalmának újbóli
-lekérdezésével fog reagálni (az ehhez tartozó hiányzó *.refreshList()*
-metódust később készítjük el):
+Ezután hozzuk létre a showTodos(...) függvényt a TodoListActivityben:
 
 ```java
-private BroadcastReceiver updateDbReceiver = new BroadcastReceiver() {
-    @Override
-    public void onReceive(Context context, Intent intent) {
-        refreshList();
+   public void showTodos(Cursor result) {
+        adapter = new TodoAdapter(getApplicationContext(), result, mTwoPane);
+        setupRecyclerView(recyclerView, adapter);
     }
-};
+
 ```
+
+
+Most a fordító nem találja a *recyclerView* viewElement-et, amit eddig csak az *onCreate*-ben lokálisan deklaráltuk és használtunk. Deklaráljuk most *globálisan* az osztályban, ezzel megoldva a problémát (Ctrl+alt+F), és ne View-ként hanem RecyclerView ként használjuk!
 
 Ezt követően az Activity életciklus-hívásait az alábbi módon adjuk meg:
 
-Az *.onCreate()* hívásban kérjünk referenciát a Support Library-ben
-található LocalBroadcastManager osztály példányára, illetve kérjük el a
-referenciát a TodoApplication objektumunktól a nyitott adatbázis
-kapcsolatot tartalmazó TodoDbLoader-re.
+Az *.onCreate()* hívásban kérjünk referenciát a TodoApplication objektumunktól a nyitott adatbázis kapcsolatot tartalmazó TodoDbLoader-re.
 
 ```java
-lbm = LocalBroadcastManager.getInstance(this);
-       dbLoader = TodoApplication.getTodoDbLoader();
+dbLoader = TodoApplication.getTodoDbLoader();
 ```
 
-Az *.onResume()* hívásban (még nincs implementálva) regisztráljuk be a
-korábban létrehozott BroadcastReceiver osztálypéldányunkat, illetve
-rögtön kérjük a Todo-lista tartalmának lekérdezését:
+Az *.onResume()* hívásban rögtön kérjük a Todo-lista tartalmának lekérdezését:
 
 ```java
 @Override
 public void onResume() {
     super.onResume();
 
-    // Kódból regisztraljuk az adatbazis modosulasara figyelmezteto     Receiver-t
-    IntentFilter filter = new IntentFilter(
-            DbConstants.ACTION_DATABASE_CHANGED);
-    lbm.registerReceiver(updateDbReceiver, filter);
-
     // Frissitjuk a lista tartalmat, ha visszater a user
     refreshList();
 }
 ```
 
-Az *.onPause()* hívásban (ez sem létezik még) kiregisztráljuk a
-BroadcastReceiver-ünket, illetve ha van éppen folyamatban DB-lekérdezés,
+Az *.onPause()* hívásban ha van éppen folyamatban DB-lekérdezés,
 akkor azt megszakítjuk:
 
 ```java
@@ -647,11 +605,8 @@ akkor azt megszakítjuk:
 public void onPause() {
     super.onPause();
 
-    // Kiregisztraljuk az adatbazis modosulasara figyelmezteto  Receiver-t
-    lbm.unregisterReceiver(updateDbReceiver);
-
-    if (getAllTask != null) {
-        getAllTask.cancel(false);
+    if (loadTodosTask != null) {
+        loadTodosTask.cancel(false);
     }
 }
 ```
@@ -676,12 +631,12 @@ az adatbázist lekérdező aszinkron folyamatot:
 
 ```java
 private void refreshList() {
-    if (getAllTask != null) {
-        getAllTask.cancel(false);
+    if (loadTodosTask != null) {
+        loadTodosTask.cancel(false);
     }
 
-    getAllTask = new GetAllTask();
-    getAllTask.execute();
+    loadTodosTask = new LoadTodosTask(this, dbLoader);
+    loadTodosTask.execute();
 }
 ```
 
@@ -692,7 +647,6 @@ adatbázis. Ahhoz, hogy működjön a Todo-elem létrehozása funkció újra,
 módosítanunk kell az *.onTodoCreated(…)* callbacket a következő módon:
 
 ```java
-// ITodoCreateFragment
 @Override
 public void onTodoCreated(Todo newTodo) {
     dbLoader.createTodo(newTodo);
@@ -709,5 +663,5 @@ létrehozott Todo-k.
 Az eredeti funkcionalitás további részeinek megvalósítása önálló
 feladatként oldandók meg:
 
--   Kiválasztott Todo elem törlése
+-   Kiválasztott Todo elem törlése, hosszú nyomásra.
 -   Összes Todo elem törlése funkció (pl. Options menüből elérve)
