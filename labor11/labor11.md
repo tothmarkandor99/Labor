@@ -13,11 +13,11 @@ Az alábbi oldalon található az összes engedély kategóriánként:
 
 https://developer.android.com/guide/topics/security/permissions.html#normal-dangerous
 
-Az `AndroidManifest.xml` fájlban Kategóriától függetlenül meg kell adni az alkalmazás számára szükséges összes engedélyt, de ennek hatása eltér a futtató  rendszer verziójától és a targetSdk értékétől függően:
+Az `AndroidManifest.xml` fájlban kategóriától függetlenül meg kell adni az alkalmazás számára szükséges összes engedélyt, de ennek hatása eltér a futtató rendszer verziójától és a *targetSdk*-tól függően:
 
-Ha az eszköz Android 5.1 (API level 22) vagy alacsonyabb verziót futtat, **VAGY** az alkalmazás target SDK szintje 22 vagy kisebb, akkor a rendszer telepítéskor kéri el az összes szükséges engedélyt. Ha a felhasználó nem fogadja el egyben az összes kérést, akkor a telepítési folyamat leáll.
+* Ha az eszköz Android 5.1 (API level 22) vagy alacsonyabb verziót futtat, **VAGY** az alkalmazás target SDK szintje 22 vagy kisebb, akkor a rendszer telepítéskor kéri el az összes szükséges engedélyt. Ha a felhasználó nem fogadja el egyben az összes kérést, akkor a telepítési folyamat leáll.
 
-Ha az eszköz Android 6.0 (API level 23) vagy nagyobb verziót futtat **ÉS** az alkalmazás target SDK szintje 23 vagy nagyobb, akkor az alkalmazás a futása során fogja elkérni a *dangerous* kategóriába tartozó engedélyeket, a *normal* engedélyeket pedig a rendszer automatikusan megadja. Ebben az esetben a  felhasználó bármikor bármelyik engedélyt megadhatja, vagy letilthataja. Megtagadott engedélyekkel az alkalmazás limitált funkcionalitással futhat tovább, erre a helyzetre is fel kell készülni.
+* Ha az eszköz Android 6.0 (API level 23) vagy nagyobb verziót futtat **ÉS** az alkalmazás target SDK szintje 23 vagy nagyobb, akkor az alkalmazás a futása során fogja elkérni a *dangerous* kategóriába tartozó engedélyeket, a *normal* engedélyeket pedig a rendszer automatikusan megadja. Ebben az esetben a  felhasználó bármikor bármelyik engedélyt megadhatja, vagy letilthataja. Megtagadott engedélyekkel az alkalmazás limitált funkcionalitással futhat tovább, erre a helyzetre is fel kell készülni.
 
 ## Jogosultság ellenőrzése
 
@@ -37,7 +37,7 @@ when (permissionResult) {
 
 ## Jogosultság kérés magyarázata
 
-Egyes esetekben szükséges lehet arra, hogy tájékoztassuk a felhasználót arról, hogy miért kér az alkalmazás bizonyos *dangerous* engedélyeket. Ez növelheti a felhasználó bizalmát az alkalmazással szemben. Az `ActivityCompat.shouldShowRequestPermissionRationale()` függvény visszatérési értéke alapján eldönthető, hogy a kérdéses engedély elkérése a rendszer szerint szorul-e részletes magyarázatra:
+Egyes esetekben szükség lehet arra, hogy tájékoztassuk a felhasználót arról, hogy miért kér az alkalmazás bizonyos *dangerous* engedélyeket. Ez növelheti a felhasználó bizalmát az alkalmazással szemben. Az `ActivityCompat.shouldShowRequestPermissionRationale()` függvény visszatérési értéke alapján eldönthető, hogy a kérdéses engedély elkérése a rendszer szerint szorul-e részletes magyarázatra:
 
 ```kotlin
  // Permission is not granted
@@ -53,247 +53,245 @@ if (ActivityCompat.shouldShowRequestPermissionRationale(thisActivity, Manifest.p
 
 ## Jogosultság elkérése
 
-Engedélyek elkérésére az `ActivityCompat.requestPermissions()` függvény meghívásával van lehetőség, aminek eredményeképp egy nem testreszabható dialógust dob fel a rendszer.
+Engedélyek elkérésére az `ActivityCompat.requestPermissions()` függvény meghívásával van lehetőség, aminek eredményeképp egy nem testreszabható dialógust jelenít meg a rendszer.
 
 ```kotlin
 ActivityCompat.requestPermissions(thisActivity, arrayOf(Manifest.permission.READ_CONTACTS), MY_PERMISSIONS_REQUEST_READ_CONTACTS)
 ```
 
-A `MY_PERMISSIONS_REQUEST_READ_CONTACTS` ebben a kódrészletben egy általunk definiált konstans. Az engedélykérés végén a rendszer ezt az értéket adja vissza *requesCode*-ként az `onRequestPermissionsResult()` callbackben. 
+A `MY_PERMISSIONS_REQUEST_READ_CONTACTS` ebben a kódrészletben egy általunk definiált konstans. Az engedélykérés végén a rendszer ezt az értéket adja vissza `requesCode`-ként az `onRequestPermissionsResult()` callbackben. 
 
 ## Kezdő lépések
 
-A labor során egy egyszerű telefonkönyv alkalmazást kell elkészíteni. Az alkalmazásnak tudnia kell kilistázni a telefonon tárolt névjegyeket, illetve egy névjegyre kattintással tudnia kell hívást kezdeményezni az ahhoz tartozó elsődleges telefonszámra.
+A labor során egy egyszerű telefonkönyv alkalmazást kell elkészíteni. Az alkalmazásnak meg kell jeleníteni a telefonon tárolt névjegyeket, illetve egy névjegyre kattintással tudnia kell hívást kezdeményezni az ahhoz tartozó elsődleges telefonszámra.
 
-Hozzunk létre egy új Android Studio Projektet *Permissions* néven. A Company Domain mező tartalmát töröljük ki és hagyjuk is üresen.
+Hozzunk létre egy új projektet Android Studio-ban *Contacts* néven. A *Company Domain* mező tartalmát töröljük ki és hagyjuk is üresen.
 
-A *package name* legyen `hu.bme.aut.android.permissions`. A támogatott céleszközök a *telefon és tablet*, a minimum SDK szint legyen *API19: Android 4.4*.
+A *package name* legyen `hu.bme.aut.android.contacts`. A támogatott eszköz formátum legyen *Phone and Tablet*, a minimum SDK szint legyen *API 19: Android 4.4 (KitKat)*.
 
 A projekthez adjuk hozzá egy *Empty Activity*-t, melynek neve legyen `ContactsActivity`.
 
-Vegyük fel a RecyclerView komponenst függőségként, illetve állítsuk a targetSDK-t 23 vagy nagyobbra a `build.graddle(module:app)` fájlban, majd nyomjuk meg a *Sync Now* gombot. Amennyiben nincs 23, vagy magasabb SDK telepítve a gépre, akkor frissítsük az *SDK Manager* segítségével a szükséges komponenseket.
+Vegyük fel a `RecyclerView` libraryt függőségként a `build.gradle (Module: app)` fájlban:
 
-
-```java
+```groovy
 dependencies {
 	...
-	implementation 'com.android.support:recyclerview-v7:26.1.0'
+	implementation 'com.android.support:recyclerview-v7:28.0.0-rc02'
 	...
 }
 ```
+
+Szintén a `build.gradle (Module: app)` fájlban ellenőrizzük, hogy a *targetSDK* értéke legalább 23.
+
+Kattintsunk a *Sync Now* gombra.
 
 ## Felhasználói felület
 
-Első lépésként készítsük el az alkalmazás felhasználói felületét XML erőforrásból. A felület egyetlen RecyclerView komponensből fog állni, mely az eszközön tárolt névjegyeket fogja megjeleníteni. Hozzuk létre a hiányzó dimen erőforrásokat is **16dp** értékkel.
+Készítsük el az alkalmazás felhasználói felületét a `res/layout/activity_contacts.xml` fájlban. A felület egyetlen `RecyclerView`-ból fog állni, mely az eszközön tárolt névjegyeket fogja megjeleníteni.
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/activity_contacts"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="hu.bme.aut.amorg.examples.permissionslabor.ContactsActivity">
+	xmlns:tools="http://schemas.android.com/tools"
+	android:id="@+id/activity_contacts"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:paddingBottom="@dimen/activity_vertical_margin"
+	android:paddingLeft="@dimen/activity_horizontal_margin"
+	android:paddingRight="@dimen/activity_horizontal_margin"
+	android:paddingTop="@dimen/activity_vertical_margin"
+	tools:context=".ContactsActivity">
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/contactsRV"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+	<android.support.v7.widget.RecyclerView
+		android:id="@+id/contactsRV"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent" />
 </RelativeLayout>
 ```
 
-A ContactsActivity-ben szerezzünk referenciát a RecyclerView-ra, és emeljük ki mezőbe.
-
-```java
-private RecyclerView contactsRV;
-```
-
-onCreate() metódusba:
-```java
-contactsRV = findViewById(R.id.contactsRV);
-```
+Hozzuk létre a hiányzó erőforrásokat *16dp* értékkel.
 
 ## Model
 
-Készítsük el a Contact osztályt, mely az eszközön található névjegyeket fogja reprezentálni. Az egyszerűség kedvéért most csak a név és telefonszám adatokat tároljuk el benne.
+Készítsük el a `hu.bme.aut.android.contacts.model` package-et és benne a  `Contact` osztályt , ami egy eszközön található névjegyet fog reprezentálni. Az egyszerűség kedvéért most csak a név és telefonszám adatokat tároljuk el benne.
 
-```java
-public class Contact {
-    private String contactName;
-    private String contactNumber;
-
-    public String getContactName() {
-        return contactName;
-    }
-
-    public void setContactName(String contactName) {
-        this.contactName = contactName;
-    }
-
-    public String getContactNumber() {
-        return contactNumber;
-    }
-
-    public void setContactNumber(String contactNumber) {
-        this.contactNumber = contactNumber;
-    }
-}
+```kotlin
+class Contact(
+	val name: String,
+	val number: String
+)
 ```
 
-## Adapter
+## Listaelem
 
-Készítsük el a listát feltöltő adaptert **ContactsAdapter** néven, **adapter** nevű csomagba.
-
-```java
-public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ContactViewHolder> {
-    
-    private List<Contact> contactList;
-    private Context mContext;
-
-    public ContactsAdapter(List<Contact> contactList, Context mContext) {
-        this.contactList = contactList;
-        this.mContext = mContext;
-    }
-
-    @Override
-    public ContactViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(mContext).inflate(R.layout.contact_item, null);
-        ContactViewHolder contactViewHolder = new ContactViewHolder(view);
-        return contactViewHolder;
-    }
-
-    @Override
-    public void onBindViewHolder(final ContactViewHolder holder, int position) {
-        Contact contact = contactList.get(position);
-        holder.tvContactName.setText(contact.getContactName());
-        holder.tvPhoneNumber.setText(contact.getContactNumber());
-    }
-
-
-    @Override
-    public int getItemCount() {
-        return contactList.size();
-    }
-
-    public static class ContactViewHolder extends RecyclerView.ViewHolder {
-        View container;
-        ImageView ivContactImage;
-        TextView tvContactName;
-        TextView tvPhoneNumber;
-
-        public ContactViewHolder(View itemView) {
-            super(itemView);
-            container = itemView.findViewById(R.id.container);
-            ivContactImage = itemView.findViewById(R.id.ivContactImage);
-            tvContactName = itemView.findViewById(R.id.tvContactName);
-            tvPhoneNumber = itemView.findViewById(R.id.tvPhoneNumber);
-        }
-    }
-}
-```
-
-Az adapter az **onCreateViewHolder()** metódusában hivatkozik a listaelem felületleírójára, hozzuk létre a hiányzó **contact_item** xml erőforrást:
+Hozzuk létre az `item_contact.xml` layout erőforrást:
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/container"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:background="#dddddd">
+	android:id="@+id/container"
+	android:layout_width="match_parent"
+	android:layout_height="wrap_content"
+	android:orientation="horizontal"
+	android:background="#dddddd">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content">
 
-        <ImageView
-            android:id="@+id/ivContactImage"
-            android:layout_width="55dp"
-            android:layout_height="55dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginStart="10dp"
-            android:src="@drawable/contact_mail"/>
+		<ImageView
+			android:id="@+id/ivContactImage"
+			android:layout_width="55dp"
+			android:layout_height="55dp"
+			android:layout_marginLeft="10dp"
+			android:layout_marginStart="10dp"
+			android:src="@drawable/ic_contact_phone_black_48dp"/>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:gravity="center_vertical">
+		<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:orientation="vertical"
+			android:gravity="center_vertical">
 
-            <TextView
-                android:id="@+id/tvContactName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:layout_marginStart="10dp"
-                android:textSize="16sp"
-                android:textColor="@android:color/primary_text_light"
-                android:text="@string/name"/>
+			<TextView
+				android:id="@+id/tvContactName"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:layout_marginLeft="10dp"
+				android:layout_marginStart="10dp"
+				android:textSize="16sp"
+				android:textColor="@android:color/primary_text_light"
+				android:text="@string/"/>
 
-            <TextView
-                android:id="@+id/tvPhoneNumber"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:layout_marginStart="10dp"
-                android:textSize="14sp"
-                android:textColor="@android:color/primary_text_light"
-                android:text="@string/phone"/>
-        </LinearLayout>
-    </LinearLayout>
+			<TextView
+				android:id="@+id/tvPhoneNumber"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:layout_marginLeft="10dp"
+				android:layout_marginStart="10dp"
+				android:textSize="14sp"
+				android:textColor="@android:color/primary_text_light"/>
+		</LinearLayout>
+	</LinearLayout>
 </RelativeLayout>
 ```
 
-Adjuk hozzá a két hiányzó szöveges erőforrást, és másoljuk be a drawables mappába a hiányzó képet!
-
-strings.xml-be:
+Hozzuk létre a `res/values/strings.xml` fájlban a két hiányzó szöveges erőforrást:
 
 ```xml
-<string name="name">Name</string>
-<string name="phone">Phone</string>
+<resources>
+	<string name="app_name">Contacts</string>
+	<string name="contact_name_placeholder">Name is not set</string>
+	<string name="contact_number_placeholder">Phone number is not set</string>
+</resources>
 ```
 
-A hiányzó ikont töltsük le a [https://materialdesignicons.com/](https://materialdesignicons.com/) -ról, keressük a **contact-mail** icon-t, és ezt drawable XML-ként töltsük le a res/drawable mappába.
+Töltsük le az [ic_contact_phone_black_48dp.png](assets/ic_contact_phone_black_48dp.png) képet és másoljuk be a `res/drawable` mappába.
 
-A névjegyek megjelenítéséhez az utolsó lépés az adapter pélányosítása, és beállítása a recyclerview komponenshez. Szükség van az eszközön tárolt névjegyek megszerzésére, ehhez adjuk hozzá a **ContactsActivity**-be az alábbi metódust:
+## Adapter
 
-```java
-private List<Contact> getAllContacts() {
-    List<Contact> contactList = new ArrayList();
-    ContentResolver contentResolver = getContentResolver();
-    Cursor cursor = contentResolver.query(ContactsContract.Contacts.CONTENT_URI, null, null, null, ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME + " ASC");
-    if (cursor.getCount() > 0) {
-        while (cursor.moveToNext()) {
-            int hasPhoneNumber = Integer.parseInt(cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER)));
-            if (hasPhoneNumber > 0) {
-                String id = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
-                String name = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
+Készítsük el a `hu.bme.aut.android.contacts.adapter` package-et és benne a listát feltöltő adaptert `ContactsAdapter` néven.
 
-                Contact contact = new Contact();
-                contact.setContactName(name);
+```kotlin
+class ContactsAdapter : RecyclerView.Adapter<ContactsAdapter.ContactViewHolder>() {
 
-                Cursor phoneCursor = contentResolver.query(
-                        ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-                        null,
-                        ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?",
-                        new String[]{id},
-                        null);
-                if (phoneCursor.moveToNext()) {
-                    String phoneNumber = phoneCursor.getString(phoneCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-                    contact.setContactNumber(phoneNumber);
-                }
-                phoneCursor.close();
-                contactList.add(contact);
+    private val contactList = mutableListOf<Contact>()
+
+    private var itemClickListener: ContactItemClickListener? = null
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContactViewHolder {
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_contact, null)
+        return ContactViewHolder(view)
+    }
+
+
+    override fun onBindViewHolder(holder: ContactViewHolder, position: Int) {
+        val contact = contactList[position]
+        holder.tvContactName.text = contact.name
+        holder.tvPhoneNumber.text = contact.number
+        holder.contact = contact
+    }
+
+    override fun getItemCount(): Int {
+        return contactList.size
+    }
+
+    inner class ContactViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val ivContactImage: ImageView = itemView.ivContactImage
+        val tvContactName: TextView = itemView.tvContactName
+        val tvPhoneNumber: TextView = itemView.tvPhoneNumber
+
+        var contact: Contact? = null
+
+        init {
+            itemView.setOnClickListener {
+                contact?.let { itemClickListener?.onItemClick(it) }
             }
         }
     }
-    return contactList;
+
+    interface ContactItemClickListener {
+        fun onItemClick(contact: Contact)
+    }
 }
+```
+
+A névjegyek megjelenítéséhez az utolsó lépés a `ContactsAdapter` pélányosítása, és beállítása a `RecyclerView`-nak. Az eszközön tárolt névjegyek megszerzéséhez adjuk hozzá a `ContactsActivity`-hez az alábbi függvényeket:
+
+```kotlin
+private fun getAllContacts(): List<Contact> {
+        contentResolver.query(
+                ContactsContract.Contacts.CONTENT_URI,
+                null,
+                null,
+                null,
+                "${ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME} ASC"
+        ).use { contactResultCursor ->
+            contactResultCursor?.let { contactCursor ->
+                return getContacts(contactCursor)
+            }
+        }
+
+        return emptyList()
+    }
+
+    private fun getContacts(contactCursor: Cursor): List<Contact> {
+        val contactList = mutableListOf<Contact>()
+
+        while (contactCursor.moveToNext()) {
+            val hasPhoneNumber = contactCursor.getString(contactCursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER)).toInt()
+            if (hasPhoneNumber > 0) {
+                val id = contactCursor.getString(contactCursor.getColumnIndex(ContactsContract.Contacts._ID))
+                val name = contactCursor.getString(contactCursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME))
+
+                val contactPhoneNumber = getContactPhoneNumber(id)
+                
+                contactList += Contact(name, contactPhoneNumber)
+            }
+        }
+
+        return contactList
+    }
+
+    private fun getContactPhoneNumber(id: String): String {
+        var phoneNumber = ""
+        
+        contentResolver.query(
+                ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                null,
+                "${ContactsContract.CommonDataKinds.Phone.CONTACT_ID} = ?",
+                arrayOf(id),
+                null
+        ).use { phoneResultCursor ->
+            phoneResultCursor?.let { phoneCursor ->
+                if (phoneCursor.moveToNext()) {
+                    phoneNumber = phoneResultCursor.getString(phoneResultCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER))
+                }
+            }
+        }
+        
+        return phoneNumber
+    }
 ```
 
 Ez után a kapott névjegylistával példányosítsuk az adaptert, és állítsuk be a RecyclerView komponenshez.
