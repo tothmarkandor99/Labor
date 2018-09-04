@@ -17,7 +17,7 @@ Tekintve a platform adottságait, az egyébként elérhető és sikeres megoldá
 
 Elsőnek töltsük le a labor során használt kiinduló projektet, majd nyissuk meg Android Studio-val. 
 
-[Kiinduló projekt](./assets/SpaceShipGame_skeleton.zip) 
+[Kiinduló projekt](./assets/SpaceShipGame.zip) 
 
 A források közül a test könyvtárat, illetve annak a tartalmát kitörölhetjük.
 
@@ -270,7 +270,7 @@ A **Ship** osztály valamint a **Player** és **Enemy** már fel vannak készít
 override fun render(canvas: Canvas) {
     setSpriteSizes()
 
-    val statePos = state / 5
+    val statePos = state % 4
     //4 states, 64*29 each image
 
     val x = 0
