@@ -551,7 +551,8 @@ class TodoListActivity : AppCompatActivity(), TodoCreateFragment.TodoCreatedList
 
 ```kotlin
 override fun onTodoCreated(todo: Todo) {
-	simpleItemRecyclerViewAdapter.addItem(todo)
+    
+    simpleItemRecyclerViewAdapter.addItem(todo)
 }
 ```
 
@@ -646,13 +647,13 @@ class TodoCreateFragment : DialogFragment(), DatePickerDialogFragment.DateListen
 
 ```kotlin
 private fun showDatePickerDialog() {
-	val datePicker = DatePickerDialogFragment()
-	datePicker.setTargetFragment(this, 0)
-	datePicker.show(fragmentManager, DatePickerDialogFragment.TAG)
+    val datePicker = DatePickerDialogFragment()
+    datePicker.setTargetFragment(this, 0)
+    datePicker.show(fragmentManager, DatePickerDialogFragment.TAG)
 }
 
 override fun onDateSelected(date: String) {
-	tvTodoDueDate.text = date
+    tvTodoDueDate.text = date
 }
 ```
 
