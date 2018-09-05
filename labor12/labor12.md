@@ -72,9 +72,10 @@ Következő lépésben szintén az Assistant-ban az "Email and password authenti
 
 <img src="./assets/firebase_auth_connect.png" width="1024" align="middle">
 
-**Figyelem**, emulátoron való tesztelés esetében korábbi (9.6.1) Firebase service-t kell használni, mert a legújabbat az emulátor még nem támogatja:
+Vegyük fel függőségként a Firebase authentikációs könyvtárát:
+
 ```gradle
-compile 'com.google.firebase:firebase-auth:9.6.1'
+implementation 'com.google.firebase:firebase-auth:12.0.1'
 ```
 
 Ahhoz, hogy az e-mail alapú regisztráció és authentikáció megfelelően működjön, a Firebase console-ban, az Authentication->Sign-in method-ban az *Email/Password* provider-t engedélyezni kell.
@@ -83,12 +84,13 @@ Ahhoz, hogy az e-mail alapú regisztráció és authentikáció megfelelően mű
 
 Végezetül a Studioban vegyük fel a modulhoz tartozó build.gradle-be az alábbi függőségeket még; tekintsük át a laborvezetővel ezeket:
 ```gradle
-compile 'com.android.support:design:25.1.1'
-compile 'com.android.support:cardview-v7:25.1.1'
-compile 'com.jakewharton:butterknife:8.5.1'
-annotationProcessor 'com.jakewharton:butterknife-compiler:8.5.1'
-compile 'com.flaviofaria:kenburnsview:1.0.7'
-compile 'com.github.bumptech.glide:glide:3.7.0'
+implementation 'com.android.support:design:26.1.0'
+implementation 'com.android.support:cardview-v7:26.1.0'
+implementation 'com.jakewharton:butterknife:8.8.1'
+annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
+implementation 'com.flaviofaria:kenburnsview:1.0.7'
+implementation 'com.github.bumptech.glide:glide:4.6.1'
+implementation 'com.google.firebase:firebase-database:12.0.1'
 ```
 
 ## Regisztráció, bejelentkezés
@@ -348,19 +350,17 @@ A PostsActivity feladata lesz a fórum üzenetek megjelenítése egy RecyclerVie
 
 Adjuk hozzá a projekthez a *Firebase Realtime Database* támogatást az Assistant-on keresztül. Figyeljünk rá, hogy a behozott függőség verzióját is írjuk át, ha emulátoron tesztelünk:
 ```gradle
-compile 'com.google.firebase:firebase-database:9.6.1'
+implementation 'com.google.firebase:firebase-database:12.0.1'
 ```
 
 Változtassuk meg a Navigation Drawer menüjét, hogy csak egy Logout menüelem szerepeljen rajta; a res/menu/activity_posts_drawer.xml:
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-
     <item
         android:id="@+id/nav_logout"
         android:icon="@drawable/ic_menu_share"
         android:title="Logout" />
-
 </menu>
 ```
 
@@ -389,6 +389,8 @@ Cseréljük le az *app_bar_posts.xml*-ben az *AppBarLayout*-ot az alábbira, ame
 
 ```xml
 <android.support.design.widget.AppBarLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="190dp"
     android:theme="@style/AppTheme.AppBarOverlay">
@@ -569,10 +571,10 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
         public ViewHolder(View itemView) {
             super(itemView);
-            tvAuthor = (TextView) itemView.findViewById(R.id.tvAuthor);
-            tvTitle = (TextView) itemView.findViewById(R.id.tvTitle);
-            tvBody = (TextView) itemView.findViewById(R.id.tvBody);
-            imgPost = (ImageView) itemView.findViewById(R.id.imgPost);
+            tvAuthor = itemView.findViewById(R.id.tvAuthor);
+            tvTitle = itemView.findViewById(R.id.tvTitle);
+            tvBody = itemView.findViewById(R.id.tvBody);
+            imgPost = itemView.findViewById(R.id.imgPost);
         }
     }
 
@@ -685,7 +687,7 @@ private void initPostsListener() {
 }
 ```
 
-(Alternatív megoldásként a *Firebase-UI* osztálykönyvtár ad egy *FirebaseRecyclerAdapter* implementációt, melynek megoldása teljesen hasonló, de nehezebben testreszabható - https://github.com/firebase/FirebaseUI-Android - Jelen laborfoglalkozásban ezt nem használjuk, mert az emulátor által támogatott Firebase verzióval tapasztalhatók anomáliák).
+(Alternatív megoldásként a *Firebase-UI* osztálykönyvtár ad egy *FirebaseRecyclerAdapter* implementációt, melynek megoldása teljesen hasonló, de nehezebben testreszabható - https://github.com/firebase/FirebaseUI-Android - Jelen laborfoglalkozásban ezt nem használjuk.
 
 Próbáljuk ki az alkalmazás működését. A lista jelenleg még üres lesz, hacsak nem veszünk fel a Firebase console-on elemeket, de fontos, hogy már hiba nélkül kell futnia az alkalmazásnak.
 
@@ -696,7 +698,7 @@ Próbáljuk ki az alkalmazás működését. A lista jelenleg még üres lesz, h
 A következő lépés az üzenetek írása, melynek hatására már tartalom kerülhet a listába.
 Elsőként kapcsoljuk be a Firebase Assistant-ban a Storage funkciót. Ne felejtsük a *build.gradle*-ben a verziót az emulátorhoz igazítani:
 ```gradle
-compile 'com.google.firebase:firebase-storage:9.6.1'
+implementation 'com.google.firebase:firebase-storage:12.0.1'
 ```
 
 Következő lépés a *CreatePostActivity* létrehozása Empty Activity sablont használva, melynek felülete legyen az alábbi és az osztály a BaseActivity-ből származzon le:
@@ -899,7 +901,7 @@ Vizsgálja meg az elkészült alkalmazást, üzenetek létrehozását és az ada
 Android Stuidoban a Firebase Assistant segítségével adjuk hozzá a Notifications-t az alkalmazáshoz.
 Ügyeljünk ismét az emulátor kompatibilis verzóra:
 ```gradle
-compile 'com.google.firebase:firebase-messaging:9.6.1'
+implementation 'com.google.firebase:firebase-messaging:12.0.1'
 ```
 
 Csupán ennyi elegendő a push alap működéséhez, innentől fogva, ha újfa fordítjuk az alkalmazást, a Firebase felületéről, vagy API-jával küldött push üzeneteket automatikusan megkapják a mobil kliensek és egy notification-ben megjelenítik.
@@ -925,39 +927,75 @@ A Crash reporting és az analitika használatához az alábbi engedélyekre is s
 Android Stuidoban a Firebase Assistant segítségével adjuk hozzá a Crash reporting-ot az alkalmazáshoz.
 Ügyeljünk ismét az emulátor kompatibilis verzóra:
 ```gradle
-compile 'com.google.firebase:firebase-crash:9.6.1'
+implementation 'com.google.firebase:firebase-crash:12.0.1'
 ```
-
-Valósítsunk meg egy hibás működést, például nullával osztást egy gombnyomásra és vizsgáljuk meg a hibajelentést a Firebase console-ban.
 
 <img src="./assets/firebase_crash.png" width="1024" align="middle">
 
-Próbáljuk ki saját hibajelzések készítését:
+Vegyünk fel egy új menüpontot az *activity_post_drawer.xml* menübe, amellyel hibaüzenetet fogunk
+küldeni:
+
+```xml
+<item
+    android:id="@+id/nav_error"
+    android:icon="@drawable/ic_menu_share"
+    android:title="Error" />
+```
+
+Próbáljuk ki saját hibajelzések készítését a menü eseménykezelőjében. A *PostsActivity*
+osztályában az *onNavigationItemSelected()* metódusban szükséges egy else if ággal
+bővíteni a választott menüelem tesztelését:
 
 ```java
-FirebaseCrash.log("Register failed");
+if (id == R.id.nav_logout) {
+    FirebaseAuth.getInstance().signOut();
+    startActivity(new Intent(this, LoginActivity.class));
+    finish();
+} else if (id == R.id.nav_error) {
+    FirebaseCrash.log("Random failure.");
+}
 ```
 
 ## Analitika
 
 Az alkalmazás jelenleg is naplóz alapvető analitikákat, használati statisztikákat, melyek a Firebase console Analytics menüpontja alatt érhetők el.
 
-Emellett természetesen lehetőség van az analitika kibővítésére és testreszabására is. Android Studioban, a Firebase Assistant segítségével kapcsoljuk be az Analytics támogatást, ügyelve az emulátor kompatibilis gradle verzió importálásra:
+Emellett természetesen lehetőség van az analitika kibővítésére és testreszabására is. Android Studioban, a Firebase Assistant segítségével kapcsoljuk be az Analytics támogatást,
+valamint fel kell vennünk egy újabb függőséget:
+
 ```gradle
-compile 'com.google.firebase:firebase-core:9.6.1'
+implementation 'com.google.firebase:firebase-core:12.0.1'
 ```
 
-Készítsünk saját analitika üzeneteket, például:
+Készítsünk saját analitika üzeneteket egy újabb menüpontból küldve.  Ugyanabba a menü
+erőforrásba vegyük fel a menüpontot:
+
+```xml
+<item
+    android:id="@+id/nav_analytics"
+    android:icon="@drawable/ic_menu_share"
+    android:title="Analytics" />
+```
+
+Majd bővítsük az eseménykezelőt:
 
 ```java
-//mentsük el akár osztály tagváltozóként
-firebaseAnalytics = FirebaseAnalytics.getInstance(this);
+if (id == R.id.nav_logout) {
+    FirebaseAuth.getInstance().signOut();
+    startActivity(new Intent(this, LoginActivity.class));
+    finish();
+} else if (id == R.id.nav_error) {
+    FirebaseCrash.log("Random failure.");
+} else if (id == R.id.nav_analytics) {
+    //mentsük el akár osztály tagváltozóként
+    FirebaseAnalytics firebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
-// analitika küldése
-Bundle bundle = new Bundle();
-bundle.putString("demo_key", "idabc");
-bundle.putString("data_key", "mydata");
-firebaseAnalytics.logEvent(FirebaseAnalytics.Event.LOGIN, bundle);
+    // analitika küldése
+    Bundle bundle = new Bundle();
+    bundle.putString("demo_key", "idabc");
+    bundle.putString("data_key", "mydata");
+    firebaseAnalytics.logEvent(FirebaseAnalytics.Event.LOGIN, bundle);
+}
 ```
 
 Lehet saját eseményeket is definiálni, melyeket a Firebase console-ban egyedi Audience-ként definiálva lehet elérni.
