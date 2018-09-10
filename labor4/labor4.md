@@ -176,11 +176,11 @@ Hozzuk létre a `dimens.xml` fájlt, és töltsük fel az alábbiakkal:
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<!-- Default screen margins, per the Android Design guidelines. -->
-	<dimen name="activity_horizontal_margin">16dp</dimen>
-	<dimen name="activity_vertical_margin">16dp</dimen>
-	<dimen name="dialer_text_size">40sp</dimen>
-	<dimen name="drawer_text_size">16sp</dimen>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="dialer_text_size">40sp</dimen>
+    <dimen name="drawer_text_size">16sp</dimen>
 </resources>
 ```
 
@@ -218,124 +218,124 @@ Ezt felhasználva már elkészíthetjük a `DialerFragment` layoutját, ennek k�
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	android:layout_width="match_parent"
-	android:layout_height="match_parent"
-	android:background="@color/colorAccent"
-	android:padding="@dimen/activity_horizontal_margin">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorAccent"
+    android:padding="@dimen/activity_horizontal_margin">
 
-	<EditText
-		android:id="@+id/etCall"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:layout_above="@+id/tableLayout"
-		android:layout_alignParentStart="true"
-		android:layout_toStartOf="@+id/btnCallBackSpace"
-		android:textSize="@dimen/dialer_text_size" />
+    <EditText
+        android:id="@+id/etCall"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/tableLayout"
+        android:layout_alignParentStart="true"
+        android:layout_toStartOf="@+id/btnCallBackSpace"
+        android:textSize="@dimen/dialer_text_size" />
 
-	<ImageButton
-		android:id="@+id/btnCallBackSpace"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:layout_above="@+id/tableLayout"
-		android:layout_alignParentEnd="true"
-		android:layout_alignTop="@+id/etCall"
-		android:src="@drawable/ic_backspace_black_24dp" />
+    <ImageButton
+        android:id="@+id/btnCallBackSpace"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/tableLayout"
+        android:layout_alignParentEnd="true"
+        android:layout_alignTop="@+id/etCall"
+        android:src="@drawable/ic_backspace_black_24dp" />
 
-	<Button
-		android:id="@+id/btnCall"
-		style="@style/DialerButton"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:layout_alignParentBottom="true"
-		android:gravity="center"
-		android:padding="15dp"
-		android:text="@string/call"
-		android:textSize="30sp" />
+    <Button
+        android:id="@+id/btnCall"
+        style="@style/DialerButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:gravity="center"
+        android:padding="15dp"
+        android:text="@string/call"
+        android:textSize="30sp" />
 
-	<TableLayout
-		android:id="@+id/tableLayout"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:layout_above="@id/btnCall"
-		android:stretchColumns="*">
+    <TableLayout
+        android:id="@+id/tableLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/btnCall"
+        android:stretchColumns="*">
 
-		<TableRow>
+        <TableRow>
 
-			<Button
-				android:id="@+id/btnDialer1"
-				style="@style/DialerButton"
-				android:text="1" />
+            <Button
+                android:id="@+id/btnDialer1"
+                style="@style/DialerButton"
+                android:text="1" />
 
-			<Button
-				android:id="@+id/btnDialer2"
-				style="@style/DialerButton"
-				android:text="2" />
+            <Button
+                android:id="@+id/btnDialer2"
+                style="@style/DialerButton"
+                android:text="2" />
 
-			<Button
-				android:id="@+id/btnDialer3"
-				style="@style/DialerButton"
-				android:text="3" />
+            <Button
+                android:id="@+id/btnDialer3"
+                style="@style/DialerButton"
+                android:text="3" />
 
-		</TableRow>
+        </TableRow>
 
-		<TableRow>
+        <TableRow>
 
-			<Button
-				android:id="@+id/btnDialer4"
-				style="@style/DialerButton"
-				android:text="4" />
+            <Button
+                android:id="@+id/btnDialer4"
+                style="@style/DialerButton"
+                android:text="4" />
 
-			<Button
-				android:id="@+id/btnDialer5"
-				style="@style/DialerButton"
-				android:text="5" />
+            <Button
+                android:id="@+id/btnDialer5"
+                style="@style/DialerButton"
+                android:text="5" />
 
-			<Button
-				android:id="@+id/btnDialer6"
-				style="@style/DialerButton"
-				android:text="6" />
+            <Button
+                android:id="@+id/btnDialer6"
+                style="@style/DialerButton"
+                android:text="6" />
 
-		</TableRow>
+        </TableRow>
 
-		<TableRow>
+        <TableRow>
 
-			<Button
-				android:id="@+id/btnDialer7"
-				style="@style/DialerButton"
-				android:text="7" />
+            <Button
+                android:id="@+id/btnDialer7"
+                style="@style/DialerButton"
+                android:text="7" />
 
-			<Button
-				android:id="@+id/btnDialer8"
-				style="@style/DialerButton"
-				android:text="8" />
+            <Button
+                android:id="@+id/btnDialer8"
+                style="@style/DialerButton"
+                android:text="8" />
 
-			<Button
-				android:id="@+id/btnDialer9"
-				style="@style/DialerButton"
-				android:text="9" />
+            <Button
+                android:id="@+id/btnDialer9"
+                style="@style/DialerButton"
+                android:text="9" />
 
-		</TableRow>
+        </TableRow>
 
-		<TableRow>
+        <TableRow>
 
-			<Button
-				android:id="@+id/btnDialerStar"
-				style="@style/DialerButton"
-				android:text="*" />
+            <Button
+                android:id="@+id/btnDialerStar"
+                style="@style/DialerButton"
+                android:text="*" />
 
-			<Button
-				android:id="@+id/btnDialer0"
-				style="@style/DialerButton"
-				android:text="0" />
+            <Button
+                android:id="@+id/btnDialer0"
+                style="@style/DialerButton"
+                android:text="0" />
 
-			<Button
-				android:id="@+id/btnDialerHashmark"
-				style="@style/DialerButton"
-				android:text="#" />
+            <Button
+                android:id="@+id/btnDialerHashmark"
+                style="@style/DialerButton"
+                android:text="#" />
 
-		</TableRow>
+        </TableRow>
 
-	</TableLayout>
+    </TableLayout>
 
 </RelativeLayout>
 ```
@@ -387,9 +387,9 @@ A `RecyclerView` külön libraryként érhető el. Vegyük fel a következő fü
 
 ```groovy
 dependencies {
-	...
-	implementation 'com.android.support:recyclerview-v7:28.0.0-rc02'
-	...
+    ...
+    implementation 'com.android.support:recyclerview-v7:28.0.0-rc02'
+    ...
 }
 ```
 
@@ -529,8 +529,8 @@ Hívjuk meg a `loadApplications` metódust az `ApplicationFragment` `onCreate` �
 
 ```kotlin
 override fun onCreate(savedInstanceState: Bundle?) {
-	super.onCreate(savedInstanceState)
-	loadApplications()
+    super.onCreate(savedInstanceState)
+    loadApplications()
 }
 ```
 
@@ -538,17 +538,17 @@ Ezek után össze kell kötnünk az összegyűjtött információkat a `Recycler
 
 ```kotlin
 private fun setupRecyclerView() {
-	val adapter = ApplicationsAdapter()
-	adapter.listener = this
-	rvApplications.layoutManager = GridLayoutManager(context, 4)
-	rvApplications.adapter = adapter
-	adapter.setApps(applications)
+    val adapter = ApplicationsAdapter()
+    adapter.listener = this
+    rvApplications.layoutManager = GridLayoutManager(context, 4)
+    rvApplications.adapter = adapter
+    adapter.setApps(applications)
 }
 ```    
 
 ```kotlin
 override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-	setupRecyclerView()
+    setupRecyclerView()
 }
 ```
 
@@ -556,9 +556,9 @@ Az elvárt működés eléréséhez módosítsuk úgy az `ApplicationsFragment` 
 
 ```kotlin
 class ApplicationsFragment : Fragment(), ApplicationsAdapter.OnApplicationClickedListener {
-	...
-	
-	override fun onApplicationClicked(appInfo: AppInfo) {
+    ...
+    
+    override fun onApplicationClicked(appInfo: AppInfo) {
         requireContext().startActivity(appInfo.intent)
     }
 }
@@ -581,10 +581,7 @@ Példa a hívás indítására:
 
 ```kotlin
 val phoneNumber = "tel:+36201234567"
-val intent = Intent(
-		Intent.ACTION_CALL,
-		Uri.parse(phoneNumber)
-)
+val intent = Intent(Intent.ACTION_CALL, Uri.parse(phoneNumber))
 requireContext().startActivity(intent)
 ```
 
