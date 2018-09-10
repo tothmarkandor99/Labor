@@ -10,7 +10,7 @@ Android platformon két fő `Service` típus létezik, melyek közül az egyik t
 
 * *Started Service*: Egyszerűen indítható szolgáltatás. A fő szálon fut, ha hosszan tartó műveleteket végzünk benne, a fejlesztő felelőssége ezekhez saját szálat létrehozni. Beállítható, hogy magas prioritással, *foreground* módban fusson, illetve megadható, hogy a leállása esetén milyen módon/prioritással indítsa újra a rendszer. Például, ha alacsony memóriaszint miatt lett kilőve, mi történjen, hogyan/mikor induljon újra.
 * *Intent Service*: a *Started Service* speciális típusa. `Intent`-tel paraméterezhető, hogy milyen feladatot lásson el. A kéréseket sorosítja és már automatikusan külön szálon hajtja végre a benne megírt kódot.
-* *Bound Service*: Lehetőséget biztosít, hogy más komponensek csatlakozzanak a `Service`-hez és egy egységes interface-en keresztül kommunikáljanak a `Service`-szel. Ha minden komponens lecsatlakozott róla, a `Service` leáll.
+* *Bound Service*: Lehetőséget biztosít arra, hogy más komponensek csatlakozzanak a `Service`-hez és egy egységes interface-en keresztül kommunikáljanak a `Service`-szel. Ha minden komponens lecsatlakozott róla, a `Service` leáll.
 
 Fontos: Egy `Service` lehet egyszerre *Started Service* és *Bound Service* módban is!
 
@@ -129,7 +129,7 @@ Figyeljük meg, hogyan éri el a `Service` a `Messenger` objektumot amin kereszt
 
 > A `Message` konfigurációjánál a Kotlin Standard Library [`apply`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/apply.html) függvényét használjuk. Az ennek átadott lambdán belül annak az objektumnak a scope-jába kerülünk, amin a függvényt meghívtuk. Jelen esetben ez azt jelenti, hogy az `apply`-nak átadott kódblokkon belül a `this` a `Message` példányra mutat, így nem kell minden property beállításánál leírnunk a változó nevét.
 
-A `Service` is egy teljes értékű alkalmazáskomponens, ezért a Manifest fájlban fel kell tüntetnünk:
+A `Service` is egy teljes értékű alkalmazáskomponens, ezért a Manifest fájlban fel kell tüntetnünk (az `application` tagen belül):
 
 ```xml
 <service android:name=".service.FileSystemStatsIntentService"/>
@@ -163,7 +163,7 @@ Az `MainActivity`-ben hozzunk létre egy `Handler`-t, amely az `IntentService`-b
 class MainActivity : AppCompatActivity() {
 
     @SuppressLint("HandlerLeak")
-    private val handlerFreeSpaceIntentService = object : Handler() {
+    private val freeSpaceHandler = object : Handler() {
         override fun handleMessage(msg: Message) {
             if (msg.arg1 == Activity.RESULT_OK) {
                 val freeMB = msg.obj as Long
@@ -173,7 +173,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private val freeSpaceMessenger = Messenger(handlerFreeSpaceIntentService)
+    private val freeSpaceMessenger = Messenger(freeSpaceHandler)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -200,7 +200,7 @@ class MainActivity : AppCompatActivity() {
 }
 ```
 
-Látható, hogy az `IntentService` milyen módon paraméterezhető, amennyiben összetettebb feladatokat hajtunk végre a `Service`-ben (pl. hálózati kommunikáció, letöltés, stb.), hasonlóan adhatók át a kérések paraméterei, például az URL vagy különböző azonosítók.
+Látható, hogy az `IntentService` milyen módon paraméterezhető, amennyiben összetettebb feladatokat hajtunk végre a `Service`-ben (pl. hálózati kommunikáció, letöltés, stb.), hasonlóan adhatók át a kérések paraméterei, például egy URL vagy különböző azonosítók.
 
 Az `app` modul `build.gradle` fájljában állítsuk át a `targetSdkVersion` értékét 22-re, mivel 23-as API szinten és felette futásidőben kellene kezelnünk a veszélyes engedélyek elkérését. Ezt egy későbbi laboron nézzük majd meg.
 
@@ -218,7 +218,7 @@ override fun onHandleIntent(intent: Intent) {
 }
 ```
 
-Indítsuk el így az alkalmazást és próbáljunk többször egymás után a menüre kattintani. Azt tapasztaljuk, hogy valóban nem foglalja a hívás a UI szálat, illetve, hogy valóban sorban hajtja végre a kéréseket!
+Indítsuk el így az alkalmazást és próbáljunk többször egymás után a menüre kattintani. Azt tapasztaljuk, hogy valóban nem foglalja a hívás a UI szálat, illetve hogy valóban sorban hajtja végre a kéréseket!
 
 ## 3. Felhasználói felület előkészítése helymeghatározáshoz
 
@@ -484,7 +484,7 @@ class SettingsActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferen
 Fontos kiemelni, hogy a `PreferenceFragment` megoldás már automatikusan megoldja
 a beállítások tárolását `SharedPreferences`-ben, ezt nem kell külön implementálnunk.
 
-Figyeljük meg, hogyan iratkozunk fel a beállítások megváltozására az `onStart`-ban, mely majd az állapottól függően fogja indítani/leállítani a `Service`-t. Fontos, hogy, ha feliratkoztunk a változásokra, akkor iratkozzunk is le róla a megfelelő helyen (pl. `onStop`), egyébként beragadhat ez a listener.
+Figyeljük meg, hogyan iratkozunk fel a beállítások megváltozására az `onStart`-ban, mely majd az állapottól függően fogja indítani/leállítani a `Service`-t. Fontos, hogy ha feliratkoztunk a változásokra, akkor iratkozzunk is le róla a megfelelő helyen (pl. `onStop`), egyébként beragadhat ez a listener.
 
 Hogy elérhessük a *Settings* nézetet, egészítsük ki a `MainActivity` menü kezelő függvényét
 (`onOptionsItemSelected`), hogy a *Settings* menüpontot választva indítsa el a `SettingsActivity`-t:
@@ -528,9 +528,9 @@ class LocationHelper(private val context: Context, private val callback: Locatio
 }
 ```
 
-Vizsgáljuk meg az osztály felépítését, az API felé intézett kérés felparaméterezését, az [`apply`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/apply.html) függvény használatát!
+Vizsgáljuk meg az osztály felépítését, az API felé intézett kérés felparaméterezését!
 
-> Itt ismét az `apply` függvényt használjuk, hogy egyszerűen és olvasható módon hozzunk létre egy `LocationRequest`-et.
+> Itt ismét az [`apply`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/apply.html) függvényt használjuk, hogy egyszerűen és olvasható módon hozzunk létre egy `LocationRequest`-et.
 
 Következő lépésként a `service` package-ben hozzuk létre a `LocationService` osztályt:
 
@@ -716,13 +716,13 @@ A `LocationService`-t indító `onStartCommand` függvény legelején állítsuk
 startForeground(NOTIFICATION_ID, createNotification("Starting location service..."))
 ```
 
-Az `onLocationChanged` függvényben új pozíció érkezésekor frissítsük a *Notification*-t:
+Az `onLocationResult` függvényben új pozíció érkezésekor frissítsük a *Notification*-t:
 
 ```kotlin
 updateNotification("Lat: ${location.latitude} Lng: ${location.longitude}")
 ```
 
-A helymeghatározási szolgáltatás elérhetőségével kapcsolatos változások esetén szintén frissítsük a Notification tartalmát:
+A helymeghatározási szolgáltatás elérhetőségével kapcsolatos változások esetén szintén frissítsük az értesítés tartalmát:
 
 ```kotlin
 override fun onLocationAvailability(locationAvailability: LocationAvailability) {
@@ -941,6 +941,8 @@ végigkövetni az alábbiakat.)
 
 Egészítsük ki a megoldást úgy, hogy a felületen elhelyezünk egy gombot az alábbi ábrának megfelelően, melyre kattintva az utolsó pozíció alapján (ha van), `Geocoder` segítségével kérdezzük le az aktuális címet.
 
+![](images/geocode.png)
+
 Első lépésként a `LocationService` osztályba vegyünk fel egy belső osztályt, mely reprezentálja a `Binder`-t:
 
 ```kotlin
@@ -1038,7 +1040,7 @@ override fun onStop() {
 }
 ```
 
-A `Geocoder` használatát háttérszálon fogjuk végezni. Ehhez hozzunk létre egy `task` package-et és benne az alábbi `GeocoderTask` osztályt, ami az `AsnycTask` osztályból származik. Az `AsyncTask` `doInBackground` függvénye háttérszálon fut, az ott előállított eredményt pedig az `onPostExecute` függvényben a fő szálon használhatjuk.
+A `Geocoder` használatát háttérszálon fogjuk végezni. Ehhez hozzunk létre egy `task` package-et és benne az alábbi `GeocoderTask` osztályt, ami az `AsnycTask` osztályból származik.
 
 A `GeocoderTask` osztály háttérszálon a paraméterként kapott `Location` objektumból kinyeri a latitude és longitude értékeket, egy `Geocoder` segítségével `Address`-szé alakítja őket (ez egy hálózati hívást jelent, ezért fontos hogy háttérszálon végezzük el), és az eredményt a fő szálra visszaütemezve megjeleníti azt egy `Toast` üzenetben.
 
@@ -1094,8 +1096,6 @@ btnGeocode.setOnClickListener {
 ```
 
 Próbáljuk ki a Geocoding működését!
-
-![](images/geocode.png)
 
 ### Feladatok
 * Önálló feladat: Jelenítsünk meg további két adatot a LocationDashboard-on!
