@@ -65,61 +65,55 @@ Ennek az alkalmazásnak az a feladata, hogy meglátogatandó helyeket gyűjtsün
 
 * A Room számára annotációkkal adhatjuk meg hogy pontosan hogyan történjen az adott modell objektum mentése.
 
-```java
+```kotlin
 @Entity
-public class Place implements Serializable {
+data class Place(@ColumnInfo(name = "place_type")   var placeType: PlaceType,
+                 @ColumnInfo(name = "place_name")   var placeName: String,
+                 @ColumnInfo(name = "description")  var description: String,
+                 @ColumnInfo(name = "pick_up_date") var pickUpDate: Date) : Serializable{
 
     @PrimaryKey(autoGenerate = true)
-    private Long id = null;
-    @ColumnInfo(name = "place_type")
-    private PlaceType placeType;
-    @ColumnInfo(name = "place_name")
-    private String placeName;
-    @ColumnInfo(name = "description")
-    private String description;
-    @ColumnInfo(name = "pick_up_date")
-    private Date pickUpDate;
+    var id : Long? = null
     ...
 }
 ```
 
-* Az adatok manipulálását az úgynevezett DAO (Data Access Object) osztályokon keresztől végezetjük. Mi csak egy megfelelő annotációkkal ellátott interfacet definiálunk (az nnotáció magáért beszél, a `@Query`-be SQL kódot írhatunk, kódkiegészítésel **!!!**)
+* Az adatok manipulálását az úgynevezett DAO (Data Access Object) osztályokon keresztől végezetjük. Mi csak egy megfelelő annotációkkal ellátott interfacet definiálunk (az Annotáció magáért beszél, a `@Query`-be SQL kódot írhatunk, kódkiegészítésel **!!!**)
 
-```java
+```kotlin
 @Dao
-public interface PlaceDao {
+interface PlaceDao {
 
     @Insert
-    void insertAll(Place... places);
+    fun insertAll(vararg places: Place)
 
     @Query("SELECT * FROM Place")
-    List<Place> getAll();
+    fun getAll(): List<Place>
 
     @Update
-    int updatePlace(Place place);
-
+    fun updatePlace(place: Place): Int
 
     @Delete
-    void delete(Place plave);
+    fun delete(place: Place)
 }
 
 ``` 
 
 * A DAO-hoz generált kód a Database osztály segítségével érhető el. Ez is egy abstract osztály, melyhez az implementációt a Room generálja. Az adatbázis általános beállításai is itt adhatóak meg, szintén annotációkkal.
 
-```java
-@Database(entities = {Place.class}, version = 1, exportSchema = false)
-@TypeConverters({DateTypeConverter.class, PlaceTypeConverter.class})
-public abstract class PlaceDatabase extends RoomDatabase {
-    public abstract PlaceDao placeDao();
+```kotlin
+@Database(entities = [Place::class], version = 1, exportSchema = false)
+@TypeConverters(DateTypeConverter::class, PlaceTypeConverter::class)
+abstract class PlaceDatabase : RoomDatabase() {
+    abstract fun placeDao(): PlaceDao
 }
 ```
 
 * Az adatbázishoz, és így a generált kódokhoz hozzáférést a Room osztály factory metódusainak segítségével kaphatunk.
 
-```java
-PlaceDatabase db = Room.databaseBuilder(getApplicationContext(), 
-    PlaceDatabase.class, "place-db").build();
+```kotlin
+db = Room.databaseBuilder(applicationContext, 
+        PlaceDatabase::class.java, "place-db").build()
 ```
 
 
@@ -129,14 +123,10 @@ PlaceDatabase db = Room.databaseBuilder(getApplicationContext(),
 
 A PlacesListActivityben az OnCreatebe:
 
-```java
-FloatingActionButton fab = findViewById(R.id.addButton);
-    fab.setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            showNewPlaceDialog();
-        }
-});
+```kotlin
+addButton.setOnClickListener{
+    showNewPlaceDialog()
+}
 ```
 
 
@@ -242,89 +232,73 @@ Figyeljük meg a FrameLayoutot! Egyszerre csak egyik gyermeke látható. Most m�
 
 Először is hozzunk létre egy új View-t, ami képes ezt kezelni. Legyen a neve EmptyRecyclerView, és származzon a RecyclerView-ból. Implementáljuk a három kötelező konstruktorát is:
 
-```java
-public class EmptyRecyclerView extends RecyclerView {
+```kotlin
+class EmptyRecyclerView : RecyclerView{
+    constructor(context: Context): super(context)
 
-    public EmptyRecyclerView(Context context) {
-        super(context);
-    }
+    constructor(context: Context,attrs: AttributeSet?): super(context, attrs)
 
-    public EmptyRecyclerView(Context context, @Nullable AttributeSet attrs) {
-        super(context, attrs);
-    }
-
-    public EmptyRecyclerView(Context context, @Nullable AttributeSet attrs, int defStyle) {
-        super(context, attrs, defStyle);
-    }
+    constructor(context: Context, attrs: AttributeSet?, defStyle: Int): super(context, attrs, defStyle)
 
 }
 ```
 Vegyünk fel bele egy emptyView-t, amiben azt a View-t fogjuk tárolni, amit üres lista esetén meg szeretnénk jeleníteni:
 
-```java
-private View emptyView;
+```kotlin
+private var emptyView: View? = null
 ```
 
 Ezek után vegyünk fel egy observert, aminek a feladata, hogy a listában történt változásokat lekezelje. 
 
-```java
-final private AdapterDataObserver observer = new AdapterDataObserver() {
-    @Override
-    public void onChanged() {
-        checkIfEmpty();
+```kotlin
+private val observer = object : RecyclerView.AdapterDataObserver() {
+    override fun onChanged() {
+        checkIfEmpty()
     }
 
-    @Override
-    public void onItemRangeInserted(int positionStart, int itemCount) {
-        checkIfEmpty();
+    override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+        checkIfEmpty()
     }
 
-    @Override
-    public void onItemRangeRemoved(int positionStart, int itemCount) {
-        checkIfEmpty();
+    override fun onItemRangeRemoved(positionStart: Int, itemCount: Int) {
+        checkIfEmpty()
     }
-};
+}
 ```
 
 Bármilyen változás történik az adathalmazban, le kell ellenőriznünk, hogy a melyik felületet kell megjelenítenünk vagyis, hogy üres-e a lista. Erre szolgál a checkIfEmpty() függvény. Implementáljuk ezt is:
 
-```java
-void checkIfEmpty() {
-        if (emptyView != null && getAdapter() != null) {
-            final boolean emptyViewVisible = 
-                                    getAdapter().getItemCount() == 0;
-            emptyView.setVisibility(emptyViewVisible ? VISIBLE : GONE);
-            setVisibility(emptyViewVisible ? GONE : VISIBLE);
-        }
+```kotlin
+fun checkIfEmpty() {
+    if (emptyView != null && adapter != null) {
+        val emptyViewVisible = adapter!!.itemCount == 0
+        emptyView?.visibility = if (emptyViewVisible) View.VISIBLE else View.GONE
+        visibility = if (emptyViewVisible) View.GONE else View.VISIBLE
     }
+}
 ```
 
 Látható, hogy a checkIfEmpty függvény az adapterben található elemek számának függvényében állítja az EmptyRecyclerView, és az EmptyView láthatóságát.
 
 Hozzunk létre egy setter fügvényt az emptyView-hoz, amivel kívülről megadhatjuk majd a megfelelő View-t. Hívjunk ebben is egy checkIfEmpty-t:
 
-```java
-public void setEmptyView(View emptyView) {
-    this.emptyView = emptyView;
-    checkIfEmpty();
+```kotlin
+fun setEmptyView(emptyView: View) {
+    this.emptyView = emptyView
+    checkIfEmpty()
 }
 ```
 
 Az EmptyRecyclerView-nk megfelelő működéséhez felül kell még írnunk a setAdapter függvényt. Ebben tudjuk beregisztrálni az imént létrehozott observerünket, ami kezeli az adathalmazban történt változásokat:
 
-```java
-@Override
-public void setAdapter(Adapter adapter) {
-    final Adapter oldAdapter = getAdapter();
-    if (oldAdapter != null) {
-        oldAdapter.unregisterAdapterDataObserver(observer);
-    }
-    super.setAdapter(adapter);
-    if (adapter != null) {
-        adapter.registerAdapterDataObserver(observer);
-    }
+```kotlin
+override fun setAdapter(adapter: RecyclerView.Adapter<*>?) {
+    val oldAdapter = getAdapter()
+    oldAdapter?.unregisterAdapterDataObserver(observer)
+    super.setAdapter(adapter)
+    adapter?.registerAdapterDataObserver(observer)
 
-    checkIfEmpty();
+    checkIfEmpty()
 }
 ```
 
@@ -332,8 +306,8 @@ Ezzel el is készült az EmptyRecyclerView-nk. Most cseréljük le az eddig hasz
 
 `content_places_list.xml`:
 
-```java
-<hu.bme.aut.amorg.examples.placestovisit.view.EmptyRecyclerView
+```xml
+<hu.bme.aut.android.examples.placestovisit.view.EmptyRecyclerView
             android:id="@+id/placesListERV"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -342,26 +316,17 @@ Ezzel el is készült az EmptyRecyclerView-nk. Most cseréljük le az eddig hasz
 
 PlacesListActivity.java:
 
-```java
-private EmptyRecyclerView emptyRecyclerView;
+```kotlin
+placesListERV?.layoutManager = LinearLayoutManager(applicationContext)
+placesListERV?.adapter = adapter as RecyclerView.Adapter<*>
+
+registerForContextMenu(placesListERV)
 ```
 
-```java
-emptyRecyclerView = findViewById(R.id.placesListERV);
-```
+A Kotlinban megszokott módon állítsuk be az EmptyRecyclerView emptyView-jának a `content_places_list.xml`-ben létrehozott TextView-t:
 
-```java
-emptyRecyclerView.setLayoutManager(new LinearLayoutManager((getApplicationContext())));
-adapter = new PlacesToVisitAdapter(PlacesListActivity.this, db, placesToVisit);
-emptyRecyclerView.setAdapter(adapter);
-registerForContextMenu(emptyRecyclerView);
-```
-
-Végül szerezzünk referenciát a `content_places_list.xml`-ben létrehozott TextView-ra, és állítsuk be az EmptyRecyclerView emptyView-jának:
-
-```java
-View emptyTV= findViewById(R.id.emptyTV);
-emptyRecyclerView.setEmptyView(emptyTV);
+```kotlin
+placesListERV.setEmptyView(emptyTV)
 ```
 
 Próbáljuk ki az alkalmazást! Láthatjuk, hogy üres lista helyett valóban az "Add places to visit" felirat jelenik meg.
@@ -370,14 +335,10 @@ Próbáljuk ki az alkalmazást! Láthatjuk, hogy üres lista helyett valóban az
  
 Segíthetünk a felhasználónak még annyiban, hogy megengedjük, hogy erre a feliratra rákattintva is vehessen fel új helyet. Ehhez írjuk meg az OnClickListenert:
 
-```java
-emptyTV.setOnClickListener(new View.OnClickListener() {
-    @Override
-    public void onClick(View v) {
-        showNewPlaceDialog();
-    }
-});
-
+```kotlin
+emptyTV.setOnClickListener{
+    showNewPlaceDialog()
+}
 ```
 
 
@@ -418,16 +379,15 @@ android:transitionName="create"
 
 Ezután a PlaceListActivity showNewPlaceDialog metódusát egészítsük ki az alábbiak szerint (a Floating Action Buttont ki kell szervezni) :
 
-```java
-private void showNewPlaceDialog() {
-    ActivityOptionsCompat options = 
-		ActivityOptionsCompat.makeSceneTransitionAnimation(
-            PlacesListActivity.this,
-            fab,
-            "create");
-    Intent i = new Intent();
-    i.setClass(this, CreatePlaceToVisitActivity.class);
-    startActivityForResult(i, REQUEST_NEW_PLACE_CODE, options.toBundle());
+```kotlin
+private fun showNewPlaceDialog() {
+    val options = ActivityOptionsCompat.makeSceneTransitionAnimation(
+            this@PlacesListActivity,
+            addButton,
+            "create")
+    val i = Intent()
+    i.setClass(this, CreatePlaceToVisitActivity::class.java)
+    startActivityForResult(i, REQUEST_NEW_PLACE_CODE, options.toBundle())
 }
 ```
 
@@ -470,28 +430,19 @@ A Toast üzeneteknél már van egy sokkal szebb megoldás, ami a Material Design
 
 Ehhez írjunk egy külön showText() függvényt, ami a paraméterül kapott szöveget jeleníti meg, majd használjuk ezt: 
 
-```java
-private void showText(String text) {
-    Snackbar.make(coordinatorLayout,text,Snackbar.LENGTH_LONG).show();
+```kotlin
+private fun showText(text: String) {
+    Snackbar.make(main_coordinator_layout, text, Snackbar.LENGTH_LONG).show()
 }
 ```
 
 Hívás:
 
-```java
-showText(getResources().getString(R.string.cancelled));
+```kotlin
+showText(getString(R.string.cancelled))
 ```
 
-A Snackbar.make(...) függvény első paramétere egy View. Adjuk meg ide az Activitynk CoordinatorLayout-ját. Ehhez a PlacesListActivityben fel kell venni változóként, majd az onCreate-ben referenciát szerezni rá.
-
-
-```java
-private CoordinatorLayout coordinatorLayout;
-```
-
-```java
-coordinatorLayout = findViewById(R.id.main_coordinator_layout);
-```
+A Snackbar.make(...) függvény első paramétere egy View. Ide az Activitynk CoordinatorLayout-ját adtuk meg.
 
 Próbáljuk ki a Snakcbart!
 
