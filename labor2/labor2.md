@@ -39,7 +39,7 @@ Nyissuk meg a honlapot, majd az alábbi beállításokkal generáljunk témát:
 4.  … *XML* formátumban töltsük is le.
 5.  A kapott fájl tartalmát másoljuk a `colors.xml`-be.
 
-Az alkalmazásunkban használt stílusokat pedig definiáljuk a `styles.xml` fájlban, az alábbó módon:
+Az alkalmazásunkban használt stílusokat pedig definiáljuk a `styles.xml` fájlban, az alábbi módon:
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -66,7 +66,7 @@ Az alkalmazásunkban használt stílusokat pedig definiáljuk a `styles.xml` fá
 </resources>
 ```
 
-Az `AndroidManifest.xml` fájlt megnézve látható, hogy az alkalmazásunk alapértelmezett témája az `AppTheme`. Így amit ebben a stílusban definiálunk, az lesz az alapértelmezett kinézet az egész alkalmazásunkban. Így például az `android:textViewStyle` definiálja, hogy hogy néz ki az adott alkalmazásban egy `TextView`. Ezeknek a felüldefiniált stílusoknak minden esetben a beépített stílusból kell leszármaznia, jelen esetünkben a saját `TextView` stílusunknak az `android:Widget.TextView` stílusból. Ebben megadhatjuk a `textColor` attribútumot, aminek hatására minden `TextView` alapértelmezett betűszíne megváltozik az ott megadottra.
+Az `AndroidManifest.xml` fájlt megnézve látható, hogy az alkalmazásunk alapértelmezett témája az `AppTheme`. Így amit ebben a stílusban definiálunk, az lesz az alapértelmezett kinézet az egész alkalmazásunkban. Így például az `android:textViewStyle` definiálja, hogy hogyan néz ki az adott alkalmazásban egy `TextView`. Ezeknek a felüldefiniált stílusoknak minden esetben a beépített stílusból kell leszármaznia, jelen esetünkben a saját `TextView` stílusunknak az `android:Widget.TextView` stílusból. Ebben megadhatjuk a `textColor` attribútumot, aminek hatására minden `TextView` alapértelmezett betűszíne megváltozik az ott megadottra.
 
 ## Saját View létrehozása
 
@@ -222,9 +222,9 @@ LayoutInflater.from(context).inflate(R.layout.view_password_edittext, this, true
  
 kóddal tudjuk a `RelativeLayout`-ba felfújni, aminek hatására a `RelativeLayout`-nak lesz két gyerek nézete, egy `ImageView` és egy `EditText`.
 
-> A [`View`](https://developer.android.com/reference/android/view/View) ősosztálynak, és így a [`RelativeLayout`](https://developer.android.com/reference/android/widget/RelativeLayout)-nak is számos különböző konstruktora van, amelyek attól függően hívódnak meg, hogy hogy jön létre a `View` példány (layout-ból "felfújva", stb.). Mi a saját `PasswordEditText` osztályunkban [secondary constructor](https://kotlinlang.org/docs/reference/classes.html#secondary-constructors)-ok segítségével hozunk létre ezeknek megfelelő konstruktorokat, és mindegyikből áthívunk az ősosztály azonos paraméterezésű konstruktorába.
+> A [`View`](https://developer.android.com/reference/android/view/View) ősosztálynak, és így a [`RelativeLayout`](https://developer.android.com/reference/android/widget/RelativeLayout)-nak is számos különböző konstruktora van, amelyek attól függően hívódnak meg, hogy hogyan jön létre a `View` példány (layout-ból "felfújva", stb.). Mi a saját `PasswordEditText` osztályunkban [secondary constructor](https://kotlinlang.org/docs/reference/classes.html#secondary-constructors)-ok segítségével hozunk létre ezeknek megfelelő konstruktorokat, és mindegyikből áthívunk az ősosztály azonos paraméterezésű konstruktorába.
 
-> Az `ivPassword` és az `etPassword` nevű `View`-kat a fenti kódban csak az ID-juk szerint hivatkoztuk, `findViewById` hívások nélkül. Ezt a kényelmi funkciót a [`Kotlin Android Extensions`](https://kotlinlang.org/docs/tutorials/android-plugin.html#view-binding) plugin adja, amely a Kotlin támogatással együtt automatikusan hozzá lett adva a projetünkhöz. A plugin custom `View`-kban, `Activity`-kben, és `Fragment`-ekben is hasonlóképpen tudja nekünk kikeresni a különböző `View`-kat. Használatakor mindig figyeljünk rá, hogy az általa nyújtott `kotlinx.` csomagnévvel kezdődő property-ket importáljuk, és ne az `R` fájlban lévő azonosítókat.
+> Az `ivPassword` és az `etPassword` nevű `View`-kat a fenti kódban csak az ID-juk szerint hivatkoztuk, `findViewById` hívások nélkül. Ezt a kényelmi funkciót a [`Kotlin Android Extensions`](https://kotlinlang.org/docs/tutorials/android-plugin.html#view-binding) plugin adja, amely a Kotlin támogatással együtt automatikusan hozzá lett adva a projektünkhöz. A plugin custom `View`-kban, `Activity`-kben, és `Fragment`-ekben is hasonlóképpen tudja nekünk kikeresni a különböző `View`-kat. Használatakor mindig figyeljünk rá, hogy az általa nyújtott `kotlinx.` csomagnévvel kezdődő property-ket importáljuk, és ne az `R` fájlban lévő azonosítókat.
 
 A Kotlin osztály fontosabb függvényei:
 
