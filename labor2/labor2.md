@@ -602,9 +602,9 @@ Módosítsa a `PasswordEditText` osztályt úgy, hogy attribútumként megadhat�
 
 Segítség, az ehhez szükséges lépések:
 
-*   Új attribútum az `attrs.xml`-be, a típusa legyen `reference`.
-*   Ezt a feldolgozó osztályban *Resource ID*-ként olvashatjuk ki (`getResourceId()` függvény).
-*   Az így kapott azonosítóhoz tartozó `Drawable`-t a `getResources().getDrawable(resourceId)` függvény segítségével kérhetjük le.
-*   A `PasswordEditText` osztály `init` függvényének bővítése, hogy az `attrs` paraméterből olvassa ki a referenciát.
-*   Az attribútum használata az Activity elrendezésében.
-*   A kinyert `Drawable` beállítása az `eyeImageView` objektum képének (`setImageDrawable()` függvény).
+*   Új attribútum az `attrs.xml`-be, a típusa legyen `reference`. Figyeljünk rá, hogy ez egy új `styleable`-höz tartozzon, és ne a `ChoiceLayout` attribútumaihoz adjuk hozzá.
+*   Ezt a feldolgozó osztályban *Resource ID*-ként olvashatjuk ki (`getResourceId()` függvény). Itt alapértelmezett értéknek használhatjuk ugyanazt a beépített `@android:drawable/ic_menu_view` erőforrást, amit a `view_password_edittext`-ben eddig is használtunk az `ImageView` forrásaként, ezt Kotlin kódból az `android.R.drawable.ic_menu_view` szintaxissal érhetjük el.
+*   Az így kapott azonosítóhoz tartozó `Drawable`-t a `resources.getDrawable(resourceId)` függvény segítségével kérhetjük le.
+*   A `PasswordEditText` osztály bővítése, hogy az `attrs` paraméterből olvassa ki a referenciát.
+*   Az attribútum használata az `Activity` elrendezésében.
+*   A kinyert `Drawable` beállítása az `ivPassword` objektum képének (`setImageDrawable()` függvény).
