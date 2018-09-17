@@ -25,7 +25,7 @@ A projektben található egyetlen, indító `Activity` a `GameActivity`. Ez egy 
 
 ### Model
 
-A `model` csomagban található az előre elkészített játékmodell. Minden a játékban megjeleníthető entitás a megvalósítja a `Renderable` interface-t. A kirajzolást végző szál majd mindent, mint `Renderable`-t fog kezelni (ezt később készítjük majd el). Ezen keresztül az entitásoknak meg tudjuk adni, hogy mekkora a rajzfelület (`setSize`), hogy ebből a saját méreteit kiszámolhassa. Lehetőség van minden egyes kirajzolás után az objektum állapotát léptetni (`step`), valamint minden objektumnak ki kell tudnia rajzolni magát egy `Canvas` objektumra (`render`).
+A `model` csomagban található az előre elkészített játékmodell. Minden a játékban megjeleníthető entitás megvalósítja a `Renderable` interface-t. A kirajzolást végző szál majd mindent `Renderable`-ként fog kezelni (ezt később készítjük majd el). Ezen keresztül az entitásoknak meg tudjuk adni, hogy mekkora a rajzfelület (`setSize`), hogy ebből a saját méreteit kiszámolhassa. Lehetőség van minden egyes kirajzolás után az objektum állapotát léptetni (`step`), valamint minden objektumnak ki kell tudnia rajzolni magát egy `Canvas` objektumra (`render`).
 
 ### Háttér
 
@@ -33,7 +33,7 @@ A legegyszerűbb játékelem a háttér (`Background`). A háttérnek nincs áll
 
 ### Űrhajó
 
-A játékban kétfelé űrhajó is található, a játékos (`Player`) és az ellenség (`Enemy`). Mindkét entitás az absztrakt `Ship`-ből származik. Minden `Ship`-hez tartozik egy kép, amit kirajzol magáról, valamint egy számlálóban lépteti, hogy hányadik kirajzolásról van szó, valamint a képernyőn lévő pozícióját (`posX`, `posY`) is tárolja. Ezen túl még van egy `elevation` propertyje, amivel mozgatni fogjuk az űrhajót. A `Player` és az `Enemy` osztályok a megfelelő bitmapet töltik be, valamint eltárolják, hogy a bitmapen belül hol helyezkedik el az űrhajó alapállapota. A `Player` objektum az `elevation` értékétől függően függőlegesen mozog, az `Enemy` objektum pedig egy véletlenszerű magasságon mozog egy adott sebességgel jobbról balra.
+A játékban kétfelé űrhajó is található, a játékos (`Player`) és az ellenség (`Enemy`). Mindkét entitás az absztrakt `Ship`-ből származik. Minden `Ship`-hez tartozik egy kép, amit kirajzol magáról, ezen kívül egy számlálóban lépteti, hogy hányadik kirajzolásról van szó, valamint a képernyőn lévő pozícióját (`posX`, `posY`) is tárolja. A `Player` és az `Enemy` osztályok a megfelelő bitmapet töltik be, eltárolják, hogy a bitmapen belül hol helyezkedik el az űrhajó alapállapota. A `Player` objektum az `elevation` property-jének értékétől függően függőlegesen mozog, az `Enemy` objektum pedig egy véletlenszerű magasságon mozog egy adott sebességgel jobbról balra.
 
 ## A Renderer elkészítése
 
@@ -267,9 +267,9 @@ Próbáljuk ki az alkalmazást!
 
 ### Animáció
 
-Az animációk során `Sprite`-okat, olyan képeket használunk, ahol az animáció egyes állapotai mind megtalálhatóak ugyanazon a képen. Spriteok esetén az animáció a gyakorlatban abból áll, hogy a forrásképen egy maszkot tologatunk attól függően hogy milyen állapotban van az animáció. Így megspóroljuk a folyamatos kép betöltést, és a GC-t sem terheljük túl.
+Az animációk során *Sprite*okat, olyan képeket használunk, ahol az animáció egyes állapotai mind megtalálhatóak ugyanazon a képen. *Sprite*ok esetén az animáció abból áll, hogy a forrásképen egy maszkot tologatunk attól függően, hogy milyen állapotban van az animáció. Így megspóroljuk a folyamatos kép betöltést, és a GC-t sem terheljük túl.
 
-A `Ship` osztály valamint a `Player` és `Enemy` már fel vannak készítve arra hogy különböző állapotok között animáljanak. A megfelelő képi erőforrások is biztosítottak, már csak a képeket kell elcsúsztatni az adott állapotba, a `Ship` osztály `render` függvényében: 
+A `Ship` osztály, valamint a `Player` és `Enemy` már fel vannak készítve arra, hogy különböző állapotok között animáljanak. A megfelelő képi erőforrások is biztosítottak, már csak a képeket kell elcsúsztatni az adott állapotba, a `Ship` osztály `render` függvényében: 
 
 ```kotlin
 override fun render(canvas: Canvas) {
@@ -284,7 +284,6 @@ override fun render(canvas: Canvas) {
     val src = Rect(x, y, x + spriteWidth, y + spriteHeight)
     val dst = Rect(posX, posY, posX + spriteWidth * 4, posY + spriteHeight * 4)
 
-
     canvas.drawBitmap(image, src, dst, null)
 }
 ```
@@ -295,7 +294,7 @@ Próbáljuk ki az alkalmazást!
 
 ## FPS korlát elhelyezése
 
-Azért hogy a kirajzolás sebességét egy fix értékre állítsuk két kirajzolás között aludnia kell a kirajzoló szálnak, amennyiben a kirajzolás nem tartott annyi ideig, mint a kívánt FPS érték időköze. 
+Azért, hogy a kirajzolás sebességét egy fix értékre állítsuk két kirajzolás között aludnia kell a kirajzoló szálnak, amennyiben a kirajzolás nem tartott annyi ideig, mint a kívánt FPS érték időköze. 
 
 A `RenderLoop` osztályt egészítsük ki a következőkkel:
 
@@ -335,9 +334,9 @@ override fun run() {
 }
 ```
  
-A renderelés kezdete és vége előtt eltelt időt nézzük és ha ez kisebb mint amennyi az adott FPS számhoz szükséges, úgy a megfelelő ideig altatjuk a szálat. Amennyiben tovább tartott a renderelés, akkor is adunk valamennyi alvás időt a CPU-nak.
+Ebben a renderelés kezdete és vége között eltelt időt nézzük, és ha ez kisebb mint amennyi az adott FPS számhoz szükséges, úgy a megfelelő ideig altatjuk a szálat. Amennyiben tovább tartott a renderelés, akkor is adunk valamennyi alvás időt a CPU-nak.
 
-`Próbáljuk ki az alkalmazást!` 
+Próbáljuk ki az alkalmazást! 
 
 ![](./images/animate.gif)
 
