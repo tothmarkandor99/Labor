@@ -26,9 +26,7 @@ A feladat megvalósításához szerver oldalon egy galéria alkalmazás áll ren
 
 ### API leírás
 
-A galéria egy HTTP API-n keresztül lehetőséget biztosít arra, hogy a képeket listázzuk, új képek tölsünk fel, illetve hogy képet értékeljünk.
-
-Az API a követekező címen érhető el:
+A galéria egy HTTP API-n keresztül lehetőséget biztosít arra, hogy a képeket listázzuk, új képek töltsünk fel, illetve hogy képet értékeljünk. Az API a követekező címen érhető el:
 
 ```
 http://android-gallery.node.autsoft.hu/api
@@ -40,7 +38,7 @@ A `GET /images` lehetőségünk van a feltöltött fotókat listázni.
  
  A válasz egy JSON tömb, ami a képek adatait tartalmazza, pl. 
  
- ```javascript
+```json
 [
   {
     "_id": "58a5b80aa8e86411008ca8e4",
@@ -55,7 +53,7 @@ A `GET /images` lehetőségünk van a feltöltött fotókat listázni.
 ]
  ```
  
- A képek URL je, az API címe után fűzve érhető el. (Ne feledkezzünk meg a `/`-ről.)
+ A képek URL je, az API címe után fűzve érhető el.
 
 #### Fotó feltöltése
 
@@ -81,11 +79,11 @@ Hozzunk létre egy új Android Studio projektet `CameraLabor` néven.
 
 A *Company domain* mező tartalmát töröljük ki és hagyjuk is üresen.
  
-A *Package name* legyen `hu.bme.aut.android.cameralabor` 
+A *Package name* legyen `hu.bme.aut.android.cameralabor`.
 
-A támogatott céleszközök a *Telefon és Tablet*, valamint a minimum SDK szint a *API19: Android 4.4* 
+A támogatott céleszközök a *Telefon és Tablet*, a minimum SDK szint az *API19: Android 4.4*.
 
-A kezdő projekthez adjuk hozzá egy *Empty Activity*-t, melynek neve legyen `MainActivity`. 
+A kezdő projekthez válasszunk egy *Empty Activity*-t, melynek neve legyen `MainActivity`. 
 
 Töröljük ki a `test` és `androidTest` mappákat, most nem lesz rájuk szükség.
 
@@ -97,26 +95,26 @@ Vegyük fel a Manifest állományba a szükséges engedélyeket:
 <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 ```
 
-> Ezen engedélyek közül a kamera kezelés és a külső háttértár elérése veszélyes engedély, amit Android 6.0 felett megfelelően, futásidőben kell elkérni. A félév során lesz ennek a menetéről is szó. Mi ezt most a laboron nem szeretnénk támogatni, ezért a modul szintű `build.gradle`-ben a `targetSdkVersion` értékét vegyük le `22`-re.
+> Ezen engedélyek közül a kamera kezelés és a külső háttértár elérése veszélyes engedély, amit Android 6.0 felett futásidőben kell elkérni. A félév során lesz ennek a menetéről is szó. Ezen a laboron azonban ezt még nem szeretnénk támogatni, ezért a modul szintű `build.gradle`-ben a `targetSdkVersion` értékét vegyük le `22`-re.
 
-A modul szintű `build.gradle`-ben vegyük fel a RecyclerView függőséget:
+A modul szintű `build.gradle`-ben vegyük fel a `RecyclerView` függőséget:
 
 ```groovy
-implementation 'com.android.support:recyclerview-v7:28.0.0-rc01'
+implementation 'com.android.support:recyclerview-v7:28.0.0-rc02'
 ```
  
-A `MainActivity` nézet fogja kilistázni a feltöltött képeket. Ez egy egyszerű `RecyclerView`, mely egy `SwipeRefreshLayout`-ba van ágyazva, ami lehetőséget biztosít arra, hogy a listához egyszerűen implementáljunk pull-to-refresh működést. A hozzá tartozó `activity_main.xml` tartalma a következő:
+A `MainActivity` nézet fogja kilistázni a feltöltött képeket. Ez egy egyszerű `RecyclerView`, mely egy `SwipeRefreshLayout`-ba van ágyazva, ami lehetőséget biztosít arra, hogy a listához egyszerűen implementáljunk *pull-to-refresh* működést. A hozzá tartozó `activity_main.xml` tartalma a következő:
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin">
+    android:layout_marginBottom="@dimen/activity_vertical_margin"
+    android:layout_marginEnd="@dimen/activity_horizontal_margin"
+    android:layout_marginStart="@dimen/activity_horizontal_margin"
+    android:layout_marginTop="@dimen/activity_vertical_margin">
 
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/srlImages"
@@ -125,12 +123,13 @@ A `MainActivity` nézet fogja kilistázni a feltöltött képeket. Ez egy egysze
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/rvImages"
-            android:scrollbars="vertical"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent"
+            android:scrollbars="vertical" />
+
     </android.support.v4.widget.SwipeRefreshLayout>
-    
-</RelativeLayout>
+
+</FrameLayout>
 ```
 
 A hiányzó dimenzió értékeket vegyük fel *Alt+Enter* segítségével. Értékük legyen `16dp`.
@@ -234,7 +233,7 @@ Próbáljuk ki az alkalmazást!
 
 ## Képek megjelenítése - Glide
 
-Az alkalmazás jelenleg a képek helyén a layout fájlban beállított alapértelmezett ikont jeleníti meg. Ez azért van, mert bár a listát feltöltöttük, az `onBindViewHolder(...)` hívásban nem állítottuk be a képet. A megjelenítendő képekről csak a webes URL áll rendelkezésünkre. Ilyen esetben a fájlt le kell töltenünk a hálózaton keresztül, dekódolni a kapott byte-okat, és az így kapott `Bitmap`-et beállítani az `ImageView` forrásaként. Ezt a platform által nyújtott eszközökkel elég kényelmetlen implementálni, ezért erre egy elterjedt, nyílt forráskódú könyvtárat fogunk használni.
+Az alkalmazás jelenleg a képek helyén a layout fájlban beállított alapértelmezett ikont jeleníti meg. Ez azért van, mert bár a listát feltöltöttük, az `onBindViewHolder(...)` hívásban nem állítottuk be a képet. A megjelenítendő képekről csak a webes URL áll rendelkezésünkre. Ilyen esetben a fájlt le kell töltenünk a hálózaton keresztül, dekódolni a kapott bájtokat, és az így kapott `Bitmap`-et beállítani az `ImageView` forrásaként. Ezt a platform által nyújtott eszközökkel elég kényelmetlen implementálni, ezért erre egy elterjedt, nyílt forráskódú könyvtárat fogunk használni.
 
 A [Glide](https://github.com/bumptech/glide) egy általános célú képkezelő könyvtár, gyakorlatilag a fent említett műveleteket végzi el helyettünk egyetlen kódsor használatával, továbbá támogatja a cache-elést, az aszinkron letöltést, valamint több forrásból is képes megjeleníteni (web, háttértár, content provider, resource, stb.). 
 
@@ -247,7 +246,8 @@ implementation 'com.github.bumptech.glide:glide:4.7.1'
 Ezután az `ImagesAdapter` `onBindViewHolder` függvényében töltsük be az adott fotót az `ImageView`-ba:
 
 ```kotlin       
-Glide.with(context).load(images[position]).into(holder.imageView)
+val imageUrl = images[position]
+Glide.with(context).load(imageUrl).into(holder.imageView)
 ```
 
 Próbáljuk ki az alkalmazást!
@@ -282,10 +282,11 @@ data class Image(
         val url: String,
         val size: Long,
         val mimetype: String,
-        val encoding: String)
+        val encoding: String
+)
 ```
 
-Látható, hogy a Gson automatikus megoldja majd az egyes tagváltozók szerializálását, kivéve az id mezőt, mivel azt a szerver `_id`-ként adja vissza. Ezt a `@SerializedName` annotációval írhatjuk felül.
+A Gson automatikus megoldja majd az egyes tagváltozók szerializálását, kivéve az `id` property esetében, mivel azt a szerver `_id`-ként adja vissza. Ezt a `@SerializedName` annotációval adhatjuk meg.
 
 Ezután hozzunk létre egy új csomagot `network` néven, benne egy új interface-t `GalleryAPI` néven. Ez lesz az API leírónk. Az elérhető `Call` osztályok közül válasszuk a Retrofit által nyújtottat, az `Image` osztályok közül pedig mindig a sajátunkat importáljuk. 
 
@@ -312,7 +313,7 @@ interface GalleryAPI {
 }
 ```
 
-Ezután hozzuk létre azt az osztályt a `network` csomagban, amely a fenti API-t használni fogja. Ennek az osztálynak az a feladata, hogy a fenti API hívásokat egységbezárja, és az előző laboron látott módon külön szálon végezze el a hálózati hívásokat. *Az eseménybusz megoldást most idő hiányában nem használjuk, de abszolút releváns ebben a helyzetben is.**
+Ezután hozzuk létre azt az osztályt a `network` csomagban, amely a fenti API-t használni fogja. Ennek az osztálynak az a feladata, hogy a fenti API hívásokat egységbezárja, és az előző laboron látott módon külön szálon végezze el a hálózati hívásokat. *Az eseménybusz megoldást most idő hiányában nem használjuk, de abszolút releváns ebben a helyzetben is.*
 
 Az osztály neve legyen `GalleryInteractor`.
 
@@ -332,26 +333,30 @@ class GalleryInteractor {
 }
 ```
 
-Látható, hogy a `Retrofit` objektumot felhasználva hozzuk létre a `GalleryAPI` osztály implementációját, melyet azután használhatunk is. Itt állítjuk be hogy a konverziókhoz a `Gson`-t használja, így felteti meg a `Retrofit` a Kotlin modell objektumokat a JSON formátumnak (illetve szükség esetén visszafelé is).
+Látható, hogy a `Retrofit` objektumot felhasználva hozzuk létre a `GalleryAPI` osztály implementációját, melyet azután használhatunk is. Itt állítjuk be hogy a konverziókhoz a `Gson`-t használja, így felelteti meg a `Retrofit` a Kotlin modell objektumokat a JSON formátumnak (illetve szükség esetén visszafelé is).
 
 
 Azért, hogy a hálózati hívásokat külön szálra ütemezzük, majd a választ egy interface-en keresztül visszaütemezzük a főszálra *generikus függvényeket* fogunk használni. Az API-ban definiált `Call` objektumok lehetővé teszik, hogy a hálózati hívások ne a definiálás (ne a függvényhívás) idejében történjenek, hanem később tetszőlegesen (`.execute()` hívással) bármikor. Ez lehetőséget ad arra, hogy az összeállított kéréseket generikusan kezeljük (nem kell minden kérésre külön implementálni a szálkezelést). 
 
-Készítsük is el a generikus hívásunkat, mely egy tetszőleges típusú `Call` objektumot vár, azt egy új szálon meghívja, majd a választ (`Handler` segítségével) visszaütemezi a főszálra, és ott meghívja az előbb létrehozott listener objektumot. A `Handler`-rel a `runOnUiThread`-hez hasonló működést tudunk elérni, anélkül hogy referenciánk lenne egy `Activity`-re. Mind a sikeres hívás `onSuccess`, mind a sikertelen hívás `onError` esetére definiáljunk egy visszatérési érték nélküli, egy paraméteres lambdát, siker esetén a válasszal, mely a `T` generikus paraméter, hiba esetén a kapott `Exception`.
+Készítsük is el a generikus hívásunkat, mely egy tetszőleges típusú `Call` objektumot vár, azt egy új szálon meghívja, majd a választ (`Handler` segítségével) visszaütemezi a főszálra, és ott meghívja az előbb létrehozott listener objektumot. A `Handler`-rel a `runOnUiThread`-hez hasonló működést tudunk elérni, anélkül hogy referenciánk lenne egy `Activity`-re. Mind a sikeres hívás `onSuccess`, mind a sikertelen hívás `onError` esetére definiáljunk egy visszatérési érték nélküli, egy paraméteres lambdát, ez siker esetén a válasz lesz, mely a `T` generikus típussal rendelkezik, hiba esetén pedig a kapott `Exception`.
 
-Ennek a kódja a következő (ezt is a **GalleryInteractor**-ban definiáljuk):
+Ennek a kódja a következő (ezt is a `GalleryInteractor`-ban definiáljuk):
 
 ```kotlin
-private fun <T> runCallOnBackgroundThread(call: Call<T>, onSuccess: (T) -> Unit, onError: (Throwable) -> Unit) {
+private fun <T> runCallOnBackgroundThread(
+        call: Call<T>,
+        onSuccess: (T) -> Unit,
+        onError: (Throwable) -> Unit
+) {
     val handler = Handler()
     Thread {
         try {
             val response = call.execute().body()!!
-            handler.post { onSuccess.invoke(response) }
+            handler.post { onSuccess(response) }
 
         } catch (e: Exception) {
             e.printStackTrace()
-            handler.post { onError.invoke(e) }
+            handler.post { onError(e) }
         }
     }.start()
 }
@@ -387,9 +392,7 @@ fun uploadImage(
 }
 ```
 
-Figyeljük meg, hogy az adott hívás nem egyből a válasz típusával tér vissza, hanem azt a már említett `Call` objektumba csomagolja, így nagyobb rugalmasságot adva a fejlesztőknek.
-
-Ezután a `MainActivity`-ben példányosítsuk a `GalleryInteractor`-unkat, majd hívjuk meg a `getImages` hívást, melynek eredményét jelentsük meg a `ImagesAdapter` segítségével.
+Ezután a `MainActivity`-ben példányosítsuk a `GalleryInteractor`-unkat, majd hajtsuk végre a `getImages` hívást, melynek eredményét jelentsük meg a `ImagesAdapter` segítségével.
 
 ```kotlin
 private fun loadImages() {
@@ -411,7 +414,7 @@ private fun showError(e: Throwable) {
 
 > A `getImages` által várt függvény paramétereket lambdák létrehozása helyett [metódus referenciákkal](https://kotlinlang.org/docs/reference/lambdas.html#instantiating-a-function-type) adtuk át, amihez természetesen a `showImages` és `showError` függvényeknek a megfelelő fejléccel kell rendelkezniük.
 
-Mivel eddig `String` listát jelenítettünk meg az `ImagesAdapter`-rel, most át kell alakítani az adaptert, hogy egy `Image` listát kezeljen. Ezen kívül az `IMAGE_PREFIX_URL` után kell fűznünk a kép `url` mezőjének tartalmát.
+Mivel eddig `String` listát jelenítettünk meg az `ImagesAdapter`-rel, most át kell alakítani az adaptert, hogy egy `Image` listát kezeljen. Ezen kívül a képek eléréhez az `IMAGE_PREFIX_URL` után kell fűznünk a kép `url` mezőjének tartalmát.
 
 ```kotlin
 class ImagesAdapter(
@@ -431,13 +434,17 @@ class ImagesAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        Glide.with(context).load(GalleryAPI.IMAGE_PREFIX_URL + images[position].url).into(holder.imageView)
+        val image = images[position]
+
+        Glide.with(context)
+                .load(GalleryAPI.IMAGE_PREFIX_URL + image.url)
+                .into(holder.imageView)
     }
 
     override fun getItemCount() = images.size
 
-    class ViewHolder(v: View) : RecyclerView.ViewHolder(v) {
-        var imageView: ImageView = v.ivImage
+    class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        var imageView: ImageView = itemView.ivImage
     }
 
 }
@@ -500,11 +507,9 @@ Hozzunk létre egy új *Empty Activity*-t `UploadActivity` néven. A hozzá tart
 </LinearLayout>
 ```
 
-Töltsük le az üres képet jelző [placeholder](./images/placeholder.png) képet, és másoljuk a `drawable` mappába.
-
 Az `UploadActivity`-ben a *Capture* gomb megnyomásra elindítjuk a beépített kamera alkalmazást, majd a fotózott képet visszakapva megjelenítjük azt (szintén *Glide* segítségével).
 
-A beépített Kamera alkalmazás indítása előtt definiálunk egy útvonalat az *External Storage*-ban (miért itt?), majd ezt adjuk át paraméterként, erre a helyre fogja a Kamera alkalmazás menteni az elkészített fotót. Az *Activity* kódja a következő:
+A beépített Kamera alkalmazás indítása előtt definiálunk egy útvonalat az *External Storage*-ban (miért itt?), majd ezt adjuk át paraméterként, erre a helyre fogja a Kamera alkalmazás menteni az elkészített fotót. Az ezt elvégző `UploadActivity` kódja a következő:
 
 
 ```kotlin
@@ -527,23 +532,25 @@ class UploadActivity : AppCompatActivity() {
             cameraIntent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, imageFileUri)
             startActivityForResult(cameraIntent, REQUEST_CAMERA_IMAGE)
         }
-
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == REQUEST_CAMERA_IMAGE) {
             if (resultCode == Activity.RESULT_OK) {
                 try {
-                    Glide.with(this).load(Uri.fromFile(File(IMAGE_PATH))).apply(RequestOptions().signature(ObjectKey(System.currentTimeMillis()))).into(ivImage)
+                    Glide.with(this)
+                            .load(Uri.fromFile(File(IMAGE_PATH)))
+                            .apply(RequestOptions().signature(ObjectKey(System.currentTimeMillis())))
+                            .into(ivImage)
 
                 } catch (t: Throwable) {
                     t.printStackTrace()
                     Toast.makeText(this, "ERROR: " + t.message, Toast.LENGTH_LONG).show()
                 }
-
             }
         }
     }
+
 }
 ```
 
@@ -591,7 +598,6 @@ Próbáljuk ki az alkalmazást!
 
 A feltöltéshez szükséges API definíció és Interactor hívás is definiálva van, így a `getImages`-hez hasonlóan hívjuk meg ezt a hívást is a kép `Uri` paraméterével. Ezt az `UploadActivity` `onCreate(..)` metódusában tegyük meg.
 
-
 ```kotlin
 override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -606,7 +612,7 @@ override fun onCreate(savedInstanceState: Bundle?) {
     }
 
     btnUpload.setOnClickListener {
-        val galleryInteractor = GalleryInteractor)
+        val galleryInteractor = GalleryInteractor()
 
         val name = etName.text.toString()
         val description = etDescription.text.toString()
@@ -622,14 +628,17 @@ override fun onCreate(savedInstanceState: Bundle?) {
 }
 
 private fun uploadSuccess(responseBody: ResponseBody) {
-    Toast.makeText(this@UploadActivity, "Successfully uploaded!", Toast.LENGTH_SHORT).show()
+    Toast.makeText(this, "Successfully uploaded!", Toast.LENGTH_SHORT).show()
+    finish()
 }
 
 private fun uploadError(e: Throwable) {
-    Toast.makeText(this@UploadActivity, "Error during uploading photo!", Toast.LENGTH_SHORT).show()
+    Toast.makeText(this, "Error during uploading photo!", Toast.LENGTH_SHORT).show()
     e.printStackTrace()
 }
 ```
+
+>Láthatjuk, hogy az [elnevezett paraméterek](https://kotlinlang.org/docs/reference/functions.html#named-arguments) mennyivel olvashatóbbá tudják tenni egy sok paraméterrel rendelkező függvény meghívását.
 
 Figyeljük meg, hogy nekünk csak a fájl elérési útvonalát kellett megadnunk, a fájl beolvasását és feltöltését a *Retrofit* elvégzi helyettünk.
 
@@ -639,7 +648,7 @@ Próbáljuk ki az alkalmazást, és töltsünk fel egy fotót!
 
 ## Megjegyzések:
 
-A labor során a 22-es `targetSdkVersion` beállításával több, az újabb Android verziókban bevezetett változtatást/megszorítást megkerültünk. [A Google azonban](https://developer.android.com/distribute/best-practices/develop/target-sdk) 2018 augusztusától nem enged 26-nál kisebb target SDK-val alkalmazásokat publikálni, 2018 novemberétől pedig meglévő alkalmazásokat sem lehet frissíteni úgy, hogy az új verzió ne célozná meg legalább a 26-os SDK-t.
+A labor során a 22-es `targetSdkVersion` beállításával több, az újabb Android verziókban bevezetett változtatást/megszorítást megkerültünk. A Google azonban 2018 augusztusától nem enged 26-nál kisebb target SDK-val alkalmazásokat publikálni, 2018 novemberétől pedig meglévő alkalmazásokat sem lehet frissíteni úgy, hogy az új verzió ne célozná meg legalább a 26-os SDK-t. Ennek részleteiről itt olvashatunk bővebben: https://developer.android.com/distribute/best-practices/develop/target-sdk
 
 A teljesség kedvéért a most kihagyott részek az alábbiak voltak:
 - Android Pie (28)-tól külön engedélyeznünk kéne a http feletti kommunikációt, ahogy azt már az előző laboron láttuk.
@@ -654,7 +663,7 @@ Az előző labor mintájára módosítsd úgy a generikus szálkezelő megoldás
 
 ### Feladat 2: Szavazat feltöltése
 
-Az API-val lehetőség van szavazatokat is feltölteni. Egészítsd ki a fotók listáját egy részletek nézettel, ahol a felhasználó megadhatja az adatait, és a fotó értékelését. Majd töltse fel az értékelést az API-n keresztül. Az értékelés változását a [weboldalon](http://android-gallery.node.autsoft.hu/) keresztül követheted.
+Az API-val lehetőség van szavazatokat is feltölteni. Egészítsd ki a fotók listáját egy részletek nézettel, ahol a felhasználó megadhatja az adatait, a fotó értékelését, és feltöltheti az értékelést az API-n keresztül. Az értékelés változását a [weboldalon](http://android-gallery.node.autsoft.hu/) keresztül követheted.
 
 Segítség: a hozzá tartozó hívás Retrofit hívás leírója a következő:
 
