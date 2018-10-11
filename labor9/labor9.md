@@ -3,45 +3,41 @@
 
 ## Bevezetés
 
-Ma már igen sok alkalmazás található a Play áruházban, köszönhető ez többek között a terjesztés egyszerűségének és az alacsony belépési korlátnak. Azonban ezeknek az alkalmazásoknak igen magas hányada végzi alacsony értékeléssel és magas elégedetlenséggel. A legtöbb projekt fejlesztője késznek érzi az alkalmazást, azonban csak magára gondol és nem a felhasználóra. Ezen a laboron bemutatunk néhány egyszerű fogalmat és technikát, ami segít abban, hogy minőségibb alkalmazások szülessenek. Ehhez egy alapvetően prototípus kaliberű alkalmazást fogunk material szemlélettel javítani.
+Ma már igen sok alkalmazás található a Play áruházban, köszönhető ez többek között a terjesztés egyszerűségének és az alacsony belépési korlátnak. Azonban ezeknek az alkalmazásoknak igen magas hányada végzi alacsony értékeléssel és magas elégedetlenséggel. A legtöbb projekt fejlesztője késznek érzi az alkalmazást, azonban csak magára gondol és nem a felhasználóra. Ezen a laboron bemutatunk néhány egyszerű fogalmat és technikát, ami segít abban, hogy minőségibb alkalmazások szülessenek. Ehhez egy prototípus alkalmazást fogunk Material szemlélettel javítani.
 
-Tartsuk szem előtt, hogy ez csak néhány egyszerű ötlet, és ahogy a lollipopos megjelenésű elemektől még nem lesz material egy alkalmazás megjelenése, úgy mi sem leszünk mindenható dizájnerek a labor után. Ez a témakör koránt sem olyan egyértelmű, mint a mérnöki tanulmányok jó része, az itt alkalmazott lépések nem feltétlenül univerzálisak.
+Tartsuk szem előtt, hogy ez csak néhány egyszerű ötlet, és ahogy pár Material megjelenésű elemtől még nem lesz Material Design szerinti egy alkalmazás megjelenése, úgy mi sem leszünk mindenható designerek a labor után. Ez a témakör koránt sem olyan egyértelmű, mint a mérnöki tanulmányok jó része, az itt alkalmazott lépések nem feltétlenül univerzálisak.
 
 
 ## Material és UX alapok
 
-Először is, akinek szándékában áll végigolvasni a teljes útmutatót később, az itt megteheti:
-[https://material.google.com/#](https://material.google.com/#)
+A Material Design teljes útmutatója a [material.io/design/](https://material.io/design/) címen érhető el. Ezt érdemes egyszer jól átnézni, és később egy-egy adott design kérdés felmerülésekor újra felkeresni a megfelelő részeit, hogy informált döntést tudjunk hozni.
 
+* A Material Designban lényeges minden elem megjelenése. Például a *Floating Action Button* vetett árnyéka nem véletlen. Funkciója kiemelkedik, ezért megjelenítéskor is azt próbáljuk hangsúlyozni, hogy feljebb van. Az elemeknek van Z tengely szerinti **magasságuk (elevation)**, a rendszer ebből számolja az általuk vetett árnyékot.
 
-* A material dizájnban lényeges minden elem megjelenése. Például a Floating Action Button vetett árnyéka nem véletlen. Funkciója kiemelkedik, ezért megjelenítéskor is azt próbáljuk hangsúlyozni, hogy feljebb van. Az elemeknek van Z tengely szerinti **magasságuk**, a rendszer ebből számolja az általuk vetett árnyékot.
+* Az **animációknak jelentéssel kell bírniuk**. Csak úgy nem animálunk dolgokat, mert az jól néz ki. Ha egy listaelemre vagy kártyára tapint a felhasználó, akkor azt az elemet átanimálhatjuk az új képernyővé úgy, hogy a kártya (vagy listaelem) olyan elemei, amik a következő képernyőn is szerepelnek elfoglalják új helyüket a második képernyőn. Android platformon már régóta elérhetőek egyszerű áttűnések, lapozások a képernyőátmenetek közt. Erre azért van szükség, mert a felhasználót megzavarhatja a hirtelen váltás. A való életben sem villanással kerül az égre a madár, hanem lezajlik egy átmenet (a felszállás), ami átvezet a két állapot között. Emlékezzünk vissza: találkoztunk már olyan alkalmazással, ahol a képernyőváltás során oldalirányban úsztak ki-be a képernyők? Előre és visszafelé navigálásnál melyik irányba haladtak a képernyők?
 
-* Az **animációknak jelentésük** kell legyen. Csak úgy nem animálunk dolgokat, mert az jól néz ki. Ha egy listaelemre vagy kártyára tapint a felhasználó, akkor azt az elemet átanimálhatjuk az új képernyővé, úgy, hogy a kártya (vagy listaelem) olyan elemei, amik a következő képernyőn is szerepelnek elfoglalják új helyüket a második képernyőn. Az Android platformon már régóta elérhetőek egyszerű áttűnések, lapozások a képernyőátmenetek közt. Erre azért van szükség, mert a felhasználót (meg)zavarja a hirtelen váltás. A való életben sem villanással kerül az égre a madár, hanem lezajlik egy átmenet (a felszállás), ami átvezet a két állapot között. Emlékezzünk vissza: találkoztunk már olyan alkalmazással, ahol a képernyőváltás során oldalirányban úsztak ki-be a képernyők? Előre és visszafelé navigálásnál melyik irányba haladtak a képernyők?
+* Bár laboron a beépített komponensek során nem futunk ebbe a problémába, de jegyezzük meg: **minden felhasználói interakcióra legyen visszajelzés!** Gondoljunk bele mit teszünk, ha egy gombot megnyomva nem történik semmi (fel se villan a gomb nyomott állapota), mit feltételezünk? Jusson eszünkbe egyéni nézetek használatakor! A Material szemlélet ezt bővíti azzal, hogy a kiváltott változás egy egyre nagyobb sugarú kör íve mentén történik, aminek középpontja az a hely, ahol a felhasználó kiváltotta a változást.
+[Egy példa ilyen animációra.](http://material-design.storage.googleapis.com/publish/material_v_3/material_ext_publish/0B3T7oTWa3HiFdWhpd296VUhLTFk/animation_responsiveinteraction_radialreaction.webm?_=1)
 
-* Bár laboron a beépített komponensek során nem futunk ebbe a problémába, de jegyezzük meg: **minden felhasználói interakcióra legyen visszajelzés!** Gondoljunk bele mit teszünk, ha egy gombot megnyomva nem történik semmi (fel se villan a gomb nyomott állapota), mit feltételezünk? Jusson eszünkbe egyéni nézetek használatakor! A material szemlélet ezt bővíti azzal, hogy a kiváltott változás egy egyre nagyobb sugarú kör íve mentén történik, aminek középpontja az a hely, ahol a felhasználó kiváltotta a változást:
-[material animáció](http://material-design.storage.googleapis.com/publish/material_v_3/material_ext_publish/0B3T7oTWa3HiFdWhpd296VUhLTFk/animation_responsiveinteraction_radialreaction.webm?_=1)
+* **Minimális gépelés.** Nehéz nagyobb fájdalmat okozni a felhsználónak annál, hogy mobilon kelljen gépelnie, nem véletlenül létezik annyi különböző gesztúra. Ha egyszerű bevitelről van szó (számok, intervallumok, dátumok) egyszerűsítsük csúszkával, vizuális naptári választóval.
 
-* **Minimális gépelés**. Nehéz nagyobb fájdalmat okozni a felhsználónak annál, hogy mobilon kelljen gépelnie, nem véletlenül létezik annyi különböző gesztúra. Ha egyszerű bevitelről van szó (számok, intervallumok, dátumok) egyszerűsítsük csúszkával, vizuális naptári választóval.
+* A Materialos színekhez jó segítség például [ez a (nem hivatalos) oldal](http://www.materialpalette.com/). Innen le is tudjuk tölteni xml formában a kapott színeket. Annyit érdemes tudni, hogy az "accent" színt csak a leghangsúlyosabb elemek kaphatják meg. Tipikusan ilyen a *Floating Action Button*, ami a képernyő legfontosabb funkcióját kell jelentse, ha van ilyen. Ugyanúgy másodlagos színt kapnak a *Switch* és a *Slider* nézetek is. A hivatalos leírás is [részletesen taglalja a színek használatát](https://material.io/design/color/the-color-system.html).
 
-* A materialos színekhez jó segítség az alábbi oldal: [http://www.materialpalette.com/](http://www.materialpalette.com/). Innen le is tudjuk tölteni xml formában a kapott színeket. Annyit érdemes tudni, hogy az “accent” színt csak a leghangsúlyosabb elemek kaphatják meg. Tipikusan ilyen a Floating Action Button, ami a képernyő legfontosabb funkcióját kell jelentse, ha van ilyen. Ugyanúgy másodlagos színt kapnak a Switch és a Slider nézetek is.
+* Ikonokat tervezni külön szakma, de mivel a legtöbb fejlesztő nem foglalkozik ilyesmivel másodállásban, ezért a Google nem csak néhány ikont készített el előre, hanem rengeteget. [Innen](https://material.io/tools/icons/) letölthetők a hivatalos ikonok. 
 
-* Ikonokat tervezni külön szakma, de mivel a legtöbb fejlesztő nem foglalkozik ilyesmivel másodállásban, ezért a Google nem csak néhány ikont készített el előre, hanem rengeteget. Innen letölthetőka hivatalos ikonok: [http://www.google.com/design/spec/resources/sticker-sheets-icons.html#sticker-sheets-icons-system-icons](http://www.google.com/design/spec/resources/sticker-sheets-icons.html#sticker-sheets-icons-system-icons). 
-
-* A fejlesztői közösség az előbbit tovább gondolta, és létrehoztak egy oldalt ezen ikonok egyszerű kezelésére, illetve számos továbbival ki is egészítettek. [https://materialdesignicons.com/](https://materialdesignicons.com/) Valószínűleg megtaláljuk a nekünk kellőt. Alapszabály, hogy ne használjunk olyan ikont (bármennyire is jó lenne), ami már másik ismert funkciót jelöl. Hasonlóan kinéző komponenstől a felhasználó azt várja, hogy hasonlóan fog működni. A Floating Action Button funkciójának alapvetően egy pozitív cselekedetnek kell lennie (jó példa az új elem létrehozása, rossz példa a szín módosítása vagy a kuka törlése), így válasszunk ennek megfelelő ikont. A laborhoz mellékeljük a szükséges ikonokat, de az otthoni használathoz a javasolt mód az alábbi:
+* A fejlesztői közösség az előbbit továbbgondolta, és létrehoztak egy oldalt ([materialdesignicons.com](https://materialdesignicons.com/)) ezen ikonok egyszerű kezelésére, illetve számos továbbival ki is egészítették a Google által nyújtott ikonkészletet. Alapszabály, hogy ne használjunk olyan ikont (bármennyire is jó lenne), ami már másik ismert funkciót jelöl. Hasonlóan kinéző komponenstől a felhasználó azt várja, hogy hasonlóan fog működni. A *Floating Action Button* funkciójának alapvetően egy pozitív cselekedetnek kell lennie (jó példa az új elem létrehozása, rossz példa a szín módosítása vagy a kuka törlése), így válasszunk ennek megfelelő ikont. A laborhoz mellékeljük a szükséges ikonokat, de az otthoni használathoz a javasolt mód a linkelt oldal használatával az alábbi:
 
  * Az Android 5.0 változatot töltsük le.
- * Válasszuk ki a nekünk kellő variánst. Szerepel fehérben, feketében, szürkében és mindhárom színhez 4 féle méretben (nekünk az `ic_add_white_24dp.png` kell)
+ * Válasszuk ki a nekünk kellő variánst. Szerepel fehérben, feketében, szürkében és mindhárom színhez 4 féle méretben.
  * Menjünk egy könyvtárral feljebb másoljuk az összes minősített mappát a célhelyre.
 
-* Tartsunk megfelelő távolságokat az elemek között, különösen ügyelve az interaktív elemekre. Lesz olyan, akinek nálunk nagyobb az ujjbegye, gondoljunk rá is! A tartalom ne kezdődjön a képernyő 0. pixelénél! Az ajánlásokban elég részletesen taglalják a számokat: az új guideline szerint minden elem egy 8dp-s rácsban helyezkedik el. Ez alól kivételek a szövegek (amiknek alapvonala igazodik 4dp-hez) és a toolbar ikonjai (szintén 4 dp). Tehát alapvetően mindennek a mérete vagy a távolsága n x 8dp. A kijelző szélétől tartandó margó például 16dp, az érinthető területek minimum mérete 48 x 48dp, a köztük tartandó távolság pedig minimum 8dp, de inkább több.
-* A képi elemek legyen inkább személyesek. Ne használjunk pár élettelen mosolyú modell arcát mutató sotck fotókat, a képnek legyen köze a tartalomhoz. A személyes (felhasználó készítette) képek még jobbak. A képek töltsék ki a teret, amennyire csak lehet! Ez azt jelenti, hogy szélességben a teljes kijelzőt fedje, magasságban pedig lehetőleg valamilyen jellegzetes arány vonalát kövesse. Van néhány ajánlás, ezekre az arányokra – mármint arra hogy bizonyos képarányú elemek magassága hol helyezkedik el.
+* Tartsunk megfelelő távolságokat az elemek között, különösen ügyelve az interaktív elemekre. Lesz olyan, akinek nálunk nagyobb az ujjbegye, gondoljunk rá is! A tartalom ne kezdődjön a képernyő 0. pixelénél! Az [ajánlásokban](https://material.io/design/layout/spacing-methods.html) elég részletesen taglalják a számokat: az új guideline szerint minden elem egy 8dp-s rácsban helyezkedik el. Ez alól kivételek a szövegek (amiknek alapvonala igazodik 4dp-hez) és a toolbar ikonjai (szintén 4 dp). Tehát alapvetően mindennek a mérete vagy a távolsága n x 8dp. A kijelző szélétől tartandó margó például 16dp, az érinthető területek minimum mérete 48 x 48dp, a köztük tartandó távolság pedig minimum 8dp, de inkább több.
 
-* Ne használjuk a kártyanézeteket (tipikusan Google asszisztens) olyan elemekre, amik megjelenése azonos! Ezesetben egy listáról beszélünk, aminek használatát megnehezíti, hogy a kártyák közt van kihagyott terület és árnyékot is vetnek.
-
+* A képi elemek legyen inkább személyesek. Ne használjunk pár élettelen mosolyú modell arcát mutató stock fotókat, a képnek legyen köze a tartalomhoz. A személyes (felhasználó készítette) képek még jobbak. A képek töltsék ki a teret, amennyire csak lehet! Ez azt jelenti, hogy szélességben a teljes kijelzőt fedje, magasságban pedig lehetőleg valamilyen jellegzetes arány vonalát kövesse. Van néhány ajánlás, ezekre az arányokra – mármint arra hogy bizonyos képarányú elemek magassága hol helyezkedik el.
 
 ## Hasznos fejlesztői eszközök
 
-Amikor a felhasználói felületet igazítjuk, nem mindig egyértelmű, hogy miért azt látjuk renderelve, amit. A Beállítások/Fejlesztői eszközök menüpontban találjuk az alábbiakat:
+Amikor a felhasználói felületet igazítjuk, nem mindig egyértelmű, hogy miért azt látjuk renderelve, amit. A *Settings -> Developer options* menüpontban találjuk az alábbiakat:
 
 * **Show layout bounds**: Megmutatja mettől-meddig tartanak a nézetek, kiderülhet melyik eltartás (margin, padding) melyik nézethez tartozik.
 * **Windows animation scale**, **Transition animation scale** és **Animator duration scale**: Segítségükkel lelassíthatóak, részletesebben megtekinthetőek az egyébként gyors animációk.
@@ -57,71 +53,89 @@ Most, hogy néhány hasznos dolgot megismertünk, ideje letöltenünk a prototí
 
 [PlacesToVisit.zip](./assets/PlacesToVisit.zip)
 
-Tömörítsük ki a mappát, indítsuk el az Android Studio-t, majd az Open segítségével nyissuk meg az alkalmazást.
+Tömörítsük ki a mappát, indítsuk el az Android Studio-t, majd nyissuk meg az alkalmazást.
 
 <img src="./images/screen1_framed.png" width="200" align="middle">
 
-Ennek az alkalmazásnak az a feladata, hogy meglátogatandó helyeket gyűjtsünk benne. A prototípus arra koncentrál, hogy minimális funkcionalitást valósítson meg gyorsan. Az adatok perzisztens tárolásához a Google új, hivatalos *Room* API ([Room - Android Developers](https://developer.android.com/topic/libraries/architecture/room.html)) könyvtárat használja . Laborvezetővel tekintsék át a kódot és a működést! Főbb elemei:
+Ennek az alkalmazásnak az a feladata, hogy meglátogatandó helyeket gyűjtsünk benne. A prototípus arra koncentrál, hogy minimális funkcionalitást valósítson meg gyorsan. Az adatok perzisztens tárolásához a Google által készített [*Room*](https://developer.android.com/topic/libraries/architecture/room.html) könyvtárat használja. Laborvezetővel tekintsék át a kódot és a működést! Főbb elemei:
 
-* A Room számára annotációkkal adhatjuk meg hogy pontosan hogyan történjen az adott modell objektum mentése.
+* A Room számára annotációkkal adjuk meg, hogy pontosan hogyan történjen az adott modell objektum mentése.
 
-```kotlin
-@Entity
-data class Place(@ColumnInfo(name = "place_type")   var placeType: PlaceType,
-                 @ColumnInfo(name = "place_name")   var placeName: String,
-                 @ColumnInfo(name = "description")  var description: String,
-                 @ColumnInfo(name = "pick_up_date") var pickUpDate: Date) : Serializable{
+    ```kotlin
+    @Entity
+    data class Place(
+            @PrimaryKey(autoGenerate = true)
+            var id: Int = 0,
+            @ColumnInfo(name = "place_type")
+            var placeType: PlaceType = PlaceType.fromInt(0),
+            @ColumnInfo(name = "place_name")
+            var placeName: String = "",
+            @ColumnInfo(name = "description")
+            var description: String = "",
+            @ColumnInfo(name = "creation_date")
+            var creationDate: Date = Date(0)
+    )
+    ```
 
-    @PrimaryKey(autoGenerate = true)
-    var id : Long? = null
-    ...
-}
-```
+* Az adatok manipulálását az úgynevezett DAO (Data Access Object) osztályokon keresztül végezetjük. Mi csak egy megfelelő annotációkkal ellátott interface-t definiálunk, az implementációt pedig (a korábban már látott Retrofithez hasonlóan) a könyvtár generálja majd nekünk. Az interface függvényein lévő annotációk magukért beszélnek - az `@Insert` beilleszt elemeket, a `@Delete` töröl, a `@Query`-be pedig tetszőleges SQL kódot írhatunk, kódkiegészítésel!
 
-* Az adatok manipulálását az úgynevezett DAO (Data Access Object) osztályokon keresztől végezetjük. Mi csak egy megfelelő annotációkkal ellátott interfacet definiálunk (az Annotáció magáért beszél, a `@Query`-be SQL kódot írhatunk, kódkiegészítésel **!!!**)
+    ```kotlin
+    @Dao
+    interface PlaceDao {
+    
+        @Insert
+        fun insertAll(vararg places: Place)
+    
+        @Query("SELECT * FROM Place")
+        fun getAll(): List<Place>
+    
+        @Update
+        fun updatePlace(place: Place): Int
+    
+        @Delete
+        fun delete(place: Place)
+    
+    }
+    ``` 
 
-```kotlin
-@Dao
-interface PlaceDao {
+* A generált Dao implementáció egy `RoomDatabase`-ből származó osztály segítségével érhető el. Ez is egy `abstract` osztály, melyhez az implementációt a Room generálja majd. Az adatbázis általános beállításai itt adhatóak meg, szintén annotációkkal.
 
-    @Insert
-    fun insertAll(vararg places: Place)
+    ```kotlin
+    @Database(entities = [Place::class], version = 1, exportSchema = false)
+    @TypeConverters(DateTypeConverter::class, PlaceTypeConverter::class)
+    abstract class PlaceDatabase : RoomDatabase() {
+    
+        abstract fun placeDao(): PlaceDao
+    
+    }
+    ```
 
-    @Query("SELECT * FROM Place")
-    fun getAll(): List<Place>
+* Az adatbázisból példányt a `Room` osztály factory metódusainak segítségével kaphatunk.
 
-    @Update
-    fun updatePlace(place: Place): Int
-
-    @Delete
-    fun delete(place: Place)
-}
-
-``` 
-
-* A DAO-hoz generált kód a Database osztály segítségével érhető el. Ez is egy abstract osztály, melyhez az implementációt a Room generálja. Az adatbázis általános beállításai is itt adhatóak meg, szintén annotációkkal.
-
-```kotlin
-@Database(entities = [Place::class], version = 1, exportSchema = false)
-@TypeConverters(DateTypeConverter::class, PlaceTypeConverter::class)
-abstract class PlaceDatabase : RoomDatabase() {
-    abstract fun placeDao(): PlaceDao
-}
-```
-
-* Az adatbázishoz, és így a generált kódokhoz hozzáférést a Room osztály factory metódusainak segítségével kaphatunk.
-
-```kotlin
-db = Room.databaseBuilder(applicationContext, 
-        PlaceDatabase::class.java, "place-db").build()
-```
+    ```kotlin
+    db = Room.databaseBuilder(applicationContext, 
+            PlaceDatabase::class.java, "place-db").build()
+    ```
 
 
 ### Menü
 
-Új elemet az options menü megnyomásával lehet létrehozni, amely menüben más elem nincs is. Ez a menü tipikusan nem ilyen feladatokra szolgál. Az ilyen feladatokat Floating Action Buttonnel szokás megoldani. Ezért először is töröljük a menüt a nyitóképernyőről, majd helyezzünk fel egy Floating Action Buttont. Ehhez töröljük az Activity OnCreateOptionsMenu és OnOptionsItemSelected metódusait, illetve a res/menu mappát, majd hozzunk létre egy Floating Action Buttont!
+Új elemet az options menü megnyomásával lehet létrehozni, amely menüben más elem nincs is. Ez a menü tipikusan nem ilyen feladatokra szolgál, ezt inkább *Floating Action Button*-nel szokás megoldani. Ezért először is töröljük a menüt a nyitóképernyőről: távolítsuk el az `Activity` meglévő `onCreateOptionsMenu` és `onOptionsItemSelected` metódusait, illetve a használt `menu_places_list.xml` erőforrást. 
 
-A PlacesListActivityben az OnCreatebe:
+Ezután hozzunk létre egy *Floating Action Button*-t, az `activity_places_list.xml`-ben az `include` után:
+
+```xml
+<android.support.design.widget.FloatingActionButton
+    android:id="@+id/addButton"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_alignParentEnd="true"
+    android:layout_alignParentBottom="true"
+    android:layout_gravity="bottom|end"
+    android:layout_margin="@dimen/fab_margin" />
+```
+
+Állítsuk be a megfelelő listenert is a `PlaceListActivity` `onCreate` függvényében:
 
 ```kotlin
 addButton.setOnClickListener{
@@ -129,26 +143,9 @@ addButton.setOnClickListener{
 }
 ```
 
-
-Az `activity_places_list.xml`ben az include után:
-
-```xml
-<android.support.design.widget.FloatingActionButton
-    android:id="@+id/addButton"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_gravity="bottom|end"
-    android:layout_margin="@dimen/fab_margin"
-    android:layout_alignParentBottom="true"
-    android:layout_alignParentRight="true"/>
-```
-
-
 ### FAB ikon
 
-A Floating Action Button ikonja fontos szerepet játszik. A felhasználónak  első ránézésre tudnia kell belőle, hogy mire szolgál a gomb. Így tehát olyan ikont kell választanunk, amiből rögtön látszik, hogy a gomb elem hozzáadására szolgál. Töltsük le az alábbi *zip*et:
-
-[Drawable.zip](./assets/drawable.zip)
+A *Floating Action Button* ikonja fontos szerepet játszik. A felhasználónak első ránézésre tudnia kell belőle, hogy mire szolgál a gomb. Így tehát olyan ikont kell választanunk, amiből rögtön látszik, hogy a gomb elem hozzáadására szolgál. Töltsük le az ikont tartalmazó *zip* fájlt: [drawable.zip](./assets/drawable.zip)
 
 Tömörítsük ki és tegyük a projektünkbe, majd állítsuk be a FAB ikonját az `activity_places_list.xml`-ben:
 
@@ -156,33 +153,29 @@ Tömörítsük ki és tegyük a projektünkbe, majd állítsuk be a FAB ikonját
 app:srcCompat="@drawable/ic_add_white_24dp"
 ```
 
-
 ### A lista fejléce
 
-Jelenleg a Toolbaron megjelenik az Activity neve, ami "PlacesToVisit", alatta egy TextView-ban pedig a szöveg, hogy "Places to visit". Ezek közül az egyik felesleges, és szebb, ha a normál helyesírás szerinti "Places to visit"-et hagyjuk meg. Azonban egy üres Toolbarnak nincs sok értelme, úgyhogy inkább rakjuk fel ezt a szöveget oda.
+Jelenleg a `Toolbar`-on megjelenik az `Activity` neve, ami *PlacesToVisit*, alatta pedig egy `TextView`-ban pedig a *Places to visit* felirat. Ezek közül az egyik felesleges, és szebb, ha a jobban olvasható *Places to visit*-et hagyjuk meg. Azonban egy üres `Toolbar`-nak nincs sok értelme, ezért inkább rakjuk fel ezt a szöveget oda, és távolítsuk el a `TextView`-t.
 
-Ehhez először is az `activity_places_list.xml`-ben a Toolbar tagen belül vegyük fel az app:title attribútumot, és vegyük fel a string erőforrást.
+Ehhez először is az `activity_places_list.xml`-ben a `Toolbar` tagen belül vegyük fel az `app:title` attribútumot, és vegyük fel a szükséges string erőforrást a `Places to visit` értékkel.
 
 ```xml
 app:title="@string/places_to_visit"
 ```
 
-Majd töröljük a `content_places_list.xml`-ből a TextViewt, a RecyclerView-t pedig igazítsuk a szülője tetejéhez.
+Majd töröljük a `content_places_list.xml`-ből az ott lévő `TextView`-t, a `RecyclerView`-t pedig igazítsuk a szülője tetejéhez, az alábbi módon:
 
 ```xml
 android:layout_alignParentTop="true"
 ```
 
-Ahhoz, hogy a Toolbar vetett árnyéka érvényesüljön, és úgy tűnjön, hogy a lista görgetésnél tényleg alá csúszik be, töröljük ki a RelativeLayout felső paddingjét.
-
 Próbáljuk ki az alkalmazást!
 
 <img src="./images/screen2_framed.png" width="200" align="middle">
 
-
 ### Üres lista
 
-Kevesen készülnek arra a lehetőségre, hogy mi fogadja a felhasználót akkor, ha üres a listanézet. Célszerű ilyenkor az üres lista helyett valamilyen szöveget megjeleníteni. Írjuk tehát át a `content_places_list.xml`-t.
+Kevesen készülnek arra a lehetőségre, hogy mi fogadja a felhasználót akkor, ha üres a listanézet. Célszerű ilyenkor az üres lista helyett valamilyen szöveget (esetleg illusztrációt) megjeleníteni. Írjuk ehhez át a `content_places_list.xml`-t.
 
 ```xml
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -191,9 +184,9 @@ Kevesen készülnek arra a lehetőségre, hogy mi fogadja a felhasználót akkor
     android:id="@+id/content_places_list"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".PlacesListActivity"
     tools:showIn="@layout/activity_places_list">
@@ -207,11 +200,9 @@ Kevesen készülnek arra a lehetőségre, hogy mi fogadja a felhasználót akkor
         <android.support.v7.widget.RecyclerView
             android:id="@+id/placesListRV"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true" />
+            android:layout_height="wrap_content" />
 
-        <TextView
-            xmlns:android="http://schemas.android.com/apk/res/android"
+        <TextView xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/emptyTV"
             style="@style/TextViewTitleStyle"
             android:layout_width="wrap_content"
@@ -224,31 +215,33 @@ Kevesen készülnek arra a lehetőségre, hogy mi fogadja a felhasználót akkor
 </RelativeLayout>
 ```
 
+Az üres nézet szöveges erőforrása legyen például:
+
 ```xml
 <string name="add_places_to_visit">Add places to visit</string>
 ```
 
-Figyeljük meg a FrameLayoutot! Egyszerre csak egyik gyermeke látható. Most már csak meg kell oldanunk, hogy üres RecyclerView esetén csak a TextView jelenjen meg:
+Figyeljük meg a `FrameLayout`-ot, ami egyszerűen egymás tetejére teszi a benne lévő `View`-kat! Ez ebben az esetben nem lesz probléma, mivel mindig csak az egyik gyermeke lesz látható. Ehhez meg kell oldanunk, hogy üres `RecyclerView` esetén csak a `TextView` jelenjen meg (és fordítva):
 
-Először is hozzunk létre egy új View-t, ami képes ezt kezelni. Legyen a neve EmptyRecyclerView, és származzon a RecyclerView-ból. Implementáljuk a három kötelező konstruktorát is:
+Először is hozzunk létre egy új custom `View`-t, ami képes ezt kezelni. Kerüljön a `view` package-be, a neve legyen `EmptyRecyclerView`, és származzon a `RecyclerView`-ból. Először implementáljuk a három kötelező konstruktorát:
 
 ```kotlin
-class EmptyRecyclerView : RecyclerView{
-    constructor(context: Context): super(context)
+class EmptyRecyclerView : RecyclerView {
 
-    constructor(context: Context,attrs: AttributeSet?): super(context, attrs)
-
-    constructor(context: Context, attrs: AttributeSet?, defStyle: Int): super(context, attrs, defStyle)
-
+    constructor(context: Context) : super(context)
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
+    constructor(context: Context, attrs: AttributeSet?, defStyle: Int) : super(context, attrs, defStyle)
+    
 }
 ```
-Vegyünk fel bele egy emptyView-t, amiben azt a View-t fogjuk tárolni, amit üres lista esetén meg szeretnénk jeleníteni:
+
+Vegyünk fel bele egy `emptyView` nevű property-t, amiben azt a `View`-t fogjuk tárolni, amit üres lista esetén meg szeretnénk jeleníteni:
 
 ```kotlin
-private var emptyView: View? = null
+var emptyView: View? = null
 ```
 
-Ezek után vegyünk fel egy observert, aminek a feladata, hogy a listában történt változásokat lekezelje. 
+Ezek után vegyünk fel egy `RecyclerView.AdapterDataObserver` példányt, aminek a feladata, hogy a listában történt változásokat lekezelje. Láthatjuk, hogy az `override`-olt függvényei megfelelnek a `RecyclerView.Adapter`-nél már ismert `notify...` hívásoknak. 
 
 ```kotlin
 private val observer = object : RecyclerView.AdapterDataObserver() {
@@ -266,74 +259,69 @@ private val observer = object : RecyclerView.AdapterDataObserver() {
 }
 ```
 
-Bármilyen változás történik az adathalmazban, le kell ellenőriznünk, hogy a melyik felületet kell megjelenítenünk vagyis, hogy üres-e a lista. Erre szolgál a checkIfEmpty() függvény. Implementáljuk ezt is:
+Ha bármilyen változás történik az adathalmazban, le kell ellenőriznünk, hogy a melyik felületet kell megjelenítenünk attól függően, hogy üres-e a lista. Erre szolgál a `checkIfEmpty` függvény. Implementáljuk ezt is:
 
 ```kotlin
 fun checkIfEmpty() {
+    val emptyView = emptyView
+    val adapter = adapter
+
     if (emptyView != null && adapter != null) {
-        val emptyViewVisible = adapter!!.itemCount == 0
-        emptyView?.visibility = if (emptyViewVisible) View.VISIBLE else View.GONE
-        visibility = if (emptyViewVisible) View.GONE else View.VISIBLE
+        val emptyViewVisible = adapter.itemCount == 0
+
+        emptyView.visibility = if (emptyViewVisible) View.VISIBLE else View.GONE
+        this.visibility = if (emptyViewVisible) View.GONE else View.VISIBLE
     }
 }
 ```
 
-Látható, hogy a checkIfEmpty függvény az adapterben található elemek számának függvényében állítja az EmptyRecyclerView, és az EmptyView láthatóságát.
+Látható, hogy a `checkIfEmpty` függvény az adapterben található elemek számának függvényében állítja az `EmptyRecyclerView`, és az `emptyView` láthatóságát.
 
-Hozzunk létre egy setter fügvényt az emptyView-hoz, amivel kívülről megadhatjuk majd a megfelelő View-t. Hívjunk ebben is egy checkIfEmpty-t:
+Ezt az ellenőrzést akkor is meg kéne tennünk, amikor beállítjuk az `emptyView` értékét. Adjunk hozzá a property-hez egy *custom setter*-t, amiben beállítjuk a backing field értékét, utána pedig meghívjuk a `checkIfEmpty` függvényt:
 
 ```kotlin
-fun setEmptyView(emptyView: View) {
-    this.emptyView = emptyView
-    checkIfEmpty()
-}
+var emptyView: View? = null
+    set(value) {
+        field = value
+        checkIfEmpty()
+    }
 ```
 
-Az EmptyRecyclerView-nk megfelelő működéséhez felül kell még írnunk a setAdapter függvényt. Ebben tudjuk beregisztrálni az imént létrehozott observerünket, ami kezeli az adathalmazban történt változásokat:
+Az `EmptyRecyclerView`-nk megfelelő működéséhez felül kell még írnunk a `setAdapter` függvényt. Ebben tudjuk beregisztrálni az imént létrehozott observerünket, ami kezeli az adathalmazban történt változásokat, valamint az adapter cseréje esetén a régi adapter változásairól leiratkozhatunk:
 
 ```kotlin
 override fun setAdapter(adapter: RecyclerView.Adapter<*>?) {
-    val oldAdapter = getAdapter()
+    val oldAdapter = this.adapter
     oldAdapter?.unregisterAdapterDataObserver(observer)
+
     super.setAdapter(adapter)
+
     adapter?.registerAdapterDataObserver(observer)
 
     checkIfEmpty()
 }
 ```
 
-Ezzel el is készült az EmptyRecyclerView-nk. Most cseréljük le az eddig használt RecyclerView-t:
-
-`content_places_list.xml`:
+Ezzel el is készült az EmptyRecyclerView-nk. Cseréljük le erre az eddig használt `RecyclerView`-t a `content_places_list.xml` fájlban:
 
 ```xml
-<hu.bme.aut.android.examples.placestovisit.view.EmptyRecyclerView
-            android:id="@+id/placesListERV"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true" />
+<hu.bme.aut.android.placestovisit.view.EmptyRecyclerView
+    android:id="@+id/placesListRV"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" />
 ```
 
-PlacesListActivity.java:
+A `PlacesListActivity` `onCreate` függvényében a `RecyclerView` inicializálása után állítsuk be az `emptyView`-jának az erre a célra létrehozott `TextView`-t:
 
 ```kotlin
-placesListERV?.layoutManager = LinearLayoutManager(applicationContext)
-placesListERV?.adapter = adapter as RecyclerView.Adapter<*>
-
-registerForContextMenu(placesListERV)
+placesListRV.emptyView = emptyTV
 ```
 
-A Kotlinban megszokott módon állítsuk be az EmptyRecyclerView emptyView-jának a `content_places_list.xml`-ben létrehozott TextView-t:
-
-```kotlin
-placesListERV.setEmptyView(emptyTV)
-```
-
-Próbáljuk ki az alkalmazást! Láthatjuk, hogy üres lista helyett valóban az "Add places to visit" felirat jelenik meg.
+Próbáljuk ki az alkalmazást! Láthatjuk, hogy üres lista helyett valóban az *Add places to visit* felirat jelenik meg.
 
 <img src="./images/screen3_framed.png" width="200" align="middle">
  
-Segíthetünk a felhasználónak még annyiban, hogy megengedjük, hogy erre a feliratra rákattintva is vehessen fel új helyet. Ehhez írjuk meg az OnClickListenert:
+Segíthetünk a felhasználónak még annyiban, hogy megengedjük, hogy erre a feliratra rákattintva is vehessen fel új helyet. Ehhez vegyünk fel egy listenert:
 
 ```kotlin
 emptyTV.setOnClickListener{
@@ -344,54 +332,56 @@ emptyTV.setOnClickListener{
 
 ### Dialógus és animációja
 
-Az Android Lollipop verziójától lehetőségünk van képernyőátmenetek során elemeket megosztva animálni. Ebben az esetben azt fogjuk elérni, hogy amikor a felhasználó megérinti a FAB-ot, akkor az új helyszínt létrehozó képernyő abból animálódjon ki. A visszafelé portolás ebben az esetben nem tökéletes, 21-es API szint alatt ezt nem fogjuk látni. A megosztott animációhoz át kell írjuk a stílusainkat, azonban az új xml elemek csak API 21-től működnek.
+Az Android Lollipop verziójától lehetőségünk van képernyőátmenetek során elemeket megosztva animálni. Ebben az esetben azt fogjuk elérni, hogy amikor a felhasználó megérinti a FAB-ot, akkor az új helyszínt létrehozó képernyő abból animálódjon ki. A visszafelé portolás ebben az esetben nem tökéletes, 21-es API szint alatt ezt nem fogjuk látni. A megosztott animációhoz át kell írjuk a stílusainkat, azonban az ezekben használt új xml elemek csak API 21-től működnek.
 
-Hozzunk létre egy új erőforrás mappát! A neve legyen **values-v21**! Ebbe másoljuk bele a meglevő `styles.xml` állományt a minősítetlen mappából. A v21-es styles-xml-ben az alaptémát módosítsuk az alábbiaknak megfelelően:
+Hozzunk létre egy új erőforrás mappát, a neve legyen `values-v21`! Az ebbe elhelyezett erőforrások fognak betöltésre kerülni, ha az eszköz 21-es, vagy újabb API szintű Androidot futtat. Ebben hozzunk létre egy `styles.xml` állományt, és az alkalmazás alaptémáját módosítsuk az alábbiaknak megfelelően:
 
 ```xml
-<!-- Base application theme. -->
-<style name="AppTheme"
-    parent="Theme.AppCompat.Light.DarkActionBar">
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
 
-    <item name="colorPrimary">@color/colorPrimary</item>
-    <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-    <item name="colorAccent">@color/colorAccent</item>
-        
-    <!-- Customize your theme here. -->
-    <item name="android:buttonStyle">@style/ButtonStyleRounded</item>
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
 
-    <!-- enable window content transitions -->
-    <item name="android:windowContentTransitions">true</item>
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
 
-    <!-- enable overlapping of exiting and entering activities-->
-    <item name="android:windowAllowEnterTransitionOverlap">true</item>
-    <item name="android:windowAllowReturnTransitionOverlap">true</item>
+        <!-- Customize your theme here. -->
+        <item name="android:buttonStyle">@style/ButtonStyleRounded</item>
 
-</style>
+        <!-- enable window content transitions -->
+        <item name="android:windowContentTransitions">true</item>
 
+        <!-- enable overlapping of exiting and entering activities-->
+        <item name="android:windowAllowEnterTransitionOverlap">true</item>
+        <item name="android:windowAllowReturnTransitionOverlap">true</item>
+
+    </style>
+
+</resources>
 ```
 
-Most meg kell adjuk az xml erőforrásokban, hogy miből-mit kell animálni. Ehhez úgy párosítjuk össze őket, hogy új attribútumot veszünk fel mind a Floating Action Button-hez, mind az `activity_create_place_to_visit.xml` gyökér eleméhez (Ez ugye a LinearLayout).
+Most meg kell adnunk az xml erőforrásokban, hogy miből mit szeretnénk animálni. Úgy párosítjuk össze a `View`-kat, hogy új attribútumot veszünk fel mind a *Floating Action Button*-höz, mind az `activity_create_place_to_visit.xml` gyökér eleméhez (Ez ugye a `LinearLayout`). 
 
 ```xml
 android:transitionName="create"
 ```
 
-Ezután a PlaceListActivity showNewPlaceDialog metódusát egészítsük ki az alábbiak szerint (a Floating Action Buttont ki kell szervezni) :
+Ezután a `PlaceListActivity` `showNewPlaceDialog` metódusát egészítsük ki az alábbiak szerint:
 
 ```kotlin
 private fun showNewPlaceDialog() {
     val options = ActivityOptionsCompat.makeSceneTransitionAnimation(
-            this@PlacesListActivity,
+            this,
             addButton,
             "create")
-    val i = Intent()
-    i.setClass(this, CreatePlaceToVisitActivity::class.java)
-    startActivityForResult(i, REQUEST_NEW_PLACE_CODE, options.toBundle())
+    val intent = Intent(this, CreatePlaceToVisitActivity::class.java)
+    startActivityForResult(intent, REQUEST_NEW_PLACE_CODE, options.toBundle())
 }
 ```
 
-Itt megdjuk, hogy melyik View-ból indul az animáció (fab), és azt is, hogy milyen transitionName-mel kell dolgoznia a rendszernek ("create"). Az animációról szóló információt egy Bundle-be pakolva adjuk át.
+Itt megadjuk, hogy melyik `View`-ból indul az animáció (`addButton`), és azt is, hogy milyen `transitionName`-mel kell dolgoznia a rendszernek (`"create"`). Az animációról szóló információt egy `Bundle`-be pakolva tudjuk az `Intent`-be helyezni.
 
 Próbáljuk ki az alkalmazást!
 
@@ -400,17 +390,17 @@ Próbáljuk ki az alkalmazást!
 
 ### Új hely felvétele
 
-Nem a legjobb, hiszen az alkalmazás második képernyője eredetileg dialógus stílusú. Hát töröljük a Manifestből és a stílusfájlokból a kapcsolódó stílusbejegyzést!
+Nem a legjobb megoldás, hogy az alkalmazás második képernyője eredetileg dialógus stílusú. Töröljük a *Manifest*-ből és a stílusfájlokból a kapcsolódó stílusbejegyzést!
 
-Az Activity azonban még így sem tökéletes, hiszen ha nagyon hosszú leírást adunk neki, akkor a Save gomb kicsúszik a képernyőről és használhatatlan lesz. Rögzítsük tehát a gombot a képernyő aljára, a fölötte lévő tartalmat pedig tegyük görgethetővé!
+Az `Activity` azonban még így sem tökéletes, hiszen ha nagyon hosszú leírást adunk neki, akkor a `Save` gomb kicsúszik a képernyőről és használhatatlan lesz. Rögzítsük tehát a gombot a képernyő aljára, a fölötte lévő tartalmat pedig tegyük görgethetővé!
 
-Az `activity_create_place_to_visit.xml` gyökérelemét változtassuk RelativeLayout-ra, a benne lévő gombot pedig kössük az aljához.
+Az `activity_create_place_to_visit.xml` gyökérelemét változtassuk `RelativeLayout`-ra, a benne lévő gombot pedig kössük az aljához:
 
 ```xml
 android:layout_alignParentBottom="true"
 ```
 
-A többi elemet pedig ágyazzuk be egy vertikális LinearLayoutba, majd egy ScrollView-ba, amit kössünk felülre, és helyezzünk a gomb fölé:
+A többi elemet pedig ágyazzuk be egy függőleges `LinearLayout`-ba, majd egy `ScrollView`-ba, amit kössünk felülre, és helyezzünk a gomb fölé:
 
 ```xml
 <ScrollView
@@ -418,46 +408,60 @@ A többi elemet pedig ágyazzuk be egy vertikális LinearLayoutba, majd egy Scro
         android:layout_alignParentTop="true"
         android:layout_height="match_parent"
         android:layout_above="@+id/btnSave">
+        
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
+            
+        <!-- A képernyő elemi a Save gombon kívül -->
+        
+        </LinearLayout>
+        
+</ScrollView>
 ```
 
 ### Snackbar
 
-A Toast üzeneteknél már van egy sokkal szebb megoldás, ami a Material Design-t követi, a SnackBar. Cseréljük le a Toast figyelmeztetést SnackBar-ra!
+A `Toast` üzeneteknél már van egy sokkal szebb megoldás, ami a Material Designt követi, a [`Snackbar`](https://material.io/design/components/snackbars.html). Cseréljük le az alkalmazásban lévő `Toast` figyelmeztetéseket `Snackbar`-ra!
 
-Ehhez írjunk egy külön showText() függvényt, ami a paraméterül kapott szöveget jeleníti meg, majd használjuk ezt: 
+Ehhez írjunk egy külön `showText()` függvényt, ami a paraméterül kapott szöveges erőforrást jeleníti meg, majd használjuk ezt: 
 
 ```kotlin
-private fun showText(text: String) {
-    Snackbar.make(main_coordinator_layout, text, Snackbar.LENGTH_LONG).show()
+private fun showText(@StringRes textRes: Int) {
+    Snackbar.make(main_coordinator_layout, textRes, Snackbar.LENGTH_LONG).show()
 }
 ```
 
-Hívás:
+A `Snackbar.make` függvény első paramétere egy `View`. Ide az `Activity`-nkben lévő `CoordinatorLayout`-ot adtuk meg. A függvény így hívható meg:
 
 ```kotlin
-showText(getString(R.string.cancelled))
+showText(R.string.cancelled)
 ```
 
-A Snackbar.make(...) függvény első paramétere egy View. Ide az Activitynk CoordinatorLayout-ját adtuk meg.
+Figyeljük meg, hogy a [`@StringRes`](https://developer.android.com/reference/android/support/annotation/StringRes) annotációnak hála az Android Studio ellenőrzi, hogy a paraméterként adott `Int` tényleg egy string erőforrás azonosítója, és például a `showText(42)` hívásra hibát jelez.
 
-Próbáljuk ki a Snakcbart!
+Próbáljuk ki a `Snackbar`-t!
 
 <img src="./images/screen5_framed.png" width="200" align="middle">
 
 
 ## Önálló feladat
 
-### Feladat 1 - Továbbfejlesztés
-
 A fenti alapok segítségével alakítsa tovább az alkalmazást!
 
-* Készítsen új képernyőt, ahol részletesen jeleníti meg az adott helyet
-* Készítse fel a felületet arra, hogy később a felhasználónak lehetősége lesz képet rögzíteni a helyről
+### Feladat 1 - Részletes nézet
+
+Készítsen új képernyőt, ahol részletesen jeleníti meg az adott helyet!
+
+### Feladat 2 - Kép hozzáadása
+
+Készítse fel a felületet arra, hogy később a felhasználónak lehetősége lesz képet rögzíteni a helyről! Ennek a működését nem kell implementálni.
 
 ### Feladat 2 - Swipe to delete
 
-Valósítsa meg a swipe gesztussal való törlést (és esetleg módosítást). Példa megvalósítás: [https://medium.com/@ipaulpro/drag-and-swipe-with-recyclerview-b9456d2b1aaf](https://medium.com/@ipaulpro/drag-and-swipe-with-recyclerview-b9456d2b1aaf)
+Valósítsa meg a swipe gesztussal való törlést (és esetleg módosítást). 
+
+Példa megvalósítás: [https://medium.com/@ipaulpro/drag-and-swipe-with-recyclerview-b9456d2b1aaf](https://medium.com/@ipaulpro/drag-and-swipe-with-recyclerview-b9456d2b1aaf)
+
+Egy másik példa megvalósítás: [https://medium.com/@kitek/recyclerview-swipe-to-delete-easier-than-you-thought-cff67ff5e5f6](https://medium.com/@kitek/recyclerview-swipe-to-delete-easier-than-you-thought-cff67ff5e5f6)
