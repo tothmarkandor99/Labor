@@ -137,7 +137,7 @@ Ezután hozzunk létre egy *Floating Action Button*-t, az `activity_places_list.
 Állítsuk be a megfelelő listenert is a `PlaceListActivity` `onCreate` függvényében:
 
 ```kotlin
-addButton.setOnClickListener{
+addButton.setOnClickListener {
     showNewPlaceDialog()
 }
 ```
@@ -301,7 +301,7 @@ override fun setAdapter(adapter: RecyclerView.Adapter<*>?) {
 }
 ```
 
-Ezzel el is készült az EmptyRecyclerView-nk. Cseréljük le erre az eddig használt `RecyclerView`-t a `content_places_list.xml` fájlban:
+Ezzel el is készült az `EmptyRecyclerView` osztályunk. Cseréljük le erre az eddig használt `RecyclerView`-t a `content_places_list.xml` fájlban:
 
 ```xml
 <hu.bme.aut.android.placestovisit.view.EmptyRecyclerView
@@ -323,7 +323,7 @@ Próbáljuk ki az alkalmazást! Láthatjuk, hogy üres lista helyett valóban az
 Segíthetünk a felhasználónak még annyiban, hogy megengedjük, hogy erre a feliratra rákattintva is vehessen fel új helyet. Ehhez vegyünk fel egy listenert:
 
 ```kotlin
-emptyTV.setOnClickListener{
+emptyTV.setOnClickListener {
     showNewPlaceDialog()
 }
 ```
@@ -361,7 +361,7 @@ Hozzunk létre egy új erőforrás mappát, a neve legyen `values-v21`! Az ebbe 
 </resources>
 ```
 
-Most meg kell adnunk az xml erőforrásokban, hogy miből mit szeretnénk animálni. Úgy párosítjuk össze a `View`-kat, hogy új attribútumot veszünk fel mind a *Floating Action Button*-höz, mind az `activity_create_place_to_visit.xml` gyökér eleméhez (Ez ugye a `LinearLayout`). 
+Most meg kell adnunk az xml erőforrásokban, hogy miből mit szeretnénk animálni. Úgy párosítjuk össze a `View`-kat, hogy új attribútumot veszünk fel mind a *Floating Action Button*-höz, mind az `activity_create_place_to_visit.xml` gyökér eleméhez (ez egy `LinearLayout`). 
 
 ```xml
 android:transitionName="create"
@@ -380,7 +380,7 @@ private fun showNewPlaceDialog() {
 }
 ```
 
-Itt megadjuk, hogy melyik `View`-ból indul az animáció (`addButton`), és azt is, hogy milyen `transitionName`-mel kell dolgoznia a rendszernek (`"create"`). Az animációról szóló információt egy `Bundle`-be pakolva tudjuk az `Intent`-be helyezni.
+Itt megadjuk, hogy melyik `View`-ból indul az animáció (`addButton`), és azt is, hogy milyen `transitionName`-mel kell dolgoznia a rendszernek (`"create"`). Az animációról szóló információt egy `Bundle`-lé alakítva tudjuk az `Intent`-be helyezni.
 
 Próbáljuk ki az alkalmazást!
 
@@ -424,7 +424,7 @@ A többi elemet pedig ágyazzuk be egy függőleges `LinearLayout`-ba, majd egy 
 
 A `Toast` üzeneteknél már van egy sokkal szebb megoldás, ami a Material Designt követi, a [`Snackbar`](https://material.io/design/components/snackbars.html). Cseréljük le az alkalmazásban lévő `Toast` figyelmeztetéseket `Snackbar`-ra!
 
-Ehhez írjunk egy külön `showText()` függvényt, ami a paraméterül kapott szöveges erőforrást jeleníti meg, majd használjuk ezt: 
+Ehhez írjunk egy külön `showText()` függvényt a `PlacesListActivity`-ben, ami a paraméterül kapott szöveges erőforrást jeleníti meg, majd használjuk ezt: 
 
 ```kotlin
 private fun showText(@StringRes textRes: Int) {
@@ -453,11 +453,11 @@ A fenti alapok segítségével alakítsa tovább az alkalmazást!
 
 Készítsen új képernyőt, ahol részletesen jeleníti meg az adott helyet!
 
-### Feladat 2 - Kép hozzáadása
+### Feladat 2 - Lista javítása
 
-Készítse fel a felületet arra, hogy később a felhasználónak lehetősége lesz képet rögzíteni a helyről! Ennek a működését nem kell implementálni.
+Módosítsa a lista elemek leíróját (`row_place.xml`): `padding`, `margin`, `textStyle` és egyéb attribútumok segítségével tegye átláthatóbbá az elemek megjelenítését. 
 
-### Feladat 2 - Swipe to delete
+### Feladat 3 - Swipe to delete
 
 Valósítsa meg a swipe gesztussal való törlést (és esetleg módosítást). 
 
