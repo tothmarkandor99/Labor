@@ -14,7 +14,7 @@ A következőkben egy olyan Android alkalmazást készítünk, mely egy kliens a
 
 A játék tényleges felülete nem az Android alkalmazás része, azt egy előre elkészített webes alkalmazás jeleníti meg, amely elérhető az alábbi címen:
 
-[http://android-labyrinth.node.autsoft.hu](http://android-labyrinth.node.autsoft.hu)
+[https://aut-android-labyrinth.herokuapp.com/](https://aut-android-labyrinth.herokuapp.com/)
 
 A játék szabályai egyszerűek, a játékosunkat a készülékről négy gomb segítségével (bal, jobb, fel, le) irányíthatjuk, továbbá lehetőség van még üzenetküldésre is. Az első lépésünk során kerül rá az új játékos a játéktérre egy véletlen pozícióra (színes GitHub ikon). Ha egy játékos egy pontot érő mezőre lép (színes pipa), akkor pontot szerez, és egy újabb pontot érő mező kerül a pályára véletlenszerű helyre. A játékosok nem tudnak a fal (fekete négyzet) elemen átlépni, illetve másik játékos által foglalt mezőre sem léphetnek!
 
@@ -212,10 +212,12 @@ Próbáljuk ki az alkalmazást, nézzük meg a felületét.
 
 ## Az API bemutatása
 
-A szerver egy NodeJS alapú oldal, amely HTTP GET kérésekben várja a lépéseket és az üzeneteket. Ezeket eltárolja egy adatbázisban, amelyet egy REST híváson keresztül tesz elérhetővé a megjelenítésért felelős Angular alkalmazás számára. Az Angular alkalmazás ezt a NodeJS oldalt pollozza viszonylag kis időközönként és a kapott válaszok alapján frissíti a felhasználói felületét. A szerver alap címe az alábbi oldalon érhető el: 
+A szerver egy Spring alapú backend, amely HTTP GET kérésekben várja a lépéseket és az üzeneteket. Ezeket eltárolja egy adatbázisban, és elérhetővé teszi a megjelenítésért felelős Angular alkalmazás számára. Az Angular alkalmazás ettől a Spring backendtől Websocket-en kap üzeneteket közel valós időben, és ezek alapján frissíti a felhasználói felületét. 
+
+A szerver alap címe az alábbi oldalon érhető el: 
 
 ```
-http://android-labyrinth.node.autsoft.hu/api
+https://aut-android-labyrinth.herokuapp.com/api
 ``` 
 
 Ezen belül kell majd a megfelelő REST végpontokat meghívni az előre definiált GET paraméterekkel. A szervertől hiba esetén mindig „ERROR”-ral kezdődő üzenetet kapunk.
@@ -230,7 +232,7 @@ A játékos mozgatásához a `/step/{username}/{direction}`-t kell meghívni (`G
 Például: 
 
 ``` 
-GET http://android-labyrinth.node.autsoft.hu/api/step/hallgato/3
+GET https://aut-android-labyrinth.herokuapp.com/api/step/hallgato/3
 ```
 
 ### Üzenet feltöltése
@@ -243,7 +245,7 @@ GET http://android-labyrinth.node.autsoft.hu/api/step/hallgato/3
 Például: 
 
 ```
-GET http://android-labyrinth.node.autsoft.hu/api/message/hallgato/hello
+GET https://aut-android-labyrinth.herokuapp.com/api/message/hallgato/hello
 ```
 
 
@@ -257,8 +259,8 @@ Android platformon a hálózati kommunikáció emiatt új szálon kell hogy tör
 
 *	Java [Thread](https://docs.oracle.com/javase/7/docs/api/java/lang/Thread.html) (Plain Old Java Thread, rugalmas, de testre kell szabni)
 *	Android [AsyncTask](http://developer.android.com/reference/android/os/AsyncTask.html) (szálakra épül, sok beépített feature, de nem elég rugalmas)
-*   [Kotlin couroutine](https://kotlinlang.org/docs/reference/coroutines.html)-ok (bonyolultabb az előzőeknél, szálakra épül ez is)
-*   [RxJava](https://github.com/ReactiveX/RxJava) (sokkal bonyolultabb az előzőeknél, nem is csak szálkezelést végez, szálakra épül ez is)
+*   [Kotlin couroutine](https://kotlinlang.org/docs/reference/coroutines.html)-ok (bonyolultabb az előzőeknél, szálakhoz hasonló, de alapjaiban más koncepció)
+*   [RxJava](https://github.com/ReactiveX/RxJava) (sokkal bonyolultabb az előzőeknél, nem is csak szálkezelést végez, szálakra épül)
 
 
 ### Visszatérés a fő szálra
@@ -298,7 +300,7 @@ A `network` csomagban hozzuk létre a `LabyrinthAPI` osztályt.
 class LabyrinthAPI {
 
     companion object {
-        private const val BASE_URL = "http://android-labyrinth.node.autsoft.hu/api"
+        private const val BASE_URL = "https://aut-android-labyrinth.herokuapp.com/api"
         private const val UTF_8 = "UTF-8"
     }
     
@@ -329,15 +331,15 @@ Ennek használatához fel kell vennünk a következő sort az alkalmazás modul 
 implementation 'com.squareup.okhttp3:okhttp:3.11.0'
 ```
 
-Ezután a könyvtár nagyon egyszerűen használható. Készítsünk is egy általános HTTP GET hívást lebonyolító függvényt a `LabyrinthAPI` osztályba.
+Ezután a könyvtár nagyon egyszerűen használható. A `LabyrinthAPI` osztályba vegyünk fel egy property-t egy `OkHttpClient` példány tárolására. Ezt használva készítsünk egy általános HTTP GET hívást lebonyolító függvényt.
 
 ```kotlin
-private fun httpGet(url: String): String {
-    val client = OkHttpClient.Builder()
-            .connectTimeout(10, TimeUnit.SECONDS)
-            .readTimeout(10, TimeUnit.SECONDS)
-            .build()
+private val client = OkHttpClient.Builder()
+        .connectTimeout(10, TimeUnit.SECONDS)
+        .readTimeout(10, TimeUnit.SECONDS)
+        .build()
 
+private fun httpGet(url: String): String {
     val request = Request.Builder()
             .url(url)
             .build()
@@ -360,7 +362,7 @@ Használjuk is az újonnan elkészített függvényünket, és implementáljuk a
 
 ```kotlin
 companion object {
-    private const val BASE_URL = "http://android-labyrinth.node.autsoft.hu/api"
+    private const val BASE_URL = "https://aut-android-labyrinth.herokuapp.com/api"
     private const val UTF_8 = "UTF-8"
     private const val TAG = "Network"
     private const val RESPONSE_ERROR = "ERROR"
@@ -508,28 +510,6 @@ btnSend.setOnClickListener {
 ```
 
 Nézzük meg mit tapasztalunk, ha újra kipróbáljuk az alkalmazást.
-
-### Network security config
-
-[Android P-től kezdve](https://android-developers.googleblog.com/2018/04/protecting-users-with-tls-by-default-in.html) alapértelmezetten le van tiltva a titkosítatlan, plaintext hálózati kommunikáció, azaz csak a *https* használata megengedett a hálózati hívásoknál, a sima *http* nem. Ha ilyen eszközön próbáljuk az alkalmazást használni, ezzel kapcsolatos exception-t fogunk kapni. Mivel a szerverünk nem támogatja a https kommunikációt, erre most az jelenti a megoldást, ha explicit módon megengedjük a titkosítás nélküli kommunikációt az adott domain felé.
-
-Ehhez hozzunk létre egy `network_security_config.xml` fájlt a `res/xml` mappában:
- 
- ```xml
-<network-security-config>
-    <domain-config cleartextTrafficPermitted="true">
-        <domain includeSubdomains="true">node.autsoft.hu</domain>
-    </domain-config>
-</network-security-config>
-```
-
-És a manifestben is adjuk meg, hogy ezt a konfigurációt használjuk, az `application` tag-hez az alábbi attribútumot hozzáadva:
-
-```xml
-android:networkSecurityConfig="@xml/network_security_config"
-```
-
-*Éles projektben természetesen nem ez lenne a megoldás, ott kizárólag olyan szervert használnánk, amivel https felett is tudunk kommunikálni.*
 
 ## Megfelelő válasz kezelés
 
