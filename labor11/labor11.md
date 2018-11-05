@@ -339,17 +339,12 @@ Amennyiben az eszközön, vagy emulátoron nincsenek névjegyek, adjunk hozzá l
 
 <img src="./assets/app.png" width="400" align="middle">
 
-Android 6.0 vagy magasabb verzión futtatva az alkalmazást hibát kapunk, hiszen a névjegyek beolvasásához szükséges engedély a *dangerous* kategóriába tartozik, ezt külön kell kezelni kód szinten (6.0 felett **ÉS** targetSdk 23+ esetén)
+Android 6.0 vagy magasabb verzión futtatva az alkalmazást hibát kapunk, hiszen a névjegyek beolvasásához szükséges engedély a *dangerous* kategóriába tartozik, ezt külön kell kezelni kód szinten (6.0 felett **ÉS** targetSdk 23+ esetén).
 
 A kapott hiba az alábbihoz hasonló:
 
 ```text
-java.lang.SecurityException: Permission Denial: 
-opening provider com.android.providers.contacts.ContactsProvider2
-from ProcessRecord{b077ff821678:
-hu.bme.aut.amorg.examples.permissionslabor/u0a264} 
-(pid=21678, uid=10264) requires android.permission.READ_CONTACTS or
-android.permission.WRITE_CONTACTS
+java.lang.SecurityException: Permission Denial: opening provider com.android.providers.contacts.ContactsProvider2 from ProcessRecord{7a6a2b4 14701:hu.bme.aut.android.contacts/u0a135} (pid=14701, uid=10135) requires android.permission.READ_CALENDAR or android.permission.WRITE_CALENDAR
 ```
 
 ## Futásidejű jogosultságkezelés megvalósítása
@@ -506,7 +501,7 @@ override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<Str
 Amennyiben a felhasználó megadta az engedélyt, az alkalmazás betölti a névjegyeket.
 
 Próbáljuk ki az alkalmazást 6.0+/API level 23+ eszközön, vagy emulátoron!
-Figyeljük meg a magyarázó dialógust abban az esetben, ha megtagadjuk az engedélyt, majd újraindítjuk az alkalmazást!
+Figyeljük meg a magyarázó dialógust miután megtagadjuk az engedélyt, majd újraindítjuk az alkalmazást!
 
 ## Telefonszám hívása
 
