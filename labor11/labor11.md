@@ -309,7 +309,7 @@ Ebben az alábbi részleteket érdemes megfigyelni:
 - A többi hasonló hívást egyszerűbben tesszük meg ugyanezen függvény következő soraiban: itt a `Cursor`-okon hívott `getString(columnName: String)` függvény egy *extension function*, ami az *Android KTX* libraryben található, és rögtön az oszlop neve alapján olvashatunk ki adatokat vele, nem kell az indexekkel foglalkoznunk. Hogy ez meghívható legyen, vegyük fel az *Android KTX* libraryt függőségként a `build.gradle` fájlban:
 
 ```groovy
-dependencies{
+dependencies {
 	implementation 'androidx.core:core-ktx:0.3'
 }
 ```
