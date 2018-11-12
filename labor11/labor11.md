@@ -7,17 +7,17 @@ Android 6.0 (API level 23, Marshmallow) verziótól kezdve a felhasználó futá
 Az engedélyek két kategóriába vannak sorolva: *normal* és *dangerous*
 A *normal* kategóriába tartozó engedélyek nem jelentenek közvetlen kockázatot a felhasználó személyes adataira, ezeket az engedélyeket a rendszer automatikusan megadja az alkalmazásnak, ha szüksége van rá.
 
-A *dangerous* kategóriába tartozó engedélyek lehetőséget adhatnak az alkalmazásnak, hogy a felhasználó személyes adataihoz hozzáférjen. Ebben az esetben a felhasználónak kell megadni az engedélyt az alkalmazás számára. Ennek a közvetlen következménye az, hogy az alkalmazásokat fel kell készíteni arra az esetre, ha nincs megadva egy adott funkció működéséhez elengedhetetlen engedély.
+A *dangerous* kategóriába tartozó engedélyek lehetőséget adhatnak az alkalmazásnak a felhasználó személyes adataihoz való hozzáféréshez. Ebben az esetben a felhasználónak kell megadni az engedélyt az alkalmazás számára. Ennek a közvetlen következménye az, hogy az alkalmazásokat fel kell készíteni arra az esetre, ha nincs megadva egy adott funkció működéséhez elengedhetetlen engedély.
 
-Az alábbi oldalon található az összes engedély kategóriánként:
+[Ezen az oldalon](https://developer.android.com/guide/topics/permissions/overview#normal-dangerous)  található az összes engedély kategóriánként.
 
-https://developer.android.com/guide/topics/security/permissions.html#normal-dangerous
-
-Az `AndroidManifest.xml` fájlban kategóriától függetlenül meg kell adni az alkalmazás számára szükséges összes engedélyt, de ennek hatása eltér a futtató rendszer verziójától és a *targetSdk*-tól függően:
+Az `AndroidManifest.xml` fájlban kategóriától függetlenül meg kell adni az alkalmazás számára szükséges összes engedélyt, de ennek hatása eltér a futtató rendszer verziójától és a target SDK verziótól függően:
 
 * Ha az eszköz Android 5.1 (API level 22) vagy alacsonyabb verziót futtat, **VAGY** az alkalmazás target SDK szintje 22 vagy kisebb, akkor a rendszer telepítéskor kéri el az összes szükséges engedélyt. Ha a felhasználó nem fogadja el egyben az összes kérést, akkor a telepítési folyamat leáll.
 
-* Ha az eszköz Android 6.0 (API level 23) vagy nagyobb verziót futtat **ÉS** az alkalmazás target SDK szintje 23 vagy nagyobb, akkor az alkalmazás a futása során fogja elkérni a *dangerous* kategóriába tartozó engedélyeket, a *normal* engedélyeket pedig a rendszer automatikusan megadja. Ebben az esetben a  felhasználó bármikor bármelyik engedélyt megadhatja, vagy letilthataja. Megtagadott engedélyekkel az alkalmazás limitált funkcionalitással futhat tovább, erre a helyzetre is fel kell készülni.
+* Ha az eszköz Android 6.0 (API level 23) vagy nagyobb verziót futtat **ÉS** az alkalmazás target SDK szintje 23 vagy nagyobb, akkor az alkalmazás a futása során fogja elkérni a *dangerous* kategóriába tartozó engedélyeket, a *normal* engedélyeket pedig a rendszer automatikusan megadja. Ebben az esetben a  felhasználó bármikor bármelyik engedélyt megadhatja, vagy visszavonhatja. Megtagadott engedélyekkel az alkalmazás limitált funkcionalitással futhat tovább, erre a helyzetre is fel kell készülni.
+
+Megjegyzés: a Google Play 2018 augusztusától megköveteli a legalább 26-os target SDK verziót új alkalmazásokra, 2018 novemberétől pedig már meglévő alkalmazások frissítéseire is. Ezzel a legalább 6.0-s Androidot futtató eszközökön elkerülhetetlenné vált a futásidejű engedélyek kezelése.
 
 ## Jogosultság ellenőrzése
 
@@ -35,14 +35,27 @@ when (permissionResult) {
 }
 ```
 
-## Jogosultság kérés magyarázata
+## Jogosultság elkérése
 
-Egyes esetekben szükség lehet arra, hogy tájékoztassuk a felhasználót arról, hogy miért kér az alkalmazás bizonyos *dangerous* engedélyeket. Ez növelheti a felhasználó bizalmát az alkalmazással szemben. Az `ActivityCompat.shouldShowRequestPermissionRationale()` függvény visszatérési értéke alapján eldönthető, hogy a kérdéses engedély elkérése a rendszer szerint szorul-e részletes magyarázatra:
+Engedélyek elkérésére az `ActivityCompat.requestPermissions()` függvény meghívásával van lehetőség, aminek eredményeképp egy nem testreszabható, beépített dialógust jelenít meg a rendszer.
 
 ```kotlin
- // Permission is not granted
+ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_CONTACTS), 
+    MY_PERMISSIONS_REQUEST_READ_CONTACTS)
+```
+
+A `MY_PERMISSIONS_REQUEST_READ_CONTACTS` ebben a kódrészletben egy általunk definiált konstans. Az engedélykérés végén a rendszer ezt az értéket adja vissza `requestCode`-ként az `onRequestPermissionsResult()` callbackben. 
+
+## Jogosultság kérés magyarázata
+
+Egyes esetekben szükség lehet arra, hogy tájékoztassuk a felhasználót arról, hogy miért kér az alkalmazás bizonyos *dangerous* engedélyeket. Ez növelheti a felhasználó bizalmát az alkalmazással szemben.
+ 
+Ha egy jogosultságot a felhasználó egyszer elutasított, az `ActivityCompat.shouldShowRequestPermissionRationale()` függvény visszatérési értéke alapján eldönthető, hogy a kérdéses engedély újra elkérése a rendszer szerint szorul-e részletes magyarázatra:
+
+```kotlin
+// Permission is not granted
 // Should we show an explanation?
-if (ActivityCompat.shouldShowRequestPermissionRationale(thisActivity, Manifest.permission.READ_CONTACTS)) {
+if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_CONTACTS)) {
 	// Show an explanation to the user *asynchronously* -- don't block
 	// this thread waiting for the user's response! After the user
 	// sees the explanation, try again to request the permission.
@@ -51,37 +64,27 @@ if (ActivityCompat.shouldShowRequestPermissionRationale(thisActivity, Manifest.p
 }
 ```
 
-## Jogosultság elkérése
-
-Engedélyek elkérésére az `ActivityCompat.requestPermissions()` függvény meghívásával van lehetőség, aminek eredményeképp egy nem testreszabható dialógust jelenít meg a rendszer.
-
-```kotlin
-ActivityCompat.requestPermissions(thisActivity, arrayOf(Manifest.permission.READ_CONTACTS), MY_PERMISSIONS_REQUEST_READ_CONTACTS)
-```
-
-A `MY_PERMISSIONS_REQUEST_READ_CONTACTS` ebben a kódrészletben egy általunk definiált konstans. Az engedélykérés végén a rendszer ezt az értéket adja vissza `requesCode`-ként az `onRequestPermissionsResult()` callbackben. 
+Így a következő engedélykérés előtt a felhasználó megtudja, hogy miért van szükségünk az engedélyre.
 
 ## Kezdő lépések
 
-A labor során egy egyszerű telefonkönyv alkalmazást kell elkészíteni. Az alkalmazásnak meg kell jeleníteni a telefonon tárolt névjegyeket, illetve egy névjegyre kattintással tudnia kell hívást kezdeményezni az ahhoz tartozó elsődleges telefonszámra.
+A labor során egy egyszerű telefonkönyv alkalmazást fogunk elkészíteni. Az alkalmazás meg fogja jeleníteni a telefonon tárolt névjegyeket, illetve egy névjegyre kattintással hívást kezdeményez az ahhoz tartozó elsődleges telefonszámra.
 
-Hozzunk létre egy új projektet Android Studio-ban *Contacts* néven. A *Company Domain* mező tartalmát töröljük ki és hagyjuk is üresen.
+Hozzunk létre egy új projektet Android Studio-ban `Contacts` néven. A *Company domain* mező tartalmát töröljük ki és hagyjuk is üresen.
 
-A *package name* legyen `hu.bme.aut.android.contacts`. A támogatott eszköz formátum legyen *Phone and Tablet*, a minimum SDK szint legyen *API 19: Android 4.4 (KitKat)*.
+A package név legyen `hu.bme.aut.android.contacts`. A támogatott eszköz formátum legyen *Phone and Tablet*, a minimum SDK szint legyen *API 19: Android 4.4 (KitKat)*.
 
-A projekthez adjuk hozzá egy *Empty Activity*-t, melynek neve legyen `ContactsActivity`.
+A projekthez kezdésnek válasszunk egy *Empty Activity*-t, melynek neve legyen `ContactsActivity`.
 
-Vegyük fel a `RecyclerView` libraryt függőségként a `build.gradle (Module: app)` fájlban:
+Miután létrejött a projekt, vegyük fel a `RecyclerView` könyvtárat függőségként a modul szintű `build.gradle` fájlban:
 
 ```groovy
 dependencies {
-	...
-	implementation 'com.android.support:recyclerview-v7:28.0.0-rc02'
-	...
+	implementation 'com.android.support:recyclerview-v7:28.0.0'
 }
 ```
 
-Szintén a `build.gradle (Module: app)` fájlban ellenőrizzük, hogy a *targetSDK* értéke legalább 23.
+Ugyanebben a fájlban ellenőrizzük, hogy a `targetSdkVersion` értéke legalább 23.
 
 Kattintsunk a *Sync Now* gombra.
 
@@ -91,7 +94,7 @@ Készítsük el az alkalmazás felhasználói felületét a `res/layout/activity
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:tools="http://schemas.android.com/tools"
 	android:id="@+id/activity_contacts"
 	android:layout_width="match_parent"
@@ -106,14 +109,15 @@ Készítsük el az alkalmazás felhasználói felületét a `res/layout/activity
 		android:id="@+id/rvContacts"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent" />
-</RelativeLayout>
+	
+</FrameLayout>
 ```
 
-Hozzuk létre a hiányzó erőforrásokat *16dp* értékkel.
+Hozzuk létre a hiányzó erőforrásokat `16dp` értékkel.
 
 ## Model
 
-Készítsük el a `hu.bme.aut.android.contacts.model` package-et és benne a  `Contact` osztályt , ami egy eszközön található névjegyet fog reprezentálni. Az egyszerűség kedvéért most csak a név és telefonszám adatokat tároljuk el benne.
+Hozzunk létre egy `model` package-et és benne a `Contact` osztályt, ami egy eszközön található névjegyet fog reprezentálni. Az egyszerűség kedvéért most csak a név és telefonszám adatokat tároljuk el benne.
 
 ```kotlin
 class Contact(
@@ -143,7 +147,6 @@ Hozzuk létre az `item_contact.xml` layout erőforrást:
 			android:id="@+id/ivContactImage"
 			android:layout_width="55dp"
 			android:layout_height="55dp"
-			android:layout_marginLeft="10dp"
 			android:layout_marginStart="10dp"
 			android:src="@drawable/ic_contact_phone_black_48dp"/>
 
@@ -157,40 +160,39 @@ Hozzuk létre az `item_contact.xml` layout erőforrást:
 				android:id="@+id/tvContactName"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:layout_marginLeft="10dp"
 				android:layout_marginStart="10dp"
 				android:textSize="16sp"
 				android:textColor="@android:color/primary_text_light"
-				android:text="@string/"/>
+				android:text="@string/contact_name_placeholder"/>
 
 			<TextView
 				android:id="@+id/tvPhoneNumber"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:layout_marginLeft="10dp"
 				android:layout_marginStart="10dp"
 				android:textSize="14sp"
-				android:textColor="@android:color/primary_text_light"/>
+				android:textColor="@android:color/primary_text_light"
+				android:text="@string/contact_number_placeholder"/>
+
 		</LinearLayout>
+
 	</LinearLayout>
+
 </RelativeLayout>
 ```
 
 Hozzuk létre a `res/values/strings.xml` fájlban a két hiányzó szöveges erőforrást:
 
 ```xml
-<resources>
-	<string name="app_name">Contacts</string>
-	<string name="contact_name_placeholder">Name is not set</string>
-	<string name="contact_number_placeholder">Phone number is not set</string>
-</resources>
+<string name="contact_name_placeholder">Name is not set</string>
+<string name="contact_number_placeholder">Phone number is not set</string>
 ```
 
 Töltsük le az [ic_contact_phone_black_48dp.png](assets/ic_contact_phone_black_48dp.png) képet és másoljuk be a `res/drawable` mappába.
 
 ## Adapter
 
-Készítsük el a `hu.bme.aut.android.contacts.adapter` package-et és benne a listát feltöltő adaptert `ContactsAdapter` néven.
+Hozzunk létre egy `adapter` nevű package-et és benne készítsük el a listát feltöltő adaptert `ContactsAdapter` néven.
 
 ```kotlin
 class ContactsAdapter : RecyclerView.Adapter<ContactsAdapter.ContactViewHolder>() {
@@ -238,6 +240,7 @@ class ContactsAdapter : RecyclerView.Adapter<ContactsAdapter.ContactViewHolder>(
     interface ContactItemClickListener {
         fun onItemClick(contact: Contact)
     }
+    
 }
 ```
 
@@ -300,17 +303,20 @@ private fun getContactPhoneNumber(id: String): String {
 }
 ```
 
-A `Cursor`-okon hívott `getString(columnName: String)` függvény egy *extension function*, ami az *Android KTX* libraryben található és olvashatóbbá teszi a lekérdezés kódját. Vegyük fel az *Android KTX* libraryt függőségként a `build.gradle (Module: app)` fájlban:
+Ebben az alábbi részleteket érdemes megfigyelni:
+- Bevezettünk egy saját `performQuery` függvényt, ami csupán továbbhív a `ContentResolver` már meglévő `query` függvényébe a neki átadott paraméterekkel. Rendelkezik viszont default paraméter értékekkel, hogy ne kelljen sok, nehezen átlátható `null`-t átadnunk a meghívásakor, valamint mivel ez a függvény Kotlinban van írva, ezért meg tudjuk hívni elnevezett paraméterekkel, ami javítja a kód olvashatóságát.
+- A `getContacts` függvényben a `while` első sorában láthatjuk azt a megoldást a `Cursor`-ból való adat kiolvasásra, amit a SQLite laboron már használtunk. Elkérjük az API-tól az adott nevű oszlop indexét, és utána erről az indexről olvasunk ki egy `String` értéket. Ez körülményes, és főleg nehezen olvasható.
+- A többi hasonló hívást egyszerűbben tesszük meg ugyanezen függvény következő soraiban: itt a `Cursor`-okon hívott `getString(columnName: String)` függvény egy *extension function*, ami az *Android KTX* libraryben található, és rögtön az oszlop neve alapján olvashatunk ki adatokat vele, nem kell az indexekkel foglalkoznunk. Hogy ez meghívható legyen, vegyük fel az *Android KTX* libraryt függőségként a `build.gradle` fájlban:
 
 ```groovy
 dependencies{
-	...
 	implementation 'androidx.core:core-ktx:0.3'
-	...
 }
 ```
 
-A `ContactsActivity` `onCreate()` függvényében írjuk meg a `RecyclerView` inicializálását:
+Ez után ne felejtsük importálni is a `getString` függvényt.
+
+A `ContactsActivity` `onCreate` függvényében írjuk meg a `RecyclerView` inicializálását:
 
 ```kotlin
 override fun onCreate(savedInstanceState: Bundle?) {
@@ -324,7 +330,7 @@ override fun onCreate(savedInstanceState: Bundle?) {
 }
 ```
 
-Jelezzük a rendszer felé, hogy az alkalmazásnak szüksége van engedéylre a névjegyek olvasásához. Ehhez vegyük fel az `AndroidManifest.xml` fájlban a `<manifest>...</manifest>` tagen belül az alábbi sort:
+Jelezzük a rendszer felé, hogy az alkalmazásnak szüksége van engedélyre a névjegyek olvasásához. Ehhez vegyük fel az `AndroidManifest.xml` fájlban a `manifest` tagen belül az alábbi sort:
 
 ```xml
 <uses-permission android:name="android.permission.READ_CONTACTS" />
@@ -334,8 +340,8 @@ Jelezzük a rendszer felé, hogy az alkalmazásnak szüksége van engedéylre a 
 
 Egyelőre nem valósítottunk meg futásidejű jogosulságkezelést a kódban, ezért az alkalmazás működésének kipróbálásához Android 6.0 előtti verziót futtató eszközre, vagy emulátorra van szükség. Újabb verzió esetén hibát kapunk az alkalmazás indulása során.
 
-Próbáljuk ki az alkalmazást 6.0/API 23 előtti verzióval rendelkező eszközön, vagy emulátoron!
-Amennyiben az eszközön, vagy emulátoron nincsenek névjegyek, adjunk hozzá legalább egyet telefonszámmal ellátva a beépített névjegykezelő alkalmazásban.
+Próbáljuk ki az alkalmazást 6.0/API 23 előtti verzióval rendelkező eszközön  vagy emulátoron!
+Amennyiben az eszközön nincsenek névjegyek, adjunk hozzá legalább egyet telefonszámmal ellátva a beépített névjegykezelő alkalmazásban.
 
 <img src="./assets/app.png" width="400" align="middle">
 
@@ -344,14 +350,16 @@ Android 6.0 vagy magasabb verzión futtatva az alkalmazást hibát kapunk, hisze
 A kapott hiba az alábbihoz hasonló:
 
 ```text
-java.lang.SecurityException: Permission Denial: opening provider com.android.providers.contacts.ContactsProvider2 from ProcessRecord{7a6a2b4 14701:hu.bme.aut.android.contacts/u0a135} (pid=14701, uid=10135) requires android.permission.READ_CALENDAR or android.permission.WRITE_CALENDAR
+java.lang.SecurityException: Permission Denial: opening provider 
+com.android.providers.contacts.ContactsProvider2 from ProcessRecord{...} (pid=14701, uid=10135)
+requires android.permission.READ_CALENDAR or android.permission.WRITE_CALENDAR
 ```
 
 ## Futásidejű jogosultságkezelés megvalósítása
 
-Módosítsuk az alkalmazást úgy, hogy futási időben kérje el a felhasználótól a manifestben deklarált *dangerous* engedélyt! Ebben a bevezetőben ismertetett függcények lesznek segítségünkre.
+Módosítsuk az alkalmazást úgy, hogy futási időben kérje el a felhasználótól a manifestben deklarált *dangerous* engedélyt! Ebben a bevezetőben ismertetett függvények lesznek segítségünkre.
 
-Emeljük ki a `ContactsActivity` `onCreate()` metódusában található alábbi sorokat egy függvénybe, melynek a neve legyen `loadContacts()`!
+Emeljük ki a `ContactsActivity` `onCreate` metódusában található alábbi sorokat egy függvénybe, melynek a neve legyen `loadContacts`!
 
 ```kotlin
 val contactsAdapter = ContactsAdapter()
@@ -360,7 +368,7 @@ rvContacts.adapter = contactsAdapter
 contactsAdapter.setContacts(getAllContacts())
 ```
 
-Ezt Android Studio-ban legegyszerűbben a kiemelni kívánt kód kijelölésével, majd a CTRL+ALT+M billentyűkombinációval tudjuk megtenni.
+Ezt Android Studio-ban legegyszerűbben a kiemelni kívánt kód kijelölésével, majd a *CTRL+ALT+M* billentyűkombinációval tudjuk megtenni. Ezzel a következő függvény kapjuk:
 
 ```kotlin
 private fun loadContacts() {
@@ -368,11 +376,10 @@ private fun loadContacts() {
 	rvContacts.layoutManager = LinearLayoutManager(this)
 	rvContacts.adapter = contactsAdapter
 	contactsAdapter.setContacts(getAllContacts())
-	contactsAdapter.itemClickListener = this
 }
 ```
 
-A kiemelés után az `onCreate()` függvény:
+A kiemelés után az `onCreate` függvény:
 
 ```kotlin
 override fun onCreate(savedInstanceState: Bundle?) {
@@ -383,60 +390,60 @@ override fun onCreate(savedInstanceState: Bundle?) {
 }
 ```
 
-Ahelyett hogy az `onCreate()` függvényben azonnal meghívnánk a `loadContacts()` függvényt, kérjünk engedélyt a felhasználótól a névjegyek olvasására!
+Ahelyett, hogy az `onCreate` függvényben azonnal meghívnánk ezt a `loadContacts` függvényt, kérjünk engedélyt a felhasználótól a névjegyek olvasására!
 
 Adjuk hozzá az alábbi függvényeket a `ContactsActivity`-hez!
 
 ```kotlin
 private fun showRationaleDialog(
-		@StringRes title: Int = R.string.rationalerationale_dialog_title,
-		@StringRes explanation: Int,
-		onPositiveButton: () -> Unit,
-		onNegativeButton: () -> Unit = this::finish
+    @StringRes title: Int = R.string.rationale_dialog_title,
+    @StringRes explanation: Int,
+    onPositiveButton: () -> Unit,
+    onNegativeButton: () -> Unit = this::finish
 ) {
-	val alertDialog = AlertDialog.Builder(this)
-			.setTitle(title)
-			.setMessage(explanation)
-			.setCancelable(false)
-			.setPositiveButton(R.string.proceed) { dialog, id ->
-				dialog.cancel()
-				onPositiveButton()
-			}
-			.setNegativeButton(R.string.exit) { dialog, id -> onNegativeButton() }
-			.create()
-	alertDialog.show()
+    val alertDialog = AlertDialog.Builder(this)
+        .setTitle(title)
+        .setMessage(explanation)
+        .setCancelable(false)
+        .setPositiveButton(R.string.proceed) { dialog, id ->
+            dialog.cancel()
+            onPositiveButton()
+        }
+        .setNegativeButton(R.string.exit) { dialog, id -> onNegativeButton() }
+        .create()
+    alertDialog.show()
 }
 
 private fun handleReadContactsPermission() {
-	if (ContextCompat.checkSelfPermission(this,
-					Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
-		// Should we show an explanation?
-		if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_CONTACTS)) {
+    if (ContextCompat.checkSelfPermission(this,
+            Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
+        // Should we show an explanation?
+        if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_CONTACTS)) {
 
-			// Show an explanation to the user *asynchronously* -- don't block
-			// this thread waiting for the user's response! After the user
-			// sees the explanation, try again to request the permission.
+            // Show an explanation to the user *asynchronously* -- don't block
+            // this thread waiting for the user's response! After the user
+            // sees the explanation, try again to request the permission.
 
-			showRationaleDialog(
-					explanation = R.string.contacts_permission_explanation,
-					onPositiveButton = this::requestContactsPermission
-			)
-			
-		} else {
-			// No explanation needed, we can request the permission.
-			requestContactsPermission()
-		}
-	} else {
-		loadContacts()
-	}
+            showRationaleDialog(
+                explanation = R.string.contacts_permission_explanation,
+                onPositiveButton = this::requestContactsPermission
+            )
+
+        } else {
+            // No explanation needed, we can request the permission.
+            requestContactsPermission()
+        }
+    } else {
+        loadContacts()
+    }
 }
 
 private fun requestContactsPermission() {
-	ActivityCompat.requestPermissions(
-			this,
-			arrayOf(READ_CONTACTS),
-			PERMISSIONS_REQUEST_READ_CONTACTS
-	)
+    ActivityCompat.requestPermissions(
+        this,
+        arrayOf(READ_CONTACTS),
+        PERMISSIONS_REQUEST_READ_CONTACTS
+    )
 }
 ```
 
@@ -452,32 +459,32 @@ companion object {
 }
 ```
 
-A `res/values/strings.xml`-be vegyük fel a hiányzó szöveges erőforrásokat:
+A `strings.xml`-be vegyük fel a hiányzó szöveges erőforrásokat:
 
 ```xml
 <string name="rationale_dialog_title">Attention!</string>
-<string name="explanation">The application needs to access your contacts to display them.</string>
+<string name="contacts_permission_explanation">The application needs to access your contacts to display them.</string>
 <string name="exit">Exit</string>
 <string name="proceed">Proceed</string>
 ```
 
-> Magyarázat
+A `handleReadContactsPermission` függvényben a `checkSelfPermission` függvény segítségével megvizsgáljuk, hogy az alkalmazás rendelkezik-e a `READ_CONTACTS` engedéllyel. Ha igen, akkor meghívjuk a `loadContacts` függvényt, ami ezt az engedélyt használva betölti a névjegyeket. 
 
-> A `handleReadContactsPermission()` függvényben a `checkSelfPermission()` függvény segítségével megvizsgáljuk, hogy az alkalmazás rendelkezik-e a `READ_CONTACTS` engedéllyel. Ha igen, akkor meghívjuk a `loadContacts()` függvényt, ami betölti a névjegyeket. Ellenkező esetben megkérdezzük arendszert, hogy a felhasználót kell-e tájékoztatni az engedélykérés létjogosultságáról (`shouldShowRequestPermissionRationale()`). Ez a függvény akkor tér vissza true értékkel, ha a felhasználó korábban megtagadta az engedélyt az alkalmazástól. (Például azért, mert nem gondolta, hogy az adott funkcióhoz feltétlenül szükséges az engedély.) Ilyenkor érdemes egy magyarázatot adni, melyben leírjuk, hogy miért van feltétlenül szükség az engedélyre. Legyünk tömörek, a hosszú magyarázatokat a felhasználó nem fogja elolvasni, inkább letörli az alkalmazást. A magyarázat jelen esetben egy dialógus, mely rövid tájékoztatást ad az engedély szükségességéről.
-Amennyiben nincs szükség magyarázatra, vagy a magyarázat dialógusablakában a *Proceed* gombra nyomott a felhasználó, akkor elkérjük az engedélyt (`requestPermissions()`).
+Ellenkező esetben megkérdezzük a rendszert, hogy a felhasználót kell-e tájékoztatni az engedélykérés létjogosultságáról (`shouldShowRequestPermissionRationale`). Ez a függvény akkor tér vissza `true` értékkel, ha a felhasználó korábban megtagadta az engedélyt az alkalmazástól. (Például azért, mert nem gondolta, hogy az adott funkcióhoz feltétlenül szükséges az engedély.) Ilyenkor érdemes egy magyarázatot adni, melyben leírjuk, hogy miért van feltétlenül szükség az engedélyre. Legyünk tömörek, a hosszú magyarázatokat a felhasználó nem fogja elolvasni, inkább letörli az alkalmazást. A magyarázat jelen esetben egy dialógus, mely rövid tájékoztatást ad az engedély szükségességéről.
+Amennyiben nincs szükség magyarázatra, vagy a magyarázat dialógusablakában a *Proceed* gombra nyomott a felhasználó, akkor elkérjük az engedélyt (`requestPermissions`).
 
-Ceréljük le a `ContactsActivity` `onCreate()` függvényében a `loadContacts()` hívást az előzőekben létrehozott `handleReadContactsPermission()` hívásra:
+Cseréljük le a `ContactsActivity` `onCreate` függvényében a `loadContacts` hívást az előzőekben létrehozott `handleReadContactsPermission` hívásra:
 
 ```kotlin
 override fun onCreate(savedInstanceState: Bundle?) {
 	super.onCreate(savedInstanceState)
 	setContentView(R.layout.activity_contacts)
 
-	loadContacts()
+	handleReadContactsPermission()
 }
 ```
 
-Kezeljük le az engedélykérés válaszát is úgy, hogy felülírjuk a `ContactsActivity` `onRequestPermissionResult()` függvényét:
+Kezeljük le az engedélykérés válaszát is úgy, hogy felülírjuk a `ContactsActivity` `onRequestPermissionResult` függvényét:
 
 ```kotlin
 override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
@@ -500,8 +507,7 @@ override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<Str
 
 Amennyiben a felhasználó megadta az engedélyt, az alkalmazás betölti a névjegyeket.
 
-Próbáljuk ki az alkalmazást 6.0+/API level 23+ eszközön, vagy emulátoron!
-Figyeljük meg a magyarázó dialógust miután megtagadjuk az engedélyt, majd újraindítjuk az alkalmazást!
+Próbáljuk ki az alkalmazást 6.0+/API level 23+ eszközön! Figyeljük meg a magyarázó dialógust miután megtagadjuk az engedélyt, majd újraindítjuk az alkalmazást!
 
 ## Telefonszám hívása
 
@@ -511,10 +517,9 @@ Ahhoz, hogy az alkalmazásunk hívásokat indíthasson, fel kell venni a követk
 <uses-permission android:name="android.permission.CALL_PHONE" />
 ```
 
-Ez az engedély is a *dangerous* kategóriába tartozik, ezért a telefonhívás indítását is az előzőekben leírtaknak megfelelően kell kezelnünk.
-Bővítsük a funkcionalitást úgy, hogy az alkalmazás egy adott névjegy elemre kattintás hatására hívást indítson a névjegyben szereplő telefonszámra!
+Ez az engedély is a *dangerous* kategóriába tartozik, ezért a telefonhívás indítását is az előzőekben leírtaknak megfelelően kell kezelnünk. Bővítsük a funkcionalitást úgy, hogy az alkalmazás egy adott névjegy elemre kattintás hatására hívást indítson a névjegyben szereplő telefonszámra!
 
-Módosítsuk úgy a `ContactsActivity`-t, hogy implementálja a `ContactsAdapter.ContactItemClickListener` interfészt:
+Módosítsuk úgy a `ContactsActivity`-t, hogy implementálja a `ContactsAdapter.ContactItemClickListener` interface-t, ezen tud szólni az adapter, hogy a lista valamelyik elemét kiválasztották:
 
 ```kotlin
 class ContactsActivity : AppCompatActivity(), ContactsAdapter.ContactItemClickListener {
@@ -524,6 +529,12 @@ class ContactsActivity : AppCompatActivity(), ContactsAdapter.ContactItemClickLi
 	}
 	...
 }
+```
+
+A `loadContacts` függvény végén adjuk meg a `ContactsActivity`-t listenerként:
+
+```kotlin
+contactsAdapter.itemClickListener = this
 ```
 
 Adjuk hozzá az alábbi propertyt és függvényeket a `ContactsActivity` osztályhoz:
@@ -583,8 +594,7 @@ A `strings.xml`-ben vegyük fel a hiányzó szöveges erőforrást:
 <string name="call_permission_explanation">The application needs permission to make phone calls. It will not initiate calls without explicit user intention.</string>
 ```
 
-A `callPhoneNumber()` függvény fogja indítani a hívást, a `handleCallPermission()` függvény pedig az engedélykérést kezeli a névjegyeknél látottakkal megegyező módon.
-Hozzuk létre a `PERMISSIONS_REQUEST_PHONE_CALL` konstanst a `ContactsActivity` `companion objec`-jében a korábban létrehozott `PERMISSIONS_REQUEST_READ_CONTACTS`-tól eltérő értékkel.
+A `callPhoneNumber` függvény fogja indítani a hívást, a `handleCallPermission` függvény pedig az engedélykérést kezeli a névjegyeknél látottakkal megegyező módon. Hozzuk létre a `PERMISSIONS_REQUEST_PHONE_CALL` konstanst a `ContactsActivity` `companion object`-jében a korábban létrehozott `PERMISSIONS_REQUEST_READ_CONTACTS`-tól eltérő értékkel, például.
 
 ```kotlin
 companion object {
@@ -593,7 +603,7 @@ companion object {
 }
 ```
 
-Az engedélykérés eredményét ebben az esetben is a `ContactsActivity` fogja kezelni. Módosítsuk az `onRequestPermissionsResult()` függvényt:
+Az engedélykérés eredményét ebben az esetben is a `ContactsActivity` fogja kezelni. Módosítsuk az `onRequestPermissionsResult` függvényt:
 
 ```kotlin
 override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
@@ -623,11 +633,9 @@ Teszteljük a hívás funkciót 6.0+/API level 23+ emulátoron!
 
 ## Önálló feladatok
 
-### Valósítsa meg az SMS küldés funkciót!
+Valósítsa meg az SMS küldés funkciót, például hosszú érintés eseménykezelő segítségével. 
 
-Például hosszú érintés eseménykezelő segítségével. 
-
-A szükséges engedély:
+Az ehhez szükséges engedély:
 
 ```xml
 <uses-permission android:name="android.permission.SEND_SMS"/>
