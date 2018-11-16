@@ -22,19 +22,19 @@ A labor az alábbi témákat érinti:
 
 A feladat megvalósításához szerver oldalon egy galéria alkalmazás áll rendelkezésre, mely az alábbi címen elérhető:
 
-[http://android-gallery.node.autsoft.hu/](http://android-gallery.node.autsoft.hu/) 
+[https://aut-android-gallery.herokuapp.com/](https://aut-android-gallery.herokuapp.com/) 
 
 ### API leírás
 
 A galéria egy HTTP API-n keresztül lehetőséget biztosít arra, hogy a képeket listázzuk, új képek töltsünk fel, illetve hogy képet értékeljünk. Az API a követekező címen érhető el:
 
 ```
-http://android-gallery.node.autsoft.hu/api
+https://aut-android-gallery.herokuapp.com/api
 ```
 
 #### Képek lekérdezése
 
-A `GET /images` lehetőségünk van a feltöltött fotókat listázni.
+A `GET /images` végpont meghívásával lehetőségünk van a feltöltött fotókat listázni.
  
  A válasz egy JSON tömb, ami a képek adatait tartalmazza, pl. 
  
@@ -53,16 +53,15 @@ A `GET /images` lehetőségünk van a feltöltött fotókat listázni.
 ]
  ```
  
- A képek URL je, az API címe után fűzve érhető el.
+A képek az `url` mező tartalmát az API címe után fűzve érhetőek el.
 
 #### Fotó feltöltése
 
 A `POST /upload` hívással lehetőségünk van fotót feltölteni. A kérés tartalma a bináris kép fájl `image` kulccsal.
 
-
 #### Szavazat feltöltése
 
-A  `POST /rate/{id}` hívással lehetőségünk van a feltöltött fotókat értékelni. Az `{id}` helyére a kép ID-ját kell fűznünk.
+A `POST /rate/{id}` hívással lehetőségünk van a feltöltött fotókat értékelni. Az `{id}` helyére a kép ID-ját kell fűznünk.
 
 A kérés paraméterek:
 
@@ -100,7 +99,7 @@ Vegyük fel a Manifest állományba a szükséges engedélyeket:
 A modul szintű `build.gradle`-ben vegyük fel a `RecyclerView` függőséget:
 
 ```groovy
-implementation 'com.android.support:recyclerview-v7:28.0.0-rc02'
+implementation 'com.android.support:recyclerview-v7:28.0.0'
 ```
  
 A `MainActivity` nézet fogja kilistázni a feltöltött képeket. Ez egy egyszerű `RecyclerView`, mely egy `SwipeRefreshLayout`-ba van ágyazva, ami lehetőséget biztosít arra, hogy a listához egyszerűen implementáljunk *pull-to-refresh* működést. A hozzá tartozó `activity_main.xml` tartalma a következő:
@@ -294,8 +293,8 @@ Ezután hozzunk létre egy új csomagot `network` néven, benne egy új interfac
 interface GalleryAPI {
 
     companion object {
-        const val ENDPOINT_URL = "http://android-gallery.node.autsoft.hu/api/"
-        const val IMAGE_PREFIX_URL = "http://android-gallery.node.autsoft.hu/"
+        const val ENDPOINT_URL = "https://aut-android-gallery.herokuapp.com/api/"
+        const val IMAGE_PREFIX_URL = "https://aut-android-gallery.herokuapp.com/"
 
         const val MULTIPART_FORM_DATA = "multipart/form-data"
         const val PHOTO_MULTIPART_KEY_IMG = "image"
@@ -651,7 +650,6 @@ Próbáljuk ki az alkalmazást, és töltsünk fel egy fotót!
 A labor során a 22-es `targetSdkVersion` beállításával több, az újabb Android verziókban bevezetett változtatást/megszorítást megkerültünk. A Google azonban 2018 augusztusától nem enged 26-nál kisebb target SDK-val alkalmazásokat publikálni, 2018 novemberétől pedig meglévő alkalmazásokat sem lehet frissíteni úgy, hogy az új verzió ne célozná meg legalább a 26-os SDK-t. Ennek részleteiről itt olvashatunk bővebben: https://developer.android.com/distribute/best-practices/develop/target-sdk
 
 A teljesség kedvéért a most kihagyott részek az alábbiak voltak:
-- Android Pie (28)-tól külön engedélyeznünk kéne a http feletti kommunikációt, ahogy azt már az előző laboron láttuk.
 - Android Nougat (24) óta nem hivatkozhatunk külső fájlokat URI szerint [FileProvider](https://developer.android.com/training/secure-file-sharing/setup-sharing) nélkül.
 - Android Marshmallow (23) felett a veszélyes engedélyeket futásidőben kell elkérnünk, erre később fogunk példát látni. 
 
@@ -663,7 +661,7 @@ Az előző labor mintájára módosítsd úgy a generikus szálkezelő megoldás
 
 ### Feladat 2: Szavazat feltöltése
 
-Az API-val lehetőség van szavazatokat is feltölteni. Egészítsd ki a fotók listáját egy részletek nézettel, ahol a felhasználó megadhatja az adatait, a fotó értékelését, és feltöltheti az értékelést az API-n keresztül. Az értékelés változását a [weboldalon](http://android-gallery.node.autsoft.hu/) keresztül követheted.
+Az API-val lehetőség van szavazatokat is feltölteni. Egészítsd ki a fotók listáját egy részletek nézettel, ahol a felhasználó megadhatja az adatait, a fotó értékelését, és feltöltheti az értékelést az API-n keresztül. Az értékelés változását a [weboldalon](https://aut-android-gallery.herokuapp.com/) keresztül követheted.
 
 Segítség: a hozzá tartozó hívás Retrofit hívás leírója a következő:
 
