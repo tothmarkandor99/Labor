@@ -2,7 +2,7 @@
 
 A labor célja, hogy bemutassa, hogyan lehet ún. Master/Detail nézetet tartalmazó alkalmazást készíteni, kiemelve a `Fragment`-eket és az erőforrásminősítők használatát.
 
-Első lépésben készítsünk egy új alkalmazást, neve legyen *Todo* (Kotlin supportot ne felejtsük el kipipálni!).
+Első lépésben készítsünk egy új alkalmazást, neve legyen `Todo` (Kotlin supportot ne felejtsük el kipipálni!).
 
 A package név legyen: `hu.bme.aut.android.todo`.
 
@@ -12,11 +12,11 @@ A sablonválasztónál válasszuk a *Master/Detail Flow* opciót!
 
 A következő ablakban írjuk be rendre, hogy *Todo*, *Todos*, *Todos*! Ennek csak a generált sablonban van szerepe, de legalább az `Activity` nevét nem kell később átírnunk.
 
-Laborvezetővel elemezzék a generált alkalmazás működését, próbálják ki emulátoron, készüléken! A Master/Detail nézet célja, hogy egyetlen alkalmazással megoldjunk egy lista és annak egy elemének megjelenítését tableten és mobiltelefonon egyaránt. Működésének a lényege, hogy egy `Activity`-hez tartozó layoutnak kétféle változata van, egy kétpaneles és egy egypaneles változat. Az ezek közötti választást erőforrás minősítőkkel biztosítjuk, hogy tableten a kétpaneles változat töltődjön be, míg mobilon az egypaneles. 
+Laborvezetővel elemezzék a generált alkalmazás működését, próbálják ki emulátoron, készüléken! A Master/Detail nézet célja, hogy egyetlen alkalmazással megoldjuk egy lista és annak egy elemének részletes megjelenítését tableten és mobiltelefonon egyaránt. Működésének a lényege, hogy egy `Activity`-hez tartozó layoutnak kétféle változata van, egy kétpaneles és egy egypaneles változat. Az ezek közötti választást erőforrás minősítőkkel biztosítjuk, hogy tableten a kétpaneles változat töltődjön be, míg mobilon az egypaneles. 
 
-Ezután kódból az `Activity`-ben megpróbálunk referenciát szerezni a második panelre, és ha sikerül, akkor tableten vagyunk, ha nem, akkor mobilon. Az első panel tartalma egy `RecyclerView`, a másodiké pedig egy sima `Fragment` a lista egy elemének megjelenítésére. Ha mobilon vagyunk, akkor a listaelemre kattintva új `Activity`-be töltjük a részletező `Fragment`-et, míg tableten egyszerűen betöltjük a jobb oldali panelbe.
+Ezután kódból az `Activity`-ben megpróbálunk referenciát szerezni a második panelre, és ha sikerül, akkor tudjuk hogy tableten vagyunk, ha nem, akkor mobilon. Az első panel tartalma egy `RecyclerView`, a másodiké pedig egy sima `Fragment` a lista egy elemének megjelenítésére. Ha mobilon vagyunk, akkor a listaelemre kattintva új `Activity`-be töltjük a részletező `Fragment`-et, míg tableten egyszerűen betöltjük a jobb oldali panelbe.
 
-*Tipp: Az egyszerűbb teszteléshez, keresse ki a tablet mérethez tartozó (`layout-w900dp`) felületleírót (`todo_list.xml`), majd másolja a `layout-land` mappába (hozza létre a mappát!). Ezáltal a mobiltelefon álló orientációjában egy-, míg fektetve kétpaneles viselkedést kapunk.*
+*Tipp: Az egyszerűbb teszteléshez keresse ki a tablet mérethez tartozó (`layout-w900dp`) felületleírót (`todo_list.xml`), majd másolja a `layout-land` mappába (hozza létre a mappát!). Ezáltal a mobiltelefon álló orientációjában egy-, míg fektetve kétpaneles viselkedést kapunk.*
 
 ## Átalakítás Todo alkalmazássá
 
@@ -37,9 +37,9 @@ class Todo(
 }
 ```
 
-Figyeljük meg az enum-ot az osztályunkban. Ezen konstansoknak megfelelő ikonokat fogunk használni a listában.
+Figyeljük meg az enum-ot az osztályunkban. Ezen konstansoknak megfelelő ikonokat fogunk később használni a listában a prioritás megjelenítéséhez.
 
-Töröljük ki a `dummy` nevű package-t!
+Töröljük ki a `dummy` nevű package-et!
 
 Írjuk felül a `TodoDetailFragment` osztály tartalmát, mely a `Todo` leírását fogja megjeleníteni. Ez legyen az alábbi:
 
@@ -88,7 +88,7 @@ class TodoDetailFragment : Fragment() {
 }
 ```
 
-> A [`let`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/let.html) függvény tetszőleges objektumon meghívható, és csupán annyit csinál, hogy lefuttatja a paramétereként adott lambdát, odaadva neki az objektumot. Ez önmagában elég haszontalan, viszont a [safe call operátorral](https://kotlinlang.org/docs/reference/null-safety.html#safe-calls) (`?.`) kombinálva a `null` ellenőrzések egyik legkényelmesebb formáját nyújtja. Amennyiben a `?.let` előtt álló kifejezés `null`, a `let` függvény nem hívódik meg (ezt csinálja az említett operátor), ha pedig nem `null`, akkor a `let` függvényen belül már biztosan nem `null`-ként kapjuk meg az objektumunkat. Jelen esetben ha az `arguments` nem `null`, meghívódik a `let` és a lambdába beérkező `args` nevű paraméter már biztosan nem `null`, így szabadon használható.
+> A [`let`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/let.html) függvény tetszőleges objektumon meghívható, és csupán annyit csinál, hogy lefuttatja a paramétereként adott lambdát, odaadva neki az objektumot. Ez önmagában elég haszontalan, viszont a [safe call operátorral](https://kotlinlang.org/docs/reference/null-safety.html#safe-calls) (`?.`) kombinálva a `null` ellenőrzések egyik legkényelmesebb formáját nyújtja. Amennyiben a `?.let` előtt álló kifejezés `null`, a `let` függvény nem hívódik meg (ezt csinálja az említett operátor), ha pedig nem `null`, akkor a `let` függvényen belül már biztosan nem `null`-ként kapjuk meg az objektumunkat. Jelen esetben ha az [`arguments`](https://developer.android.com/reference/android/support/v4/app/Fragment#getarguments) nem `null`, meghívódik a `let` és a lambdába beérkező `args` nevű paraméter már biztosan nem `null`, így szabadon használható.
 
 > A `Todo` konstruktor hívásánál [elnevezett paraméterekkel](https://kotlinlang.org/docs/reference/functions.html#named-arguments) (illetve sortörésekkel) tettük olvashatóbbá a kódot. Elnevezett paramétereket bármilyen Kotlibnan definiált függvény meghívásakor használhatunk.
 
@@ -104,13 +104,13 @@ Vegyük fel a `TodoDetailActivity`-ben az alábbi kulcsot ami még hiányzik:
 
 ```kotlin
 companion object {
-	const val KEY_DESC = "KEY_DESC"
+    const val KEY_DESC = "KEY_DESC"
 }
 ```
 
 A két `Activity` és a jobb oldali panel már fel van készítve az új működésre. A `TodoListActivity` el tudja dönteni, hogy egy vagy két panel jelenik meg, listenerként pedig majd betölti a `TodoDetailActivity`-t vagy a jobb oldali `Fragment`-et.
 
-Már csak egy dolog van hátra: ahhoz, hogy a Todoink megfelelően jelenjenek meg a listában, módosítanunk kell a sablonban létrejött `SimpleItemRecyclerViewAdapter`-t. Először is töröljük a `TodoListActivity`-ből az `SimpleItemRecyclerViewAdapter` belső osztályt és hozzunk létre a `SimpleItemRecyclerViewAdapter` osztályt az `adapter` package-ben. Ennek tartalma legyen a következő:
+Már csak egy dolog van hátra: ahhoz, hogy a Todo-ink megfelelően jelenjenek meg a listában, módosítanunk kell a sablonban létrejött `SimpleItemRecyclerViewAdapter`-t. Először is töröljük a `TodoListActivity`-ből az `SimpleItemRecyclerViewAdapter` belső osztályt és hozzunk létre a `SimpleItemRecyclerViewAdapter` osztályt az `adapter` package-ben. Ennek tartalma legyen a következő:
 
 ```kotlin
 class SimpleItemRecyclerViewAdapter : RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder>() {
@@ -201,41 +201,41 @@ Ez az adapter hivatkozik egy `row_todo.xml`-re. Hozzuk létre ezt a fájlt a `re
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
 
     <ImageView
-        android:id="@+id/imageViewPriority"
-        android:layout_height="wrap_content"
+        android:id="@+id/ivPriority"
         android:layout_width="wrap_content"
-        android:src="@drawable/ic_high"
-        android:padding="5dp"/>
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:src="@drawable/ic_high" />
 
     <RelativeLayout
-        android:layout_margin="8dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_width="fill_parent">
+        android:layout_margin="8dp">
 
         <TextView
-            android:id="@+id/textViewTitle"
-            android:textSize="16dp"
+            android:id="@+id/tvTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
             android:text="Title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"/>
+            android:textSize="16dp" />
 
         <TextView
-            android:id="@+id/textViewDueDate"
-            android:textSize="12dp"
-            android:text="DueDate"
+            android:id="@+id/tvDueDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/textViewTitle"
             android:layout_alignParentBottom="true"
-            android:gravity="bottom"/>
+            android:layout_below="@id/tvTitle"
+            android:gravity="bottom"
+            android:text="DueDate"
+            android:textSize="12dp" />
+
     </RelativeLayout>
 
 </LinearLayout>
@@ -251,15 +251,15 @@ Szükségünk van még a nézetekhez az alábbi három képre. Ezek különböz�
 
 ```kotlin
 private fun setupRecyclerView() {
-	val demoData = mutableListOf(
-			Todo("title1", Todo.Priority.LOW, "2011. 09. 26.", "description1"),
-			Todo("title2", Todo.Priority.MEDIUM, "2011. 09. 27.", "description2"),
-			Todo("title3", Todo.Priority.HIGH, "2011. 09. 28.", "description3")
-	)
-	simpleItemRecyclerViewAdapter = SimpleItemRecyclerViewAdapter()
-	simpleItemRecyclerViewAdapter.itemClickListener = this
-	simpleItemRecyclerViewAdapter.addAll(demoData)
-	todo_list.adapter = simpleItemRecyclerViewAdapter
+    val demoData = mutableListOf(
+            Todo("title1", Todo.Priority.LOW, "2011. 09. 26.", "description1"),
+            Todo("title2", Todo.Priority.MEDIUM, "2011. 09. 27.", "description2"),
+            Todo("title3", Todo.Priority.HIGH, "2011. 09. 28.", "description3")
+    )
+    simpleItemRecyclerViewAdapter = SimpleItemRecyclerViewAdapter()
+    simpleItemRecyclerViewAdapter.itemClickListener = this
+    simpleItemRecyclerViewAdapter.addAll(demoData)
+    todo_list.adapter = simpleItemRecyclerViewAdapter
 }
 ```
 
@@ -271,27 +271,27 @@ private lateinit var simpleItemRecyclerViewAdapter: SimpleItemRecyclerViewAdapte
 
 > A [`lateinit`](https://kotlinlang.org/docs/reference/properties.html#late-initialized-properties-and-variables) kulcsszóval megjelölt property-ket a fordító megengedi inicializálatlanul hagyni az osztály konstruktorának lefutása utánig, anélkül, hogy nullable-ként kéne azokat megjelölnünk (ami később kényelmetlenné tenné a használatukat, mert mindig ellenőriznünk kéne, hogy `null`-e az értékük). Ez praktikus olyan esetekben, amikor egy osztály inicializálása nem a konstruktorában történik (például ahogy az `Activity`-k esetében az `onCreate`-ben), mert később az esetleges `null` eset lekezelése nélkül használhatjuk majd a property-t. A `lateinit` használatával átvállaljuk a felelősséget a fordítótól, hogy a property-t az első használata előtt inicializálni fogjuk - ellenkező esetben kivételt kapunk.
 
-Illetve generáljuk ki az interfész implementációs metódusokat (tipp: a `setupRecyclerView()`-ban a `this`-en *Alt+Enter*-t nyomva az IDE felajánlja a generálást), ebből az `onItemClick` megvalósítása:
+Implementálja a `TodoListActivity` a `TodoItemClickListener` interfészt, illetve generáljuk ki az interfész implementációs metódusokat (tipp: a `setupRecyclerView()`-ban a `this`-en *Alt+Enter*-t nyomva az IDE felajánlja a generálást), ebből az `onItemClick` megvalósítása:
 
 ```kotlin
 override fun onItemClick(todo: Todo) {
-	if (twoPane) {
-		val fragment = TodoDetailFragment.newInstance(todo.description)
-		supportFragmentManager
-				.beginTransaction()
-				.replace(R.id.todo_detail_container, fragment)
-				.commit()
-	} else {
-		val intent = Intent(this, TodoDetailActivity::class.java)
-		intent.putExtra(TodoDetailActivity.KEY_DESC, todo.description)
-		startActivity(intent)
-	}
+    if (twoPane) {
+        val fragment = TodoDetailFragment.newInstance(todo.description)
+        supportFragmentManager
+                .beginTransaction()
+                .replace(R.id.todo_detail_container, fragment)
+                .commit()
+    } else {
+        val intent = Intent(this, TodoDetailActivity::class.java)
+        intent.putExtra(TodoDetailActivity.KEY_DESC, todo.description)
+        startActivity(intent)
+    }
 }
 ```
 
-Minden fejlesztés során fontos a kódolási konvenciók betartása, hogy könyebben olvasható kódot adjunk ki a kezünkből amelyra ha más ránéz, nem lehet problémája a megértésével. Ezért itt alkalmazzuk a widget elemek típusukkal való prefixelését, tehát adjunk új id-t a `todo_detail.xml`-ben a `TextView`-nak `tvTodoDetail` néven majd a `row_todo.xml`-ben, amely a lista egy eleme, nevezzük át az id-kat értelemszerűen: `ivPriority`, `tvTitle`, `tvDueDate`-nak.
- 
-Ha valamelyik osztályban még hibát jelezne az IDE, ellenőrizzük, hogy nem-e maradt felesleges import a **dummy** csomag elemeire, valamint importáljuk be az imént átnevezett View-kat ID szerint.
+Minden fejlesztés során fontos a kódolási konvenciók betartása, hogy könyebben olvasható kódot adjunk ki a kezünkből amelyra ha más ránéz, nem lehet problémája a megértésével. Ezért itt alkalmazzuk a widget elemek típusukkal való prefixelését, tehát adjunk új id-t a `todo_detail.xml`-ben a `TextView`-nak, ez legyen `tvTodoDetail`.
+
+Ha valamelyik osztályban még hibát jelezne az IDE, ellenőrizzük, hogy nem-e maradt felesleges import a `dummy` csomag elemeire, valamint importáljuk be az imént átnevezett `View`-t ID szerint a `TodoDetailFragment` osztályban.
 
 Próbálja ki az alkalmazást!
 
@@ -315,7 +315,7 @@ override fun onItemLongClick(position: Int, view: View): Boolean {
 }
 ```
 
-Az `onItemLongClick`-ben hivatkozunk egy layout erőforrásra, ami tartalmazza a lehetséges menüpontokat. Hozzuk létre a `menu_todo.xml` fájlt a `menu` mappában (amit el kell készítenünk).
+Az `onItemLongClick`-ben hivatkozunk egy menü erőforrásra, ami tartalmazza a lehetséges menüpontokat. Hozzuk létre a `menu_todo.xml` fájlt a `menu` mappában (amit létre kell hoznunk).
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -336,7 +336,7 @@ Próbáljuk ki a törlést!
 
 ## Új Todo létrehozása
 
-A `TodoListActivity`-hez adjunk egy saját menüt, melyben egy *Create new Todo* menüpont található, melyet kiválasztva dialógus formában egy új `DialogFragment` jelenik meg, hasonlóan a korábbi laboron látott megoldáshoz.
+A `TodoListActivity`-hez adjunk egy saját menüt, melyben egy *Create* menüpont található, melyet kiválasztva dialógus formában egy új `DialogFragment` jelenik meg, hasonlóan a korábbi laboron látott megoldáshoz.
 
 Ehhez természetesen szükségünk lesz egy menü erőforrásra. A `menu` mappában hozzuk létre a `menu_list.xml` állományt!
 
@@ -358,16 +358,16 @@ Majd az `TodoListActivity`-n belül kezeljük az ehhez tartozó metódusokat is.
 
 ```kotlin
 override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-	menuInflater.inflate(R.menu.menu_list, menu)
-	return super.onCreateOptionsMenu(menu)
+    menuInflater.inflate(R.menu.menu_list, menu)
+    return super.onCreateOptionsMenu(menu)
 }
 
 override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-	if (item?.itemId == R.id.itemCreateTodo) {
-		val todoCreateFragment = TodoCreateFragment()
-		todoCreateFragment.show(supportFragmentManager, "TAG")
-	}
-	return super.onOptionsItemSelected(item)
+    if (item?.itemId == R.id.itemCreateTodo) {
+        val todoCreateFragment = TodoCreateFragment()
+        todoCreateFragment.show(supportFragmentManager, "TAG")
+    }
+    return super.onOptionsItemSelected(item)
 }
 ```
 
@@ -442,99 +442,92 @@ class TodoCreateFragment : DialogFragment() {
 }
 ```
 
-> Az `onAttach` függvényben láthatjuk, hogy sok más konstrukcióval együtt Kotlinban az [`if-else`](https://kotlinlang.org/docs/reference/control-flow.html#if-expression) is használható kifejezésként, értéke pedig a lefutott ág utolsó kifejezése.
-
-Most ugorjunk vissza a `TodoListActivity`-re, és valósítsuk meg a `TodoCreatedListener` interfészt!
-
-```kotlin
-class TodoListActivity : AppCompatActivity(), TodoCreateFragment.TodoCreatedListener, SimpleItemRecyclerViewAdapter.TodoItemClickListener
-```
-
-```kotlin
-override fun onTodoCreated(todo: Todo) {
-	simpleItemRecyclerViewAdapter.addItem(todo)
-}
-```
+> Az `onAttach` függvényben láthatjuk, hogy mint sok más nyelvi elem a Kotlinban az [`if-else`](https://kotlinlang.org/docs/reference/control-flow.html#if-expression) is használható kifejezésként, értéke pedig a lefutott ág utolsó kifejezése.
 
 Hozzuk létre a `Fragment` layoutját, ez a `fragment_create.xml`, tartalma a következő:
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	android:layout_width="wrap_content"
-	android:layout_height="wrap_content"
-	android:stretchColumns="1">
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:stretchColumns="1">
 
-	<TableRow>
+    <TableRow>
 
-		<TextView
-			android:layout_column="1"
-			android:text="@string/lblTodoTitle"
-			android:layout_width="wrap_content"
-			android:gravity="right" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_column="1"
+            android:gravity="end"
+            android:text="@string/lblTodoTitle" />
 
-		<EditText
-			android:id="@+id/etTodoTitle"
-			android:width="200dp" />
-	</TableRow>
+        <EditText
+            android:id="@+id/etTodoTitle"
+            android:width="200dp" />
 
-	<TableRow>
+    </TableRow>
 
-		<TextView
-			android:layout_column="1"
-			android:text="@string/lblTodoPriority"
-			android:layout_width="wrap_content"
-			android:gravity="right" />
+    <TableRow>
 
-		<Spinner
-			android:id="@+id/spnrTodoPriority"
-			android:width="200dp" />
-	</TableRow>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_column="1"
+            android:gravity="end"
+            android:text="@string/lblTodoPriority" />
 
-	<TableRow>
+        <Spinner
+            android:id="@+id/spnrTodoPriority"
+            android:width="200dp" />
+    </TableRow>
 
-		<TextView
-			android:layout_column="1"
-			android:text="@string/lblTodoDueDate"
-			android:layout_width="wrap_content"
-			android:gravity="right" />
+    <TableRow>
 
-		<TextView
-			android:id="@+id/tvTodoDueDate"
-			android:textSize="20dp"
-			android:width="200dp"
-			android:gravity="center" />
-	</TableRow>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_column="1"
+            android:gravity="end"
+            android:text="@string/lblTodoDueDate" />
 
-	<TableRow>
+        <TextView
+            android:id="@+id/tvTodoDueDate"
+            android:width="200dp"
+            android:gravity="center"
+            android:textSize="20dp" />
 
-		<TextView
-			android:layout_column="1"
-			android:text="@string/lblTodoDescription"
-			android:layout_width="wrap_content"
-			android:gravity="right" />
+    </TableRow>
 
-		<EditText
-			android:id="@+id/etTodoDescription"
-			android:width="200dp"
-			android:text="" />
-	</TableRow>
+    <TableRow>
 
-	<TableRow>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_column="1"
+            android:gravity="end"
+            android:text="@string/lblTodoDescription" />
 
-		<Button
-			android:id="@+id/btnCreateTodo"
-			android:layout_column="1"
-			android:text="@string/btnOk"
-			android:layout_width="wrap_content"
-			android:gravity="right" />
+        <EditText
+            android:id="@+id/etTodoDescription"
+            android:width="200dp"
+            android:text="" />
 
-		<Button
-			android:id="@+id/btnCancelCreateTodo"
-			android:text="@string/btnCancel"
-			android:layout_width="wrap_content"
-			android:gravity="left" />
-	</TableRow>
+    </TableRow>
+
+    <TableRow>
+
+        <Button
+            android:id="@+id/btnCreateTodo"
+            android:layout_width="wrap_content"
+            android:layout_column="1"
+            android:gravity="end"
+            android:text="@string/btnOk" />
+
+        <Button
+            android:id="@+id/btnCancelCreateTodo"
+            android:layout_width="wrap_content"
+            android:gravity="left"
+            android:text="@string/btnCancel" />
+
+    </TableRow>
+
 </TableLayout>
 ```
 
@@ -550,13 +543,26 @@ A szöveges erőforrásokat vagy hozzuk létre a hibákból kiindulva, vagy más
 <string name="dummyDescription">dummyDescription</string>
 ```
 
+Most ugorjunk vissza a `TodoListActivity`-re, és valósítsuk meg a `TodoCreatedListener` interfészt!
+
+```kotlin
+class TodoListActivity : AppCompatActivity(), TodoCreateFragment.TodoCreatedListener, SimpleItemRecyclerViewAdapter.TodoItemClickListener
+```
+
+```kotlin
+override fun onTodoCreated(todo: Todo) {
+    
+    simpleItemRecyclerViewAdapter.addItem(todo)
+}
+```
+
 Ezek után ellenőrizzük, hogy működik az új Todo felvitele (kivéve a dátumválasztást)!
 
 ## Önálló feladat
 
 ### Dátumválasztó elkészítése
 
-Először is csináljunk még egy `DialogFragment`-ből származó osztályt, ezúttal nevezzük `DatePickerDialogFragment`-nek. A `TodoCreateFragment`-ünk implementálja a `DateListener` interfészét a `DatePickerDialogFragment`-ünknek, így a dátumválasztásról értesül az új Todo felvételére szolgáló `DialogFragment`-ünk.
+Először is csináljunk még egy `DialogFragment`-ből származó osztályt, ezúttal nevezzük `DatePickerDialogFragment`-nek. A `TodoCreateFragment`-ünk implementálja a `DateListener` interfészét a `DatePickerDialogFragment`-ünknek, így értesül a dátumválasztásról.
 
 ```kotlin
 class DatePickerDialogFragment : DialogFragment() {
@@ -627,12 +633,13 @@ class DatePickerDialogFragment : DialogFragment() {
     interface DateListener {
         fun onDateSelected(date: String)
     }
+
 }
 ```
 
 > A `DatePickerDialog.OnDateSetListener` implementációhoz egy anonim osztályt használunk egy [`object expression`](https://kotlinlang.org/docs/reference/object-declarations.html#object-expressions)-nel leírva, ami az `object` kulcsszó harmadik előfordulása a nyelvben. (Mi volt az előző kettő?)
 
-Ugorjunk vissza a `TodoCreateFragment`-re és valósítsuk meg a `DateListener` interfészt, illetve állítsuk be a `txtDueDate` `onClickListener(…)`-jében, hogy mutassunk egy `DialogFragment`-et.
+Ugorjunk vissza a `TodoCreateFragment`-re és valósítsuk meg a `DateListener` interfészt, illetve állítsuk be a `txtDueDate` `onClickListener(…)`-jében, hogy mutassunk egy `DatePickerDialogFragment`-et a megnyomásakor.
 
 ```kotlin
 class TodoCreateFragment : DialogFragment(), DatePickerDialogFragment.DateListener 
@@ -640,13 +647,13 @@ class TodoCreateFragment : DialogFragment(), DatePickerDialogFragment.DateListen
 
 ```kotlin
 private fun showDatePickerDialog() {
-	val datePicker = DatePickerDialogFragment()
-	datePicker.setTargetFragment(this, 0)
-	datePicker.show(fragmentManager, DatePickerDialogFragment.TAG)
+    val datePicker = DatePickerDialogFragment()
+    datePicker.setTargetFragment(this, 0)
+    datePicker.show(fragmentManager, DatePickerDialogFragment.TAG)
 }
 
 override fun onDateSelected(date: String) {
-	tvTodoDueDate.text = date
+    tvTodoDueDate.text = date
 }
 ```
 
