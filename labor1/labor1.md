@@ -16,7 +16,12 @@ A laborhoz kapcsolódó önálló feladat:
 
 A megvalósítandó játék felhasználói felületét az alábbi képernyőképek szemléltetik:
 
-![](images/main.png) ![](images/dialog.png) ![](images/game.png)
+<p float="left">
+<img src="./images/main.png" width="400" align="middle">
+<img src="./images/dialog.png" width="400" align="middle">
+<img src="./images/game.png" width="400" align="middle">
+</p>
+
 
 ## Projekt létrehozása
 
