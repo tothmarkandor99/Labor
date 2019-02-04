@@ -212,7 +212,9 @@ Próbáljuk ki az alkalmazást, nézzük meg a felületét.
 
 ## Az API bemutatása
 
-A szerver egy NodeJS alapú oldal, amely HTTP GET kérésekben várja a lépéseket és az üzeneteket. Ezeket eltárolja egy adatbázisban, amelyet egy REST híváson keresztül tesz elérhetővé a megjelenítésért felelős Angular alkalmazás számára. Az Angular alkalmazás ezt a NodeJS oldalt pollozza viszonylag kis időközönként és a kapott válaszok alapján frissíti a felhasználói felületét. A szerver alap címe az alábbi oldalon érhető el: 
+A szerver egy Spring alapú backend, amely HTTP GET kérésekben várja a lépéseket és az üzeneteket. Ezeket eltárolja egy adatbázisban, és elérhetővé teszi a megjelenítésért felelős Angular alkalmazás számára. Az Angular alkalmazás ettől a Spring backendtől Websocket-en kap üzeneteket közel valós időben, és ezek alapján frissíti a felhasználói felületét. 
+
+A szerver alap címe az alábbi oldalon érhető el: 
 
 ```
 https://aut-android-labyrinth.herokuapp.com/api
@@ -329,15 +331,15 @@ Ennek használatához fel kell vennünk a következő sort az alkalmazás modul 
 implementation 'com.squareup.okhttp3:okhttp:3.11.0'
 ```
 
-Ezután a könyvtár nagyon egyszerűen használható. Készítsünk is egy általános HTTP GET hívást lebonyolító függvényt a `LabyrinthAPI` osztályba.
+Ezután a könyvtár nagyon egyszerűen használható. A `LabyrinthAPI` osztályba vegyünk fel egy property-t egy `OkHttpClient` példány tárolására. Ezt használva készítsünk egy általános HTTP GET hívást lebonyolító függvényt.
 
 ```kotlin
-private fun httpGet(url: String): String {
-    val client = OkHttpClient.Builder()
-            .connectTimeout(10, TimeUnit.SECONDS)
-            .readTimeout(10, TimeUnit.SECONDS)
-            .build()
+private val client = OkHttpClient.Builder()
+        .connectTimeout(10, TimeUnit.SECONDS)
+        .readTimeout(10, TimeUnit.SECONDS)
+        .build()
 
+private fun httpGet(url: String): String {
     val request = Request.Builder()
             .url(url)
             .build()
