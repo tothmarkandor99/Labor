@@ -12,7 +12,7 @@ A labor során az alábbiakat nézzük meg:
 
 A labor során az alábbi regisztrációs nézetet rakjuk össze az egyedi `View`-k segítségével.
 
-<img src="./assets/labor_3_ss1.png" width="200" align="middle">
+<img src="./images/app.png" width="500" align="middle">
 
 *Az alkalmazás felülete*
 
