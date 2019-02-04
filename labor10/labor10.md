@@ -37,11 +37,14 @@ A játékban kétfelé űrhajó is található, a játékos (`Player`) és az el
 
 ## A Renderer elkészítése
 
-Készítsük el az objektumok kirajzolását végző `Renderer` osztályt a `rendering` csomagban. Ez az osztály tárolja a kirajzolni kívánt objektumokat, és azokat megfelelő sorrendben a képernyőre is rajzolja, illetve lépteti őket. A léptetés közben néha véletlenszerűen egy új `Enemy` objektumot is hozzáad a játéktérhez. Az `setPlayerElevation` függvényével pedig a `Player` magasságát állíthatjuk be. 
+Készítsük el az objektumok kirajzolását végző `Renderer` osztályt a `rendering` csomagban. Ez az osztály tárolja a kirajzolni kívánt objektumokat, és azokat megfelelő sorrendben a képernyőre is rajzolja, illetve lépteti őket. A léptetés közben néha véletlenszerűen egy új `Enemy` objektumot is hozzáad a játéktérhez. A `setPlayerElevation` függvényével pedig a `Player` magasságát állíthatjuk be. 
 
 ```kotlin
-class Renderer(private val context: Context, private val width: Int, private val height: Int) {
-
+class Renderer(
+        private val context: Context,
+        private val width: Int,
+        private val height: Int
+) {
     private val random = Random()
     private val entitiesToDraw = mutableListOf<Renderable>()
 
@@ -77,7 +80,6 @@ class Renderer(private val context: Context, private val width: Int, private val
     fun setPlayerElevation(elevation: Float) {
         player.elevation = elevation
     }
-
 }
 ```
 
@@ -86,8 +88,12 @@ class Renderer(private val context: Context, private val width: Int, private val
 Készítsük el a kirajzolás ütemezéséért felelős szálat, a `rendering` csomagban `RenderLoop` néven. Ezen a szálon fognak kirajzolásra kerülni a `Renderer` objektumai. Ez tartalmaz egy referenciát a `GameView`-ra, hogy abban megjelenítse a kirajzolt képet, valamint az előbb létrehozott `Renderer`-t használja fel. Az osztály a `Thread`-ből származik, és a `run` függvényében egy végtelen ciklusban rajzolja ki újra és újra a játékelemeket. A rajzolás kezdetén először lépteti a játéktér állapotát, majd a `SurfaceView` `SurfaceHolder` objektuma segítségével kirajzolja magát. Fontos, hogy a kirajzolás időtartama alatt zárolni kell a `SurfaceHolder`-hez tartozó `Canvas`-t.
 
 ```kotlin
-class RenderLoop(context: Context, private val view: GameView, width: Int, height: Int) : Thread() {
-
+class RenderLoop(
+        context: Context,
+        private val view: GameView,
+        width: Int,
+        height: Int
+) : Thread() {
     private val renderer = Renderer(context, width, height)
 
     var running = false
@@ -118,7 +124,6 @@ class RenderLoop(context: Context, private val view: GameView, width: Int, heigh
     fun setPlayerElevation(elevation: Float) {
         renderer.setPlayerElevation(elevation)
     }
-
 }
 ```
 
@@ -171,7 +176,7 @@ fun setPlayerElevation(elevation: Float) {
 
 Próbáljuk ki az alkalmazást!
 
-![](./images/screen1.png)
+![](./images/stage0.png)
 
 ## Irányítás
 
@@ -179,7 +184,6 @@ Mozgassuk a felhasználó űrhajóját a gyorsulásmérő és magnetométer seg�
 
 ```kotlin
 class GyroscopeHelper(context: Context, private val gameView: GameView) : SensorEventListener {
-    
     private val sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
     private val accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
     private val magnetometer = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)
@@ -225,7 +229,6 @@ class GyroscopeHelper(context: Context, private val gameView: GameView) : Sensor
     }
 
     override fun onAccuracyChanged(sensor: Sensor, accuracy: Int) {}
-
 }
 ```
 
@@ -235,7 +238,6 @@ Használjuk ezt az osztályt a `GameActivity`-ben!
 
 ```kotlin
 class GameActivity : AppCompatActivity() {
-
     private lateinit var gyroscopeHelper: GyroscopeHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -253,7 +255,6 @@ class GameActivity : AppCompatActivity() {
         gyroscopeHelper.stop()
         super.onPause()
     }
-
 }
 ```
 
@@ -263,7 +264,7 @@ Figyeljük meg, ahogy az `onResume` és `onPause` életciklus függvényekben el
 
 Próbáljuk ki az alkalmazást!
 
-![](./images/screen2.png)
+![](./images/stage1.png)
 
 ### Animáció
 
@@ -360,6 +361,6 @@ Segítség: [Keeping the Device Awake](https://developer.android.com/training/sc
 
 Jelenleg minden ellenséges űrhajó képe külön be van töltve a memóriába. 
 
-Valósítsa meg hogy ezek csak egy példányban legyenek betöltve (pl. "statikus", *companion object*-ben tárolt bitmap), illetve a képernyőről eltűnő ellenséges űrhajókat szabadítsa fel, hogy azok ne foglaljanak helyet a memóriában.
+Valósítsa meg, hogy ezek csak egy példányban legyenek betöltve (pl. "statikus", *companion object*-ben tárolt bitmap), illetve a képernyőről eltűnő ellenséges űrhajókat szabadítsa fel, hogy azok ne foglaljanak helyet a memóriában.
 
 A képernyőről eltűnő űrhajókat a poziciójuk alapján (aktuális pocizió kisebb-e mint a `(bal szél) - (a hajó mérete)`) vegye ki a listából (pl. [`removeAll`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/remove-all.html) segítségével). Ha nincs már rájuk referencia, a GC felszabadítja őket.
