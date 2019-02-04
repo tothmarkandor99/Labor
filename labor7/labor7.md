@@ -4,26 +4,25 @@
 
 A labor célja a hálózati kommunikáció, azon belül is a platformon leginkább használt HTTP kommunikáció alapjainak bemutatása, valamint az ehhez kapcsolódó aszinkron hívások ismertetése. A labor során egy multiplayer labirintus játékhoz fogunk mobil klienst fejleszteni. A kliens segítségével irányíthatunk a labirintusban egy bábut, továbbá lehetőség lesz üzenetek küldésére is. A labor az alábbi témákat érinti:
 
-*   Felületek kezelése Kotlin Android Extensions segítségével
 *   HTTP hálózati hívások
 *   Aszinkron hívások szálakkal
 *   Események kezelése EventBus-szal
 
 ## A feladat
 
-A következőkben egy olyan Android alkalmazást készítünk, mely tulajdonképpen egy kliens alkalmazás egy multiplayer labirintus játékhoz.
+A következőkben egy olyan Android alkalmazást készítünk, mely egy kliens alkalmazás egy multiplayer labirintus játékhoz.
 
 A játék tényleges felülete nem az Android alkalmazás része, azt egy előre elkészített webes alkalmazás jeleníti meg, amely elérhető az alábbi címen:
 
-[http://android-labyrinth.node.autsoft.hu](http://android-labyrinth.node.autsoft.hu)
+[https://aut-android-labyrinth.herokuapp.com/](https://aut-android-labyrinth.herokuapp.com/)
 
-A játék szabályai egyszerűek, a játékosunkat a készülékről négy gomb segítségével (bal, jobb, fel, le) irányíthatjuk, továbbá lehetőség van még üzenetküldésre is. Az első lépésünk során kerül rá az új játékos a játéktérre egy véletlen pozícióra (színes GitHub icon). Ha egy játékos egy pontot érő mezőre lép (színes pipa), akkor pontot szerez, és egy újabb pontot érő mező kerül a pályára véletlenszerű helyre. A játékosok nem tudnak a fal (fekete négyzet) elemen átlépni, illetve másik játékos által foglalt mezőre sem léphetnek!
+A játék szabályai egyszerűek, a játékosunkat a készülékről négy gomb segítségével (bal, jobb, fel, le) irányíthatjuk, továbbá lehetőség van még üzenetküldésre is. Az első lépésünk során kerül rá az új játékos a játéktérre egy véletlen pozícióra (színes GitHub ikon). Ha egy játékos egy pontot érő mezőre lép (színes pipa), akkor pontot szerez, és egy újabb pontot érő mező kerül a pályára véletlenszerű helyre. A játékosok nem tudnak a fal (fekete négyzet) elemen átlépni, illetve másik játékos által foglalt mezőre sem léphetnek!
 
 <img src="./images/game.png" width="600" align="middle">
 
 ## A felhasználói felület elkészítése
 
-Hozzunk létre egy új Android Studio Projektet *NetworkLabor* néven, természetesen engedélyezve a Kotlin támogatást. A Company domain mező tartalmát töröljük ki és hagyjuk is üresen. 
+Hozzunk létre egy új Android Studio projektet *NetworkLabor* néven, természetesen engedélyezve a Kotlin támogatást. A *Company domain* mező tartalmát töröljük ki és hagyjuk is üresen. 
 
 A package név legyen `hu.bme.aut.android.networklabor`. A támogatott céleszközök a telefon és tablet, a minimum SDK szint az API 19: Android 4.4. 
 
@@ -31,12 +30,11 @@ A kezdő projekthez adjunk hozzá egy *Empty Activity*-t, melynek neve legyen `M
 
 A `test` és az `androidTest` mappákra nem lesz szükségünk, azokat törölhetjük!
 
-Első lépésként készítsük el az alkalmazás felhasználói felületét XML erőforrásból. A felületen helyezzünk el két `EditText`-et, egyet a felhasználónév bekéréséhez, egyet pedig üzenetküldéshez. Emellett legyen összesen 5 gomb, négy gomb az irányításhoz, egy pedig az üzenetküldéshez, valamint 3 `TextView` az üzenetek megjelenítéséhez. 
-
+Első lépésként készítsük el az alkalmazás felhasználói felületét XML erőforrásból. A felületen helyezzünk el két `EditText`-et, egyet a felhasználónév, egyet pedig az üzenet bekéréséhez. Emellett legyen összesen öt gomb: négy gomb az irányításhoz, egy az üzenet elküldéséhez, valamint három `TextView` az üzenetek megjelenítéséhez. 
 
 <img src="./images/ui.png" width="250" align="middle">
 
-Az ehhez megfelelő XML állomány a következő: 
+Az ehhez megfelelő XML állomány a következő:
 
 ```xml  
 <?xml version="1.0" encoding="utf-8"?>
@@ -180,14 +178,14 @@ Szabjuk testre az alkalmazás színeit a `res/values` könyvtárban lévő `colo
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <color name="primary">#009688</color>
-  <color name="primary_dark">#00796B</color>
-  <color name="primary_light">#B2DFDB</color>
-  <color name="accent">#00BCD4</color>
-  <color name="primary_text">#212121</color>
-  <color name="secondary_text">#757575</color>
-  <color name="icons">#FFFFFF</color>
-  <color name="divider">#BDBDBD</color>
+    <color name="primary">#009688</color>
+    <color name="primary_dark">#00796B</color>
+    <color name="primary_light">#B2DFDB</color>
+    <color name="accent">#00BCD4</color>
+    <color name="primary_text">#212121</color>
+    <color name="secondary_text">#757575</color>
+    <color name="icons">#FFFFFF</color>
+    <color name="divider">#BDBDBD</color>
 </resources>
 ``` 
 
@@ -208,57 +206,25 @@ Mivel az alkalmazásunk interneten keresztül fog kommunikálni, vegyük fel a m
 <uses-permission android:name="android.permission.INTERNET"/>
 ```
 
-## A felületi elemek egyszerű feloldása
-
-Az első laborokban még használtuk a `findViewById` hívást a nézetek feloldására. Ez a felületi elemekkel arányos mennyiségű kódolást kiván, mely egyébként nagyon repetitív. Azért, hogy ezt ne *kézzel* kelljen megcsinálnunk újra használjuk a [Kotlin Android Extensions](https://kotlinlang.org/docs/tutorials/android-plugin.html#view-binding) megoldását.
-
-Ezt a megoldást az Android Studio már automatikusan fel is veszi a projektünkbe ha Kotlin nyelven hozzuk létre, a modul szintű `build.gradle` fájlban ezt látszik is:
-
-```xml
-apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
-```
-
-Az eszköz fordítás időben generálja le a `findViewById` hívásokat, és el is fedi előlünk, az összerendelést pedig név alapján, az adott property importálásával tehetjük meg. Ha elkezdjük gépelni például az `etUsername`-et az `onCreate`-ben (fontos hogy a `setContentView` után, mert ekkor kapnak értéket ezek a property-k!) fel is ajánlja a Studio. Mutatja, hogy ez a property az Android Extensions-ből származik, illetve hogy melyik layout fájlban található és milyen típusú `View`-nak felel meg. 
-
-<img src="./images/extensions.png" width="400" align="middle">
-
-Ezt kiválasztva látható is, hogy a megfelelő propery-t be is importálja a Studio:
-
-```kotlin
-import android.support.v7.app.AppCompatActivity
-import android.os.Bundle
-import kotlinx.android.synthetic.main.activity_main.*
-
-class MainActivity : AppCompatActivity() {
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        etUsername.setText("")
-    }
-    
-}
-```
-
 Próbáljuk ki az alkalmazást, nézzük meg a felületét.
 
 <img src="./images/ui.png" width="250" align="middle">
 
 ## Az API bemutatása
 
-A szerver egy NodeJS alapú oldal, amely HTTP GET kérésekben várja a lépéseket és az üzeneteket. Ezeket eltárolja egy adatbázisban, amelyet egy REST híváson keresztül tesz elérhetővé a megjelenítésért felelős Angular alkalmazás számára. Az Angular alkalmazás ezt a NodeJS oldalt pollozza viszonylag kis időközönként és a kapott válaszok alapján frissíti a felhasználói felületét. A szerver alap címe az alábbi oldalon érhető el: 
+A szerver egy Spring alapú backend, amely HTTP GET kérésekben várja a lépéseket és az üzeneteket. Ezeket eltárolja egy adatbázisban, és elérhetővé teszi a megjelenítésért felelős Angular alkalmazás számára. Az Angular alkalmazás ettől a Spring backendtől Websocket-en kap üzeneteket közel valós időben, és ezek alapján frissíti a felhasználói felületét. 
+
+A szerver alap címe az alábbi oldalon érhető el: 
 
 ```
-http://android-labyrinth.node.autsoft.hu
+https://aut-android-labyrinth.herokuapp.com/api
 ``` 
 
 Ezen belül kell majd a megfelelő REST végpontokat meghívni az előre definiált GET paraméterekkel. A szervertől hiba esetén mindig „ERROR”-ral kezdődő üzenetet kapunk.
 
 ### Játékos mozgatása
 
-A játékos mozgatásához a `/api/step/{username}/{direction}`-t kell meghívni (`GET` hívás), amely két paramétert vár:
+A játékos mozgatásához a `/step/{username}/{direction}`-t kell meghívni (`GET` hívás), amely két paramétert vár:
 
 *   `username`: felhasználónév (ne felejtsük URL encode-olni!)
 *   `direction`: lépés típusa (1: bal, 2: fel, 3: jobb, 4: le)
@@ -266,12 +232,12 @@ A játékos mozgatásához a `/api/step/{username}/{direction}`-t kell meghívni
 Például: 
 
 ``` 
-GET /api/step/hallgato/3
+GET https://aut-android-labyrinth.herokuapp.com/api/step/hallgato/3
 ```
 
 ### Üzenet feltöltése
 
-Üzenet feltöltéséhez a `/api/message/{username}/{message}`-t kell hívni (`GET` hívás), amely szintén két paramétert vár:
+Üzenet feltöltéséhez a `/message/{username}/{message}`-t kell hívni (`GET` hívás), amely szintén két paramétert vár:
 
 *   `username`: felhasználónév (ne felejtsük URL encode-olni!)
 *   `message`: üzenet (ne felejtsük URL encode-olni!)
@@ -279,7 +245,7 @@ GET /api/step/hallgato/3
 Például: 
 
 ```
-GET /api/message/hallgato/hello
+GET https://aut-android-labyrinth.herokuapp.com/api/message/hallgato/hello
 ```
 
 
@@ -291,17 +257,17 @@ Alapértelmezetten Androidon a hívások a fő szálon (UI thread, main thread) 
 
 Android platformon a hálózati kommunikáció emiatt új szálon kell hogy történjen. Ehhez mind a Java, mind az Android SDK, mind a Kotlin nyelv ad lehetőségeket:
 
-*	Java Thread (Plain Old Java Thread, rugalmas, de testre kell szabni)
+*	Java [Thread](https://docs.oracle.com/javase/7/docs/api/java/lang/Thread.html) (Plain Old Java Thread, rugalmas, de testre kell szabni)
 *	Android [AsyncTask](http://developer.android.com/reference/android/os/AsyncTask.html) (szálakra épül, sok beépített feature, de nem elég rugalmas)
-*   [RxJava](https://github.com/ReactiveX/RxJava) (sokkal bonyolultabb az előzőeknél, szálakra épül ez is)
-*   [Kotlin couroutine](https://kotlinlang.org/docs/reference/coroutines.html)-ok (bonyolultabb az előzőeknél, szálakra épül ez is)
+*   [Kotlin couroutine](https://kotlinlang.org/docs/reference/coroutines.html)-ok (bonyolultabb az előzőeknél, szálakhoz hasonló, de alapjaiban más koncepció)
+*   [RxJava](https://github.com/ReactiveX/RxJava) (sokkal bonyolultabb az előzőeknél, nem is csak szálkezelést végez, szálakra épül)
 
 
 ### Visszatérés a fő szálra
 
 A hálózatról érkező választ általában a felhasználói felületen jelenítjük meg valamilyen módon, de a platform nem engedi, hogy más szálból a UI-t módosítsuk - ezt mindig csak a fő szálról tehetjük meg. 
 
-Arra, hogy egy mellék szálról hogyan térjünk vissza a fő szálra a platform szintén több eszközt is biztosít:
+Arra, hogy egy mellék szálról hogyan térjünk vissza a fő szálra a platform szintén több eszközt is biztosít.
 
 #### Erősen csatolt megoldások
 
@@ -326,7 +292,7 @@ A mostani laboron a *Java Thread* és az *Eseménybusz* kombinációját fogjuk 
 
 ## Kommunikáció a szerver oldallal
 
-Következő feladatunk a szerver oldali kommunikációt biztosító osztály megvalósítása, mely végrehajtja a HTTP GET hívásokat és a választ visszaadja String formátumban.
+Következő feladatunk a szerver oldali kommunikációt biztosító osztály megvalósítása, mely végrehajtja a HTTP GET hívásokat és a választ visszaadja `String` formájában.
 
 A `network` csomagban hozzuk létre a `LabyrinthAPI` osztályt.
 
@@ -334,7 +300,7 @@ A `network` csomagban hozzuk létre a `LabyrinthAPI` osztályt.
 class LabyrinthAPI {
 
     companion object {
-        private const val BASE_URL = "http://android-labyrinth.node.autsoft.hu"
+        private const val BASE_URL = "https://aut-android-labyrinth.herokuapp.com/api"
         private const val UTF_8 = "UTF-8"
     }
     
@@ -355,7 +321,7 @@ Ez az osztály fogja végezni a különböző API hívásokat, és egységbe zá
 
 ### HTTP hívások Androidon
 
-Az Android platform több megoldást is ad beépítve HTTP hívásokra. Egyrészt elérhető az *Apache HTTP Client*, valamint a Java `HttpUrlConnection`, ezeket beépítve tartalmazza a platform. Az *Apache HTTP Client* mára elavult, az Android 6.0 feletti eszközök már csak kiegészítéssel támogatják, *NE HASZNÁLJUK*. A `HttpUrlConnection` elérhető mindenhol, viszont nagyon körülményes a használata. 
+Az Android platform több megoldást is ad beépítve HTTP hívásokra. Egyrészt elérhető az *Apache HTTP Client*, valamint a Java [`HttpUrlConnection`](https://developer.android.com/reference/java/net/HttpURLConnection), ezeket beépítve tartalmazza a platform. Az *Apache HTTP Client* mára elavult, az Android 6.0 feletti eszközök már csak kiegészítéssel támogatják, *NE HASZNÁLJUK*. A `HttpUrlConnection` elérhető mindenhol, viszont nagyon körülményes a használata. 
 
 A fentiek miatt a beépített megoldások helyett egy széleskörben elterjedt, harmadik féltől ([Square](http://square.github.io)) származó, nyilt forráskódú könyvtárat, az [OkHttp](http://square.github.io/okhttp/)-t fogjuk használni.
 
@@ -365,17 +331,15 @@ Ennek használatához fel kell vennünk a következő sort az alkalmazás modul 
 implementation 'com.squareup.okhttp3:okhttp:3.11.0'
 ```
 
-Ezután a könyvtár nagyon egyszerűen használható. Készítsünk is egy általános HTTP GET hívást lebonyolító függvényt a `LabyrinthAPI` osztályba.
+Ezután a könyvtár nagyon egyszerűen használható. A `LabyrinthAPI` osztályba vegyünk fel egy property-t egy `OkHttpClient` példány tárolására. Ezt használva készítsünk egy általános HTTP GET hívást lebonyolító függvényt.
 
 ```kotlin
-@Throws(IOException::class)
+private val client = OkHttpClient.Builder()
+        .connectTimeout(10, TimeUnit.SECONDS)
+        .readTimeout(10, TimeUnit.SECONDS)
+        .build()
+
 private fun httpGet(url: String): String {
-
-    val client = OkHttpClient.Builder()
-            .connectTimeout(10, TimeUnit.SECONDS)
-            .readTimeout(10, TimeUnit.SECONDS)
-            .build()
-
     val request = Request.Builder()
             .url(url)
             .build()
@@ -398,7 +362,7 @@ Használjuk is az újonnan elkészített függvényünket, és implementáljuk a
 
 ```kotlin
 companion object {
-    private const val BASE_URL = "http://android-labyrinth.node.autsoft.hu"
+    private const val BASE_URL = "https://aut-android-labyrinth.herokuapp.com/api"
     private const val UTF_8 = "UTF-8"
     private const val TAG = "Network"
     private const val RESPONSE_ERROR = "ERROR"
@@ -406,7 +370,7 @@ companion object {
 
 fun moveUser(username: String, direction: Int): String {
     return try {
-        val moveUserUrl = "$BASE_URL/api/step/${encode(username)}/$direction"
+        val moveUserUrl = "$BASE_URL/step/${encode(username)}/$direction"
 
         Log.d(TAG, "Call to $moveUserUrl")
         httpGet(moveUserUrl)
@@ -418,7 +382,7 @@ fun moveUser(username: String, direction: Int): String {
 
 fun writeMessage(username: String, message: String): String {
     return try {
-        val writeMessageUrl = "$BASE_URL/api/message/${encode(username)}/${encode(message)}"
+        val writeMessageUrl = "$BASE_URL/message/${encode(username)}/${encode(message)}"
 
         Log.d(TAG, "Call to $writeMessageUrl")
         httpGet(writeMessageUrl)
@@ -547,28 +511,6 @@ btnSend.setOnClickListener {
 
 Nézzük meg mit tapasztalunk, ha újra kipróbáljuk az alkalmazást.
 
-### Network security config
-
-[Android P-től kezdve](https://android-developers.googleblog.com/2018/04/protecting-users-with-tls-by-default-in.html) alapértelmezetten le van tiltva a titkosítatlan, plaintext hálózati kommunikáció, azaz csak a *https* használata megengedett a hálózati hívásoknál, a sima *http* nem. Ha ilyen eszközön próbáljuk az alkalmazást használni, ezzel kapcsolatos exception-t fogunk kapni. Mivel a szerverünk nem támogatja a https kommunikációt, erre most az jelenti a megoldást, ha explcit módon megengedjük a titkosítás nélküli kommunikációt az adott domain felé.
-
-Ehhez hozzunk létre egy `network_security_config.xml` fájlt a `res/xml` mappában:
- 
- ```xml
-<network-security-config>
-    <domain-config cleartextTrafficPermitted="true">
-        <domain includeSubdomains="true">node.autsoft.hu</domain>
-    </domain-config>
-</network-security-config>
-```
-
-És a manifestben is adjuk meg, hogy ezt a konfigurációt használjuk, az `application` tag-hez az alábbi attribútumot hozzáadva:
-
-```xml
-android:networkSecurityConfig="@xml/network_security_config"
-```
-
-*Éles projektben természetesen nem ez lenne a megoldás, ott kizárólag olyan szervert használnánk, amivel https felett is tudunk kommunikálni.*
-
 ## Megfelelő válasz kezelés
 
 Próbáljuk ki mi történik, ha megnyomunk egy gombot, majd elfordítjuk a készüléket/emulátort. Azt tapasztaljuk, hogy az alkalmazás hibába ütközik. 
@@ -595,9 +537,9 @@ class MoveUserResponseEvent(val response: String)
 class WriteMessageResponseEvent(val response: String)
 ```
 
-Ezután az eseményeket a külön szálakban az `EventBus.getDefault().post(...)` segítségével küldjük ki. Minden eseményt a fenti osztályok egy-egy példánya reprezentál.
+Ezután az eseményeket a külön szálakban az `EventBus.getDefault().post(...)` segítségével váltjuk ki. Minden eseményt a fenti osztályok egy-egy példánya reprezentál.
 
-Ahhoz, hogy az aszinkron segédfüggvényünket tudjuk használni, alakítsuk át úgy, hogy a paraméter függvénynek ne legyen visszatérési értéke:
+Ahhoz, hogy az aszinkron segédfüggvényünket tudjuk használni, alakítsuk át úgy, hogy a paraméter függvénynek ne legyen visszatérési értéke, valamint ne végezze el a hívás fő szálra való visszaütemezését:
 
 ```kotlin
 private fun async(call: () -> Unit) = Thread { call() }.start()
@@ -656,11 +598,9 @@ fun onWriteMessageResponse(event: WriteMessageResponseEvent) {
 }
 ```
 
-Itt fontos, hogy a `@Subscribe` annotáció használva legyen, ez mondja meg hogy ez egy eseménykezelő metódus, valamint a thread mode `MAIN` legyen, mert így az események a főszálon kerülnek továbbításra. Fontos, hogy az elküldött objektumokat az osztály típusa szerint tudja a rendszer a megfelelő eseménykezelőknek elküldeni. Egy eseményhez több eseménykezelő metódus is lehet egyszerre beregisztrálva, ilyenkor mindegyik megkapja az elküldött eseményt.
+Itt fontos, hogy a `@Subscribe` annotáció használva legyen, ez mondja meg hogy ez egy eseménykezelő metódus, valamint a thread mode `MAIN` legyen, mert így az események a főszálon kerülnek kézbesítésre. Fontos, hogy az elküldött objektumokat az osztály típusa szerint tudja a rendszer a megfelelő eseménykezelőknek elküldeni. Egy eseményhez több eseménykezelő metódus is lehet egyszerre beregisztrálva, ilyenkor mindegyik megkapja az elküldött eseményt.
 
-Ezután regisztráljuk be az metódusainkat, pontosabban azt az osztályt amely ezeket tartalmazza, ami a `MainActivity` aktuális példánya (`this`).
-
-Azt szeretnénk, hogy akkor legyenek ezek az eseménykezelő metódusok aktívak, amikor az `Activity` előtérben van, így az `onStart`-ban iratkozunk fel, és az `onStop`-ban le.
+Ezután regisztráljuk be az metódusainkat, pontosabban azt az osztályt amely ezeket tartalmazza, ami a `MainActivity` aktuális példánya (`this`). Azt szeretnénk, hogy akkor legyenek ezek az eseménykezelő metódusok aktívak, amikor az `Activity` előtérben van, így az `onStart`-ban iratkozunk fel, és az `onStop`-ban le.
 
 ```kotlin
 override fun onStart() {
@@ -682,7 +622,15 @@ Végül próbáljuk ki az alkalmazást működés közben:
 
 <img src="./images/ui_fin.png" width="250" align="middle">
 
-## Bónusz feladat 1 - Válaszidő kijelzése
+## Bónusz feladat 1 - Extension function
+
+Cseréljük le a `LabyrinthAPI`-ban definált `encode` függvényt egy [extension function](https://kotlinlang.org/docs/reference/extensions.html#extension-functions)-re, amelyet az eddigi helyett az alábbi szintaxissal használhatunk:
+
+```kotlin
+username.encode()
+```
+
+## Bónusz feladat 2 - Válaszidő kijelzése
 
 Egészítsük ki az alkalmazást úgy, hogy a felhasználói felületen megjelenítsük a szerverrel való kommunikáció során tapasztalt átlagos válaszidőt (üzenet küldése és válasz megérkezése közti idő).
 
@@ -692,7 +640,7 @@ Tipp: Az aktuális időt legegyszerűbben a következő hívással érhetjük el
 val currentTime = System.currentTimeMillis()
 ```
 
-## Bónusz feladat 2 - Hálozat elérhető-e
+## Bónusz feladat 3 - Hálozat elérhető-e
 
 Egészítsük ki az alkalmazást úgy, hogy a hálózati hívások előtt ellenőrizzük, hogy elérhető-e a hálózat, és ha nem, akkor jelenítsünk meg hibaüzenetet pl. `Toast`-ban. Segítség: 
 
