@@ -208,7 +208,7 @@ Mivel az alkalmazásunk interneten keresztül fog kommunikálni, vegyük fel a m
 
 Próbáljuk ki az alkalmazást, nézzük meg a felületét.
 
-<img src="./images/ui.png" width="250" align="middle">
+<img src="./images/stage0.png" width="250" align="middle">
 
 ## Az API bemutatása
 
@@ -633,9 +633,7 @@ Próbáljuk ki az alkalmazást. Láthatjuk, hogy most már a hálózati híváso
   
 Végül próbáljuk ki az alkalmazást működés közben: 
 
-<img src="./images/game.png" width="400" align="middle">
-
-<img src="./images/stage2.png" width="250" align="middle">
+<img src="./images/game.png" width="400" align="middle"> <img src="./images/stage2.png" width="250" align="middle">
 
 ## Bónusz feladat 1 - Extension function
 
