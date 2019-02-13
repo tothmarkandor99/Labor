@@ -575,7 +575,7 @@ Próbáljuk ki az alkalmazást!
 
 Segítség a megoldáshoz:
 
-A gombok eseménykezelője legyen közös, a kattintott `View7 objektum `id`-ja alapján állítsa be a felhívandó telefonszámot az `EditText`-ben (ha kell töröljön is). A hívás gomb megnyomására indítson hívást a beírt telefonszámra.
+A gombok eseménykezelője legyen közös, a kattintott `View` objektum `id`-ja alapján állítsa be a felhívandó telefonszámot az `EditText`-ben (ha kell töröljön is). A hívás gomb megnyomására indítson hívást a beírt telefonszámra.
 
 Példa a hívás indítására:
 
