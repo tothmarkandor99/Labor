@@ -10,11 +10,15 @@ Első lépésként indítsuk el az Android Studio-t, majd:
 4. A minimum API szint legyen 19 (Android 4.4).
 5. Az *instant app* támogatást és az *AndroidX* használatát NE pipáljuk be.
 
-<img src="./assets/AddNoActivity.png" width="200" align="middle">
+<p align="center">
+  <img src="./assets/addNoActivity.png" width="460">
+</p>
 
 Amikor az üres projekt elkészült, hozzunk létre egy Master/Detail Flow-t a `hu.bme.aut.android.todo` package-ben.
 
-<img src=".assets/NewMasterDetailFlow.png" width="600" align="middle">
+<p align="center">
+    <img src="./assets/newMasterDetailFlow.png" width="600">
+</p>
 
 A következő ablakban írjuk be rendre, hogy *Todo*, *Todos*, *Todos*. Ennek csak a generált sablonban van szerepe, de legalább az `Activity` nevét nem kell később átírnunk. Ezt követően pipáljuk be a Launcher Activity checkboxot, majd kattintsunk a Finishre.
 
