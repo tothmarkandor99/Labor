@@ -6,8 +6,10 @@ Az alkamazás két nézetből fog állni, az egyik egy tárcsázó, a másik ped
 
 A nézetek `Fragment`-ek lesznek, és a két nézet között `ViewPager` használatával lehet majd navigálni.
 
+<p align=center>
 <img src="./images/view_dialer.png" width="300">
 <img src="./images/view_apps.png" width="300">
+</p>
 
 ## Projekt létrehozása
 
@@ -137,7 +139,9 @@ class LauncherActivity : AppCompatActivity() {
 
 Próbáljuk ki az alkalmazást!
 
-![](images/viewpager.png)
+<p align="center">
+<img src="./images/view_viewpager.png" width="300">
+</p>
 
 ### Saját téma Roboto betűtípussal
 
