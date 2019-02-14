@@ -6,8 +6,8 @@ Az alkamazás két nézetből fog állni, az egyik egy tárcsázó, a másik ped
 
 A nézetek `Fragment`-ek lesznek, és a két nézet között `ViewPager` használatával lehet majd navigálni.
 
-<img src="./images/dialer.png" width="300")
-<img src="./images/app.png" width="300">
+<img src="./images/view_dialer.png" width="300">
+<img src="./images/view_apps.png" width="300">
 
 ## Projekt létrehozása
 
