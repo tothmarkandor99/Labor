@@ -6,8 +6,8 @@ Az alkamazás két nézetből fog állni, az egyik egy tárcsázó, a másik ped
 
 A nézetek `Fragment`-ek lesznek, és a két nézet között `ViewPager` használatával lehet majd navigálni.
 
-![](images/dialer.png)
-![](images/apps.png)
+<img src="./images/dialer.png" width="300")
+<img src="./images/app.png" width="300">
 
 ## Projekt létrehozása
 
@@ -66,9 +66,9 @@ dependencies {
 
 Ha a létrehozott projektben más `com.android.support` group-ban lévő függőségek verziója különbözik a fentebb megadottól, akkor egyeztessük össze velük a `ViewPager` verzióját!
 
-A `ViewPager`-ben két `Fragment`-et szeretnénk megjeleníteni. Hozzuk létre a `fragments` nevű csomagot!
+A `ViewPager`-ben két `Fragment`-et szeretnénk megjeleníteni. Hozzuk létre a `fragment` nevű csomagot!
 
-Hozzunk létre a `hu.bme.aut.android.launcher.fragments` package-ben két `Fragment` osztályt `DialerFragment` és `ApplicationsFragment` néven! Figyeljünk oda, hogy a két választható `Fragment` import közül mindig a support library-ből származót válasszuk! (A másikra rögtön figyelmeztetést kapnánk, mert már nem javasolt a használata.)
+Hozzunk létre a `hu.bme.aut.android.launcher.fragment` package-ben két `Fragment` osztályt `DialerFragment` és `ApplicationsFragment` néven! Figyeljünk oda, hogy a két választható `Fragment` import közül mindig a support library-ből származót válasszuk! (A másikra rögtön figyelmeztetést kapnánk, mert már nem javasolt a használata.)
 
 ```kotlin
 class DialerFragment : Fragment() {
