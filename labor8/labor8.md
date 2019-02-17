@@ -74,9 +74,9 @@ A kérés paraméterek:
 
 ## Felhasználói felület
 
-Hozzunk létre egy új Android Studio projektet. Válasszuk a *Phone and Tablet* szekcióban az *EmptyActivity*.
+Hozzunk létre egy új Android Studio projektet. Válasszuk a *Phone and Tablet* szekcióban az *EmptyActivity* sablont.
 
-Az alkalmatás neve legyen `CameraLabor` a package név legyen `hu.bme.aut.android.cameralabor` és természetesen válasszuk a Kotlin nyelvet.
+Az alkalmazás neve legyen `CameraLabor`, a package név legyen `hu.bme.aut.android.cameralabor`, és természetesen válasszuk a Kotlin nyelvet.
 
 A minimum SDK szint az *API 19: Android 4.4*, az Instant alkalmazásokat nem támogatjuk és az AndroidX függőségekre nincs szükségünk a labor során.
 
@@ -223,7 +223,9 @@ Az egyes képekhez tartozó cella elem felületét pedig a `li_image.xml` layout
 
 Próbáljuk ki az alkalmazást!
 
-<img src="./images/stage0.png" width="250" align="middle">
+<p align="center">
+<img src="./images/stage0.png" width="250">
+</p>
 
 
 ## Képek megjelenítése - Glide
@@ -247,7 +249,9 @@ Glide.with(context).load(imageUrl).into(holder.imageView)
 
 Próbáljuk ki az alkalmazást!
 
-<img src="./images/stage1.png" width="250" align="middle">
+<p align="center">
+<img src="./images/stage1.png" width="250">
+</p>
 
 
 ## Retrofit
@@ -446,7 +450,9 @@ class ImagesAdapter(
 
 Próbáljuk ki az alkalmazást.
 
-<img src="./images/stage2.png" width="250" align="middle">
+<p align="center">
+<img src="./images/stage2.png" width="250">
+</p>
 
 ## Fotó feltöltés
 
@@ -455,46 +461,46 @@ Hozzunk létre egy új *Empty Activity*-t `UploadActivity` néven. A hozzá tart
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:gravity="center"
-              android:orientation="vertical">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical">
 
     <ImageView
-            android:id="@+id/ivImage"
-            android:layout_width="280dp"
-            android:layout_height="280dp"
-            android:scaleType="fitCenter"/>
+        android:id="@+id/ivImage"
+        android:layout_width="280dp"
+        android:layout_height="280dp"
+        android:scaleType="fitCenter"/>
 
     <EditText
-            android:id="@+id/etName"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Name"/>
+        android:id="@+id/etName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Name"/>
 
     <EditText
-            android:id="@+id/etDescription"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Description"/>
+        android:id="@+id/etDescription"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Description"/>
 
     <LinearLayout
-            android:layout_width="match_parent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btnCapture"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="horizontal">
+            android:text="Capture"/>
 
         <Button
-                android:id="@+id/btnCapture"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Capture"/>
-
-        <Button
-                android:id="@+id/btnUpload"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Upload"/>
+            android:id="@+id/btnUpload"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Upload"/>
 
     </LinearLayout>
 
@@ -584,8 +590,10 @@ override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
 Próbáljuk ki az alkalmazást!
 
+<p align="center">
 <img src="./images/stage3.png" width="250" align="middle">
 <img src="./images/stage4.png" width="250" align="middle">
+</p>
 
 ### A feltöltés megvalósítása
 
@@ -637,7 +645,9 @@ Figyeljük meg, hogy nekünk csak a fájl elérési útvonalát kellett megadnun
 
 Próbáljuk ki az alkalmazást, és töltsünk fel egy fotót!
 
-<img src="./images/stage5.png" width="250" align="middle">
+<p align="center">
+<img src="./images/stage5.png" width="250">
+</p>
 
 ## Megjegyzések:
 
