@@ -139,10 +139,6 @@ class LauncherActivity : AppCompatActivity() {
 
 Próbáljuk ki az alkalmazást!
 
-<p align="center">
-<img src="./images/view_viewpager.png" width="300">
-</p>
-
 ### Saját téma Roboto betűtípussal
 
 Az Android hivatalos betűtípusa a *Roboto* család, annak ellenére, hogy beépítve nem szerepel minden verzióban:
