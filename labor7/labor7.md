@@ -18,13 +18,15 @@ A játék tényleges felülete nem az Android alkalmazás része, azt egy előre
 
 A játék szabályai egyszerűek, a játékosunkat a készülékről négy gomb segítségével (bal, jobb, fel, le) irányíthatjuk, továbbá lehetőség van még üzenetküldésre is. Az első lépésünk során kerül rá az új játékos a játéktérre egy véletlen pozícióra (színes GitHub ikon). Ha egy játékos egy pontot érő mezőre lép (színes pipa), akkor pontot szerez, és egy újabb pontot érő mező kerül a pályára véletlenszerű helyre. A játékosok nem tudnak a fal (fekete négyzet) elemen átlépni, illetve másik játékos által foglalt mezőre sem léphetnek!
 
-<img src="./images/game.png" width="600" align="middle">
+<p align="center">
+<img src="./images/game.png" width="600">
+</p>
 
 ## A felhasználói felület elkészítése
 
-Hozzunk létre egy új Android Studio projektet. Válasszuk a *Phone and Tablet* szekcióban az *EmptyActivity*.
+Hozzunk létre egy új Android Studio projektet. Válasszuk a *Phone and Tablet* szekcióban az *EmptyActivity*-t.
 
-Az alkalmatás neve legyen `NetworkLabor` a package név legyen `hu.bme.aut.android.networklabor` és természetesen válasszuk a Kotlin nyelvet.
+Az alkalmazás neve legyen `NetworkLabor`, a package név legyen `hu.bme.aut.android.networklabor`, és természetesen válasszuk a Kotlin nyelvet.
 
 A minimum SDK szint az *API 19: Android 4.4*, az Instant alkalmazásokat nem támogatjuk és az AndroidX függőségekre nincs szükségünk a labor során.
 
@@ -39,99 +41,99 @@ Az ehhez megfelelő XML állomány a következő:
 ```xml  
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:orientation="vertical"
-              android:padding="@dimen/default_padding">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="@dimen/default_padding">
 
     <TextView
-            style="@style/DefaultViewMarginStyle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/title_username"/>
+        style="@style/DefaultViewMarginStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/title_username"/>
 
     <EditText
-            android:id="@+id/etUsername"
-            style="@style/DefaultViewMarginStyle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+        android:id="@+id/etUsername"
+        style="@style/DefaultViewMarginStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
 
     <RelativeLayout
-            android:layout_width="match_parent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <Button
+            android:id="@+id/btnUp"
+            style="@style/DefaultViewMarginStyle"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="vertical">
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:text="@string/up"/>
 
         <Button
-                android:id="@+id/btnUp"
-                style="@style/DefaultViewMarginStyle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_centerHorizontal="true"
-                android:text="@string/up"/>
+            android:id="@+id/btnDown"
+            style="@style/DefaultViewMarginStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/btnUp"
+            android:layout_centerHorizontal="true"
+            android:text="@string/down"/>
 
         <Button
-                android:id="@+id/btnDown"
-                style="@style/DefaultViewMarginStyle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/btnUp"
-                android:layout_centerHorizontal="true"
-                android:text="@string/down"/>
+            android:id="@+id/btnLeft"
+            style="@style/DefaultViewMarginStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/btnUp"
+            android:layout_toStartOf="@id/btnDown"
+            android:text="@string/left"/>
 
         <Button
-                android:id="@+id/btnLeft"
-                style="@style/DefaultViewMarginStyle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/btnUp"
-                android:layout_toStartOf="@id/btnDown"
-                android:text="@string/left"/>
-
-        <Button
-                android:id="@+id/btnRight"
-                style="@style/DefaultViewMarginStyle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/btnUp"
-                android:layout_toEndOf="@id/btnDown"
-                android:text="@string/right"/>
+            android:id="@+id/btnRight"
+            style="@style/DefaultViewMarginStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/btnUp"
+            android:layout_toEndOf="@id/btnDown"
+            android:text="@string/right"/>
 
     </RelativeLayout>
 
     <TextView
-            style="@style/DefaultViewMarginStyle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/title_message"/>
+        style="@style/DefaultViewMarginStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/title_message"/>
 
     <EditText
-            android:id="@+id/etMessage"
-            style="@style/DefaultViewMarginStyle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+        android:id="@+id/etMessage"
+        style="@style/DefaultViewMarginStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
 
     <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="horizontal">
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal">
 
         <Button
-                android:id="@+id/btnSend"
-                style="@style/DefaultViewMarginStyle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/send"/>
+            android:id="@+id/btnSend"
+            style="@style/DefaultViewMarginStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/send"/>
 
     </LinearLayout>
 
     <TextView
-            android:id="@+id/tvResponse"
-            style="@style/DefaultViewMarginStyle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+        android:id="@+id/tvResponse"
+        style="@style/DefaultViewMarginStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
 
 </LinearLayout>
 ``` 
@@ -208,7 +210,9 @@ Mivel az alkalmazásunk interneten keresztül fog kommunikálni, vegyük fel a m
 
 Próbáljuk ki az alkalmazást, nézzük meg a felületét.
 
-<img src="./images/stage0.png" width="250" align="middle">
+<p align="center">
+<img src="./images/stage0.png" width="250">
+</p>
 
 ## Az API bemutatása
 
@@ -511,7 +515,9 @@ btnSend.setOnClickListener {
 
 Nézzük meg mit tapasztalunk, ha újra kipróbáljuk az alkalmazást.
 
-<img src="./images/stage1.png" width="250" align="middle">
+<p align="center">
+<img src="./images/stage1.png" width="250">
+</p>
 
 ## Megfelelő válasz kezelés
 
@@ -530,7 +536,7 @@ private fun async(call: () -> String) {
 ```
 Miután kipróbáltuk, töröljük ki a `Thread.sleep(2000)` sort.
 
-Ennek az az oka, hogy a szálak tovább képesek élni, mint az `Activity`, és ha egy hálózati hívás keresztül ível egy `Activity` váltáson/újralétrehozáson, akkor a szál még az előző `Activity`-re rendelkezik referenciával. Ilyenkor vagy a memóriában ragad az előző `Activity` (ezt hívjuk *memory leaknek*), vagy a rendszer megszünteti, ilyenkor `NullPointerException`-t kaptunk. Továbbá a kérésünk eredményét sem látjuk.
+Ennek az az oka, hogy a szálak tovább képesek élni, mint az `Activity`, és ha egy hálózati hívás keresztül ível egy `Activity` váltáson/újralétrehozáson, akkor a szál még az előző `Activity`-re rendelkezik referenciával. Ilyenkor vagy a memóriában ragad az előző `Activity` (ezt hívjuk *memory leak*-nek), vagy a rendszer megszünteti, ilyenkor a rá hivatkozáskor `NullPointerException`-t kaptunk. Ezeken a problémákon felül a kérésünk eredményét sem látjuk.
 
 Ezt úgy lehet kiküszöbölni, hogy az erős, referencia alapú csatolás helyett laza csatolást alkalmazunk. Ilyen esetben az `Activity` amikor előtérbe kerül (`onStart`) feliratkozik, majd ha háttérbe kerül (`onStop`) leiratkozik az eseményről. A hálózati hívás során pedig a választ nem direkt függvényhívásban állítjuk be, hanem csak egy eseményt váltunk ki.
 
@@ -633,7 +639,10 @@ Próbáljuk ki az alkalmazást. Láthatjuk, hogy most már a hálózati híváso
   
 Végül próbáljuk ki az alkalmazást működés közben: 
 
-<img src="./images/game.png" width="400" align="middle"> <img src="./images/stage2.png" width="250" align="middle">
+<p align="center">
+<img src="./images/game.png" width="400">
+<img src="./images/stage2.png" width="250">
+</p>
 
 ## Bónusz feladat 1 - Extension function
 
@@ -653,7 +662,7 @@ Tipp: Az aktuális időt legegyszerűbben a következő hívással érhetjük el
 val currentTime = System.currentTimeMillis()
 ```
 
-Tipp: Kotlinban egy kódrészlet futásidejét az alábbi standard library függvényel egyszerűbben us mérhetjük
+Tipp: Kotlinban egy kódrészlet futásidejét az alábbi standard library függvényel egyszerűbben is mérhetjük:
 
 ```kotlin
 val duration = measureTimeMillis {
