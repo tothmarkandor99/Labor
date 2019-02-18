@@ -8,433 +8,359 @@ Tekintve a platform adottságait, az egyébként elérhető és sikeres megoldá
 
 ## Érintett témakörök
 
-*   Rajzolás SurfaceView-ra
-*   Sensorok kezelése
-*   Sprite-ok és animáció.
+*   Rajzolás `SurfaceView`-ra
+*   Szenzorok kezelése
+*   *Sprite*-ok és animáció
 *   FPS szabályozás
 
 ## Kiinduló projekt
 
-Elsőnek töltsük le a labor során használt kiinduló projektet, majd nyissuk meg Android Studio-val. 
+Töltsük le a labor során használt [kiinduló projektet](./assets/SpaceShipGame.zip), majd nyissuk meg Android Studio-val.
 
-[Kiinduló projekt](./assets/SpaceShipGame_skeleton.zip) 
-
-Frissítsük a **Gradlet** és a **Gradle Plugint**, ezeket a Studio megoldja nekünk.
-
-A module `build.grade` -ben frissítsük  a **Compile SDK** és a **Target SDK**-t `26`-ra, a **Build Tools** értékét `26.0.2`-re, az **AppCompat** könyvtárat pedíg `26.1.0`-ra.
-
-A project `build.gradle` -ben vegyük fel a **Google Maven** repositoryt.
-
-```
-allprojects {
-	repositories {
-		jcenter()
-		maven {url 'https://maven.google.com'}
-	}
-}
-```
-
-A források közül a test könyvtárat, illetve annak a tartalmát kitörölhetjük.
-
-Fordítsuk le a projektet, majd a Laborvezető segítségével vizsgáljuk meg a projekt felépítését.
-
-
-
+Fordítsuk le a projektet, majd a laborvezető segítségével vizsgáljuk meg a projekt felépítését.
 
 ### Általános
 
-A projektben található egyetlen, indító _activity_ a **GameActivity**. Ez egy elfordított (_landscape_) nézet, _ActionBar_ nélkül (lásd styles.xml), valamint a **GameView** nézetet tartalmazza (lásd **activity_game.xml** ). A **GameView** a kirajzolt játéktér megjelenítésért felelős nézet, de magát a kirajzolást nem ő fogja végezni, csak megjeleníteni a már kirajzolt képet.
+A projektben található egyetlen, indító `Activity` a `GameActivity`. Ez egy elfordított (*landscape*) nézet, `Toolbar` nélkül (lásd `styles.xml`), valamint a `GameView` nézetet tartalmazza (lásd `activity_game.xml` ). A `GameView` a játéktér megjelenítésért felelős nézet, de magát a kirajzolást nem ő fogja végezni, csak megjeleníteni a már kirajzolt képet.
 
 ### Model
 
-A _model_ csomagban található az előre elkészített játékmodell. Minden a játékban megjeleníthető entitás a **Renderable** interface megvalósítója. A kirajzolást végző szál majd mindent, mint **Renderable**-t fog kezelni (ezt később készítjük majd el). Minden entitásnak lehetőség van megadni, hogy mekkora a rajzfelület **size(x,y)**, hogy ebből a saját méreteit kiszámolhassa. Lehetőség van minden egyes kirajzolás után az objektum állapotát léptetni (**step()**), valamint minden objektumnak ki kell tudnia rajzolni magát egy _Canvas_ objektumra (**render(Canvas canvas)**).
+A `model` csomagban található az előre elkészített játékmodell. Minden a játékban megjeleníthető entitás megvalósítja a `Renderable` interface-t. A kirajzolást végző szál majd mindent `Renderable`-ként fog kezelni (ezt később készítjük majd el). Ezen keresztül az entitásoknak meg tudjuk adni, hogy mekkora a rajzfelület (`setSize`), hogy ebből a saját méreteit kiszámolhassa. Lehetőség van minden egyes kirajzolás után az objektum állapotát léptetni (`step`), valamint minden objektumnak ki kell tudnia rajzolni magát egy `Canvas` objektumra (`render`).
 
 ### Háttér
 
-A legegyszerűbb játékelem a háttér (**Background**). A háttérnek állapota nincs és egy teljes képernyőt kitöltő méretű képet rajzol ki. Ha a képi erőforrás kisebb mint a kirajzolt kép, akkor azt mind vízszintesen, mind függőlegesen tükrözi. A képek kirajzolása a _BitmapDrawable_ segítségével történik, amit a _BitmapFactory.decodeResource_-al hozunk létre.
+A legegyszerűbb játékelem a háttér (`Background`). A háttérnek nincs állapota és egy teljes képernyőt kitöltő méretű képet rajzol ki. Ha a képi erőforrás kisebb mint a kirajzolt kép, akkor azt mind vízszintesen, mind függőlegesen tükrözi. A képek kirajzolása a `BitmapDrawable` segítségével történik, amit a `BitmapFactory.decodeResource`-szal hozunk létre.
 
 ### Űrhajó
 
-A játékban kétfelé űrhajó is található, a játékos (**Player**) és az ellenség (**Enemy**). Mindkét entitás az abstract **Ship**-ből származik. Minden **Shiphez** tartozik egy kép, amit kirajzol magáról, valamint egy számlálóban lépteti, hogy hányadik kirajzolásról van szó, valamint a képernyőn lévő x,y pozícióját (**posX,posY**) is tárolja. Ezen túl még van egy **elevation** értéke, amivel mozgatni fogjuk az űrhajót. A **Player** és az **Enemy** osztályok a megfelelő bitmapet töltik be, valamint tartalmazzák, hogy az adott képen, amit betöltenek, hol helyezkedik el az űrhajó alapállapota. A **Player** objektum az **elevation** értékétől függően függőlegesen mozog, az **Enemy** objektum pedig egy véletlen szerű magasságon mozog egy adott sebességgel jobbról balra.
+A játékban kétfelé űrhajó is található, a játékos (`Player`) és az ellenség (`Enemy`). Mindkét entitás az absztrakt `Ship`-ből származik. Minden `Ship`-hez tartozik egy kép, amit kirajzol magáról, ezen kívül egy számlálóban lépteti, hogy hányadik kirajzolásról van szó, valamint a képernyőn lévő pozícióját (`posX`, `posY`) is tárolja. A `Player` és az `Enemy` osztályok a megfelelő bitmapet töltik be, eltárolják, hogy a bitmapen belül hol helyezkedik el az űrhajó alapállapota. A `Player` objektum az `elevation` property-jének értékétől függően függőlegesen mozog, az `Enemy` objektum pedig egy véletlenszerű magasságon mozog egy adott sebességgel jobbról balra.
 
 ## A Renderer elkészítése
 
-Készítsük el az objektumok kirajzolását végző **Renderer** osztályt a _rendering_ csomagban. Ez az osztály tárolja a kirajzolni kívánt objektumokat, és azokat megfelelő sorrendben a képernyőre is rajzolja, illetve lépteti a megfelelő objektumokat. A léptetés hatására véletlenszerűen egy új **Enemy** objektumot ad hozzá a játéktérhez. A _setElevation_ hatására pedig a **Player** magasságát állítja be. 
+Készítsük el az objektumok kirajzolását végző `Renderer` osztályt a `rendering` csomagban. Ez az osztály tárolja a kirajzolni kívánt objektumokat, és azokat megfelelő sorrendben a képernyőre is rajzolja, illetve lépteti őket. A léptetés közben néha véletlenszerűen egy új `Enemy` objektumot is hozzáad a játéktérhez. A `setPlayerElevation` függvényével pedig a `Player` magasságát állíthatjuk be. 
 
+```kotlin
+class Renderer(
+        private val context: Context,
+        private val width: Int,
+        private val height: Int
+) {
+    private val random = Random()
+    private val entitiesToDraw = mutableListOf<Renderable>()
 
-```java
-public class Renderer {
-    private Context context;
+    private val background = Background(context)
+    private val player = Player(context)
 
-    private int width;
-    private int height;
+    init {
+        background.setSize(width, height)
+        player.setSize(width, height)
 
-    private Random random;
+        val enemy = Enemy(context)
+        enemy.setSize(width, height)
 
-    private List<Renderable> entitiesToDraw;
-
-    private Background background;
-    private Player player;
-
-    public Renderer(Context context) {
-        this.context = context;
-        init(0, 0);
+        entitiesToDraw.add(enemy)
+        entitiesToDraw.add(player)
     }
 
-    public void init(int width, int height) {
-        this.width = width;
-        this.height = height;
-        entitiesToDraw = new ArrayList<>();
-        background = new Background(context);
-        background.size(width, height);
-        player = new Player(context);
-        player.size(width, height);
-
-        Enemy enemy = new Enemy(context);
-        enemy.size(width, height);
-        entitiesToDraw.add(enemy);
-        entitiesToDraw.add(player);
-        random = new Random();
-    }
-
-    public void step() {
-        if (random.nextFloat() > (0.993)) {
-            Enemy enemy = new Enemy(context);
-            enemy.size(width, height);
-            entitiesToDraw.add(enemy);
+    fun step() {
+        if (random.nextFloat() > 0.993) {
+            val enemy = Enemy(context)
+            enemy.setSize(width, height)
+            entitiesToDraw.add(enemy)
         }
 
-        for (Renderable object : entitiesToDraw) {
-            object.step();
-        }
+        entitiesToDraw.forEach(Renderable::step)
     }
 
-    public void draw(Canvas canvas) {
-        background.render(canvas);
-        for (Renderable object : entitiesToDraw) {
-            object.render(canvas);
-        }
+    fun draw(canvas: Canvas) {
+        background.render(canvas)
+        entitiesToDraw.forEach { it.render(canvas) }
     }
 
-    public void setElevation(float elevation) {
-        player.setElevation(elevation);
+    fun setPlayerElevation(elevation: Float) {
+        player.elevation = elevation
     }
 }
 ```
 
 ### A kirajzoló szál
 
-Készítsük el a kirajzolás ütemezéséért felelős szálat, a *rendering* csomagban **RenderLoop** néven.. Ezen a szálon fognak kirajzolásra kerülni a **Renderer** objektumai. Ez tartalmaz egy referenciát a **GameView**-ra, hogy abban megjelenítse a kirajzolt képet, valamint az előbb létrehozott **Renderer**-t használja fel. Maga is egy szálból származik, és a _run()_ függvényében egy végtelen ciklusban rajzolja ki újra és újra a játékelemeket. A rajzolás kezdetén először lépteti a játéktér állapotát, majd a **SurfaceView** **SurfaceHolder** objektuma segítségével kirajzolja magát. Fontos, hogy a kirajzolás előtt és után le kell zárni a **SurfaceHolder**-hez tartozó **Canvas**-t. 
+Készítsük el a kirajzolás ütemezéséért felelős szálat, a `rendering` csomagban `RenderLoop` néven. Ezen a szálon fognak kirajzolásra kerülni a `Renderer` objektumai. Ez tartalmaz egy referenciát a `GameView`-ra, hogy abban megjelenítse a kirajzolt képet, valamint az előbb létrehozott `Renderer`-t használja fel. Az osztály a `Thread`-ből származik, és a `run` függvényében egy végtelen ciklusban rajzolja ki újra és újra a játékelemeket. A rajzolás kezdetén először lépteti a játéktér állapotát, majd a `SurfaceView` `SurfaceHolder` objektuma segítségével kirajzolja magát. Fontos, hogy a kirajzolás időtartama alatt zárolni kell a `SurfaceHolder`-hez tartozó `Canvas`-t.
 
+```kotlin
+class RenderLoop(
+        context: Context,
+        private val view: GameView,
+        width: Int,
+        height: Int
+) : Thread() {
+    private val renderer = Renderer(context, width, height)
 
+    var running = false
 
-```java
-public class RenderLoop extends Thread {
-  private GameView view;
-  private final Renderer renderer;
-
-  private boolean running = false;
-
-  public RenderLoop(Context context,GameView view) {
-    this.view = view;
-    this.renderer=new Renderer(context);
-  }
-
-  public void init(int width,int height){
-    renderer.init(width,height);
-  }
-
-  public void setRunning(boolean run) {
-    running = run;
-  }
-
-  @Override
-  public void run() {
-    while (running) {
-      draw();
+    override fun run() {
+        while (running) {
+            draw()
+        }
     }
-  }
 
-  private void draw() {
-    renderer.step();
-    Canvas c = null;
-    try {
-      c = view.getHolder().lockCanvas();
-      synchronized (view.getHolder()) {
-        renderer.draw(c);
-      }
-   } finally {
-      if (c != null) {
-        view.getHolder().unlockCanvasAndPost(c);
-      }
+    private fun draw() {
+        renderer.step()
+
+        var canvas: Canvas? = null
+
+        try {
+            canvas = view.holder.lockCanvas()
+            synchronized(view.holder) {
+                renderer.draw(canvas)
+            }
+        } finally {
+            if (canvas != null) {
+                view.holder.unlockCanvasAndPost(canvas)
+            }
+        }
     }
- }
 
-  public void setElevation(float elevation) {
-    renderer.setElevation(elevation);
-  }
+    fun setPlayerElevation(elevation: Float) {
+        renderer.setPlayerElevation(elevation)
+    }
 }
 ```
 
+Egészítsük ki a `GameView`-t úgy, hogy a renderelő szálat használja. Adjunk hozzá egy property-t:
 
-Egészítsük ki a **GameView**-t úgy hogy a renderelő szálat használja. Andjunk hozzá egy tagváltozót.
+```kotlin
+private var renderLoop: RenderLoop? = null
+```
 
-`private RenderLoop renderLoop;`
+Ezután valósítsuk meg a `SurfaceHolder`-hez beállított eseménykezelő függvényeit, ahol lekezeljük, ha megváltozik vagy megsemmisül a `SurfaceView`. 
 
-Majd az init függvényben ezt hozzuk létre: 
+```kotlin
+init {
+    holder.addCallback(object : SurfaceHolder.Callback {
+        override fun surfaceCreated(holder: SurfaceHolder) {
+            // empty
+        }
 
-`renderLoop = new RenderLoop(context,this);`
+        override fun surfaceDestroyed(holder: SurfaceHolder) {
+            var retry = true
+            renderLoop?.running = false
+            while (retry) {
+                try {
+                    renderLoop?.join()
+                    retry = false
+                } catch (e: InterruptedException) {
+                    e.printStackTrace()
+                }
+            }
+        }
 
-Módosítsuk a **GameView** _init()_ függvényét, hogy a kontextust paraméterül átadhassuk, majd a 3 konstruktorban adjuk is át a kontextusokat.
+        override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
+            val loop = RenderLoop(context, this@GameView, width, height)
+            loop.running = true
+            loop.start()
 
-`init(context);` 
- 
-Ezután a **SurfaceHolder** callback eseményeit valósítjuk meg. 
-  
-```java
-private void init(final Context context) {
-	SurfaceHolder holder = getHolder();
-	holder.addCallback(new SurfaceHolder.Callback() {
-		@Override
-		public void surfaceCreated(SurfaceHolder holder) {
-			renderLoop = new RenderLoop(context,GameView.this);
-			renderLoop.setRunning(true);
-			renderLoop.start();
-		}
-
-		@Override
-		public void surfaceDestroyed(SurfaceHolder holder) {
-			boolean retry = true;
-			renderLoop.setRunning(false);
-			while (retry) {
-				try {
-					renderLoop.join();
-
-					retry = false;
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-
-		@Override
-		public void surfaceChanged(SurfaceHolder holder, int format,int width, int height) {
-			renderLoop.init(width,height);
-		}
-	});
+            renderLoop = loop
+        }
+    })
 }
 ```
   
-  
-Majd a játékos űrhajójának helyzetét állító hívást vezessük ki a **GameView**-ra. 
+Majd a játékos űrhajójának helyzetét állító hívást vezessük ki a `GameView`-ra: 
 
-```java
-public void setElevation(float elevation){
-  if(renderLoop!=null) renderLoop.setElevation(elevation);
+```kotlin
+fun setPlayerElevation(elevation: Float) {
+    renderLoop?.setPlayerElevation(elevation)
 }
 ```
 
-**Próbáljuk ki az alkalmazást**
+Próbáljuk ki az alkalmazást!
 
-![](./images/screen1.png)
-
+![](./images/stage0.png)
 
 ## Irányítás
 
-Mozgassuk a felhasználó űrhajóját a gyorsulásmérő és magnetométer segítségével. Az alábbi osztályt készítsük el a _sensor_ csomagba. Majd a **GameActivity** _onResume()_ és _onPause()_ függvényében indítjuk el, majd állítjuk le. 
+Mozgassuk a felhasználó űrhajóját a gyorsulásmérő és magnetométer segítségével. Ehhez az alábbi osztályt készítsük egy új `sensor` package-ben:  
 
-```java
-public class GyroscopeHelper implements SensorEventListener {
-	private final SensorManager sensorManager;
-	private GameView gameView;
-	private Sensor accelerometer;
-	private Sensor magnetometer;
+```kotlin
+class GyroscopeHelper(context: Context, private val gameView: GameView) : SensorEventListener {
+    private val sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
+    private val accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+    private val magnetometer = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)
 
-	private float[] lastAccelerometerValue = new float[3];
-	private float[] lastMagnetometerValue = new float[3];
+    private val lastAccelerometerValue = FloatArray(3)
+    private val lastMagnetometerValue = FloatArray(3)
 
-	private boolean lastAccelerometerSet = false;
-	private boolean lastMagnetometerSet = false;
+    private var lastAccelerometerSet = false
+    private var lastMagnetometerSet = false
 
-	private float[] rotation = new float[9];
-	private float[] orientation = new float[3];
+    private val rotation = FloatArray(9)
+    private val orientation = FloatArray(3)
 
-	public GyroscopeHelper(Context context, GameView gameView) {
-		this.gameView = gameView;
-		sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
-		accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-		magnetometer = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
-	}
+    fun start() {
+        sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_FASTEST)
+        sensorManager.registerListener(this, magnetometer, SensorManager.SENSOR_DELAY_FASTEST)
+    }
 
-	public void start() {
-		sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_FASTEST);
-		sensorManager.registerListener(this, magnetometer, SensorManager.SENSOR_DELAY_FASTEST);
-	}
+    fun stop() {
+        sensorManager.unregisterListener(this)
+    }
 
-	public void stop() {
-		sensorManager.unregisterListener(this);
-	}
+    override fun onSensorChanged(event: SensorEvent) {
+        when (event.sensor) {
+            accelerometer -> {
+                System.arraycopy(event.values, 0, lastAccelerometerValue, 0, event.values.size)
+                lastAccelerometerSet = true
+            }
+            magnetometer -> {
+                System.arraycopy(event.values, 0, lastMagnetometerValue, 0, event.values.size)
+                lastMagnetometerSet = true
+            }
+        }
+        if (lastAccelerometerSet && lastMagnetometerSet) {
+            SensorManager.getRotationMatrix(rotation, null, lastAccelerometerValue, lastMagnetometerValue)
+            SensorManager.getOrientation(rotation, orientation)
 
-	@Override
-	public void onSensorChanged(SensorEvent event) {
-		if (event.sensor.equals(accelerometer)) {
-			System.arraycopy(event.values, 0, lastAccelerometerValue, 0, event.values.length);
-			lastAccelerometerSet = true;
-		} else if (event.sensor.equals(magnetometer)) {
-			System.arraycopy(event.values, 0, lastMagnetometerValue, 0, event.values.length);
-			lastMagnetometerSet = true;
-		}
-		if (lastAccelerometerSet && lastMagnetometerSet) {
-			SensorManager.getRotationMatrix(rotation, null, lastAccelerometerValue, lastMagnetometerValue);
-			SensorManager.getOrientation(rotation, orientation);
+            val roll = orientation[2] * 1.0f
 
-			float roll = orientation[2] * 1.0f;
+            val position = roll - -1.0f
+            gameView.setPlayerElevation(position)
+        }
+    }
 
-			float position = roll - (-1.0f);
-			if (gameView != null) {
-				gameView.setElevation(position);
-			}
-		}
-	}
-
-	@Override
-	public void onAccuracyChanged(Sensor sensor, int accuracy) {
-	}
+    override fun onAccuracyChanged(sensor: Sensor, accuracy: Int) {}
 }
 ```
 
+Láthatjuk, hogy a különböző szenzorok egyszerű float értékeket tartalmazó tömbökben szolgáltatnak adatokat. Ezek megfelelő értelmezéséhez a [hivatalos dokumentációban](https://developer.android.com/guide/topics/sensors/sensors_position) találunk segítséget. 
 
-Majd ezt használjuk a **GameActivity**-ben. 
+Használjuk ezt az osztályt a `GameActivity`-ben! 
 
-```java
-public class GameActivity extends AppCompatActivity {
-  private GyroscopeHelper gyroscopeHelper;
-  private GameView gameView;
+```kotlin
+class GameActivity : AppCompatActivity() {
+    private lateinit var gyroscopeHelper: GyroscopeHelper
 
-  @Override
-  protected void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    setContentView(R.layout.activity_game);
-    gameView = (GameView) findViewById(R.id.gameView);
-    gyroscopeHelper = new GyroscopeHelper(this,gameView);
-  }
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_game)
+        gyroscopeHelper = GyroscopeHelper(this, gameView)
+    }
 
-  @Override
-  protected void onResume() {
-    super.onResume();
-    gyroscopeHelper.start();
-  }
+    override fun onResume() {
+        super.onResume()
+        gyroscopeHelper.start()
+    }
 
-  @Override
-  protected void onPause() {
-    gyroscopeHelper.stop();
-    super.onPause();
-  }
+    override fun onPause() {
+        gyroscopeHelper.stop()
+        super.onPause()
+    }
 }
 ```
 
-**Próbáljuk ki az alkalmazást.**
+A komponensek összekötésére azt a megoldást választottuk, hogy átadjuk a `GameView` példányt a szenzorokat kezelő osztályunknak, és ez közvetlenül továbbítja a mért értékeket. Ezt az egyszerűség kedvéért tettük, egyébként szebb megoldás lenne a szenzor eseményeket az `GameActivity`-be továbbítani (például egy listener interfész segítésével), hogy a szenzor kezelés ne függjön a játékot rajzoló osztálytól.
 
-![](./images/screen2.png)
+Figyeljük meg, ahogy az `onResume` és `onPause` életciklus függvényekben elindítjuk és leállítjuk a szenzorok figyelését.
 
+Próbáljuk ki az alkalmazást!
+
+![](./images/stage1.png)
 
 ### Animáció
 
-A **Ship** osztály valamint a **Player** és **Enemy** már fel vannak készítve arra hogy különböző állapotok között animáljanak. A megfelelő képi erőforrások is biztosítottak, már csak a képeket kell elcsúsztatni a megfelelő állapotba, a Ship osztály render függvényében: 
+Az animációk során *Sprite*okat, olyan képeket használunk, ahol az animáció egyes állapotai mind megtalálhatóak ugyanazon a képen. *Sprite*ok esetén az animáció abból áll, hogy a forrásképen egy maszkot tologatunk attól függően, hogy milyen állapotban van az animáció. Így megspóroljuk a folyamatos kép betöltést, és a GC-t sem terheljük túl.
 
-```java
-@Override
-public void render(Canvas canvas) {
-  setSpriteSizes();
+A `Ship` osztály, valamint a `Player` és `Enemy` már fel vannak készítve arra, hogy különböző állapotok között animáljanak. A megfelelő képi erőforrások is biztosítottak, már csak a képeket kell elcsúsztatni az adott állapotba, a `Ship` osztály `render` függvényében: 
 
-  int statePos = state/5;
-  //4 states, 64*29 each image
+```kotlin
+override fun render(canvas: Canvas) {
+    setSpriteSizes()
 
-  int x = 0;
-  int y = spriteHeight * statePos;
+    val statePos = state % 4
+    //4 states, 64*29 each image
 
-  Rect src = new Rect(x, y, x + spriteWidth, y + spriteHeight);
-  Rect dst = new Rect(posX, posY, posX + spriteWidth * 4, posY + spriteHeight * 4);
+    val x = 0
+    val y = spriteHeight * statePos
 
-  if(canvas!=null) {
-      canvas.drawBitmap(image, src, dst, null);
-  }
+    val src = Rect(x, y, x + spriteWidth, y + spriteHeight)
+    val dst = Rect(posX, posY, posX + spriteWidth * 4, posY + spriteHeight * 4)
+
+    canvas.drawBitmap(image, src, dst, null)
 }
 ```
 
-**Próbáljuk ki az alkalmazást!** 
+Próbáljuk ki az alkalmazást!
 
 ![](./images/animate.gif)
-
 
 ## FPS korlát elhelyezése
 
-Azért hogy a kirajzolás sebességét egy fix értékre állítsuk két kirajzolás között aludnia kell a kirajzoló szálnak, amennyiben a kirajzolás nem tartott annyi ideig mint a kívánt FPS érték időköze. 
+Azért, hogy a kirajzolás sebességét egy fix értékre állítsuk két kirajzolás között aludnia kell a kirajzoló szálnak, amennyiben a kirajzolás nem tartott annyi ideig, mint a kívánt FPS érték időköze. 
 
-A **RenderLoop** osztályt egészítsük ki a következőkkel:
+A `RenderLoop` osztályt egészítsük ki a következőkkel:
 
-```java
-public static final long FPS = 30;
-private static final long timeBetweenFrames = 1000 / FPS;
-
-private void sleepThread(long time) {
-  try {
-    sleep(time);
-  } catch (InterruptedException e) {
-  }
+```kotlin
+companion object {
+    private const val FPS: Long = 30
+    private const val TIME_BETWEEN_FRAMES = 1000 / FPS
 }
 
-private long getTime() {
-  return System.currentTimeMillis();
+private fun sleepThread(time: Long) {
+    try {
+        Thread.sleep(time)
+    } catch (e: InterruptedException) {
+        // ignored
+    }
 }
+
+private fun getTime() = System.currentTimeMillis()
 ```
 
-Valamint a run fügyvényt egészítsük ki:
+Valamint a `run` fügyvényt egészítsük ki:
 
-```java
-@Override
-public void run() {
-  while (running) {
-    long renderStart = getTime();
-    draw();
-    
-    long renderEnd = getTime();
-    long sleepTime = timeBetweenFrames - (renderEnd - renderStart);
-    if (sleepTime > 0) {
-      sleepThread(sleepTime);
-    } else {
-      sleepThread(5);
+```kotlin
+override fun run() {
+    while (running) {
+        val renderStart = getTime()
+        draw()
+        val renderEnd = getTime()
+
+        val sleepTime = TIME_BETWEEN_FRAMES - (renderEnd - renderStart)
+        if (sleepTime > 0) {
+            sleepThread(sleepTime)
+        } else {
+            sleepThread(5)
+        }
     }
-  }
 }
 ```
  
-A renderelés kezdete és vége előtt eltelt időt nézzük és ha ez kisebb mint amennyi az adott FPS számhoz szükséges, úgy a megfelelő ideig altatjuk a szálat. Amennyiben tovább tartott a renderelés, akkor is adunk valamennyi alvás időt a CPU-nak.
+Ebben a renderelés kezdete és vége között eltelt időt nézzük, és ha ez kisebb mint amennyi az adott FPS számhoz szükséges, úgy a megfelelő ideig altatjuk a szálat. Amennyiben tovább tartott a renderelés, akkor is adunk valamennyi alvás időt a CPU-nak.
 
-**Próbáljuk ki az alkalmazást!** 
+Próbáljuk ki az alkalmazást! 
 
 ![](./images/animate.gif)
-
 
 ## Önálló feladatok
 
 ### Feladat 1 - Ütközés detektálás
 
-Detektálja, ha a felhasználó űrhajója ütközik egy ellenséges űrhajóval, ekkor jelenítsen meg egy **Toast** üzenetet, majd állítsa le a játékot!
+Detektálja, ha a felhasználó űrhajója ütközik egy ellenséges űrhajóval, ekkor jelenítsen meg egy `Toast` üzenetet, majd állítsa le a játékot!
 
 ### Feladat 2 - Játékos képernyőn maradása
 
-Biztosítsa, hogy a játékos űrhajóját ne lehessen kimozgatni a játéktérből!	
+Biztosítsa, hogy a játékos űrhajóját ne lehessen kimozgatni a játéktérből!
+
 ### Feladat 3 - Képernyő ébrenmaradás
 
-Biztosítsa, hogy a jaték alatt ne aludjon el a képernyő, akkor sem ha huzamosabb időn át nem érünk hozzá!
+Biztosítsa, hogy a játék alatt ne aludjon el a képernyő, akkor sem, ha huzamosabb időn át nem érünk hozzá!
 
 Segítség: [Keeping the Device Awake](https://developer.android.com/training/scheduling/wakelock.html)
 
 ### Feladat 4 - Okosabb memória kezelés
+
 Jelenleg minden ellenséges űrhajó képe külön be van töltve a memóriába. 
 
-Valósítsa meg hogy ezek csak egy példányban legyenek betöltve (pl. statikus objektum), illetve a képernyőről eltűnő ellenséges űrhajókat szabadítsa fel, azok ne foglaljanak helyet a memóriában.
+Valósítsa meg, hogy ezek csak egy példányban legyenek betöltve (pl. "statikus", *companion object*-ben tárolt bitmap), illetve a képernyőről eltűnő ellenséges űrhajókat szabadítsa fel, hogy azok ne foglaljanak helyet a memóriában.
 
-A képernyőről eltűnő űrhajókat a poziciójuk alapján (aktuális pocizió kisebb-e mint a bal szél=0 - a hajó mérete) vegye ki a listából (pl. iterátorral). Ha nincs már rájuk referencia, a GC felszabadítja.
-
+A képernyőről eltűnő űrhajókat a poziciójuk alapján (aktuális pocizió kisebb-e mint a `(bal szél) - (a hajó mérete)`) vegye ki a listából (pl. [`removeAll`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/remove-all.html) segítségével). Ha nincs már rájuk referencia, a GC felszabadítja őket.
