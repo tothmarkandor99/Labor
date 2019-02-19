@@ -449,7 +449,7 @@ private fun setupRecyclerView() {
 
 Ezek után már nincs szükség a korábban használt `SimpleItemRecyclerViewAdapter`-re, törölhetjük az osztályt tartalmazó fájlt a `feature.list` package-ből.
 
-Törölni kell még az `onTodoCreated` függvény törzséből az alábbi sort, mert  a `simpleItemRecyclerViewAdapter.deleteRow(position)` hívást, mert a `TodoAdapter` interfésze különbözik az eddig használt adapterétől.
+Törölni kell még az `onTodoCreated` függvény törzséből az alábbi sort, mert a `TodoAdapter` interfésze különbözik az eddig használt adapterétől.
 
 ```kotlin
 simpleItemRecyclerViewAdapter.addItem(todo)
@@ -459,7 +459,7 @@ Az diszk I/O műveleteket javasolt a háttérszálon, aszinkron módon futtatni.
 
 Készítsük el a `LoadTodosTask` osztályt a `database` csomagban, ami származzon az `AsyncTask` osztályból. Ez aszinkron módon kérdezi majd le az adatbázisunkból az összes elmentett `Todo` rekordot - az `AsyncTask` `doInBackground` függvénye háttérszálon fut, az ott előállított eredményt pedig az `onPostExecute` függvényben a fő szálon használhatjuk fel.
 
-A `LoadTodoTask` osztály kódja az alábbi lesz:
+A `LoadTodosTask` osztály kódja az alábbi lesz:
 
 ```kotlin
 class LoadTodosTask(
