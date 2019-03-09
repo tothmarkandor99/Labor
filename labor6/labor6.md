@@ -710,6 +710,12 @@ private fun updateNotification(text: String) {
 }
 ```
 
+A `NotificationCompat.Builder` egyparaméteres konstruktora elavult, és ezt jelzi is nekünk a fejlesztőkörnyezet,
+de ezzel most nincs teendőnk. Röviden ennek az az oka, hogy az Android 8.0 (API level 26) óta az értesítéseket
+csatornához kell rendelni, és a csatorna azonosítóját a kétparaméteres konstruktor második paramétereként
+adnánk meg.  Ez a témakör túlmutat a jelenlegi labor témáján, bővebben
+[itt](https://developer.android.com/training/notify-user/channels) lehet a témáról olvasni.
+
 A `LocationService`-t indító `onStartCommand` függvény legelején állítsuk be a *foreground* módot:
 
 ```kotlin
