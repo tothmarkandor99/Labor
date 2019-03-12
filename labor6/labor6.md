@@ -70,7 +70,7 @@ Az `AndroidManifest.xml`-be is vegyük fel előre az összes engedélyt, amire s
 Utolsó lépésként a projekt előkészítésében vegyük fel a következő függőségeket a modul szintű `build.gradle` fájlunkba:
 
 ```groovy
-implementation 'com.android.support:preference-v7:28.0.0-rc02'
+implementation 'com.android.support:preference-v7:28.0.0'
 implementation 'com.google.android.gms:play-services-location:15.0.1', {
     exclude group: 'com.android.support'
 }
