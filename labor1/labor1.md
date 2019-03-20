@@ -67,15 +67,12 @@ A fentiek alapján látható tehát, hogy a meglévő `MainActivity` mellett mé
 * Létrejön az `Activity`-hez tartozó Kotlin fájl.
 * Létrejön az `Activity`-hez tartozó layout XML.
 * Az `AndroidManifest.xml`-be bekerül az `Activity` az `<application>` tag-en belül.
-* Az `Activity`-hez tartozó menü XML létrejön (*Basic Activity* létrehozása esetén).
 
 Az `Activity` létrehozást azonban megkönnyíti az Android Studio és a fenti lépéseket nem kell egyesével elvégeznie a fejlesztőnek.
 
-1. A meglévő `Activity`-t tartalmazó package-re jobb egérgombbal kattintva válasszuk a *New -> Activity -> Basic Activity* opciót és hozzuk létre a másik két `Activity`-t (`AboutActivity`, `GameActivity`), *Source Language*-nek válasszuk a Kotlint. `Activity` létrehozásakor megadható, hogy melyik legyen a *szülő* `Activity`, amihez a vissza gomb visszanavigálja a felhasználót. Mindkét esetben legyen ez a `MainActivity` (ezt a ...-ra kattintva név szerint kikereshetjük).
+1. A meglévő `Activity`-t tartalmazó package-re jobb egérgombbal kattintva válasszuk a *New -> Activity -> Empty Activity* opciót és hozzuk létre a másik két `Activity`-t (`AboutActivity`, `GameActivity`), *Source Language*-nek válasszuk a Kotlint.
 2. Létrehozás után a `res/values/strings.xml`-ben állítsuk be a két új `Activity` címét amelyet a létrehozáskor a Studio automatikusan legenerált nekünk mint erőforrás (Például: *Az alkalmazásról*, illetve *Játék*).
-3. Nyissuk meg a két új `Activity` kódját, vizsgáljuk meg azokat és a fölösleges `FloatingActionButton`-t illetve annak listener-ét távolítsuk el. Ha ez kész, akkor az `Activity`-hez rendelt layout-ból is töröljük a widgetet (Tipp: az adott `Activity` `onCreate()` metódusában a `setContentView()`-ban az adott layout-ra CTRL + kattintással (vagy a Ctrl + B megnyomásával) könnyen megnyithatjuk az XML leírót).
-4. Az `AboutActivity`-ből távolítsuk el a `Toolbar` kezeléséért felelős sorokat is, mivel erre később nem lesz szükségünk. A hozzá tartozó layout fájlból is távolítsuk el a `Toolbar`-t.
-5. Állítsuk be a Manifest-ben, hogy az `AboutActivity` dialógus formában jelenjen meg, a `theme` attribútum beállításával (a kódkiegészítés segít beírni a megfelelő témát a lehetőségek közül, kezdjük el a kezdő betűket beírni):
+3. Állítsuk be a Manifest-ben, hogy az `AboutActivity` dialógus formában jelenjen meg, a `theme` attribútum beállításával (a kódkiegészítés segít beírni a megfelelő témát a lehetőségek közül, kezdjük el a kezdő betűket beírni):
 
 ```xml
 <activity
@@ -474,7 +471,7 @@ override fun onTouchEvent(event: MotionEvent?): Boolean {
 
 ## Alkalmazás ikon lecserélése
 
-Az alkalmazás ikonját jelenleg a `res/drawable[-ldpi/mdpi/hdpi/xhdpi/...]` mappákban található `ic_launcher.png` jelképezi. A laborvezető segítségével keressen egy új ikont és cserélje le. Nem muszáj az ikont minden felbontásban elkészíteni, egyszerűen elhelyezhet egy méretet a `drawable` mappában is (melyet létre kell hozni), ekkor természetesen különböző felbontású eszközökön torzulhat az ikon képe.
+Az alkalmazás ikonját jelenleg a `res/mipmap[-ldpi/mdpi/hdpi/xhdpi/...]` mappákban található `ic_launcher.png` jelképezi. A laborvezető segítségével keressen egy új ikont és cserélje le. Nem muszáj az ikont minden felbontásban elkészíteni, egyszerűen elhelyezhet egy méretet a `mipmap` mappában is (melyet létre kell hozni), ekkor természetesen különböző felbontású eszközökön torzulhat az ikon képe.
 
 ## Játéklogika ellenőrzése - önálló feladat
 
