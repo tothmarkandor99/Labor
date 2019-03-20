@@ -1,29 +1,29 @@
 # Labor 2 - Nézetek
 
-A labor során egy regisztrációs nézetet készítünk el, melyben számos egyedi `View` található. Ezek az egyedi nézetek az előző laborral ellentétben képest nem a `View` ősosztályból származnak le, hanem meglévő, komplexebb `View` elemeket bővítenek ki.
+A labor során egy regisztrációs nézetet készítünk el, melyben számos egyedi `View` található. Ezek az egyedi nézetek az előző laborral ellentétben nem a `View` ősosztályból származnak le, hanem meglévő, komplexebb `View` elemeket bővítenek ki.
 
 A labor során az alábbiakat nézzük meg:
 
 *   Színek és stílusok definiálása erőforrásokban
 *   Alapértelmezett téma módosítása
-*   Material Paletta színezés generálása
+*   Material szín paletta generálása
 *   Saját View létrehozása
 *   Egyedi attribútumok definiálása és kezelése
 
 A labor során az alábbi regisztrációs nézetet rakjuk össze az egyedi `View`-k segítségével.
 
-<img src="./assets/labor_3_ss1.png" width="200" align="middle">
+<img src="./images/app.png" width="500" align="middle">
 
 *Az alkalmazás felülete*
 
 ## Kezdő nézet
 
-1. Hozzunk létre egy új Android Studio projektet `ViewLabor` néven
-2. A *Company domain* mező tartalmát töröljük ki és hagyjuk is üresen
+1. Hozzunk létre egy új Android Studio projektet, egy *Empty Activity*-vel
+2. A projekt neve legyen `ViewLabor`
 3. A *Package name* legyen `hu.bme.aut.android.viewlabor`
-4. A támogatott céleszközök a *Telefon és Tablet*, a minimum SDK szint az *API19: Android 4.4*
-5. A kezdő projekthez adjuk hozzá egy *Empty Activity*-t, melynek neve legyen `ViewLaborActivity`
-6. A legenerált projektből töröljük ki a teszteket (ezekre most nem lesz szükség)
+4. A nyelv legyen *Kotlin*
+5. A minimum SDK szint az *API19: Android 4.4*
+6. Az *instant app* támogatást és az *AndroidX* használatát NE pipáljuk be
 
 ## Material Palette
 
@@ -35,9 +35,8 @@ Nyissuk meg a honlapot, majd az alábbi beállításokkal generáljunk témát:
 
 1.  Elsődleges színnek válasszuk ki a *Green*-t
 2.  Másodlagos színnek pedig a *Light Green*-t
-3.  Majd a *Download*-ot kiválasztva …
-4.  … *XML* formátumban töltsük is le.
-5.  A kapott fájl tartalmát másoljuk a `colors.xml`-be.
+3.  Majd a *Download*-ot kiválasztva, *XML* formátumban töltsük is le.
+4.  A kapott fájl tartalmát másoljuk a `colors.xml`-be.
 
 Az alkalmazásunkban használt stílusokat pedig definiáljuk a `styles.xml` fájlban, az alábbi módon:
 
@@ -66,7 +65,8 @@ Az alkalmazásunkban használt stílusokat pedig definiáljuk a `styles.xml` fá
 </resources>
 ```
 
-Az `AndroidManifest.xml` fájlt megnézve látható, hogy az alkalmazásunk alapértelmezett témája az `AppTheme`. Így amit ebben a stílusban definiálunk, az lesz az alapértelmezett kinézet az egész alkalmazásunkban. Így például az `android:textViewStyle` definiálja, hogy hogyan néz ki az adott alkalmazásban egy `TextView`. Ezeknek a felüldefiniált stílusoknak minden esetben a beépített stílusból kell leszármaznia, jelen esetünkben a saját `TextView` stílusunknak az `android:Widget.TextView` stílusból. Ebben megadhatjuk a `textColor` attribútumot, aminek hatására minden `TextView` alapértelmezett betűszíne megváltozik az ott megadottra.
+Az `AndroidManifest.xml` fájlt megnézve látható, hogy az alkalmazásunk alapértelmezett témája az `AppTheme`. Így amit ebben a stílusban definiálunk, az lesz az alapértelmezett kinézet az egész alkalmazásunkban. Így például az `android:textViewStyle` definiálja, hogy hogyan néz ki az adott alkalmazásban egy `TextView`. Ezeknek a felüldefiniált stílusoknak minden esetben a beépített stílusból kell leszármaznia, jelen esetünkben a saját `TextView` nevű stílusunknak az `android:Widget.TextView` stílusból.
+ Ebben megadhatjuk a `textColor` attribútumot, aminek hatására minden `TextView` alapértelmezett betűszíne megváltozik az ott megadottra.
 
 ## Saját View létrehozása
 
@@ -74,9 +74,9 @@ A következő lépés az egyedi nézetek létrehozása.
 
 ### Kiinduló elrendezés létrehozása
 
-Módosítsuk az `Activity` elrendezését (`activity_view_labor.xml`), használjuk az alábbi XML-t.
+Módosítsuk az `Activity` elrendezését (`activity_main.xml`), használjuk az alábbi XML-t.
 
-```XML
+```xml
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
@@ -125,7 +125,7 @@ Módosítsuk az `Activity` elrendezését (`activity_view_labor.xml`), használj
 </ScrollView>
 ```
 
-Az ebben szereplő `dimen` erőforrásokat rajtuk *Alt+Enter*-t nyomva hozzuk létre, értékük legyen `16dp`.
+Az ebben szereplő `dimen` erőforrásokat rajtuk *Alt+Enter*-t nyomva hozzuk létre, értékük legyen `16dp`. *Ügyeljünk rá, hogy a `dp` mértékegység ne maradjon le, anélkül a rendszer nem fogja tudni értelmezni a megadott méreteket.*
 
 ### Egyedi jelszó nézet
 
@@ -214,7 +214,7 @@ class PasswordEditText : RelativeLayout {
 }
 ```
 
-Ahhoz, hogy egy felüldefiniált `ViewGroup`-ból származó osztálynak kódból meg tudjuk adni az elrendezését, az már definiált layout-ot a 
+Ahhoz, hogy egy felüldefiniált `ViewGroup`-ból származó osztálynak kódból meg tudjuk adni a tartalmát, a már XML-ben definiált layout-ot az `init` blokkban található
 
 ```kotlin
 LayoutInflater.from(context).inflate(R.layout.view_password_edittext, this, true)
@@ -226,13 +226,13 @@ kóddal tudjuk a `RelativeLayout`-ba felfújni, aminek hatására a `RelativeLay
 
 > Az `ivPassword` és az `etPassword` nevű `View`-kat a fenti kódban csak az ID-juk szerint hivatkoztuk, `findViewById` hívások nélkül. Ezt a kényelmi funkciót a [`Kotlin Android Extensions`](https://kotlinlang.org/docs/tutorials/android-plugin.html#view-binding) plugin adja, amely a Kotlin támogatással együtt automatikusan hozzá lett adva a projektünkhöz. A plugin custom `View`-kban, `Activity`-kben, és `Fragment`-ekben is hasonlóképpen tudja nekünk kikeresni a különböző `View`-kat. Használatakor mindig figyeljünk rá, hogy az általa nyújtott `kotlinx.` csomagnévvel kezdődő property-ket importáljuk, és ne az `R` fájlban lévő azonosítókat.
 
-A Kotlin osztály fontosabb függvényei:
+A Kotlin osztály fontosabb részei:
 
 *   `init`: a saját nézetünket inicializálja. "Felfújja" a `View`-kat, valamint beállítja a szükséges `onTouchListenert`-t az `ImageView`-hoz.
 *   `setTransformationMethod`: átállítja az `EditText`-hez tartozó szöveg transzformációt, valamint elmenti és visszatölti a kijelölést.
 *   `getText`, `setError`, `setText`, `getWindowToken`: az `EditText` függvényei, melyet kiajánlunk a saját, `RelativeLayout`-ból származó osztályunkon kívülre.
 
-A használathoz az alábbi kódot adjuk hozzá az `activity_view_labor.xml` elrendezés "Ide jön majd a saját jelszó nézet" kommentje után:
+A használathoz az alábbi kódot adjuk hozzá az `activity_main.xml` elrendezés "Ide jön majd a saját jelszó nézet" kommentje után:
 
 ```xml
 <hu.bme.aut.android.viewlabor.view.PasswordEditText
@@ -241,11 +241,13 @@ A használathoz az alábbi kódot adjuk hozzá az `activity_view_labor.xml` elre
     android:layout_height="wrap_content" />
 ```
 
+*Ahogy az előző laboron, itt is fontos, hogy az egyedi nézeteink package neve megegyezzen a forrás fájlban és az XML leíróban, ahol felhasználjuk.*
+
 Próbáljuk ki az alkalmazást!
 
 ### ChoiceLayout
 
-A második egyedi nézet egy különleges választó. Ez egy olyan nézet, amelyhez XML-ben adhatunk gyermek elemeket, amelyek így kiválaszhatóvá válnak a szülőben. A szülő elemben pedig egyedi attribútumok segítségével módosíthatjuk a működést. A `multiple` attribútummal azt szeretnék beállítani, hogy hány elem legyen kijelölhető a `ViewGroup`-on belül. A `dividerType` attribútum pedig azt adja meg, hogy mi válassza el a benne lévő elemeket (lehet semmilyen, szimpla vonal, dupla vonal).
+A második egyedi nézet egy különleges választó. Ez egy olyan nézet, amelyhez XML-ben adhatunk gyermek elemeket, amelyek így kiválaszhatóvá válnak a szülőben. A szülő elemben egyedi attribútumok segítségével módosíthatjuk a működést. A `multiple` attribútummal azt szeretnék beállítani, hogy hány elem legyen kijelölhető a `ViewGroup`-on belül. A `dividerType` attribútum pedig azt adja meg, hogy mi válassza el a benne lévő elemeket (ez lehet semmi, szimpla vonal, vagy dupla vonal).
 
 Ezek alapján az `Activity` elrendezésében kétszer szeretnénk ezt a nézetet felhasználni.
 
@@ -256,7 +258,8 @@ Ezek alapján az `Activity` elrendezésében kétszer szeretnénk ezt a nézetet
 
 Első lépésben hozzuk létre a színeket és stílusokat, amiket a nézetünk használni fog.
 
-Színek hozzáadása a `colors.xml` fájlhoz:
+Adjuk hozzá a következő színeket a `colors.xml` fájlhoz:
+
 ```xml
 <color name="choiceItemBackground">#DFDFDF</color>
 <color name="choiceItemActiveBackground">#FF45FB95</color>
@@ -265,7 +268,7 @@ Színek hozzáadása a `colors.xml` fájlhoz:
 
 Ezeket a színeket használjuk majd a különböző állapotok hátteréhez.
 
-A háttér megadására több lehetőség van. Megoldhatjuk, hogy kódból figyeljük az egyes állapotok (lenyomva, kiválasztva, normál) változását és kódból állítgatjuk az elemek háttérszínét, azonban ez jelentős plusz munka lenne. Az Android platformon van ennél egyszerűbb megoldás is: használhatjuk a `selector` erőforrást. Ez egy olyan kirajzolható erőforrás, amely kinézete a `View` állapotától függ, amelyhez hozzárendeltük.
+A háttér megadására több lehetőség van. Megoldhatjuk, hogy kódból figyeljük az egyes állapotok (lenyomva, kiválasztva, normál) változását és ennek megfelelően állítgassuk az elemek háttérszínét, azonban ez jelentős plusz munka lenne. Az Android platformon van ennél egyszerűbb megoldás is: használhatjuk a `selector` erőforrást. Ez egy olyan kirajzolható erőforrás, amely kinézete a `View` állapotától függ, amelyhez hozzárendeltük.
 
 Hozzunk létre a drawable mappában egy `selector_choice_item.xml` fájlt, majd a következő selector kódot másoljuk bele:
 
@@ -290,11 +293,11 @@ Vegyünk fel egy ezt használó stílust a `styles.xml` fájlban:
 </style>
 ```
 
-Ez a stílus a `selector`-t használja háttérként, tehát az a `View`, amely ezt a stílust használja az állapota alapján változtatja majd automatikusan a hátterét.
+Ez a stílus az előbb létrehozott `selector`-t használja háttérként, tehát az a `View`, amely ezt a stílust használja az állapota alapján változtatja majd automatikusan a hátterét.
 
 #### Osztály létrehozása
 
-Először csak a `dividerType` attribútumot implementáljuk. Ehhez hozzuk létre az `attrs.xml` fájlt, az alábbiakkal:
+Először csak a `multiple` attribútumot implementáljuk. Ehhez hozzuk létre az `attrs.xml` fájlt a `res/values` mappában, az alábbiakkal:
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -305,6 +308,8 @@ Először csak a `dividerType` attribútumot implementáljuk. Ehhez hozzuk létr
 </resources>
 ```
 
+Ezzel definiáltunk egy stílusozható objektumot, aminek egy `multiple` nevű, egész szám típusú paramétere lesz.
+
 Utána pedig a `view` package-ben hozzuk létre a `ChoiceLayout` nevű Kotlin osztályt:
 
 ```kotlin
@@ -312,7 +317,10 @@ class ChoiceLayout : LinearLayout {
 
     var multiple: Int = 1
 
-    constructor(context: Context) : super(context, null)
+    constructor(context: Context) : super(context, null) {
+        init(context, null)
+    }
+
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
         init(context, attrs)
     }
@@ -366,7 +374,7 @@ class ChoiceLayout : LinearLayout {
             } else {
                 for (i in 0 until childCount) {
                     val v = getChildAt(i)
-                    v.isSelected = v == view
+                    v.isSelected = (v == view)
                 }
             }
         }
@@ -378,11 +386,11 @@ Fontosabb függvények:
 
 *   Konstruktorok: szintén az ős `View` miatt szükséges a 3 implementáció
 *   `init`: a saját inicializáló függvény. Beállítjuk az `orientation`-t, majd kiolvassuk az attribútumokat (ha elérhetőek).
-*   `addView` felüldefiniálás: itt kapjuk el azt a hívást, ahol egy új `View` belekerül a  `ChoiceLayout`-ba. Itt meghívjuk az ős implementációját, majd a hozzáadott nézeten műveletet végzünk a `refreshAfterAdd` függvényben.
+*   `addView` felüldefiniálás: itt kapjuk el azt a hívást, ahol egy új `View` belekerül a  `ChoiceLayout`-ba. Itt meghívjuk az ős implementációját (amely hozzáadja a `LinearLayout`-hoz a `View`-t), majd a hozzáadott nézeten műveleteket végzünk a `refreshAfterAdd` függvényben.
 *   `refreshAfterAdd`: a paraméterként kapott `View`-t kattinthatóvá teszi, majd beállít egy `onClickListener`-t rá.
 *   `getSelectedCount`: visszaadja, hogy hány gyerek elem van kiválasztva.
 
-Az egyedi attribútumok eléréséhez a `Context` `obtainStyledAttributes` függvényét használhatjuk. Ez első paraméterként egy `AttributeSet`-et vár (amit az osztály bizonyos konstruktoraiban kapunk meg), második paraméterként pedig egy attribútum referencia tömböt. Ezt a tömböt a fordító automatikusan generálja az `attrs.xml` fájlban megadott tag name attribútuma alapján - jelen esetben az `R.styleable.ChoiceLayout` reprezentálja ezt a tömböt. Az `obtainStyledAttributes` függvény visszatérési értéke egy `TypedArray`, ez tartalmazza a lekért attribútumok értékét. A megfelelő `get…` függvény segítségével lekérhető a megfelelő `Int`, `String` vagy bármely egyéb érték, amit XML-ben megadtunk. *FONTOS, hogy a `TypedArray` használata után mindig kell az aktuális példányon egy `recycle()` függvényhívás*, amely felszabadítja a használt attribútumokat (erre van a `try-finally` megoldás a kódban).
+Az egyedi attribútumok eléréséhez a `Context` `obtainStyledAttributes` függvényét használhatjuk. Ez első paraméterként egy `AttributeSet`-et vár (amit az osztály bizonyos konstruktoraiban kapunk meg), második paraméterként pedig egy attribútum referencia tömböt. Ezt a tömböt a fordító automatikusan generálja az `attrs.xml` fájlban megadott tag `name` attribútuma alapján - jelen esetben az `R.styleable.ChoiceLayout` reprezentálja ezt a tömböt. Az `obtainStyledAttributes` függvény visszatérési értéke egy `TypedArray`, ez tartalmazza a lekért attribútumok értékét. A megfelelő `get…` függvény segítségével lekérhető az `Int`, `String` vagy egyéb típusú érték, amit XML-ben megadtunk. *FONTOS, hogy a `TypedArray` használata után mindig kell az aktuális példányon egy `recycle()` függvényhívás*, amely felszabadítja a használt attribútumokat (erre van a `try-finally` megoldás a kódban).
 
 Az `OnClickListener` felelős az egyes elemek kiválasztásáért. Az implementáció két részre oszlik. 
 
@@ -488,11 +496,11 @@ Ehhez első lépésben az `attrs.xml` állományt kell módosítani. Hozzá kell
 </attr>
 ```
 
-A `multiple` integer formátumú attribútum volt, most viszont 3 érték közül szeretnénk majd választani. Ehhez `enum` formátumot kell használni. Ezt megadva az adott `attr` tag gyerek elemei definiálják a lehetséges értékeket. Jelen esetben lehet `none`: kikapcsolt, `simple_divider`: egyszerű vonal, `double_divider`: dupla vonal.
+A `multiple` integer formátumú attribútum volt, most viszont 3 fix érték közül szeretnénk majd választani. Ehhez `enum` formátumot érdemes használni. Ezt megadva az adott `attr` tag gyerek elemei definiálják a lehetséges értékeket. Jelen esetben lehet `none`: kikapcsolt, `simple_divider`: egyszerű vonal, `double_divider`: dupla vonal.
 
 A két divider típushoz első lépésben definiálunk két kirajzolható erőforrást a `drawable` mappában. Ehhez xml-ben leírt drawable elemeket használunk.
 
-Az első elem a szimpla vonal, melyhez létrehozunk egy `choice_divider_simple.xml` erőforrást az alábbi tartalommal:
+Az első elem a szimpla vonal, melyhez létrehozunk egy `choice_divider_simple.xml` erőforrást a `drawable` mappában az alábbi tartalommal:
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -502,7 +510,7 @@ Az első elem a szimpla vonal, melyhez létrehozunk egy `choice_divider_simple.x
 </shape>
 ```
 
-Itt létrehozunk egy egyszerű `shape` elemet, aminek egyszínű hátteret adunk (fekete) és beállítjuk `1dp` magasra.
+Itt létrehozunk egy egyszerű `shape` elemet, aminek egyszínű hátteret adunk (fekete) és beállítjuk `1dp` magasra. Ezt az alakot vízszintesen elnyújtva egy fekete vonalat kapunk.
 
 A második elem a dupla vonal, melyhez a `choice_divider_double.xml` erőforrást hozzuk létre:
 
@@ -524,11 +532,11 @@ A második elem a dupla vonal, melyhez a `choice_divider_double.xml` erőforrás
 </layer-list>
 ```
 
-Ebben az esetben egy kicsit komplexebb leírást használunk. Itt egy `layer-list` elemben definiálunk több elemet. Ennek a lényege, hogy az egyes elemek majd egymásra rajzolódnak és így definiálható komplexebb grafika XML-ben. Az első `item`-e a `layer-list`-nek egy vonal, amely a `4dp` magas vásznon `1dp` széles vonalat húz alsó, `3dp`-s padding-gel. A második elem pedig szintén egy ugyanilyen vonalat húz, de felső, `3dp`-s padding-gal. Ennek eredménye egy `4dp` magas kép, aminek a felső és alsó pixele fekete. Ezt széltében nyújtva két horizontális vonalat kapunk.
+Ebben az esetben egy kicsit komplexebb leírást használunk. Itt egy `layer-list` elemben definiálunk több elemet. Ennek a lényege, hogy az egyes elemek majd egymásra rajzolódnak és így komplexebb grafika is definiálható XML-ben. Az első `item`-e a `layer-list`-nek egy vonal, amely a `4dp` magas vásznon `1dp` széles vonalat húz alsó, `3dp`-s padding-gel. A második elem pedig szintén egy ugyanilyen vonalat húz, de felső, `3dp`-s padding-gal. Ennek eredménye egy `4dp` magas kép, aminek a felső és alsó pixele fekete. Ezt széltében nyújtva két horizontális vonalat kapunk.
 
-Tehát ezt a két drawable elemet fogjuk felhasználni elválasztóként a `ChoiceLayout`-ban. Következő lépésben a `ChoiceLayout` osztályt kell kiegészíteni.
+Ezt a két drawable elemet fogjuk felhasználni elválasztóként a `ChoiceLayout`-ban. Következő lépésben a `ChoiceLayout` osztályt kell kiegészíteni.
 
-Adjuk hozzá az osztályhoz a `divider` lehetséges értékeit:
+Adjuk hozzá az osztályhoz a `divider` lehetséges értékeit, az itt használt `Int` értékek megfelelnek az `attrs.xml`-ben megadott enum értékeknek:
 
 ```kotlin
 companion object {
@@ -542,7 +550,7 @@ var dividerType: Int = DIVIDER_NONE
 
 > Kotlinban nincs `static` kulcsszó, és így nincsenek statikus változók vagy függvények sem. Az osztály szintű funkcionalitást és konstansokat egy speciális, az osztályon belül elhelyezett singleton-ban, a [companion object](https://kotlinlang.org/docs/reference/object-declarations.html#companion-objects)-ben implementálhatjuk.
 
-Ezután ki kell olvasni az `init` függvényben az elválasztó típust az attribútumok közül. Ehhez a `multiple` kiolvasás után adjuk hozzá az alábbi sort:
+Ezután ki kell olvasni az `init` függvényben az elválasztó típust az attribútumok közül. Ehhez a `multiple` kiolvasás után, a `try`-on belül adjuk hozzá az alábbi sort:
 
 ```kotlin
 dividerType = a.getInt(R.styleable.ChoiceLayout_dividerType, DIVIDER_NONE)
@@ -568,11 +576,11 @@ private fun addDivider() {
 }
 ```
 
-A függvény létrehoz egy `ImageView`-t és a `dividerType` alapján beállítja az előbbiekben létrehozott két drawable közül a megfelelőt ennek az `ImageView`-nak. `LayoutParams` segítségével beállítjuk, hogy a magassága a tartalom alapján dőljön el, míg a szélessége a szülő szélességével egyezzen meg. Ezután az `addView` függvény segítségével hozzáadjuk a `View`-t a saját layout-hoz. Azért explicit módon az ős függvényét hívjuk, hogy itt ne fusson le a saját `addView` logikánk, amit a kijelölhetőség érdekében hoztunk létre.
+A függvény létrehoz egy `ImageView`-t és a `dividerType` alapján beállítja az előbbiekben létrehozott két drawable közül a megfelelőt ennek az `ImageView`-nak. `LayoutParams` segítségével beállítjuk, hogy a magassága a tartalom alapján dőljön el, míg a szélessége a szülő szélességével egyezzen meg. Ezután az `addView` függvény segítségével hozzáadjuk a `View`-t a saját layoutunkhoz. Azért explicit módon az ős függvényét hívjuk, hogy itt ne fusson le a saját `addView` logikánk, amit a kijelölhetőség érdekében hoztunk létre, hiszen az elválasztókat nem akarjuk kattinthatóvá és kijelölhetővé tenni.
 
 > Figyeljük meg a [`when`](https://kotlinlang.org/docs/reference/control-flow.html#when-expression) egy újabb tulajdonságát - van visszatérési értéke is, ami nem más, mint a lefutott ág utolsó kifejezése (és az ágban egyetlen kifejezés elhelyezése esetén nincs szükség a kapcsos zárójelek kiírására). Ezzel jelen esetben elkerüljük az értékadási logika leírását minden ágban, helyette egy változóba helyezzük a megfelelő erőforrást, és a `when` futása után beállítjuk azt az elválasztónak.
 
-Ezután mindkét `addView` függvény legelejére beillesztjük az alábbi kódot:
+Ezután *mindkét* `addView` függvény legelejére beillesztjük az alábbi kódot:
 
 ```kotlin
 if (childCount > 0) {
@@ -580,7 +588,7 @@ if (childCount > 0) {
 }
 ```
 
-Ez biztosítja, hogy minden elem hozzáadás előtt bekerül egy divider a layout-ba (kivétel az első elem hozzáadásánál, mert ott nincs szükség rá).
+Ez biztosítja, hogy minden elem hozzáadás előtt bekerül egy divider a layout-ba (kivéve a legelső elem hozzáadásánál, mert ott nincs szükség rá).
 
 Ezzel végeztünk a `ChoiceLayout` osztály módosításával. Már csak egyetlen dolog maradt hátra: használjuk az új attribútumot. Ehhez az `Activity` elrendezését módosítsuk úgy, hogy mindkét `ChoiceLayout` kapjon egy újabb attribútumot, `dividerType` névvel. Az első nézetnél legyen:
 
