@@ -70,11 +70,9 @@ if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permissio
 
 A labor során egy egyszerű telefonkönyv alkalmazást fogunk elkészíteni. Az alkalmazás meg fogja jeleníteni a telefonon tárolt névjegyeket, illetve egy névjegyre kattintással hívást kezdeményez az ahhoz tartozó elsődleges telefonszámra.
 
-Hozzunk létre egy új projektet Android Studio-ban `Contacts` néven. A *Company domain* mező tartalmát töröljük ki és hagyjuk is üresen.
-
-A package név legyen `hu.bme.aut.android.contacts`. A támogatott eszköz formátum legyen *Phone and Tablet*, a minimum SDK szint legyen *API 19: Android 4.4 (KitKat)*.
-
-A projekthez kezdésnek válasszunk egy *Empty Activity*-t, melynek neve legyen `ContactsActivity`.
+Hozzunk létre egy új projektet Android Studio-ban *Empty Activity*-t, melynek neve legyen `ContactsActivity`. Az alkalmazás neve
+legyen `Contacts`, `hu.bme.aut.android.contacts` package-dzsel. A támogatott eszköz formátum legyen *Phone and Tablet*, a minimum
+SDK szint legyen *API 19: Android 4.4 (KitKat)*.
 
 Miután létrejött a projekt, vegyük fel a `RecyclerView` könyvtárat függőségként a modul szintű `build.gradle` fájlban:
 
