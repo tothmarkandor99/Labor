@@ -6,16 +6,24 @@ Az alkamazás két nézetből fog állni, az egyik egy tárcsázó, a másik ped
 
 A nézetek `Fragment`-ek lesznek, és a két nézet között `ViewPager` használatával lehet majd navigálni.
 
-![](images/dialer.png)
-![](images/apps.png)
+<p align=center>
+<img src="./images/view_dialer.png" width="300">
+<img src="./images/view_apps.png" width="300">
+</p>
 
-Indítsuk el az Android Studio-t és hozzunk létre egy új alkalmazást `Launcher` néven.
+## Projekt létrehozása
 
-A *Company domain* mezőt töröljük ki, a package név legyen `hu.bme.aut.android.launcher`.
+Első lépésként indítsuk el az Android Studio-t, majd:
 
-A támogatott form factor legyen *Phone and Tablet*, a minimum API level legyen *API 19: Android 4.4 (KitKat)*.
+1. Hozzunk létre egy új projektet, válasszuk az *Empty Activity* lehetőséget.
+2. A projekt neve legyen `Launcher`, a kezdő package pedig `hu.bme.aut.android.launcher`.
+3. Nyelvnek válasszuk a *Kotlin*-t.
+4. A minimum API szint legyen 19 (Android 4.4).
+5. Az *instant app* támogatást és az *AndroidX* használatát NE pipáljuk be.
 
-A projekt létrehozásakor készítsünk egy új *Empty Activity*-t is `LauncherActivity` néven. Figyeljünk rá, hogy a *Backwards Compatibility (AppCompat)* checkbox be legyen jelölve.
+## Activity átnevezése
+
+A projekt létrehozását követően egyből próbáljuk is ki a `Refactor` funkciót. A generált `MainActivity`-re állva jobb egérkattintás hatására érjük el a `Refactor`-t, azon belül válasszuk a `Rename...` lehetőséget. Nevezzük át az Activity-t `LauncherActivity`-re. Ezután ismételjük meg ugyanezt az `activity_main` layout fájllal is, annak a neve legyen `activity_launcher`.
 
 
 A projektünkben ez az egy `Activity` lesz. Nem szeretnénk, hogy el lehessen forgatni, illetve szeretnénk, ha launcher alkalmazásként viselkedhetne. Mindkét igény miatt az `AndroidManifest.xml` fájlt kell módosítani.
@@ -53,7 +61,7 @@ Vegyük fel az alkalmazás függőségeihez a `ViewPager`-t tartalmazó könyvt�
 ```groovy
 dependencies {
     ...
-	implementation 'com.android.support:viewpager:28.0.0-rc02'
+	implementation 'com.android.support:viewpager:28.0.0'
     ...
 }
 ```
@@ -62,7 +70,7 @@ Ha a létrehozott projektben más `com.android.support` group-ban lévő függő
 
 A `ViewPager`-ben két `Fragment`-et szeretnénk megjeleníteni. Hozzuk létre a `fragment` nevű csomagot!
 
-Hozzunk létre a `hu.bme.aut.android.launcher.fragments` package-ben két `Fragment` osztályt `DialerFragment` és `ApplicationsFragment` néven! Figyeljünk oda, hogy a két választható `Fragment` import közül mindig a support library-ből származót válasszuk! (A másikra rögtön figyelmeztetést kapnánk, mert már nem javasolt a használata.)
+Hozzunk létre a `hu.bme.aut.android.launcher.fragment` package-ben két `Fragment` osztályt `DialerFragment` és `ApplicationsFragment` néven! Figyeljünk oda, hogy a két választható `Fragment` import közül mindig a support library-ből származót válasszuk! (A másikra rögtön figyelmeztetést kapnánk, mert már nem javasolt a használata.)
 
 ```kotlin
 class DialerFragment : Fragment() {
@@ -110,7 +118,7 @@ class LauncherPagerAdapter(manager: FragmentManager) : FragmentStatePagerAdapter
 }
 ```
 
-Itt is fontos, hogy a `FragmentManager` és a `Fragment` osztályokat fontos az `android.support.v4.app` package-ből importáljuk.
+Itt is fontos, hogy a `FragmentManager` és a `Fragment` osztályokat az `android.support.v4.app` package-ből importáljuk.
 
 > Mivel a `getCount` függvény [egyetlen kifejezéssel tér vissza](https://kotlinlang.org/docs/reference/functions.html#single-expression-functions), nem kell törzset adnunk neki. Akár a visszatérési értékét is elhagyhatnánk (mivel kikövetkeztethető), ezt most csak a könnyebb érthetőség kedvéért nem tettük meg.
 
@@ -130,8 +138,6 @@ class LauncherActivity : AppCompatActivity() {
 ```
 
 Próbáljuk ki az alkalmazást!
-
-![](images/viewpager.png)
 
 ### Saját téma Roboto betűtípussal
 
@@ -388,7 +394,7 @@ A `RecyclerView` külön libraryként érhető el. Vegyük fel a következő fü
 ```groovy
 dependencies {
     ...
-    implementation 'com.android.support:recyclerview-v7:28.0.0-rc02'
+    implementation 'com.android.support:recyclerview-v7:28.0.0'
     ...
 }
 ```
@@ -575,7 +581,7 @@ Próbáljuk ki az alkalmazást!
 
 Segítség a megoldáshoz:
 
-A gombok eseménykezelője legyen közös, a kattintott `View7 objektum `id`-ja alapján állítsa be a felhívandó telefonszámot az `EditText`-ben (ha kell töröljön is). A hívás gomb megnyomására indítson hívást a beírt telefonszámra.
+A gombok eseménykezelője legyen közös, a kattintott `View` objektum `id`-ja alapján állítsa be a felhívandó telefonszámot az `EditText`-ben (ha kell töröljön is). A hívás gomb megnyomására indítson hívást a beírt telefonszámra.
 
 Példa a hívás indítására:
 
