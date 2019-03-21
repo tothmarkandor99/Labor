@@ -109,9 +109,9 @@ A `MainActivity` a fenti ábra alapján három menüpontot tartalmaz középre i
         android:id="@+id/btnStart"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
         android:text="@string/btn_start"
         app:layout_constraintBottom_toTopOf="@+id/btnHighScore"
         app:layout_constraintEnd_toEndOf="parent"
@@ -124,9 +124,9 @@ A `MainActivity` a fenti ábra alapján három menüpontot tartalmaz középre i
         android:id="@+id/btnHighScore"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
         android:text="@string/btn_highscore"
         app:layout_constraintBottom_toTopOf="@+id/btnAbout"
         app:layout_constraintEnd_toEndOf="parent"
@@ -138,17 +138,16 @@ A `MainActivity` a fenti ábra alapján három menüpontot tartalmaz középre i
         android:id="@+id/btnAbout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
         android:text="@string/btn_about"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btnHighScore" />
-    	
 </android.support.constraint.ConstraintLayout>
 ```
 
@@ -167,7 +166,7 @@ btnHighScore.setOnClickListener {
 
 ## AboutActivity felület
 
-Ahogy korábban említettük az *Infó* menü elindítja az új `AboutActivity`-t, ezért elsőként készítsük el az `AboutActivity` felületét, melyet a `content_about.xml` ír le. Mint korábban, itt is lehet `ConstraintLayout`-ot készíteni a segítséggel, vagy alább megtalálható az XML:
+Ahogy korábban említettük az *Infó* menü elindítja az új `AboutActivity`-t, ezért elsőként készítsük el az `AboutActivity` felületét, melyet a `activity_about.xml` ír le. Mint korábban, itt is lehet `ConstraintLayout`-ot készíteni a segítséggel, vagy alább megtalálható az XML:
 
 ![](images/constraint_layout_2.gif)
 
@@ -178,7 +177,6 @@ Ahogy korábban említettük az *Infó* menü elindítja az új `AboutActivity`-
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".AboutActivity"
     tools:showIn="@layout/activity_about">
 
@@ -186,17 +184,17 @@ Ahogy korábban említettük az *Infó* menü elindítja az új `AboutActivity`-
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
         android:text="@string/txt_about"
         android:textSize="30sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-		
+
 </android.support.constraint.ConstraintLayout>
 ```
 
@@ -356,28 +354,28 @@ Végül az `onTouchEvent` függvényben tudjuk kezelni az érintés eseményeket
 
 > Kotlinban a `(float) x` és `(int) y` stílusú castolások helyett a numerikus típusok között a `toInt()`, `toFloat()`, [és hasonló függvényekkel](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-number/index.html) végezhetünk konverziót.
 
-Ahhoz, hogy a `GameActivity` ezt a játékteret megjelenítse, módosítsuk a hozzá tartozó layout fájlt (`content_game.xml`). A felület egy szürkés hátterű `ConstraintLayout` közepén jelenítse meg a `TicTacToeView` nézetünket:
+Ahhoz, hogy a `GameActivity` ezt a játékteret megjelenítse, módosítsuk a hozzá tartozó layout fájlt (`activity_game.xml`). A felület egy szürkés hátterű `ConstraintLayout` közepén jelenítse meg a `TicTacToeView` nézetünket:
 
 ```xml
+<?xml version="1.0" encoding="utf-8"?>
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context=".GameActivity"
     android:background="#888888"
+    tools:context=".GameActivity"
     tools:showIn="@layout/activity_game">
 
     <hu.bme.aut.android.tictactoe.view.TicTacToeView
         android:id="@+id/ticTacToeView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
