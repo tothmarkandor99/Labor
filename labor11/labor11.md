@@ -70,11 +70,9 @@ if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permissio
 
 A labor során egy egyszerű telefonkönyv alkalmazást fogunk elkészíteni. Az alkalmazás meg fogja jeleníteni a telefonon tárolt névjegyeket, illetve egy névjegyre kattintással hívást kezdeményez az ahhoz tartozó elsődleges telefonszámra.
 
-Hozzunk létre egy új projektet Android Studio-ban `Contacts` néven. A *Company domain* mező tartalmát töröljük ki és hagyjuk is üresen.
+Hozzunk létre egy új projektet Android Studio-ban! Válasszuk az  *Empty Activity*-t, az alkalmazás neve legyen `Contacts`, a package név `hu.bme.aut.android.contacts`. A minimum SDK szint legyen *API 19: Android 4.4 (KitKat)*.
 
-A package név legyen `hu.bme.aut.android.contacts`. A támogatott eszköz formátum legyen *Phone and Tablet*, a minimum SDK szint legyen *API 19: Android 4.4 (KitKat)*.
-
-A projekthez kezdésnek válasszunk egy *Empty Activity*-t, melynek neve legyen `ContactsActivity`.
+A létrejött Activity-t nevezzük át (<kbd>Shift+F6</kbd>) `ContactsActivity`-re, valamint a felület leíróját is `activity_contacts`-ra.
 
 Miután létrejött a projekt, vegyük fel a `RecyclerView` könyvtárat függőségként a modul szintű `build.gradle` fájlban:
 
@@ -99,10 +97,10 @@ Készítsük el az alkalmazás felhasználói felületét a `res/layout/activity
     android:id="@+id/activity_contacts"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
     tools:context=".ContactsActivity">
 
     <android.support.v7.widget.RecyclerView
@@ -368,7 +366,7 @@ rvContacts.adapter = contactsAdapter
 contactsAdapter.setContacts(getAllContacts())
 ```
 
-Ezt Android Studio-ban legegyszerűbben a kiemelni kívánt kód kijelölésével, majd a *CTRL+ALT+M* billentyűkombinációval tudjuk megtenni. Ezzel a következő függvény kapjuk:
+Ezt Android Studio-ban legegyszerűbben a kiemelni kívánt kód kijelölésével, majd a <kbd>Ctrl+Alt+M</kbd> billentyűkombinációval tudjuk megtenni. Ezzel a következő függvény kapjuk:
 
 ```kotlin
 private fun loadContacts() {
