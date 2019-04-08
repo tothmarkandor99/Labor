@@ -154,7 +154,7 @@ app:srcCompat="@drawable/ic_add_white_24dp"
 
 ### A lista fejléce
 
-Jelenleg a `Toolbar`on megjelenik az `Activity` neve, ami *PlacesToVisit*, alatta pedig egy `TextView`-ban a *Places to visit* felirat. Ezek közül az egyik felesleges, és szebb, ha a jobban olvasható *Places to visit*-et hagyjuk meg. Azonban egy üres `Toolbar`nak nincs sok értelme, ezért inkább rakjuk fel ezt a szöveget oda, és távolítsuk el a `TextView`-t.
+Jelenleg a `Toolbar`-on megjelenik az `Activity` neve, ami *PlacesToVisit*, alatta pedig egy `TextView`-ban a *Places to visit* felirat. Ezek közül az egyik felesleges, és szebb, ha a jobban olvasható *Places to visit*-et hagyjuk meg. Azonban egy üres `Toolbar`-nak nincs sok értelme, ezért inkább rakjuk fel ezt a szöveget oda, és távolítsuk el a `TextView`-t.
 
 Ehhez először is az `activity_places_list.xml`-ben a `Toolbar` tagen belül vegyük fel az `app:title` attribútumot:
 
@@ -162,11 +162,7 @@ Ehhez először is az `activity_places_list.xml`-ben a `Toolbar` tagen belül ve
 app:title="@string/places_to_visit"
 ```
 
-Majd töröljük a `content_places_list.xml`-ből az ott lévő `TextView`-t (illetve a rá való hivatkozást a `RecyclerView`-ból), a `RecyclerView`-t pedig igazítsuk a szülője tetejéhez, az alábbi módon:
-
-```xml
-android:layout_alignParentTop="true"
-```
+A `content_places_list.xml`-ből pedig töröljük az ott lévő `TextView`-t, illetve a rá való hivatkozást a `RecyclerView`-ból.
 
 Próbáljuk ki az alkalmazást!
 
@@ -174,44 +170,17 @@ Próbáljuk ki az alkalmazást!
 
 ### Üres lista
 
-Kevesen készülnek arra a lehetőségre, hogy mi fogadja a felhasználót akkor, ha üres a listanézet. Célszerű ilyenkor az üres lista helyett valamilyen szöveget (esetleg illusztrációt) megjeleníteni. Írjuk ehhez át a `content_places_list.xml`-t.
+Kevesen készülnek arra a lehetőségre, hogy mi fogadja a felhasználót akkor, ha üres a listanézet. Célszerű ilyenkor az üres lista helyett valamilyen szöveget (esetleg illusztrációt) megjeleníteni. Írjuk ehhez át a `content_places_list.xml`-t. Adjunk hozzá egy `TextView`-t, a `RelativeLayout` közepére igazítva:
 
 ```xml
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/content_places_list"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context=".PlacesListActivity"
-    tools:showIn="@layout/activity_places_list">
-
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true">
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/placesListRV"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-        <TextView xmlns:android="http://schemas.android.com/apk/res/android"
-            android:id="@+id/emptyTV"
-            style="@style/TextViewTitleStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="@string/add_places_to_visit" />
-
-    </FrameLayout>
-
-</RelativeLayout>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+          android:id="@+id/emptyTV"
+          android:layout_centerHorizontal="true"
+          android:layout_centerVertical="true"
+          style="@style/TextViewTitleStyle"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="@string/add_places_to_visit"/>
 ```
 
 Az üres nézet szöveges erőforrása legyen például:
@@ -220,7 +189,7 @@ Az üres nézet szöveges erőforrása legyen például:
 <string name="add_places_to_visit">Add places to visit</string>
 ```
 
-Figyeljük meg a `FrameLayout`ot, ami egyszerűen egymás tetejére teszi a benne lévő `View`-kat! Ez ebben az esetben nem lesz probléma, mivel mindig csak az egyik gyermeke lesz látható. Ehhez meg kell oldanunk, hogy üres `RecyclerView` esetén csak a `TextView` jelenjen meg (és fordítva):
+A `RecyclerView` és a `TextView` most egymáson helyezkedik el a nézetben. Ez nem lesz probléma, mivel mindig csak az egyik lesz látható. Ehhez meg kell oldanunk, hogy üres `RecyclerView` esetén csak a `TextView` jelenjen meg (és fordítva):
 
 Először is hozzunk létre egy új custom `View`-t, ami képes ezt kezelni. Kerüljön a `view` package-be, a neve legyen `EmptyRecyclerView`, és származzon a `RecyclerView`-ból. Először implementáljuk a három kötelező konstruktorát:
 
@@ -240,25 +209,7 @@ Vegyünk fel bele egy `emptyView` nevű property-t, amiben azt a `View`-t fogjuk
 var emptyView: View? = null
 ```
 
-Ezek után vegyünk fel egy `RecyclerView.AdapterDataObserver` példányt, aminek a feladata, hogy a listában történt változásokat lekezelje. Láthatjuk, hogy az `override`-olt függvényei megfelelnek a `RecyclerView.Adapter`-nél már ismert `notify...` hívásoknak. 
-
-```kotlin
-private val observer = object : RecyclerView.AdapterDataObserver() {
-    override fun onChanged() {
-        checkIfEmpty()
-    }
-
-    override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-        checkIfEmpty()
-    }
-
-    override fun onItemRangeRemoved(positionStart: Int, itemCount: Int) {
-        checkIfEmpty()
-    }
-}
-```
-
-Ha bármilyen változás történik az adathalmazban, le kell ellenőriznünk, hogy a melyik felületet kell megjelenítenünk attól függően, hogy üres-e a lista. Erre szolgál a `checkIfEmpty` függvény. Implementáljuk ezt is:
+Ha bármilyen változás történik az adathalmazban, le kell ellenőriznünk, hogy a melyik felületet kell megjelenítenünk attól függően, hogy üres-e a lista. Erre szolgál a `checkIfEmpty` függvény. Implementáljuk ezt:
 
 ```kotlin
 fun checkIfEmpty() {
@@ -276,7 +227,25 @@ fun checkIfEmpty() {
 
 Látható, hogy a `checkIfEmpty` függvény az adapterben található elemek számának függvényében állítja az `EmptyRecyclerView`, és az `emptyView` láthatóságát.
 
-Ezt az ellenőrzést akkor is meg kéne tennünk, amikor beállítjuk az `emptyView` értékét. Adjunk hozzá a property-hez egy *custom setter*-t, amiben beállítjuk a backing field értékét, utána pedig meghívjuk a `checkIfEmpty` függvényt:
+Vegyünk fel egy `RecyclerView.AdapterDataObserver` példányt, aminek a feladata, hogy a listában történt változásokat lekezelje. Láthatjuk, hogy az `override`-olt függvényei megfelelnek a `RecyclerView.Adapter`-nél már ismert `notify...` hívásoknak. Bármilyen változás történik, a `checkIfEmpty` segítségével beállítjuk a megfelelő láthatóságokat. 
+
+```kotlin
+private val observer = object : RecyclerView.AdapterDataObserver() {
+    override fun onChanged() {
+        checkIfEmpty()
+    }
+
+    override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+        checkIfEmpty()
+    }
+
+    override fun onItemRangeRemoved(positionStart: Int, itemCount: Int) {
+        checkIfEmpty()
+    }
+}
+```
+
+Ezt az ellenőrzést akkor is meg kéne tennünk, amikor beállítjuk az `emptyView` értékét. Adjunk hozzá a property-hez egy *custom setter*-t, amiben beállítjuk a *backing field* értékét, utána pedig meghívjuk a `checkIfEmpty` függvényt:
 
 ```kotlin
 var emptyView: View? = null
@@ -286,7 +255,9 @@ var emptyView: View? = null
     }
 ```
 
-Az `EmptyRecyclerView`-nk megfelelő működéséhez felül kell még írnunk a `setAdapter` függvényt. Ebben tudjuk beregisztrálni az imént létrehozott observerünket, ami kezeli az adathalmazban történt változásokat. Illetve az adapter cseréje esetén a régi adapter változásairól is itt iratkozhatunk le:
+>Egy Kotlin property igazából egy [backing field](https://kotlinlang.org/docs/reference/properties.html#backing-fields), egy getter függvény, és egy setter (amennyiben `var`-ként lett deklarálva) összessége. A getter alapértelmezett működése az, hogy visszaadja a backing field értékét, a setter pedig beállítja azt.
+
+Az `EmptyRecyclerView` megfelelő működéséhez felül kell még írnunk a `setAdapter` függvényt. Ebben tudjuk beregisztrálni az imént létrehozott observerünket, ami kezeli az adathalmazban történt változásokat. Az adapter cseréje esetén a régi adapter változásairól is itt iratkozhatunk le:
 
 ```kotlin
 override fun setAdapter(adapter: RecyclerView.Adapter<*>?) {
@@ -307,7 +278,7 @@ Ezzel el is készült az `EmptyRecyclerView` osztályunk. Cseréljük le erre az
 <hu.bme.aut.android.placestovisit.view.EmptyRecyclerView
     android:id="@+id/placesListRV"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content" />
+    android:layout_height="match_parent" />
 ```
 
 A `PlacesListActivity` `onCreate` függvényében a `RecyclerView` inicializálása után állítsuk be az `emptyView`-jának az erre a célra létrehozott `TextView`-t:
@@ -361,7 +332,7 @@ Hozzunk létre egy új erőforrás mappát, a neve legyen `values-v21`! Az ebbe 
 </resources>
 ```
 
-Most meg kell adnunk az xml erőforrásokban, hogy miből mit szeretnénk animálni. Úgy párosítjuk össze a `View`-kat, hogy új attribútumot veszünk fel mind a *Floating Action Button*höz, mind az `activity_create_place_to_visit.xml` gyökér eleméhez (ez egy `LinearLayout`). 
+Most meg kell adnunk az xml erőforrásokban, hogy miből mit szeretnénk animálni. Úgy párosítjuk össze a `View`-kat, hogy új attribútumot veszünk fel mind a *Floating Action Button*-höz, mind az `activity_create_place_to_visit.xml` gyökér eleméhez (ez egy `LinearLayout`). 
 
 ```xml
 android:transitionName="create"
@@ -380,7 +351,7 @@ private fun showNewPlaceDialog() {
 }
 ```
 
-Itt megadjuk, hogy melyik `View`-ból indul az animáció (`addButton`), és azt is, hogy milyen `transitionName`-mel kell dolgoznia a rendszernek (`"create"`). Az animációról szóló információt egy `Bundle`-lé alakítva tudjuk az `Intent`be helyezni.
+Itt megadjuk, hogy melyik `View`-ból indul az animáció (`addButton`), és azt is, hogy milyen `transitionName`-mel kell dolgoznia a rendszernek (`"create"`). Az animációról szóló információt egy `Bundle`-lé alakítva tudjuk az `Intent`-be helyezni.
 
 Próbáljuk ki az alkalmazást!
 
@@ -391,7 +362,9 @@ Próbáljuk ki az alkalmazást!
 
 Nem a legjobb megoldás, hogy az alkalmazás második képernyője eredetileg dialógus stílusú. Töröljük a *Manifest*-ből és a stílusfájlokból a kapcsolódó stílusbejegyzést!
 
-Az `Activity` azonban még így sem tökéletes, hiszen ha nagyon hosszú leírást adunk neki, akkor a `Save` gomb kicsúszik a képernyőről és használhatatlan lesz. Rögzítsük tehát a gombot a képernyő aljára, a fölötte lévő tartalmat pedig tegyük görgethetővé!
+Próbáljuk ki az alkalmazást!
+
+Az `Activity` nem tökéletes, hiszen ha nagyon hosszú leírást adunk neki, akkor a `Save` gomb kicsúszik a képernyőről és használhatatlan lesz. Rögzítsük tehát a gombot a képernyő aljára, a fölötte lévő tartalmat pedig tegyük görgethetővé!
 
 Az `activity_create_place_to_visit.xml` gyökérelemét változtassuk `RelativeLayout`-ra, a benne lévő gombot pedig kössük az aljához:
 
@@ -399,7 +372,7 @@ Az `activity_create_place_to_visit.xml` gyökérelemét változtassuk `RelativeL
 android:layout_alignParentBottom="true"
 ```
 
-A többi elemet pedig ágyazzuk be egy függőleges `LinearLayout`ba, majd egy `ScrollView`-ba, amit kössünk felülre, és helyezzünk a gomb fölé:
+A többi elemet pedig ágyazzuk be egy függőleges `LinearLayout`-ba, majd egy `ScrollView`-ba, amit kössünk felülre, és helyezzünk a gomb fölé:
 
 ```xml
 <ScrollView
@@ -422,7 +395,7 @@ A többi elemet pedig ágyazzuk be egy függőleges `LinearLayout`ba, majd egy `
 
 ### Snackbar
 
-A `Toast` üzeneteknél már van egy sokkal szebb megoldás, ami a Material Designt követi: a [`Snackbar`](https://material.io/design/components/snackbars.html). Cseréljük le az alkalmazásban lévő `Toast` figyelmeztetéseket `Snackbar`ra!
+A `Toast` üzeneteknél már van egy sokkal szebb megoldás, ami a Material Designt követi: a [`Snackbar`](https://material.io/design/components/snackbars.html). Cseréljük le az alkalmazásban lévő `Toast` figyelmeztetéseket `Snackbar`-ra!
 
 Ehhez írjunk egy külön `showText()` függvényt a `PlacesListActivity`-ben, ami a paraméterül kapott szöveges erőforrást jeleníti meg, majd használjuk ezt: 
 
@@ -432,7 +405,7 @@ private fun showText(@StringRes textRes: Int) {
 }
 ```
 
-A `Snackbar.make` függvény első paramétere egy `View`. Ide az `Activity`-nkben lévő `CoordinatorLayout`ot adtuk meg. A függvény így hívható meg:
+A `Snackbar.make` függvény első paramétere egy `View`. Ide az `Activity`-nkben lévő `CoordinatorLayout`-ot adtuk meg. A függvény így hívható meg:
 
 ```kotlin
 showText(R.string.cancelled)
