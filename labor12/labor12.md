@@ -12,7 +12,7 @@ A Firebase manapság az egyik legnépszerűbb Backend as a Service megoldás And
 - analytics
 - crash reporting
 
-További általános információk a Firebase-ről: https://firebase.google.com/.
+További általános információk a Firebase-ről: [https://firebase.google.com/](https://firebase.google.com/).
 
 A laborfoglalkozás célja, hogy bemutassa a Firebase legfontosabb szolgáltatásait egy komplett alkalmazás megvalósítása keretében. A megvalósítandó alkalmazás egy fórum megoldás lesz, melyen keresztül a felhasználók szöveges üzeneteket tudnak megosztani egymással valós időben, melyekhez opcionálisan képek is csatolhatók.
 Az alkalmazás az alábbi fő funkciókat támogatja:
@@ -35,7 +35,9 @@ Első lépésként létre kell hozni egy Firebase projektet a Firebase admin fel
 - Jelentkezzünk be!
 - Hozzunk létre egy új projektet az *Add project* elemet választva!
 
-<img src="./assets/firebase_create_project.png" align="middle">
+<p align="center">
+<img src="./assets/firebase_create_project.png">
+</p>
 
 - A projekt neve legyen *BMEForumNEPTUN_KOD*, ahol a `NEPTUN_KOD` helyére a saját Neptun kódunkat helyettesítsük!
 - A megadott *Analytics location* legyen *Hungary*, és fogadjuk el a felhasználási feltételeket!
@@ -68,11 +70,15 @@ A háttérben valójában annyi történik, hogy az alkalmazásunk package neve 
 
 Ezt a lépéssorozatot manuálisan is végrehajthatjuk a Firebase console-on az *Add Firebase to your Android app*-et választva. A debug kulcs *SHA-1* lenyomata ilyenkor a jobb oldalon található Gradle fülön a *Gradle -> [projektnév] -> Tasks -> android -> signingReport* taskot futtatva kinyerhető alul az *execution/text* módot választva.
 
-<img src="./assets/android_studio_signingreport.png" width="1024" align="middle">
+<p align="center">
+<img src="./assets/android_studio_signingreport.png">
+</p>
 
 Következő lépésben szintén az *Assistant*-ban az *Email and password authentication* alatt válasszuk az *Add Firebase Authentication to your app* elemet, itt látható is, hogy milyen módosítások történnek a projekt és modul szintű `build.gradle` fájlokban.
 
-<img src="./assets/firebase_auth_connect.png" width="1024" align="middle">
+<p align="center">
+<img src="./assets/firebase_auth_connect.png">
+</p>
 
 Sajnos a Firebase plugin nincs rendszeresen frissítve, és így majdnem mindig a függőségek régi verzióját adja hozzá a `build.gradle` fájlokhoz. Ezért most frissíteni fogjuk az imént automatikusan felvett függőségeket, valamint innentől manuálisan fogjuk hozzáadni az újabbakat az *Assistant* használata helyett. Fontos, hogy mindenből az itt leírt verziót használjuk.
 
@@ -90,7 +96,9 @@ implementation 'com.google.firebase:firebase-auth:16.2.1'
 
 Ahhoz, hogy az e-mail alapú regisztráció és authentikáció megfelelően működjön, a *Firebase console*-ban az *Authentication -> Sign-in method* alatt az *Email/Password* providert engedélyezni kell.
 
-<img src="./assets/firebase_console_auth_method.png" width="1024" align="middle">
+<p align="center">
+<img src="./assets/firebase_console_auth_method.png">
+</p>
 
 Végezetül a Studioban vegyük még fel a modulhoz tartozó `build.gradle`-be az alábbi függőségeket; tekintsük át a laborvezetővel ezeket:
 
@@ -183,7 +191,9 @@ Első lépésként valósítsuk meg a regisztrációs/bejelentkező képernyő f
 
 Tekintsük át a felhasználói felület kódját! Figyeljük meg, hogy a jelszó mezőhöz tartozó `TextInputLayout`-nál az `app:passwordToggleEnabled="true"` beállítással a mező mellett megjelenik egy kis ikon, amely segítségével láthatóvá tehetjük az alkalmazásban a jelszót.
 
-<img src="./assets/bmeforum_login.png" width="512" align="middle">
+<p align="center">
+<img src="./assets/bmeforum_login.png" width="512">
+</p>
 
 Az alkalmazásban több olyan `Activity` is lesz, amik közös funkciókkal rendelkeznek, például `ProgressDialog` megjelenítése, felhasználói adatok lekérdezése. Ezeket a közös funkciókat kiszervezzük egy `BaseActivity` osztályba (ez csak egy absztrakt osztály, nem egy konkrét `Activity`, így nem kell az `AndroidManifest.xml`-ben regisztrálni):
 
@@ -347,7 +357,9 @@ A *Navigation Drawer Activity* sablont használva készítsük el az új `PostsA
 
 Próbáljuk ki az alkalmazás jelenlegi működését! Nézzük meg, hogy a *Firebase console*-on is látszik-e a regisztrált felhasználó!
 
-<img src="./assets/firebase_user.png" width="1024" align="middle">
+<p align="center">
+<img src="./assets/firebase_user.png">
+</p>
 
 ## Postok listázása
 
@@ -365,7 +377,9 @@ implementation 'com.android.support:support-v4:28.0.0'
 
 Kapcsoljuk be a *Realtime Database*-t a *Firebase console*-on is (figyeljünk rá, hogy ne a *Cloud Firestore*-t válasszuk, ez egy újabb, kicsit máshogy működő megoldás). Az adatbázist *test mode*-ban fogjuk használni, így egyelőre publikusan írható/olvasható lesz, de cserébe nem kell konfigurálnunk a hozzáférés-szabályozást. Ezt természetesen később mindenképp meg kellene tenni egy éles projektben.
 
-<img src="./assets/firebase_create_database.png" align="middle">
+<p align="center">
+<img src="./assets/firebase_create_database.png">
+</p>
 
 Változtassuk meg a *Navigation Drawer* menüjét, hogy csak egy *Logout* menüpont szerepeljen benne! Ezt a `res/menu/activity_posts_drawer.xml`-ben tehetjük meg:
 
@@ -450,7 +464,9 @@ A `PostsActivity` központi felülete a `content_posts.xml`-ben található, enn
 
 Próbáljuk ki a jelenlegi állapotot, ellenőrizzük a kijelentkezés funkció működését!
 
-<img src="./assets/bmeforum_navdrawer.png" width="512" align="middle">
+<p align="center">
+<img src="./assets/bmeforum_navdrawer.png" width="512">
+</p>
 
 A következő lépés a `Post` listázás megvalósítása. Ehhez először hozzunk létre egy `data` package-et és benne egy `Post` osztályt a következő tartalommal:
 
@@ -631,7 +647,9 @@ private fun initPostsListener() {
 
 Próbáljuk ki az alkalmazás működését! A lista jelenleg még üres lesz, hacsak nem veszünk fel a *Firebase console*-on elemeket, de fontos, hogy már hiba nélkül kell futnia az alkalmazásnak.
 
-<img src="./assets/bmeforum_emptylist.png" width="512" align="middle">
+<p align="center">
+<img src="./assets/bmeforum_emptylist.png" width="512">
+</p>
 
 ## Postok készítése
 
@@ -694,7 +712,9 @@ Hozzuk létre a `CreatePostActivity`-t az *Empty Activity* sablont használva, �
 </LinearLayout>
 ```
 
-<img src="./assets/bmeforum_createpost.png" width="512" align="middle">
+<p align="center">
+<img src="./assets/bmeforum_createpost.png" width="512">
+</p>
 
 A `CreatePostActivity` felületén lehetőség van új üzenet írására a cím, a szöveg és opcionálisan a kép megadásával. A kép megadásakor a beépített kamera alkalmazással van lehetőségünk képet készíteni, melynek módját egy korábbi laboron már áttekintettük (implicit `Intent` + `onActivityResult`).
 
@@ -806,9 +826,13 @@ fab.setOnClickListener {
 
 Vizsgálja meg az elkészült alkalmazást, az üzenetek létrehozását és az adatbázis épülését a *Firebase console*-on!
 
-<img src="./assets/bmeforum_postlist.png" width="512" align="middle">
+<p align="center">
+<img src="./assets/bmeforum_postlist.png" width="512">
+</p>
 
-<img src="./assets/firebase_data.png" width="1024" align="middle">
+<p align="center">
+<img src="./assets/firebase_data.png">
+</p>
 
 ## Push értesítések
 
@@ -820,11 +844,15 @@ implementation 'com.google.firebase:firebase-messaging:17.6.0'
 
 Csupán ennyi elegendő a push alapvető működéséhez, ha így újrafordítjuk az alkalmazást, a Firebase felületéről vagy API-jával küldött push üzeneteket automatikusan megkapják a mobil kliensek és egy *Notification*-ben megjelenítik.
 
-<img src="./assets/firebase_push.png" width="1024" align="middle">
+<p align="center">
+<img src="./assets/firebase_push.png">
+</p>
 
 Próbáljuk ki a push küldést a *Firebase console*-ról (*Cloud messaging menüpont* alatt *Send your first message*), és vizsgáljuk meg, hogyan érkezik meg telefonra, **ha nem fut az alkalmazás**. (Amikor fut az alkalmazás, akkor tőlünk várja az üzenet lekezelését az API.)
 
-<img src="./assets/bmeforum_push.png" width="512" align="middle">
+<p align="center">
+<img src="./assets/bmeforum_push.png" width="512">
+</p>
 
 Természetesen lehetőség van saját push üzenet feldolgozó szolgáltatás készítésére is egy `FirebaseMessagingService` létrehozásával, melyről további részletek [itt olvashatók](https://firebase.google.com/docs/cloud-messaging/android/receive).  
 
@@ -863,7 +891,9 @@ Végül pedig szükségünk van egy egyszerű Gradle függőségre is, amit a me
 implementation 'com.crashlytics.sdk.android:crashlytics:2.9.9'
 ```
 
-<img src="./assets/firebase_crash.png" width="1024" align="middle">
+<p align="center">
+<img src="./assets/firebase_crash.png">
+</p>
 
 Vegyünk fel egy új menüpontot az `activity_post_drawer.xml` fájlban definiált menübe, amellyel hibaüzenetet fogunk küldeni:
 
@@ -923,7 +953,9 @@ R.id.nav_analytics -> {
 
 Fontos kiemelni, hogy nem garantált, hogy az analitika valós időben látszik a *Firebase console*-on. 30 percig vagy tovább is tarthat, mire egy-egy esemény itt megjelenik.
 
-<img src="./assets/firebase_analytics.png" width="1024" align="middle">
+<p align="center">
+<img src="./assets/firebase_analytics.png">
+</p>
 
 ## Bónusz feladatok
 1. Sikeres regisztráció után automatikusan jelentkezzen is be a felhasználó.
