@@ -30,8 +30,8 @@ Az alábbi kódrészlet a felhasználó naptárához való hozzáférési enged�
 ```kotlin
 val permissionResult = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_CALENDAR)
 when (permissionResult) {
-	PackageManager.PERMISSION_GRANTED -> writeToCalendar(event)
-	else -> requestPermissions()
+    PackageManager.PERMISSION_GRANTED -> writeToCalendar(event)
+    else -> requestPermissions()
 }
 ```
 
@@ -56,11 +56,11 @@ Ha egy jogosultságot a felhasználó egyszer elutasított, az `ActivityCompat.s
 // Permission is not granted
 // Should we show an explanation?
 if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_CONTACTS)) {
-	// Show an explanation to the user *asynchronously* -- don't block
-	// this thread waiting for the user's response! After the user
-	// sees the explanation, try again to request the permission.
+    // Show an explanation to the user *asynchronously* -- don't block
+    // this thread waiting for the user's response! After the user
+    // sees the explanation, try again to request the permission.
 } else {
-	// No explanation needed, we can request the permission.
+    // No explanation needed, we can request the permission.
 }
 ```
 
@@ -70,17 +70,15 @@ if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permissio
 
 A labor során egy egyszerű telefonkönyv alkalmazást fogunk elkészíteni. Az alkalmazás meg fogja jeleníteni a telefonon tárolt névjegyeket, illetve egy névjegyre kattintással hívást kezdeményez az ahhoz tartozó elsődleges telefonszámra.
 
-Hozzunk létre egy új projektet Android Studio-ban `Contacts` néven. A *Company domain* mező tartalmát töröljük ki és hagyjuk is üresen.
+Hozzunk létre egy új projektet Android Studio-ban! Válasszuk az  *Empty Activity*-t, az alkalmazás neve legyen `Contacts`, a package név `hu.bme.aut.android.contacts`. A minimum SDK szint legyen *API 19: Android 4.4 (KitKat)*.
 
-A package név legyen `hu.bme.aut.android.contacts`. A támogatott eszköz formátum legyen *Phone and Tablet*, a minimum SDK szint legyen *API 19: Android 4.4 (KitKat)*.
-
-A projekthez kezdésnek válasszunk egy *Empty Activity*-t, melynek neve legyen `ContactsActivity`.
+A létrejött Activity-t nevezzük át (<kbd>Shift+F6</kbd>) `ContactsActivity`-re, valamint a felület leíróját is `activity_contacts`-ra.
 
 Miután létrejött a projekt, vegyük fel a `RecyclerView` könyvtárat függőségként a modul szintű `build.gradle` fájlban:
 
 ```groovy
 dependencies {
-	implementation 'com.android.support:recyclerview-v7:28.0.0'
+    implementation 'com.android.support:recyclerview-v7:28.0.0'
 }
 ```
 
@@ -95,21 +93,21 @@ Készítsük el az alkalmazás felhasználói felületét a `res/layout/activity
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	xmlns:tools="http://schemas.android.com/tools"
-	android:id="@+id/activity_contacts"
-	android:layout_width="match_parent"
-	android:layout_height="match_parent"
-	android:paddingBottom="@dimen/activity_vertical_margin"
-	android:paddingLeft="@dimen/activity_horizontal_margin"
-	android:paddingRight="@dimen/activity_horizontal_margin"
-	android:paddingTop="@dimen/activity_vertical_margin"
-	tools:context=".ContactsActivity">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_contacts"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    tools:context=".ContactsActivity">
 
-	<android.support.v7.widget.RecyclerView
-		android:id="@+id/rvContacts"
-		android:layout_width="match_parent"
-		android:layout_height="match_parent" />
-	
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rvContacts"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
 </FrameLayout>
 ```
 
@@ -121,8 +119,8 @@ Hozzunk létre egy `model` package-et és benne a `Contact` osztályt, ami egy e
 
 ```kotlin
 class Contact(
-	val name: String,
-	val number: String
+    val name: String,
+    val number: String
 )
 ```
 
@@ -133,50 +131,50 @@ Hozzuk létre az `item_contact.xml` layout erőforrást:
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	android:id="@+id/container"
-	android:layout_width="match_parent"
-	android:layout_height="wrap_content"
-	android:orientation="horizontal"
-	android:background="#dddddd">
+    android:id="@+id/container"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:background="#dddddd">
 
-	<LinearLayout
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-		<ImageView
-			android:id="@+id/ivContactImage"
-			android:layout_width="55dp"
-			android:layout_height="55dp"
-			android:layout_marginStart="10dp"
-			android:src="@drawable/ic_contact_phone_black_48dp"/>
+        <ImageView
+            android:id="@+id/ivContactImage"
+            android:layout_width="55dp"
+            android:layout_height="55dp"
+            android:layout_marginStart="10dp"
+            android:src="@drawable/ic_contact_phone_black_48dp"/>
 
-		<LinearLayout
-			android:layout_width="match_parent"
-			android:layout_height="match_parent"
-			android:orientation="vertical"
-			android:gravity="center_vertical">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center_vertical">
 
-			<TextView
-				android:id="@+id/tvContactName"
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:layout_marginStart="10dp"
-				android:textSize="16sp"
-				android:textColor="@android:color/primary_text_light"
-				android:text="@string/contact_name_placeholder"/>
+            <TextView
+                android:id="@+id/tvContactName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:textSize="16sp"
+                android:textColor="@android:color/primary_text_light"
+                android:text="@string/contact_name_placeholder"/>
 
-			<TextView
-				android:id="@+id/tvPhoneNumber"
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:layout_marginStart="10dp"
-				android:textSize="14sp"
-				android:textColor="@android:color/primary_text_light"
-				android:text="@string/contact_number_placeholder"/>
+            <TextView
+                android:id="@+id/tvPhoneNumber"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:textSize="14sp"
+                android:textColor="@android:color/primary_text_light"
+                android:text="@string/contact_number_placeholder"/>
 
-		</LinearLayout>
+        </LinearLayout>
 
-	</LinearLayout>
+    </LinearLayout>
 
 </RelativeLayout>
 ```
@@ -248,58 +246,58 @@ Adjuk hozzá a `ContactsActivity`-hez az alábbi, névjegyek lekérdezését meg
 
 ```kotlin
 private fun ContentResolver.performQuery(
-		@RequiresPermission.Read uri: Uri,
-		projection: Array<String>? = null,
-		selection: String? = null,
-		selectionArgs: Array<String>? = null,
-		sortOrder: String? = null
+        @RequiresPermission.Read uri: Uri,
+        projection: Array<String>? = null,
+        selection: String? = null,
+        selectionArgs: Array<String>? = null,
+        sortOrder: String? = null
 ): Cursor? {
-	return query(uri, projection, selection, selectionArgs, sortOrder)
+    return query(uri, projection, selection, selectionArgs, sortOrder)
 }
 
 private fun getAllContacts(): List<Contact> {
-	contentResolver.performQuery(
-			uri = ContactsContract.Contacts.CONTENT_URI,
-			sortOrder = "${ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME} ASC"
-	).use { contactResultCursor ->
-		return if (contactResultCursor == null) {
-			emptyList()
-		} else {
-			getContacts(contactResultCursor)
-		}
-	}
+    contentResolver.performQuery(
+            uri = ContactsContract.Contacts.CONTENT_URI,
+            sortOrder = "${ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME} ASC"
+    ).use { contactResultCursor ->
+        return if (contactResultCursor == null) {
+            emptyList()
+        } else {
+            getContacts(contactResultCursor)
+        }
+    }
 }
 
 private fun getContacts(contactCursor: Cursor): List<Contact> {
-	val contactList = mutableListOf<Contact>()
+    val contactList = mutableListOf<Contact>()
 
-	while (contactCursor.moveToNext()) {
-		val hasPhoneNumber = contactCursor.getString(contactCursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER)).toInt()
-		if (hasPhoneNumber != 0) {
-			val id = contactCursor.getString(ContactsContract.Contacts._ID)
-			val name = contactCursor.getString(ContactsContract.Contacts.DISPLAY_NAME)
+    while (contactCursor.moveToNext()) {
+        val hasPhoneNumber = contactCursor.getString(contactCursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER)).toInt()
+        if (hasPhoneNumber != 0) {
+            val id = contactCursor.getString(ContactsContract.Contacts._ID)
+            val name = contactCursor.getString(ContactsContract.Contacts.DISPLAY_NAME)
 
-			val contactPhoneNumber = getContactPhoneNumber(id)
+            val contactPhoneNumber = getContactPhoneNumber(id)
 
-			contactList += Contact(name, contactPhoneNumber)
-		}
-	}
+            contactList += Contact(name, contactPhoneNumber)
+        }
+    }
 
-	return contactList
+    return contactList
 }
 
 private fun getContactPhoneNumber(id: String): String {
-	contentResolver.performQuery(
-			uri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-			selection = "${ContactsContract.CommonDataKinds.Phone.CONTACT_ID} = ?",
-			selectionArgs = arrayOf(id)
-	).use { phoneResultCursor ->
-		return if (phoneResultCursor == null || !phoneResultCursor.moveToNext()) {
-			""
-		} else {
-			phoneResultCursor.getString(ContactsContract.CommonDataKinds.Phone.NUMBER)
-		}
-	}
+    contentResolver.performQuery(
+            uri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+            selection = "${ContactsContract.CommonDataKinds.Phone.CONTACT_ID} = ?",
+            selectionArgs = arrayOf(id)
+    ).use { phoneResultCursor ->
+        return if (phoneResultCursor == null || !phoneResultCursor.moveToNext()) {
+            ""
+        } else {
+            phoneResultCursor.getString(ContactsContract.CommonDataKinds.Phone.NUMBER)
+        }
+    }
 }
 ```
 
@@ -310,7 +308,7 @@ Ebben az alábbi részleteket érdemes megfigyelni:
 
 ```groovy
 dependencies {
-	implementation 'androidx.core:core-ktx:0.3'
+    implementation 'androidx.core:core-ktx:0.3'
 }
 ```
 
@@ -320,13 +318,13 @@ A `ContactsActivity` `onCreate` függvényében írjuk meg a `RecyclerView` inic
 
 ```kotlin
 override fun onCreate(savedInstanceState: Bundle?) {
-	super.onCreate(savedInstanceState)
-	setContentView(R.layout.activity_contacts)
+    super.onCreate(savedInstanceState)
+    setContentView(R.layout.activity_contacts)
 
-	val contactsAdapter = ContactsAdapter()
-	rvContacts.layoutManager = LinearLayoutManager(this)
-	rvContacts.adapter = contactsAdapter
-	contactsAdapter.setContacts(getAllContacts())
+    val contactsAdapter = ContactsAdapter()
+    rvContacts.layoutManager = LinearLayoutManager(this)
+    rvContacts.adapter = contactsAdapter
+    contactsAdapter.setContacts(getAllContacts())
 }
 ```
 
@@ -368,14 +366,14 @@ rvContacts.adapter = contactsAdapter
 contactsAdapter.setContacts(getAllContacts())
 ```
 
-Ezt Android Studio-ban legegyszerűbben a kiemelni kívánt kód kijelölésével, majd a *CTRL+ALT+M* billentyűkombinációval tudjuk megtenni. Ezzel a következő függvény kapjuk:
+Ezt Android Studio-ban legegyszerűbben a kiemelni kívánt kód kijelölésével, majd a <kbd>Ctrl+Alt+M</kbd> billentyűkombinációval tudjuk megtenni. Ezzel a következő függvény kapjuk:
 
 ```kotlin
 private fun loadContacts() {
-	val contactsAdapter = ContactsAdapter()
-	rvContacts.layoutManager = LinearLayoutManager(this)
-	rvContacts.adapter = contactsAdapter
-	contactsAdapter.setContacts(getAllContacts())
+    val contactsAdapter = ContactsAdapter()
+    rvContacts.layoutManager = LinearLayoutManager(this)
+    rvContacts.adapter = contactsAdapter
+    contactsAdapter.setContacts(getAllContacts())
 }
 ```
 
@@ -383,10 +381,10 @@ A kiemelés után az `onCreate` függvény:
 
 ```kotlin
 override fun onCreate(savedInstanceState: Bundle?) {
-	super.onCreate(savedInstanceState)
-	setContentView(R.layout.activity_contacts)
+    super.onCreate(savedInstanceState)
+    setContentView(R.layout.activity_contacts)
 
-	loadContacts()
+    loadContacts()
 }
 ```
 
@@ -455,7 +453,7 @@ A `ContactsActivity`-ben hozzuk létre a `PERMISSIONS_REQUEST_READ_CONTACTS` kon
 
 ```kotlin
 companion object {
-	private const val PERMISSIONS_REQUEST_READ_CONTACTS = 100
+    private const val PERMISSIONS_REQUEST_READ_CONTACTS = 100
 }
 ```
 
@@ -477,10 +475,10 @@ Cseréljük le a `ContactsActivity` `onCreate` függvényében a `loadContacts` 
 
 ```kotlin
 override fun onCreate(savedInstanceState: Bundle?) {
-	super.onCreate(savedInstanceState)
-	setContentView(R.layout.activity_contacts)
+    super.onCreate(savedInstanceState)
+    setContentView(R.layout.activity_contacts)
 
-	handleReadContactsPermission()
+    handleReadContactsPermission()
 }
 ```
 
@@ -488,20 +486,20 @@ Kezeljük le az engedélykérés válaszát is úgy, hogy felülírjuk a `Contac
 
 ```kotlin
 override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
-	when (requestCode) {
-		PERMISSIONS_REQUEST_READ_CONTACTS -> {
-			// If request is cancelled, the result arrays are empty.
-			if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-				// permission was granted, yay! Do the
-				// contacts-related task you need to do.
-				loadContacts()
-			} else {
-				// permission denied! Disable the
-				// functionality that depends on this permission.
-			}
-			return
-		}
-	}
+    when (requestCode) {
+        PERMISSIONS_REQUEST_READ_CONTACTS -> {
+            // If request is cancelled, the result arrays are empty.
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // permission was granted, yay! Do the
+                // contacts-related task you need to do.
+                loadContacts()
+            } else {
+                // permission denied! Disable the
+                // functionality that depends on this permission.
+            }
+            return
+        }
+    }
 }
 ```
 
@@ -523,11 +521,11 @@ Módosítsuk úgy a `ContactsActivity`-t, hogy implementálja a `ContactsAdapter
 
 ```kotlin
 class ContactsActivity : AppCompatActivity(), ContactsAdapter.ContactItemClickListener {
-	...
-	override fun onItemClick(contact: Contact) {
-		handleCallPermission(contact.number)
-	}
-	...
+    ...
+    override fun onItemClick(contact: Contact) {
+        handleCallPermission(contact.number)
+    }
+    ...
 }
 ```
 
@@ -543,48 +541,48 @@ Adjuk hozzá az alábbi propertyt és függvényeket a `ContactsActivity` osztá
 private var lastPhoneNumber: String? = null
 
 private fun handleCallPermission(phoneNumber: String) {
-	lastPhoneNumber = phoneNumber
-	if (ActivityCompat.checkSelfPermission(this,
-					Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
-		// Should we show an explanation?
-		if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CALL_PHONE)) {
-			// Show an explanation to the user *asynchronously* -- don't block
-			// this thread waiting for the user's response! After the user
-			// sees the explanation, try again to request the permission.
+    lastPhoneNumber = phoneNumber
+    if (ActivityCompat.checkSelfPermission(this,
+                    Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+        // Should we show an explanation?
+        if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CALL_PHONE)) {
+            // Show an explanation to the user *asynchronously* -- don't block
+            // this thread waiting for the user's response! After the user
+            // sees the explanation, try again to request the permission.
 
-			showRationaleDialog(
-					explanation = R.string.call_permission_explanation,
-					onPositiveButton = this::requestCallPermission
-			)
+            showRationaleDialog(
+                    explanation = R.string.call_permission_explanation,
+                    onPositiveButton = this::requestCallPermission
+            )
 
-		} else {
-			// No explanation needed, we can request the permission.
-			requestCallPermission()
-		}
-	} else {
-		callPhoneNumber(phoneNumber)
-	}
+        } else {
+            // No explanation needed, we can request the permission.
+            requestCallPermission()
+        }
+    } else {
+        callPhoneNumber(phoneNumber)
+    }
 }
 
 private fun requestCallPermission() {
-	ActivityCompat.requestPermissions(
-			this,
-			arrayOf(CALL_PHONE),
-			PERMISSIONS_REQUEST_PHONE_CALL
-	)
+    ActivityCompat.requestPermissions(
+            this,
+            arrayOf(CALL_PHONE),
+            PERMISSIONS_REQUEST_PHONE_CALL
+    )
 }
 
 @SuppressLint("MissingPermission")
 private fun callPhoneNumber(phoneNumber: String) {
-	val callIntent = Intent(Intent.ACTION_CALL)
-	callIntent.data = Uri.parse("tel:$phoneNumber")
-	startActivity(callIntent)
+    val callIntent = Intent(Intent.ACTION_CALL)
+    callIntent.data = Uri.parse("tel:$phoneNumber")
+    startActivity(callIntent)
 }
 
 private fun callLastPhoneNumber() {
-	lastPhoneNumber?.let { phoneNumber ->
-		callPhoneNumber(phoneNumber)
-	}
+    lastPhoneNumber?.let { phoneNumber ->
+        callPhoneNumber(phoneNumber)
+    }
 }
 ```
 
@@ -598,8 +596,8 @@ A `callPhoneNumber` függvény fogja indítani a hívást, a `handleCallPermissi
 
 ```kotlin
 companion object {
-	private const val PERMISSIONS_REQUEST_READ_CONTACTS = 100
-	private const val PERMISSIONS_REQUEST_PHONE_CALL = 101
+    private const val PERMISSIONS_REQUEST_READ_CONTACTS = 100
+    private const val PERMISSIONS_REQUEST_PHONE_CALL = 101
 }
 ```
 
@@ -607,25 +605,25 @@ Az engedélykérés eredményét ebben az esetben is a `ContactsActivity` fogja 
 
 ```kotlin
 override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
-	when (requestCode) {
-		PERMISSIONS_REQUEST_READ_CONTACTS -> {
-			// If request is cancelled, the result arrays are empty.
-			if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-				// Permission was granted! Do the contacts-related task you need to do.
-				loadContacts()
-			} else {
-				// Permission denied! Disable the functionality that depends on this permission.
-				// In this example, this block is intentionally empty and serves only as a demonstration for
-				// what can be done here.
-			}
-			return
-		}
-		PERMISSIONS_REQUEST_PHONE_CALL -> {
-			if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-				callLastPhoneNumber()
-			}
-		}
-	}
+    when (requestCode) {
+        PERMISSIONS_REQUEST_READ_CONTACTS -> {
+            // If request is cancelled, the result arrays are empty.
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission was granted! Do the contacts-related task you need to do.
+                loadContacts()
+            } else {
+                // Permission denied! Disable the functionality that depends on this permission.
+                // In this example, this block is intentionally empty and serves only as a demonstration for
+                // what can be done here.
+            }
+            return
+        }
+        PERMISSIONS_REQUEST_PHONE_CALL -> {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                callLastPhoneNumber()
+            }
+        }
+    }
 }
 ```
 
