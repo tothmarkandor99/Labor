@@ -31,11 +31,11 @@ A labor során nagyobb kódrészek kerülnek megírásra, ami miatt elnézést k
 ## Projekt előkészítése, konfiguráció
 
 Első lépésként létre kell hozni egy Firebase projektet a Firebase admin felületén (Firebase console), majd egy Android Studio projektet és a kettőt össze kell kötni:
-- Navigáljunk a Firebase console felületére: https://console.firebase.google.com/ !
+- Navigáljunk a Firebase console felületére: [https://console.firebase.google.com/](https://console.firebase.google.com/) !
 - Jelentkezzünk be!
 - Hozzunk létre egy új projektet az *Add project* elemet választva!
 
-<img src="./assets/firebase_create_project.png" width="1024" align="middle">
+<img src="./assets/firebase_create_project.png" align="middle">
 
 - A projekt neve legyen *BMEForumNEPTUN_KOD*, ahol a `NEPTUN_KOD` helyére a saját Neptun kódunkat helyettesítsük!
 - A megadott *Analytics location* legyen *Hungary*, és fogadjuk el a felhasználási feltételeket!
@@ -62,7 +62,7 @@ A projekt létrehozása után válasszuk Android Studioban a *Tools -> Firebase*
 A *Firebase Assistant* akkor fogja megtalálni a Firebase console-on létrehozott projektet, ha Android Studioba is ugyanazzal a Google accounttal vagyunk bejelentkezve, mint amivel a console-on létrehoztuk a projektet. Ellenőrizzük ezt mindkét helyen! Amennyiben a *Firebase Assistant*-ot nem sikerül beüzemelni, manuálisan is összeköthető a két projekt. A leírásban ismertetni fogjuk a lépéseket, amelyeket az *Assistant* végez el.
 
 Válasszuk az *Assistant*-ban az *Authentication* szakaszt és azon belül az *Email and password authentication*-t, majd a *Connect to Firebase* gombot.
-Ezt követően egy weboldal nyílik meg, ahol ha megfelelőek az accountok, a második szakaszt (*Choose an existing Firebase or Google project*) választva kiválaszthatjuk a projektet, amit a Firebase console-on már létrehoztunk. Itt egyébként lehetőség van új projektet is létrehozni. Ha elsőre hibát látunk a projekttel való összekapcsolásnál, próbáljuk újra, másodszorra általában sikeresen megtörténik az Android Studio projekt szinkronizálása a Firebase projekttel.
+Ezt követően egy weboldal nyílik meg, ahol ha megfelelőek az accountok, a második szakaszt (*Choose an existing Firebase or Google project*) választva kiválaszthatjuk a projektet, amit a Firebase console-on már létrehoztunk. Itt egyébként lehetőség van új projektet is létrehozni. (Ha elsőre hibát látunk a projekttel való összekapcsolásnál, próbáljuk újra, másodszorra általában sikeresen megtörténik az Android Studio projekt szinkronizálása a Firebase projekttel.)
 
 A háttérben valójában annyi történik, hogy az alkalmazásunk package neve és az aláíró kulcs *SHA-1 hash-e* alapján hozzáadódik egy Android alkalmazás a Firebase console-on lévő projektünkhöz, és az ahhoz tartozó konfigurációs (`google-services.json`) fájl letöltődik a projektünk könyvtárába az alapértelmezett (`app`) modul alá.
 
@@ -85,7 +85,7 @@ classpath 'com.google.gms:google-services:4.2.0'
 Valamint a modul szintű `build.gradle`-ben a `firebase-auth` verziót a következőre:
 
 ```groovy
-implementation 'com.google.firebase:firebase-auth:16.2.0'
+implementation 'com.google.firebase:firebase-auth:16.2.1'
 ```
 
 Ahhoz, hogy az e-mail alapú regisztráció és authentikáció megfelelően működjön, a *Firebase console*-ban az *Authentication -> Sign-in method* alatt az *Email/Password* providert engedélyezni kell.
@@ -97,7 +97,7 @@ Végezetül a Studioban vegyük még fel a modulhoz tartozó `build.gradle`-be a
 ```groovy
 implementation 'com.android.support:design:28.0.0'
 implementation 'com.flaviofaria:kenburnsview:1.0.7'
-implementation 'com.github.bumptech.glide:glide:4.7.1'
+implementation 'com.github.bumptech.glide:glide:4.8.0'
 ```
 
 ## Regisztráció, bejelentkezés
@@ -363,9 +363,9 @@ implementation 'com.android.support:support-media-compat:28.0.0'
 implementation 'com.android.support:support-v4:28.0.0'
 ```
 
-Kapcsoljuk be a *Realtime Database*-t a *Firebase console*-on is (figyeljünk rá, hogy ne a *Cloud Firestore*-t válasszuk, ez egy újabb, még bétában lévő adatbázis megoldás). Az adatbázist *test mode*-ban fogjuk használni, így egyelőre publikusan írható/olvasható lesz, de cserébe nem kell konfigurálnunk a hozzáférés-szabályozást. Ezt természetesen később mindenképp meg kellene tenni egy éles projektben.
+Kapcsoljuk be a *Realtime Database*-t a *Firebase console*-on is (figyeljünk rá, hogy ne a *Cloud Firestore*-t válasszuk, ez egy újabb, kicsit máshogy működő megoldás). Az adatbázist *test mode*-ban fogjuk használni, így egyelőre publikusan írható/olvasható lesz, de cserébe nem kell konfigurálnunk a hozzáférés-szabályozást. Ezt természetesen később mindenképp meg kellene tenni egy éles projektben.
 
-<img src="./assets/firebase_create_database.png" width="1024" align="middle">
+<img src="./assets/firebase_create_database.png" align="middle">
 
 Változtassuk meg a *Navigation Drawer* menüjét, hogy csak egy *Logout* menüpont szerepeljen benne! Ezt a `res/menu/activity_posts_drawer.xml`-ben tehetjük meg:
 
@@ -578,6 +578,8 @@ class PostsAdapter(private val context: Context) : RecyclerView.Adapter<PostsAda
 
 }
 ```
+
+Az elérhető `AnimationUtils` osztályokból importáljuk a `android.view.animation.AnimationUtils` osztályt. 
 
 A `RecyclerView` adapterrel való összekötését a `PostsActivity`-ben valósítjuk meg. Vegyünk fel egy tagváltozót az osztályba az adapter számára:
 
@@ -813,10 +815,10 @@ Vizsgálja meg az elkészült alkalmazást, az üzenetek létrehozását és az 
 Adjuk hozzá a projektünkhöz a `firebase-messaging` függőséget:
 
 ```groovy
-implementation 'com.google.firebase:firebase-messaging:17.4.0'
+implementation 'com.google.firebase:firebase-messaging:17.6.0'
 ```
 
-Csupán ennyi elegendő a push alap működéséhez, innentől fogva ha újrafordítjuk az alkalmazást, a Firebase felületéről vagy API-jával küldött push üzeneteket automatikusan megkapják a mobil kliensek és egy *Notification*-ben megjelenítik.
+Csupán ennyi elegendő a push alapvető működéséhez, ha így újrafordítjuk az alkalmazást, a Firebase felületéről vagy API-jával küldött push üzeneteket automatikusan megkapják a mobil kliensek és egy *Notification*-ben megjelenítik.
 
 <img src="./assets/firebase_push.png" width="1024" align="middle">
 
@@ -824,28 +826,27 @@ Próbáljuk ki a push küldést a *Firebase console*-ról (*Cloud messaging men�
 
 <img src="./assets/bmeforum_push.png" width="512" align="middle">
 
-Természetesen lehetőség van saját push üzenet feldolgozó szolgáltatás készítésére is egy `FirebaseMessagingService` létrehozásával, melyről további részletek itt olvashatók: https://firebase.google.com/docs/cloud-messaging/android/receive 
+Természetesen lehetőség van saját push üzenet feldolgozó szolgáltatás készítésére is egy `FirebaseMessagingService` létrehozásával, melyről további részletek [itt olvashatók](https://firebase.google.com/docs/cloud-messaging/android/receive).  
 
 ## Crashlytics
 
-A Firebase 2018 szeptemberétől az egyébként a [Fabric](https://get.fabric.io/)-hez tartozó Crashlytics szolgáltatást nyújtja a régi *Firebase crash reporting* helyett. 
+A Firebase 2018 szeptemberétől a régebben a [Fabric](https://get.fabric.io/)-hez tartozó Crashlytics szolgáltatást nyújtja a *Firebase crash reporting* helyett. 
 
 Ennek beüzemeléséhez több változtatásra lesz szükség az alkalmazásban, mint az eddigi függőségek felvételnél. A projekt szintű `build.gradle` fájlban fel kell vennünk egy buildscript repository-t, illetve egy függőséget, amely ebből a repository-ból kerül majd letöltésre. Ezek egysoros változtatások, de az egyszerűség kedvéért itt a teljes `buildscript` blokk ezek hozzáadása után:
  
 ```groovy
 buildscript {
-    ext.kotlin_version = '1.3.21'
+    ext.kotlin_version = '1.3.20'
     repositories {
         google()
         jcenter()
         maven { url 'https://maven.fabric.io/public' }
-        
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.3.2'
+        classpath 'com.android.tools.build:gradle:3.3.0'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath 'com.google.gms:google-services:4.2.0'
-        classpath 'io.fabric.tools:gradle:1.25.4'
+        classpath 'io.fabric.tools:gradle:1.27.1'
     }
 }
 ```
