@@ -32,7 +32,7 @@ A Material Design teljes útmutatója a [material.io/design](https://material.io
 
 * Tartsunk megfelelő távolságokat az elemek között, különösen ügyelve az interaktív elemekre. Lesz olyan, akinek nálunk nagyobb az ujjbegye, gondoljunk rá is! A tartalom ne kezdődjön a képernyő 0. pixelénél! Az [layout ajánlásokban](https://material.io/design/layout/spacing-methods.html) elég részletesen taglalják a számokat: az új guideline szerint minden elem egy 8dp-s rácsban helyezkedik el. Ez alól kivételek a szövegek (amiknek alapvonala igazodik 4dp-hez) és a toolbar ikonjai (szintén 4dp). Tehát alapvetően mindennek a mérete vagy a távolsága n x 8dp. A kijelző szélétől tartandó margó például 16dp, az érinthető területek minimum mérete 48 x 48dp, a köztük tartandó távolság pedig minimum 8dp, de inkább több.
 
-* A képi elemek legyen inkább személyesek. Ne használjunk pár élettelen mosolyú modell arcát mutató stock fotókat, a képnek legyen köze a tartalomhoz. A személyes (felhasználó készítette) képek még jobbak. A képek töltsék ki a teret, amennyire csak lehet! Ez azt jelenti, hogy szélességben a teljes kijelzőt fedje, magasságban pedig lehetőleg valamilyen jellegzetes arány vonalát kövesse. Van [néhány ajánlás](https://material.io/design/communication/imagery.html) ezekre az arányokra – mármint arra hogy bizonyos képarányú elemek magassága hol helyezkedik el.
+* A képi elemek legyenek inkább személyesek. Ne használjunk pár élettelen mosolyú modell arcát mutató stock fotókat, a képnek legyen köze a tartalomhoz. A személyes (felhasználó készítette) képek még jobbak. A képek töltsék ki a teret, amennyire csak lehet! Ez azt jelenti, hogy szélességben a teljes kijelzőt fedje, magasságban pedig lehetőleg valamilyen jellegzetes arány vonalát kövesse. Van [néhány ajánlás](https://material.io/design/communication/imagery.html) ezekre az arányokra – mármint arra hogy bizonyos képarányú elemek magassága hol helyezkedik el.
 
 ## Hasznos fejlesztői eszközök
 
@@ -119,7 +119,7 @@ Ennek az alkalmazásnak az a feladata, hogy meglátogatandó helyeket gyűjtsün
 
 ### Menü
 
-Új elemet az options menü megnyomásával lehet létrehozni, amely menüben más elem nincs is. Ez a menü tipikusan nem ilyen feladatokra szolgál, ezt inkább *Floating Action Button*-nel szokás megoldani. Ezért először is töröljük a menüt a nyitóképernyőről: távolítsuk el az `Activity` meglévő `onCreateOptionsMenu` és `onOptionsItemSelected` metódusait, illetve a használt `menu_places_list.xml` erőforrást. 
+Új elemet az options menü megnyomásával lehet létrehozni, amely menüben más elem nincs is. Ez a menü tipikusan nem ilyen feladatokra szolgál, ezt inkább *Floating Action Button*-nel szokás megoldani. Ezért először is töröljük a menüt a nyitóképernyőről: távolítsuk el a `PlacesListActivity` meglévő `onCreateOptionsMenu` és `onOptionsItemSelected` metódusait, illetve a használt `menu_places_list.xml` erőforrást. 
 
 Ezután hozzunk létre egy *Floating Action Button*-t, az `activity_places_list.xml`-ben az `include` után:
 
@@ -154,15 +154,15 @@ app:srcCompat="@drawable/ic_add_white_24dp"
 
 ### A lista fejléce
 
-Jelenleg a `Toolbar`-on megjelenik az `Activity` neve, ami *PlacesToVisit*, alatta pedig egy `TextView`-ban pedig a *Places to visit* felirat. Ezek közül az egyik felesleges, és szebb, ha a jobban olvasható *Places to visit*-et hagyjuk meg. Azonban egy üres `Toolbar`-nak nincs sok értelme, ezért inkább rakjuk fel ezt a szöveget oda, és távolítsuk el a `TextView`-t.
+Jelenleg a `Toolbar`on megjelenik az `Activity` neve, ami *PlacesToVisit*, alatta pedig egy `TextView`-ban a *Places to visit* felirat. Ezek közül az egyik felesleges, és szebb, ha a jobban olvasható *Places to visit*-et hagyjuk meg. Azonban egy üres `Toolbar`nak nincs sok értelme, ezért inkább rakjuk fel ezt a szöveget oda, és távolítsuk el a `TextView`-t.
 
-Ehhez először is az `activity_places_list.xml`-ben a `Toolbar` tagen belül vegyük fel az `app:title` attribútumot, és vegyük fel a szükséges string erőforrást a `Places to visit` értékkel.
+Ehhez először is az `activity_places_list.xml`-ben a `Toolbar` tagen belül vegyük fel az `app:title` attribútumot:
 
 ```xml
 app:title="@string/places_to_visit"
 ```
 
-Majd töröljük a `content_places_list.xml`-ből az ott lévő `TextView`-t, a `RecyclerView`-t pedig igazítsuk a szülője tetejéhez, az alábbi módon:
+Majd töröljük a `content_places_list.xml`-ből az ott lévő `TextView`-t (illetve a rá való hivatkozást a `RecyclerView`-ból), a `RecyclerView`-t pedig igazítsuk a szülője tetejéhez, az alábbi módon:
 
 ```xml
 android:layout_alignParentTop="true"
@@ -220,7 +220,7 @@ Az üres nézet szöveges erőforrása legyen például:
 <string name="add_places_to_visit">Add places to visit</string>
 ```
 
-Figyeljük meg a `FrameLayout`-ot, ami egyszerűen egymás tetejére teszi a benne lévő `View`-kat! Ez ebben az esetben nem lesz probléma, mivel mindig csak az egyik gyermeke lesz látható. Ehhez meg kell oldanunk, hogy üres `RecyclerView` esetén csak a `TextView` jelenjen meg (és fordítva):
+Figyeljük meg a `FrameLayout`ot, ami egyszerűen egymás tetejére teszi a benne lévő `View`-kat! Ez ebben az esetben nem lesz probléma, mivel mindig csak az egyik gyermeke lesz látható. Ehhez meg kell oldanunk, hogy üres `RecyclerView` esetén csak a `TextView` jelenjen meg (és fordítva):
 
 Először is hozzunk létre egy új custom `View`-t, ami képes ezt kezelni. Kerüljön a `view` package-be, a neve legyen `EmptyRecyclerView`, és származzon a `RecyclerView`-ból. Először implementáljuk a három kötelező konstruktorát:
 
@@ -286,7 +286,7 @@ var emptyView: View? = null
     }
 ```
 
-Az `EmptyRecyclerView`-nk megfelelő működéséhez felül kell még írnunk a `setAdapter` függvényt. Ebben tudjuk beregisztrálni az imént létrehozott observerünket, ami kezeli az adathalmazban történt változásokat, valamint az adapter cseréje esetén a régi adapter változásairól leiratkozhatunk:
+Az `EmptyRecyclerView`-nk megfelelő működéséhez felül kell még írnunk a `setAdapter` függvényt. Ebben tudjuk beregisztrálni az imént létrehozott observerünket, ami kezeli az adathalmazban történt változásokat. Illetve az adapter cseréje esetén a régi adapter változásairól is itt iratkozhatunk le:
 
 ```kotlin
 override fun setAdapter(adapter: RecyclerView.Adapter<*>?) {
@@ -320,7 +320,7 @@ Próbáljuk ki az alkalmazást! Láthatjuk, hogy üres lista helyett valóban az
 
 <img src="./images/screen3_framed.png" width="200" align="middle">
  
-Segíthetünk a felhasználónak még annyiban, hogy megengedjük, hogy erre a feliratra rákattintva is vehessen fel új helyet. Ehhez vegyünk fel egy listenert:
+Segíthetünk a felhasználónak még annyiban, hogy megengedjük, hogy erre a feliratra rákattintva is vehessen fel új helyet. Ehhez vegyünk fel egy listenert a `PlacesListActivity` `onCreate` függvényébe:
 
 ```kotlin
 emptyTV.setOnClickListener {
@@ -361,7 +361,7 @@ Hozzunk létre egy új erőforrás mappát, a neve legyen `values-v21`! Az ebbe 
 </resources>
 ```
 
-Most meg kell adnunk az xml erőforrásokban, hogy miből mit szeretnénk animálni. Úgy párosítjuk össze a `View`-kat, hogy új attribútumot veszünk fel mind a *Floating Action Button*-höz, mind az `activity_create_place_to_visit.xml` gyökér eleméhez (ez egy `LinearLayout`). 
+Most meg kell adnunk az xml erőforrásokban, hogy miből mit szeretnénk animálni. Úgy párosítjuk össze a `View`-kat, hogy új attribútumot veszünk fel mind a *Floating Action Button*höz, mind az `activity_create_place_to_visit.xml` gyökér eleméhez (ez egy `LinearLayout`). 
 
 ```xml
 android:transitionName="create"
@@ -380,7 +380,7 @@ private fun showNewPlaceDialog() {
 }
 ```
 
-Itt megadjuk, hogy melyik `View`-ból indul az animáció (`addButton`), és azt is, hogy milyen `transitionName`-mel kell dolgoznia a rendszernek (`"create"`). Az animációról szóló információt egy `Bundle`-lé alakítva tudjuk az `Intent`-be helyezni.
+Itt megadjuk, hogy melyik `View`-ból indul az animáció (`addButton`), és azt is, hogy milyen `transitionName`-mel kell dolgoznia a rendszernek (`"create"`). Az animációról szóló információt egy `Bundle`-lé alakítva tudjuk az `Intent`be helyezni.
 
 Próbáljuk ki az alkalmazást!
 
@@ -399,7 +399,7 @@ Az `activity_create_place_to_visit.xml` gyökérelemét változtassuk `RelativeL
 android:layout_alignParentBottom="true"
 ```
 
-A többi elemet pedig ágyazzuk be egy függőleges `LinearLayout`-ba, majd egy `ScrollView`-ba, amit kössünk felülre, és helyezzünk a gomb fölé:
+A többi elemet pedig ágyazzuk be egy függőleges `LinearLayout`ba, majd egy `ScrollView`-ba, amit kössünk felülre, és helyezzünk a gomb fölé:
 
 ```xml
 <ScrollView
@@ -422,7 +422,7 @@ A többi elemet pedig ágyazzuk be egy függőleges `LinearLayout`-ba, majd egy 
 
 ### Snackbar
 
-A `Toast` üzeneteknél már van egy sokkal szebb megoldás, ami a Material Designt követi, a [`Snackbar`](https://material.io/design/components/snackbars.html). Cseréljük le az alkalmazásban lévő `Toast` figyelmeztetéseket `Snackbar`-ra!
+A `Toast` üzeneteknél már van egy sokkal szebb megoldás, ami a Material Designt követi: a [`Snackbar`](https://material.io/design/components/snackbars.html). Cseréljük le az alkalmazásban lévő `Toast` figyelmeztetéseket `Snackbar`ra!
 
 Ehhez írjunk egy külön `showText()` függvényt a `PlacesListActivity`-ben, ami a paraméterül kapott szöveges erőforrást jeleníti meg, majd használjuk ezt: 
 
@@ -432,7 +432,7 @@ private fun showText(@StringRes textRes: Int) {
 }
 ```
 
-A `Snackbar.make` függvény első paramétere egy `View`. Ide az `Activity`-nkben lévő `CoordinatorLayout`-ot adtuk meg. A függvény így hívható meg:
+A `Snackbar.make` függvény első paramétere egy `View`. Ide az `Activity`-nkben lévő `CoordinatorLayout`ot adtuk meg. A függvény így hívható meg:
 
 ```kotlin
 showText(R.string.cancelled)
