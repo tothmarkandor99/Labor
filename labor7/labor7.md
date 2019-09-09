@@ -28,9 +28,7 @@ Hozzunk létre egy új Android Studio projektet. Válasszuk a *Phone and Tablet*
 
 Az alkalmazás neve legyen `NetworkLabor`, a package név legyen `hu.bme.aut.android.networklabor`, és természetesen válasszuk a Kotlin nyelvet.
 
-A minimum SDK szint az *API 19: Android 4.4*, az Instant alkalmazásokat nem támogatjuk és az AndroidX függőségekre nincs szükségünk a labor során.
-
-A `test` és az `androidTest` mappákra nem lesz szükségünk, azokat törölhetjük!
+A minimum SDK szint az *API 19: Android 4.4*, az Instant alkalmazásokat nem támogatjuk, de az AndroidX függőségeket hagyjuk bejelölve.
 
 Első lépésként készítsük el az alkalmazás felhasználói felületét XML erőforrásból. A felületen helyezzünk el két `EditText`-et, egyet a felhasználónév, egyet pedig az üzenet bekéréséhez. Emellett legyen összesen öt gomb: négy gomb az irányításhoz, egy az üzenet elküldéséhez, valamint három `TextView` az üzenetek megjelenítéséhez. 
 
@@ -332,7 +330,7 @@ A fentiek miatt a beépített megoldások helyett egy széleskörben elterjedt, 
 Ennek használatához fel kell vennünk a következő sort az alkalmazás modul szintű `build.gradle` fájljának `dependencies` részéhez:
 
 ```kotlin
-implementation 'com.squareup.okhttp3:okhttp:3.12.1'
+implementation 'com.squareup.okhttp3:okhttp:4.1.1'
 ```
 
 Ezután a könyvtár nagyon egyszerűen használható. A `LabyrinthAPI` osztályba vegyünk fel egy property-t egy `OkHttpClient` példány tárolására. Ezt használva készítsünk egy általános HTTP GET hívást lebonyolító függvényt.
@@ -350,7 +348,7 @@ private fun httpGet(url: String): String {
 
     //The execute call blocks the thread
     val response = client.newCall(request).execute()
-    return response.body()?.string() ?: "EMPTY"
+    return response.body?.string() ?: "EMPTY"
 }
 ```
 
