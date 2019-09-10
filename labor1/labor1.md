@@ -12,7 +12,7 @@ A labor során a következő funkciókat fogjuk megvalósítani:
 * Játék logika elkezdése
 
 A laborhoz kapcsolódó önálló feladat:
-* Játék logika megvalósítása: győzelem ellenőrzésenew 
+* Játék logika megvalósítása: győzelem ellenőrzése 
 
 A megvalósítandó játék felhasználói felületét az alábbi képernyőképek szemléltetik:
 
