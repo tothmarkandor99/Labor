@@ -30,7 +30,7 @@ Első lépésként indítsuk el az Android Studio-t, majd:
 1. Hozzunk létre egy új projektet, válasszuk az *Empty Activity* lehetőséget.
 2. A projekt neve legyen `TicTacToe`, a kezdő package pedig `hu.bme.aut.android.tictactoe`.
 3. Nyelvnek válasszuk a *Kotlin*-t.
-4. A minimum API szint legyen 21 (Android 5.1).
+4. A minimum API szint legyen *API21: Android 5.0*.
 5. Az *instant app* támogatást NE pipáljuk be.
 
 Sikeres projekt létrehozás után a laborvezető vezetésével vizsgálja meg a forrás felépítését.
