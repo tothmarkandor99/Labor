@@ -109,8 +109,8 @@ Ahhoz, hogy az e-mail alapú regisztráció és authentikáció megfelelően mű
 Végezetül a Studioban vegyük még fel a modulhoz tartozó `build.gradle`-be az alábbi függőségeket; tekintsük át a laborvezetővel ezeket:
 
 ```groovy
-implementation 'com.flaviofaria:kenburnsview:1.0.7'
-implementation 'com.github.bumptech.glide:glide:4.8.0'
+    implementation 'com.flaviofaria:kenburnsview:1.0.7'
+    implementation 'com.github.bumptech.glide:glide:4.9.0'
 ```
 
 ## Regisztráció, bejelentkezés
@@ -358,7 +358,22 @@ btnRegister.setOnClickListener { registerClick() }
 btnLogin.setOnClickListener { loginClick() }
 ```
 
-A *Navigation Drawer Activity* sablont használva készítsük el az új `PostsActivity`-t, és miután létrejött, változtassuk meg az ősosztályát az `AppCompatActivity`-ről a saját `BaseActivity` osztályunkra.
+A *Navigation Drawer Activity* sablont használva készítsük el az új `PostsActivity`-t. Sajnos az útmutató írásakor
+az Android Studio rosszul veszi fel a szükséges függőségeket. Javítsuk a `build.gradle` fájlban, hogy ezek legyenek
+az új függőségek:
+
+```groovy
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'com.google.android.material:material:1.0.0'
+    implementation 'androidx.lifecycle:lifecycle-extensions:2.1.0'
+    implementation 'androidx.navigation:navigation-fragment-ktx:2.1.0'
+    implementation 'androidx.navigation:navigation-ui-ktx:2.1.0'
+```
+
+(A navigation library-knek csak a -ktx utótagú verziója legyen megadva, különben elszáll a build, mert azonos
+osztályok különböző verziói kerülnek a classpath-ra.)
+
+Miután létrejött az Activity, változtassuk meg az ősosztályát az `AppCompatActivity`-ről a saját `BaseActivity` osztályunkra.
 
 Próbáljuk ki az alkalmazás jelenlegi működését! Nézzük meg, hogy a *Firebase console*-on is látszik-e a regisztrált felhasználó!
 
