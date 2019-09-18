@@ -117,7 +117,7 @@ A `MainActivity` a fenti ábra alapján három menüpontot tartalmaz középre i
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widgetnt.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -167,7 +167,7 @@ A `MainActivity` a fenti ábra alapján három menüpontot tartalmaz középre i
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btnHighScore" />
-</androidx.constraintlayout.widgetnt.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
 ```
 
 ## Highscore gomb eseménykezelő
@@ -191,7 +191,7 @@ Ahogy korábban említettük, az *Infó* menü elindítja az `AboutActivity`-t. 
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widgetnt.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -214,7 +214,7 @@ Ahogy korábban említettük, az *Infó* menü elindítja az `AboutActivity`-t. 
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-</androidx.constraintlayout.widgetnt.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
 ```
 
 ## Játék logika
@@ -379,7 +379,7 @@ Ahhoz, hogy a `GameActivity` ezt a játékteret megjelenítse, módosítsuk a ho
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widgetnt.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -402,7 +402,7 @@ Ahhoz, hogy a `GameActivity` ezt a játékteret megjelenítse, módosítsuk a ho
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.495" />
 
-</androidx.constraintlayout.widgetnt.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
 ```
 
 *Fontos, hogy az itt szereplő package név a saját `TicTacToeView` osztályunk neve előtt azonos legyen a nézet forrásának tetején szereplő package névvel, egyébként hibát fogunk kapni, amikor megpróbáljuk megnyitni ezt a képernyőt.*
