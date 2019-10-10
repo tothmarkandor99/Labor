@@ -56,7 +56,7 @@ A `LauncherActivity`-hez tartozó `activity_launcher.xml` fájlt módosítsuk ú
     android:layout_height="match_parent" />
 ```
 
-A `ViewPager`-ben két `Fragment`-et szeretnénk megjeleníteni. Hozzuk létre a `fragment` nevű csomagot!
+A `ViewPager`-ben két `Fragment`-et szeretnénk megjeleníteni. Hozzuk létre a `fragment` nevű package-et!
 
 Hozzunk létre a `hu.bme.aut.android.launcher.fragment` package-ben két `Fragment` osztályt `DialerFragment` és `ApplicationsFragment` néven! Figyeljünk oda, hogy a két választható `Fragment` import közül mindig az `androidx.fragment.app` library-ből származót válasszuk!
 
@@ -80,7 +80,7 @@ class ApplicationsFragment : Fragment() {
 }
 ```
 
-Hozzuk létre a hozzájuk tartozó layout fájlokat is (*Alt + Enter*), egyelőre tetszőleges tartalommal.
+Hozzuk létre a hozzájuk tartozó layout fájlokat is (<kbd>Alt</kbd> + <kbd>Enter</kbd>), egyelőre tetszőleges tartalommal.
 
 A `ViewPager` működéséhez szükség van egy adapterre, ami meghatározza az egyes oldalakon megjelenő `Fragment`-eket.
 
