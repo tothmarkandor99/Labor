@@ -370,8 +370,8 @@ az új függőségek:
     implementation 'androidx.navigation:navigation-ui-ktx:2.1.0'
 ```
 
-(A navigation library-knek csak a -ktx utótagú verziója legyen megadva, különben elszáll a build, mert azonos
-osztályok különböző verziói kerülnek a classpath-ra.)
+A navigation libraryknek csak a *-ktx* utótagú verziója legyen megadva, különben elszáll a build, mert azonos
+osztályok különböző verziói kerülnek a classpath-ra!
 
 Miután létrejött az Activity, változtassuk meg az ősosztályát az `AppCompatActivity`-ről a saját `BaseActivity` osztályunkra.
 
@@ -390,10 +390,10 @@ Adjuk hozzá a projekthez a *Firebase Realtime Database* támogatást (itt is fo
 közben belegenerált függőségeket is, amelyeket a Navigation Drawer típusú Activity létrehozása változz ki.
 
 ```groovy
-    implementation 'com.google.firebase:firebase-database:19.1.0'
+    implementation 'com.google.firebase:firebase-database:19.2.0'
 ```
 
-Kapcsoljuk be a *Realtime Database*-t a *Firebase console*-on is (figyeljünk rá, hogy ne a *Cloud Firestore*-t válasszuk, ez egy újabb, kicsit máshogy működő megoldás). Az adatbázist *test mode*-ban fogjuk használni, így egyelőre publikusan írható/olvasható lesz, de cserébe nem kell konfigurálnunk a hozzáférés-szabályozást. Ezt természetesen később mindenképp meg kellene tenni egy éles projektben.
+Kapcsoljuk be a *Realtime Database*-t a *Firebase console*-on is (figyeljünk rá, hogy ne a *Cloud Firestore*-t válasszuk, ez egy újabb megoldás, komolyabb funkcionalitást nyújt, amire jelenleg nicns szükségünk). Az adatbázist *test mode*-ban fogjuk használni, így egyelőre publikusan írható/olvasható lesz, de cserébe nem kell konfigurálnunk a hozzáférés-szabályozást. Ezt természetesen később mindenképp meg kellene tenni egy éles projektben.
 
 <p align="center">
 <img src="./assets/firebase_create_database.png">
