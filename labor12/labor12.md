@@ -917,17 +917,18 @@ Ennek beüzemeléséhez több változtatásra lesz szükség az alkalmazásban, 
  
 ```groovy
 buildscript {
-    ext.kotlin_version = '1.3.41'
+    ext.kotlin_version = '1.3.50'
     repositories {
         google()
         jcenter()
         maven { url 'https://maven.fabric.io/public' }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.5.0'
+        classpath 'com.android.tools.build:gradle:3.6.0-beta01'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath 'com.google.gms:google-services:4.3.2'
-        classpath 'io.fabric.tools:gradle:1.31.0'
+        classpath 'io.fabric.tools:gradle:1.31.1'
+        classpath 'androidx.navigation:navigation-safe-args-gradle-plugin:2.1.0'
     }
 }
 ```
