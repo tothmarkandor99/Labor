@@ -804,13 +804,13 @@ class CreatePostActivity : BaseActivity() {
         val newPost = Post(uid, userName, etTitle.text.toString(), etBody.text.toString(), imageUrl)
 
         FirebaseDatabase.getInstance().reference
-                .child("posts")
-                .child(key)
-                .setValue(newPost)
-                .addOnCompleteListener {
-                    toast("Post created")
-                    finish()
-                }
+            .child("posts")
+            .child(key)
+            .setValue(newPost)
+            .addOnCompleteListener {
+                toast("Post created")
+                finish()
+            }
     }
 
     private fun attachClick() {
@@ -819,6 +819,7 @@ class CreatePostActivity : BaseActivity() {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
         if (resultCode != Activity.RESULT_OK) {
             return
         }
@@ -841,19 +842,19 @@ class CreatePostActivity : BaseActivity() {
         val newImageRef = storageReference.child("images/$newImageName")
 
         newImageRef.putBytes(imageInBytes)
-                .addOnFailureListener { exception ->
-                    toast(exception.message)
+            .addOnFailureListener { exception ->
+                toast(exception.message)
+            }
+            .continueWithTask { task ->
+                if (!task.isSuccessful) {
+                    task.exception?.let { throw it }
                 }
-                .continueWithTask { task ->
-                    if (!task.isSuccessful) {
-                        task.exception?.let { throw it }
-                    }
 
-                    newImageRef.downloadUrl
-                }
-                .addOnSuccessListener { downloadUri ->
-                    uploadPost(downloadUri.toString())
-                }
+                newImageRef.downloadUrl
+            }
+            .addOnSuccessListener { downloadUri ->
+                uploadPost(downloadUri.toString())
+            }
     }
 
 }
