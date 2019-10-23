@@ -702,7 +702,7 @@ Próbáljuk ki az alkalmazás működését! A lista jelenleg még üres lesz, h
 A következő lépés az üzenetek írása, melynek hatására már tartalom kerülhet a listába. Ehhez vegyük fel a *Firebase Storage* függőséget, amit a képek feltöltéséhez fogunk használni:
 
 ```groovy
-implementation 'com.google.firebase:firebase-storage:19.0.1'
+implementation 'com.google.firebase:firebase-storage:19.1.0'
 ```
 
 A *Firebase console*-on is inicializáljuk a *Storage* funkciót a megfelelő menüben.
