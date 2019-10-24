@@ -359,7 +359,7 @@ btnLogin.setOnClickListener { loginClick() }
 ```
 
 A *Navigation Drawer Activity* sablont használva készítsük el az új `PostsActivity`-t. Sajnos az útmutató írásakor
-az Android Studio rosszul veszi fel a szükséges függőségeket. Javítsuk a `build.gradle` fájlban, hogy ezek legyenek
+az Android Studio rosszul veszi fel a szükséges függőségeket. Javítsuk a modul szintű `build.gradle` fájlban, hogy ezek legyenek
 az új függőségek:
 
 ```groovy
@@ -372,6 +372,19 @@ az új függőségek:
 
 A navigation libraryknek csak a *-ktx* utótagú verziója legyen megadva, különben elszáll a build, mert azonos
 osztályok különböző verziói kerülnek a classpath-ra!
+
+A kompatibilitási problémák megelőzése érdekében állítsuk át a project Java verzióját 1.8-ra! Ehhez másoljuk be az alábbi kódrészletet a modul szintű `build.gradle`-be az `android{...}` blokkon belülre:
+
+```groovy
+compileOptions {
+    sourceCompatibility = JavaVersion.VERSION_1_8 "1.8"
+    targetCompatibility = JavaVersion.VERSION_1_8 "1.8"
+}
+
+kotlinOptions {
+    jvmTarget = "1.8"
+}
+```
 
 Miután létrejött az Activity, változtassuk meg az ősosztályát az `AppCompatActivity`-ről a saját `BaseActivity` osztályunkra.
 
