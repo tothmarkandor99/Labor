@@ -569,20 +569,17 @@ Próbáljuk ki az alkalmazást!
 
 Segítség a megoldáshoz:
 
-A gombok eseménykezelője legyen közös, a kattintott `View` objektum `id`-ja alapján állítsa be a felhívandó telefonszámot az `EditText`-ben (ha kell töröljön is). A hívás gomb megnyomására indítson hívást a beírt telefonszámra.
+A gombok eseménykezelője legyen közös, a kattintott `View` objektum `id`-ja alapján állítsa be a felhívandó telefonszámot
+az `EditText`-ben (ha kell töröljön is). A hívás gomb megnyomására indítson hívást a beírt telefonszámra.
 
 Példa a hívás indítására:
 
 ```kotlin
 val phoneNumber = "tel:+36201234567"
-val intent = Intent(Intent.ACTION_CALL, Uri.parse(phoneNumber))
+val intent = Intent(Intent.ACTION_DIAL, Uri.parse(phoneNumber))
 requireContext().startActivity(intent)
 ```
 
-A telefonhíváshoz engedély szükséges, ezt a Manifestben az `<application>` tagen kívül kell megadnunk. 
-
-```xml
-<uses-permission android:name="android.permission.CALL_PHONE" />
-```
-
-Ez egy veszélyesnek minősített engedély, ezért Android 6.0 (API level 23) felett futásidőben kellene elkérni. Jelen esetben ezt még kerüljük ki, az app modul `build.gradle` fájljában a `targetSDKVersion`-t állítsuk `22`-re (Android 5.1).
+A fenti megoldás valójában implicit intenttel a beépített tárcsázót hívja meg. Lehetséges lenne a közvetlen hívásindítás is,
+de ehhez a veszélyesnek minősített `CALL_PHONE` engedély szükséges, ezért Android 6.0 (API level 23) felett futásidőben kellene elkérni,
+ezt pedig egy későbbi labor során fogjuk csak vizsgálni.
