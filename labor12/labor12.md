@@ -377,8 +377,8 @@ A kompatibilitási problémák megelőzése érdekében állítsuk át a project
 
 ```groovy
 compileOptions {
-    sourceCompatibility = JavaVersion.VERSION_1_8 "1.8"
-    targetCompatibility = JavaVersion.VERSION_1_8 "1.8"
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
 }
 
 kotlinOptions {
