@@ -618,7 +618,7 @@ fun onWriteMessageResponse(event: WriteMessageResponseEvent) {
 }
 ```
 
-Itt fontos, hogy a `@Subscribe` annotáció használva legyen, ez mondja meg hogy ez egy eseménykezelő metódus, valamint a thread mode `MAIN` legyen, mert így az események a főszálon kerülnek kézbesítésre. Fontos, hogy az elküldött objektumokat az osztály típusa szerint tudja a rendszer a megfelelő eseménykezelőknek elküldeni. Egy eseményhez több eseménykezelő metódus is lehet egyszerre beregisztrálva, ilyenkor mindegyik megkapja az elküldött eseményt.
+Itt fontos a `@Subscribe` annotation használata. A `@Subscribe` mondja meg azt, hogy ez egy eseménykezelő függvény, valamint azt, hogy a thread mode `MAIN` legyen. így az események a főszálon kerülnek kézbesítésre a függvényhez. Fontos, hogy az elküldött objektumokat az osztály típusa szerint tudja a rendszer a megfelelő eseménykezelőknek elküldeni. Egy eseményhez több eseménykezelő metódus is lehet egyszerre beregisztrálva, ilyenkor mindegyik megkapja az elküldött eseményt.
 
 Ezután regisztráljuk be az metódusainkat, pontosabban azt az osztályt amely ezeket tartalmazza, ami a `MainActivity` aktuális példánya (`this`). Azt szeretnénk, hogy akkor legyenek ezek az eseménykezelő metódusok aktívak, amikor az `Activity` előtérben van, így az `onStart`-ban iratkozunk fel, és az `onStop`-ban le.
 
