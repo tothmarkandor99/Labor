@@ -333,7 +333,7 @@ Ennek használatához fel kell vennünk a következő sort az alkalmazás modul 
 implementation 'com.squareup.okhttp3:okhttp:4.1.1'
 ```
 
-Ezután a könyvtár nagyon egyszerűen használható. A `LabyrinthAPI` osztályba vegyünk fel egy property-t egy `OkHttpClient` példány tárolására. Ezt használva készítsünk egy általános HTTP GET hívást lebonyolító függvényt.
+Ezután a könyvtár nagyon egyszerűen használható. A `LabyrinthAPI` osztályba vegyünk fel egy propertyt egy `OkHttpClient` példány tárolására. Ezt használva készítsünk egy általános HTTP GET hívást lebonyolító függvényt.
 
 ```kotlin
 private val client = OkHttpClient.Builder()
@@ -382,6 +382,7 @@ fun moveUser(username: String, direction: Int): String {
     }
 }
 
+
 fun writeMessage(username: String, message: String): String {
     return try {
         val writeMessageUrl = "$BASE_URL/message/${encode(username)}/${encode(message)}"
@@ -406,7 +407,7 @@ companion object {
 }
 ```
 
-Majd privát property-ként adjunk hozzá egy példányt az előbb létrehozott `LabyrinthAPI` osztályból, és használjuk a megfelelő események bekövetkeztekor, ezeket kössűk a megfelelő gombokhoz!
+Majd privát propertyként adjunk hozzá egy példányt az előbb létrehozott `LabyrinthAPI` osztályból, és használjuk a megfelelő események bekövetkeztekor, ezeket kössűk a megfelelő gombokhoz!
 
 ```kotlin
 class MainActivity : AppCompatActivity() {
