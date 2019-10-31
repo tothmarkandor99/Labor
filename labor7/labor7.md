@@ -354,7 +354,7 @@ private fun httpGet(url: String): String {
 
 Ezt fogjuk használni az összes HTTP GET híváshoz. 
 
-A HTTP karakterek megfelelő URL encodeolásához az `URLEncoder.encode(...)` függvényét használjuk, UTF-8 karakterkódolással. Azért, hogy ezt ne kelljen feleslegesen többször leírni, használjunk egy segédfüggvényt:
+A HTTP karakterek megfelelő URL encode-olásához az `URLEncoder.encode(...)` függvényét használjuk, UTF-8 karakterkódolással. Azért, hogy ezt ne kelljen feleslegesen többször leírni, használjunk egy segédfüggvényt:
 
 ```kotlin
 private fun encode(url: String) = URLEncoder.encode(url, UTF_8)
