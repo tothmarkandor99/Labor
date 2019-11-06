@@ -95,10 +95,10 @@ Vegyük fel a Manifest állományba a szükséges engedélyeket:
 A modul szintű `build.gradle`-ben vegyük fel a `RecyclerView` függőséget:
 
 ```groovy
-implementation 'com.android.support:recyclerview-v7:28.0.0'
+implementation "androidx.recyclerview:recyclerview:1.0.0"
 ```
  
-A `MainActivity` nézet fogja kilistázni a feltöltött képeket. Ez egy egyszerű `RecyclerView`, mely egy `SwipeRefreshLayout`-ba van ágyazva, ami lehetőséget biztosít arra, hogy a listához egyszerűen implementáljunk *pull-to-refresh* működést. A hozzá tartozó `activity_main.xml` tartalma a következő:
+A `MainActivity` nézet fogja kilistázni a feltöltött képeket. Ez a nézet egy egyszerű `RecyclerView`, mely egy `SwipeRefreshLayout`-ba van ágyazva. A `SwipeRefreshLayout` lehetőséget biztosít arra, hogy a listához egyszerűen implementáljunk *pull-to-refresh* működést. Az ehhez tartozó `activity_main.xml` tartalma a következő:
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
