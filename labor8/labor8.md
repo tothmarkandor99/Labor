@@ -74,7 +74,7 @@ A kérés paraméterek:
 
 ## Felhasználói felület
 
-Hozzunk létre egy új Android Studio projektet. Válasszuk a *Phone and Tablet* szekcióban az *EmptyActivity* sablont.
+Hozzunk létre egy új Android Studio projektet. Válasszuk a *Phone and Tablet* szekcióban az *Empty Activity* sablont.
 
 Az alkalmazás neve legyen `CameraLabor`, a package név legyen `hu.bme.aut.android.cameralabor`, és természetesen válasszuk a Kotlin nyelvet.
 
