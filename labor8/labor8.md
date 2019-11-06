@@ -127,7 +127,7 @@ A `MainActivity` nézet fogja kilistázni a feltöltött képeket. Ez a nézet e
 </FrameLayout>
 ```
 
-A hiányzó dimenzió értékeket vegyük fel *Alt+Enter* segítségével. Értékük legyen `16dp`.
+A hiányzó dimenzió értékeket vegyük fel <kbd>Alt</kbd>+<kbd>Enter</kbd> segítségével. Értékük legyen `16dp`.
 
 A `MainActivity` kódja pedig a következő. Látható, hogy a `loadImages()` függvény végzi ez a fotók letöltését (egyelőre csak beégetett értékekkel), ez hívódik a nézetre navigálása után, illetve akkor is, ha lehúzzással frissítjük a tartalmat.
 
