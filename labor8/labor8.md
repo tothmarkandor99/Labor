@@ -412,7 +412,7 @@ private fun showError(e: Throwable) {
 
 > A `getImages` által várt függvény paramétereket lambdák létrehozása helyett [metódus referenciákkal](https://kotlinlang.org/docs/reference/lambdas.html#instantiating-a-function-type) adtuk át, amihez természetesen a `showImages` és `showError` függvényeknek a megfelelő fejléccel kell rendelkezniük.
 
-Mivel eddig `String` listát jelenítettünk meg az `ImagesAdapter`-rel, most át kell alakítani az adaptert, hogy egy `Image` listát kezeljen. Ezen kívül a képek eléréhez az `IMAGE_PREFIX_URL` után kell fűznünk a kép `url` mezőjének tartalmát.
+Mivel eddig `String` listát jelenítettünk meg az `ImagesAdapter`-rel, most át kell alakítani az adaptert, hogy egy `Image` listát kezeljen. Ezen kívül a képek eléréséhez az `IMAGE_PREFIX_URL` után kell fűznünk a kép `url` mezőjének tartalmát.
 
 ```kotlin
 class ImagesAdapter(
