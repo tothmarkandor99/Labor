@@ -237,7 +237,7 @@ A [Glide](https://github.com/bumptech/glide) egy általános célú képkezelő 
 Használatához a modul szintű `build.gradle`-ben vegyük fel a következő függőséget a `dependencies` blokkban. 
 
 ```groovy
-implementation 'com.github.bumptech.glide:glide:4.8.0'
+implementation 'com.github.bumptech.glide:glide:4.9.0'
 ```
 
 Ezután az `ImagesAdapter` `onBindViewHolder` függvényében töltsük be az adott fotót az `ImageView`-ba:
