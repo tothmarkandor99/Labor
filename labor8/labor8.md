@@ -364,22 +364,22 @@ Ezután a fenti segédfüggvényt felhasználva elkészíthetjük a `GalleryInte
 
 ```kotlin
 fun getImages(
-        onSuccess: (List<Image>) -> Unit,
-        onError: (Throwable) -> Unit
+    onSuccess: (List<Image>) -> Unit,
+    onError: (Throwable) -> Unit
 ) {
     val getImagesRequest = galleryApi.getImages()
     runCallOnBackgroundThread(getImagesRequest, onSuccess, onError)
 }
 
 fun uploadImage(
-        fileUri: Uri,
-        name: String,
-        description: String,
-        onSuccess: (ResponseBody) -> Unit,
-        onError: (Throwable) -> Unit
+    fileUri: Uri,
+    name: String,
+    description: String,
+    onSuccess: (ResponseBody) -> Unit,
+    onError: (Throwable) -> Unit
 ) {
     val file = File(fileUri.path)
-    val requestFile = RequestBody.create(MediaType.parse(MULTIPART_FORM_DATA), file)
+    val requestFile = RequestBody.create(MULTIPART_FORM_DATA.toMediaTypeOrNull(), file)
     val body = MultipartBody.Part.createFormData(PHOTO_MULTIPART_KEY_IMG, file.name, requestFile)
 
     val nameParam = RequestBody.create(okhttp3.MultipartBody.FORM, name)
