@@ -285,7 +285,7 @@ data class Image(
 )
 ```
 
-A Gson automatikus megoldja majd az egyes tagváltozók szerializálását, kivéve az `id` property esetében, mivel azt a szerver `_id`-ként adja vissza. Ezt a `@SerializedName` annotációval adhatjuk meg.
+A Gson automatikusan megoldja majd az egyes tagváltozók szerializálását, kivéve az `id` property esetében, mivel azt a szerver `_id`-ként adja vissza. Ezt a `@SerializedName` annotációval jelezhetjük.
 
 Ezután hozzunk létre egy új csomagot `network` néven, benne egy új interface-t `GalleryAPI` néven. Ez lesz az API leírónk. Az elérhető `Call` osztályok közül válasszuk a Retrofit által nyújtottat, az `Image` osztályok közül pedig mindig a sajátunkat importáljuk. 
 
