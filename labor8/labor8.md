@@ -78,7 +78,7 @@ Hozzunk létre egy új Android Studio projektet. Válasszuk a *Phone and Tablet*
 
 Az alkalmazás neve legyen `CameraLabor`, a package név legyen `hu.bme.aut.android.cameralabor`, és természetesen válasszuk a Kotlin nyelvet.
 
-A minimum SDK szint az *API 19: Android 4.4*, az Instant alkalmazásokat nem támogatjuk és az AndroidX függőségekre nincs szükségünk a labor során.
+A minimum SDK szint az *API 19: Android 4.4*, az androidx függőségeket szeretnénk használni és az instant alkalmazásokat nem támogatjuk a labor során.
 
 A `test` és az `androidTest` mappákra nem lesz szükségünk, azokat törölhetjük!
 
