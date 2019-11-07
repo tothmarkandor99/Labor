@@ -264,7 +264,7 @@ A Retrofit használatához vegyük fel a függőségek közé az alábbi kódot:
 
 ```groovy
 implementation 'com.squareup.retrofit2:retrofit:2.5.0'
-implementation 'com.squareup.okhttp3:okhttp:3.12.1'
+implementation 'com.squareup.okhttp3:okhttp:4.1.1'
 implementation 'com.google.code.gson:gson:2.8.5'
 implementation 'com.squareup.retrofit2:converter-gson:2.5.0'
 ```
@@ -379,15 +379,21 @@ fun uploadImage(
     onError: (Throwable) -> Unit
 ) {
     val file = File(fileUri.path)
-    val requestFile = RequestBody.create(MULTIPART_FORM_DATA.toMediaTypeOrNull(), file)
+    val requestFile = file.asRequestBody(MULTIPART_FORM_DATA.toMediaTypeOrNull())
     val body = MultipartBody.Part.createFormData(PHOTO_MULTIPART_KEY_IMG, file.name, requestFile)
 
-    val nameParam = RequestBody.create(okhttp3.MultipartBody.FORM, name)
-    val descriptionParam = RequestBody.create(okhttp3.MultipartBody.FORM, description)
+    val nameParam = name.toRequestBody(MultipartBody.FORM)
+    val descriptionParam = description.toRequestBody(MultipartBody.FORM)
 
     val uploadImageRequest = galleryApi.uploadImage(body, nameParam, descriptionParam)
     runCallOnBackgroundThread(uploadImageRequest, onSuccess, onError)
 }
+```
+Ha a Studio nem tudja feloldani az `asRequestBody` és `toRequestBody` extension functionöket, akkor az alábbi importokkal lehet a jó irányba terelni:
+
+```kotlin
+import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 ```
 
 Ezután a `MainActivity`-ben példányosítsuk a `GalleryInteractor`-unkat, majd hajtsuk végre a `getImages` hívást, melynek eredményét jelentsük meg a `ImagesAdapter` segítségével.
